@@ -21,11 +21,13 @@
 #include<random>
 #include<algorithm>
 #include<vector>
+#include<fstream>
 
 #include<wrl.h>
 #include<shellapi.h>
 
 #include<d3d12.h>
+
 #include<dxgi1_4.h>
 
 #include<d3dcompiler.h>
@@ -34,7 +36,7 @@
 #include<DirectXPackedVector.h>
 #include<DirectXColors.h>
 #include<DirectXCollision.h>
-
+#include"d3dx12.h"
 
 
 #ifdef _DEBUG
