@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "GameFramework.h"
-
+#include"ScreenGrab12.h"
 CGameFramework::CGameFramework()
 {
 	m_pdxgiFactory = NULL;
@@ -554,6 +554,20 @@ void CGameFramework::FrameAdvance()
 
 	hResult = m_pd3dCommandList->Close();
 
+	//
+	UINT index = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
+
+	ID3D12Resource* Texture2D;
+	m_pdxgiSwapChain->GetBuffer(index, __uuidof(ID3D12Resource), (void**)&Texture2D);
+
+	static int i{};
+	i++;
+	
+	
+	SaveDDSTextureToFile(m_pd3dCommandQueue, Texture2D, std::format(L"FrameCaptureDDSFile\\Screen{}.dds", i).c_str());
+	Texture2D->Release();
+	//
+
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
 
@@ -676,6 +690,7 @@ void CGameFramework::FrameAdvance()
 		//fclose(fp);
 	}
 
+	
 #ifdef _WITH_PRESENT_PARAMETERS
 	DXGI_PRESENT_PARAMETERS dxgiPresentParameters;
 	dxgiPresentParameters.DirtyRectsCount = 0;

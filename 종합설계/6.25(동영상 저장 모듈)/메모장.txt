@@ -10,8 +10,13 @@ DepthStencilView, RenderTargetView, OMSetRenderTargets
 
 6.30
 https://www.codeproject.com/Articles/5256890/ScreenCapture-Single-Header-DirectX-Library
-너무 기본지식이 없어 스크린캡처 오픈 소스 먼저 보면서 해볼까함
-자 주영아 안 급하다 이거 천천히보고 여기서 버퍼 어떻게 바꾼건지 확인해보고
+너무 기본지식이 없어 direct11 스크린캡처 오픈 소스 먼저 보면서 해볼까함
+이거 천천히보고 여기서 버퍼 어떻게 바꾼건지 확인해보고
 그거 적용해보면 될꺼야 그러니까 천처닣 해보자
 
 winrt? 새로운 윈도우 어플리케이션 개발 코드 c++17과 완벽히 호환
+
+7.3
+몇일 전에 DirectXTex-master라는 오픈소스를 찾아서 그걸로 프레임을 dds파일로 출력까지는 했다
+즉 백버퍼데이터를 텍스쳐로 출력까지는 됬는데 이걸 동영상으로 바꿔야됨
+소리를 어떻게 출력해야되는지도 알아봐야될듯
