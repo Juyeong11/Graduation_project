@@ -3,6 +3,8 @@
 //-----------------------------------------------------------------------------
 
 #include "stdafx.h"
+#include <atlimage.h>
+#include <wincodec.h>
 #include "GameFramework.h"
 #include"ScreenGrab12.h"
 CGameFramework::CGameFramework()
@@ -547,12 +549,6 @@ void CGameFramework::FrameAdvance()
 #endif
 	if (m_pPlayer) m_pPlayer->Render(m_pd3dCommandList, m_pCamera);
 
-	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	m_pd3dCommandList->ResourceBarrier(1, &d3dResourceBarrier);
-
-	hResult = m_pd3dCommandList->Close();
 
 	//
 	UINT index = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
@@ -562,11 +558,21 @@ void CGameFramework::FrameAdvance()
 
 	static int i{};
 	i++;
-	
-	
-	SaveDDSTextureToFile(m_pd3dCommandQueue, Texture2D, std::format(L"FrameCaptureDDSFile\\Screen{}.dds", i).c_str());
+
+	//SaveDDSTextureToFile(m_pd3dCommandQueue, Texture2D, std::format(L"FrameCaptureDDSFile\\Screen{}.dds", i).c_str());
+	//마이크로소프트 사랑해요
+	SaveWICTextureToFile(m_pd3dCommandQueue, Texture2D, GUID_ContainerFormatJpeg, std::format(L"FrameCaptureDDSFile\\Screen{}.jpg", i).c_str());
 	Texture2D->Release();
 	//
+
+	d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	m_pd3dCommandList->ResourceBarrier(1, &d3dResourceBarrier);
+
+	hResult = m_pd3dCommandList->Close();
+
+	
 
 	ID3D12CommandList* ppd3dCommandLists[] = { m_pd3dCommandList };
 	m_pd3dCommandQueue->ExecuteCommandLists(1, ppd3dCommandLists);
@@ -574,121 +580,7 @@ void CGameFramework::FrameAdvance()
 	WaitForGpuComplete();
 
 
-	//---------------------- 버퍼를 통해 데이터를 GPU에서 CPU로 데이터를 다시 읽는 과정 
-	// 	   https://docs.microsoft.com/ko-kr/windows/win32/direct3d12/readback-data-using-heaps
-	{
-		// The output buffer (created below) is on a default heap, so only the GPU can access it.
-		/// 아웃풋 버퍼를 디폴트 힙에 생성을 하는 코드(GPU만 접근가능함)->이게 후면버퍼라 생각하면될까?
 
-		//D3D12_HEAP_PROPERTIES defaultHeapProperties {
-		//	CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT)
-		//};
-		//D3D12_RESOURCE_DESC outputBufferDesc{ CD3DX12_RESOURCE_DESC::Buffer(outputBufferSize, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS) };
-		//Microsoft::WRL::ComPtr<ID3D12Resource> outputBuffer;
-		//HRESULT hr = m_pd3dDevice->CreateCommittedResource(
-		//	&defaultHeapProperties,
-		//	D3D12_HEAP_FLAG_NONE,
-		//	&outputBufferDesc,
-		//	D3D12_RESOURCE_STATE_COPY_DEST,
-		//	nullptr,
-		//	__uuidof(outputBuffer),
-		//	outputBuffer.put_void()));
-
-		// The readback buffer (created below) is on a readback heap, so that the CPU can access it.
-		/// CPU가 엑세스 가능한 리드백 버퍼를 만들어 주는 코드
-		//D3D12_HEAP_PROPERTIES readbackHeapProperties{ CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK) };
-		//D3D12_RESOURCE_DESC readbackBufferDesc{ CD3DX12_RESOURCE_DESC::Buffer(outputBufferSize) };
-		//Microsoft::WRL::ComPtr<::ID3D12Resource> readbackBuffer;
-		//HRESULT hr = m_pd3dDevice->CreateCommittedResource(
-		//	&readbackHeapProperties,
-		//	D3D12_HEAP_FLAG_NONE,
-		//	&readbackBufferDesc,
-		//	D3D12_RESOURCE_STATE_COPY_DEST,
-		//	nullptr,
-		//	__uuidof(readbackBuffer),
-		//	(void**)&readbackBuffer);
-
-		//{
-		//	D3D12_RESOURCE_BARRIER outputBufferResourceBarrier
-		//	{
-		//		CD3DX12_RESOURCE_BARRIER::Transition(
-		//			outputBuffer.get(),
-		//			D3D12_RESOURCE_STATE_COPY_DEST,
-		//			D3D12_RESOURCE_STATE_COPY_SOURCE)
-		//	};
-		//	commandList->ResourceBarrier(1, &outputBufferResourceBarrier);
-		//}
-
-		//commandList->CopyResource(readbackBuffer.get(), outputBuffer.get());
-
-		//// Code goes here to close, execute (and optionally reset) the command list, and also
-		//// to use a fence to wait for the command queue.
-
-		//// The code below assumes that the GPU wrote FLOATs to the buffer.
-
-		//D3D12_RANGE readbackBufferRange{ 0, outputBufferSize };
-		//FLOAT* pReadbackBufferData{};
-		//winrt::check_hresult(
-		//	readbackBuffer->Map
-		//	(
-		//		0,
-		//		&readbackBufferRange,
-		//		reinterpret_cast<void**>(&pReadbackBufferData)
-		//	)
-		//);
-
-		//// Code goes here to access the data via pReadbackBufferData.
-
-		//D3D12_RANGE emptyRange{ 0, 0 };
-		//readbackBuffer->Unmap
-		//(
-		//	0,
-		//	&emptyRange
-		//);
-	}
-	//----------------------백버퍼를 텍스쳐로 복사한 후 출력해보자는 생각으로 해본것
-	{
-	
-		//UINT index = m_pdxgiSwapChain->GetCurrentBackBufferIndex();
-
-		//ID3D12Resource* Texture2D;
-		//m_pdxgiSwapChain->GetBuffer(index, __uuidof(ID3D12Resource), (void**)&Texture2D);
-
-		//Texture2D->Release();
-
-		//float* pbits = new float[4 * FRAME_BUFFER_WIDTH * FRAME_BUFFER_HEIGHT];
-		//memset(pbits, 0, sizeof(float) * (4 * FRAME_BUFFER_WIDTH * FRAME_BUFFER_HEIGHT));
-
-		//delete[] pbits;
-		//std::ofstream out{ "FrameRGBA.txt", std::ios::binary };
-
-		//d3d10_mapped_texture2d mappedtexture;
-		//hr = texture->map(d3d10calcsubresource(0, 0, 1), d3d10_map_read, 0, &mappedtexture);
-
-		//if (!failed(hr)) {
-		//	memcpy(m_pbits, mappedtexture.pdata, 4 * descstaging.width * descstaging.height);
-		//	texture->unmap(d3d10calcsubresource(0, 0, 1));
-		//}
-		//texture->release();
-		//temptexture->release();
-
-		//fp = fopen("d:\\output.txt", "a");
-		//for (uint row = 0; row < descstaging.height; row++)
-		//{
-		//	uint rowstart = row * mappedtexture.rowpitch / 4;
-		//	for (uint col = 0; col < descstaging.width; col++)
-		//	{
-		//		r = m_pbits[rowstart + col * 4 + 0]; // red (x)
-		//		g = m_pbits[rowstart + col * 4 + 1]; // green (y)
-		//		b = m_pbits[rowstart + col * 4 + 2]; // blue (z)
-		//		a = m_pbits[rowstart + col * 4 + 3]; // alpha (w)
-
-		//		// save pixel values to disk
-		//		fprintf(fp, "%d %d - %f %f %f\n", col + 1, row + 1, r, g, b);
-		//	}
-		//}
-		//fclose(fp);
-	}
 
 	
 #ifdef _WITH_PRESENT_PARAMETERS
@@ -713,84 +605,4 @@ void CGameFramework::FrameAdvance()
 	XMFLOAT3 xmf3Position = m_pPlayer->GetPosition();
 	_stprintf_s(m_pszFrameRate + nLength, 70 - nLength, _T("(%4f, %4f, %4f)"), xmf3Position.x, xmf3Position.y, xmf3Position.z);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
-}
-
-
-void CGameFramework::OutPutBackBuffer()
-{
-	
-
-	//D3D12_CPU_DESCRIPTOR_HANDLE d3dRtvCPUDescriptorHandle = m_pd3dRtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	//for (UINT i = 0; i < m_nSwapChainBuffers; i++)
-	//{
-	//	m_pdxgiSwapChain->GetBuffer(i, __uuidof(ID3D12Resource), (void**)&m_ppd3dSwapChainBackBuffers[i]);
-
-
-	//	m_pd3dDevice->CreateRenderTargetView(m_ppd3dSwapChainBackBuffers[i], NULL, d3dRtvCPUDescriptorHandle);
-	//	d3dRtvCPUDescriptorHandle.ptr += m_nRtvDescriptorIncrementSize;
-	//}
-
-	//
-	//
-	//// 무지성 코딩 가자!
-
-	////Create
-
-	////Copy
-
-	//D3DsaveTexture
-
-
-
-	//// Get the descriptor of this texture2D
-	//D3D10_TEXTURE2D_DESC descDefault;
-	//tempTexture->GetDesc(&descDefault);
-
-	//// Create a staging texture desc based on the texture of the backbuffer
-	//D3D10_TEXTURE2D_DESC descStaging;
-	//descStaging = descDefault;
-	//descStaging.Usage = D3D10_USAGE_STAGING;
-	//descStaging.CPUAccessFlags = D3D10_CPU_ACCESS_READ;
-	//descStaging.BindFlags = 0;
-
-	//// Create the new empty staging texture
-	//ID3D10Texture2D* texture = 0;
-	//m_pd3dDevice->CreateTexture2D(&descStaging, NULL, &texture);
-	//m_pd3dDevice->CreateCommittedResource();
-
-	//// Copy the backbuffer texture data (tempTexture) to the staging texture (texture)
-	//m_D3D->GetDevice()->CopyResource(texture, tempTexture);
-	//m_pd3dCommandList->CopyResource();
-	//m_pd3dCommandList->CopyTextureRegion();
-
-	//// This call works perfectly, image is correct!
-	//// D3DX10SaveTextureToFile(texture, D3DX10_IFF_BMP, L"D:\\img.bmp");
-
-	//// We want to avoid disk access, so instead let's map the texture and read its RGB data
-	//D3D10_MAPPED_TEXTURE2D mappedTexture;
-	//hr = texture->Map(D3D10CalcSubresource(0, 0, 1), D3D10_MAP_READ, 0, &mappedTexture);
-	//FLOAT* m_pBits = (FLOAT*)malloc(4 * descStaging.Width * descStaging.Height * sizeof(FLOAT));
-	//if (!FAILED(hr)) {
-	//	memcpy(m_pBits, mappedTexture.pData, 4 * descStaging.Width * descStaging.Height);
-	//	texture->Unmap(D3D10CalcSubresource(0, 0, 1));
-	//}
-	//texture->Release();
-	//tempTexture->Release();
-
-	//fp = fopen("D:\\output.txt", "a");
-	//for (UINT row = 0; row < descStaging.Height; row++)
-	//{
-	//	UINT rowStart = row * mappedTexture.RowPitch / 4;
-	//	for (UINT col = 0; col < descStaging.Width; col++)
-	//	{
-	//		r = m_pBits[rowStart + col * 4 + 0]; // Red (X)
-	//		g = m_pBits[rowStart + col * 4 + 1]; // Green (Y)
-	//		b = m_pBits[rowStart + col * 4 + 2]; // Blue (Z)
-	//		a = m_pBits[rowStart + col * 4 + 3]; // Alpha (W)
-
-	//		// Save pixel values to disk
-	//		fprintf(fp, "%d %d - %f %f %f\n", col + 1, row + 1, r, g, b);
-	//	}
-	//}
-	//fclose(fp);
 }

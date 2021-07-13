@@ -1124,7 +1124,7 @@ HRESULT DirectX::SaveWICTextureToFile(
         &fpRowCount,
         &fpRowPitch,
         &totalResourceSize);
-
+    
     // Round up the srcPitch to multiples of 256
     UINT64 dstRowPitch = (fpRowPitch + 255) & ~0xFFu;
 
