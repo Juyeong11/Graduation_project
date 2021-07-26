@@ -25,5 +25,19 @@ dds to image -> WICTextureLoader
 capture buffer -> screenGrap  
 
 7.14
-그 동안 Direct3D 12 Video Overview 문서를 읽었다. 모르겠다.
+그 동안 Direct3D 12 Video Overview 문서를 읽었다. 모르겠다. (뭘 모르는지도 모르겠다)
 그래서 다시 돌아와서 버퍼내용 이미지파일로 바꾸고 소리도 받아와서 그걸 동영상으로 바꿔주는 쪽으로 해봐야겠다.
+
+이렇게 하려면 미디어 파운데이션 인코딩api사용하면 될거 같음
+ -> https://docs.microsoft.com/ko-kr/windows/win32/medfound/overview-of-encoding-in-media-foundation
+ -> (mp4 인코딩) https://docs.microsoft.com/ko-kr/windows/win32/medfound/tutorial--encoding-an-mp4-file-
+현재 비디오 프레임은 완료됬고 오디오 패킷만 준비되면 됨
+
+인코딩된 파일을 보내고 클라이언트에서 디코딩해서 보여주면되는건가? 
+->https://docs.microsoft.com/ko-kr/windows/win32/medfound/direct3d-12-video-overview
+
+7.26
+DXVA 비디오 처리 작업을 GPU로 할 수 있게해주는 api 나중에 필요할 것 같아서 적어놓습니다.
+내일 할 일
+https://github.com/Microsoft/Windows-classic-samples/tree/master/Samples/Win7Samples/multimedia/mediafoundation/
+미디어 파운데이션에 비디오 캡쳐 관련 샘플코드들 하나하나 정리하면서 좀 더 지식을 늘리자
