@@ -60,6 +60,13 @@ using Microsoft::WRL::ComPtr;
 
 #pragma comment(lib,"dxguid.lib")
 
+#ifdef UNICODE
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+#else
+#pragma comment(linker, "/entry:WinMainCRTStartup /subsystem:console")
+#endif
+
+
 
 constexpr int FRAME_BUFFER_WIDTH{ 800 };
 constexpr int FRAME_BUFFER_HEIGHT{ 600 };

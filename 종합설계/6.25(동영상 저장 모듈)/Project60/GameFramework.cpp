@@ -557,11 +557,12 @@ void CGameFramework::FrameAdvance()
 	m_pdxgiSwapChain->GetBuffer(index, __uuidof(ID3D12Resource), (void**)&Texture2D);
 
 	static int i{};
-	i++;
+	i++; 
 
 	//SaveDDSTextureToFile(m_pd3dCommandQueue, Texture2D, std::format(L"FrameCaptureDDSFile\\Screen{}.dds", i).c_str());
 	//마이크로소프트 사랑해요
 	SaveWICTextureToFile(m_pd3dCommandQueue, Texture2D, GUID_ContainerFormatJpeg, std::format(L"FrameCaptureDDSFile\\Screen{}.jpg", i).c_str());
+
 	Texture2D->Release();
 	//
 

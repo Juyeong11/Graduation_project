@@ -41,3 +41,22 @@ DXVA 비디오 처리 작업을 GPU로 할 수 있게해주는 api 나중에 필
 내일 할 일
 https://github.com/Microsoft/Windows-classic-samples/tree/master/Samples/Win7Samples/multimedia/mediafoundation/
 미디어 파운데이션에 비디오 캡쳐 관련 샘플코드들 하나하나 정리하면서 좀 더 지식을 늘리자
+
+MFCaptureToFile
+ 캡쳐 보드라는 하드웨어 장치가 있는데 이걸로 캡쳐할 수 있게 해주는 샘플이네 
+카메라로 사진찍게해주는 샘플이라는 말이랑 뭐가 달라 이게 왜 필요한거지?
+캡쳐라는 말 들어가 있는 모든 샘플코드가 캡쳐 장치가 있어야 되네?
+
+8.9
+https://docs.microsoft.com/ko-kr/windows/win32/medfound/sink-writer?redirectedfrom=MSDN
+mpeg-4 는 어거지로 가능할거같기도 하고 아닌거같기도하고 
+
+후면버퍼를 매타데이터로 바꾸고 원하는 확장자로 바꾸고 디코딩해서 출력해주는 코드가 있고
+DWORD배열의 픽셀값을 동영상으로 바꿔주는 코드가 있지 
+도구는 준비됬다 노력만 하면된다 이제
+640 480 크기는 같다 그러면 후면 버퍼를 메타데이터로 바꿨을 때 각 픽셀 값만 얻으면 되나?
+
+IWICBitmap -> CopyPixcel해서 BYTE자료형 배열 얻으면 그걸 넘겨줘서 해보자 내일
+8/10
+https://www.kdata.or.kr/info/info_04_view.html?field=&keyword=&type=techreport&page=151&dbnum=128333&mode=detail&type=techreport
+이게 되네??
