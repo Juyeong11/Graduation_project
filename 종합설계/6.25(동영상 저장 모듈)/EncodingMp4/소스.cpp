@@ -8,6 +8,7 @@
 #pragma comment(lib, "mfplat")
 #pragma comment(lib, "mfuuid")
 
+
 template <class T> void SafeRelease(T** ppT)
 {
     if (*ppT)
@@ -211,8 +212,11 @@ HRESULT WriteFrame(
     return hr;
 }
 
+
+
 void main()
 {
+    
     // Set all pixels to green
     for (DWORD i = 0; i < VIDEO_PELS; ++i)
     {

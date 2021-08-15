@@ -19,6 +19,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 CGameFramework gGameFramework;
+
+
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR    lpCmdLine,
@@ -44,6 +47,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+    
     // 기본 메시지 루프입니다:
     while (1)
     {
@@ -77,6 +81,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #endif
     return (int)msg.wParam;
 }
+
+
 
 
 

@@ -60,6 +60,12 @@
     <ClInclude Include="ScreenGrab12.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="WAVFileReader.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="XAudio2Versions.h">
+      <Filter>소스 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Project60.cpp">
@@ -93,6 +99,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="ScreenGrab12.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="WAVFileReader.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="XAudio2BasicSound.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

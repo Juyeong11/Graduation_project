@@ -37,7 +37,6 @@ public:
 	void WaitForGpuComplete();
 	void MoveToNextFrame();
 
-	void OutPutBackBuffer();
 	void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
@@ -88,5 +87,9 @@ private:
 	POINT						m_ptOldCursorPos;
 
 	_TCHAR						m_pszFrameRate[70];
+
+
+	//XAudio2 일단 돌아가게 만들자 추후 꼭! 꼭!!!!!!!! 수정할 것
+
 };
 
