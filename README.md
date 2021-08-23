@@ -1,13 +1,13 @@
-# Beat Slime (wt)
+# Beat Slime (wt. PulseCast)
 . 2021-2022 KPU Graduation Project
 
-Member.
+Members.
+- 정내훈 교수님 (zzapuno) / Academic Adviser
 - Riu / Programmer
 - SH-Broar / Programmer
 - MINGO / Graphic
 
 Links.
-
 - github
 https://github.com/Juyeong11/Graduation_project
 
