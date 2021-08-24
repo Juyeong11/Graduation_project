@@ -1329,30 +1329,30 @@ HRESULT InitializeSinkWriter(IMFSinkWriter** ppWriter, DWORD* pStreamIndex)
         hr = pSinkWriter->AddStream(pVideoTypeOut, &streamIndex);
     }
 
-    ComPtr<IMFCollection> availableTypes = nullptr;
-    hr = MFTranscodeGetAudioOutputAvailableTypes(MFAudioFormat_WMAudioV9, MFT_ENUM_FLAG_ALL, NULL, availableTypes.GetAddressOf());
+    //ComPtr<IMFCollection> availableTypes = nullptr;
+    //hr = MFTranscodeGetAudioOutputAvailableTypes(MFAudioFormat_WMAudioV9, MFT_ENUM_FLAG_ALL, NULL, availableTypes.GetAddressOf());
 
-    DWORD count = 0;
-    hr = availableTypes->GetElementCount(&count);  // Get the number of elements in the list.
+    //DWORD count = 0;
+    //hr = availableTypes->GetElementCount(&count);  // Get the number of elements in the list.
 
-    ComPtr<IUnknown>     pUnkAudioType = nullptr;
-    ComPtr<IMFMediaType> audioOutputType = nullptr;
-    for (DWORD i = 0; i < count; ++i)
-    {
-        hr = availableTypes->GetElement(i, pUnkAudioType.GetAddressOf());
-        hr = pUnkAudioType.Get()->QueryInterface((void**)&pAudioTypeOut);
+    //ComPtr<IUnknown>     pUnkAudioType = nullptr;
+    //ComPtr<IMFMediaType> audioOutputType = nullptr;
+    //for (DWORD i = 0; i < count; ++i)
+    //{
+    //    hr = availableTypes->GetElement(i, pUnkAudioType.GetAddressOf());
+    //    hr = pUnkAudioType.Get()->QueryInterface((void**)&pAudioTypeOut);
 
-        // compare channels, sampleRate, and bitsPerSample to target numbers
-        {
-            // audioTypeOut is set!
-            break;
-        }
+    //    // compare channels, sampleRate, and bitsPerSample to target numbers
+    //    {
+    //        // audioTypeOut is set!
+    //        break;
+    //    }
 
-        audioOutputType.Reset();
-    }
-    availableTypes.Reset();
+    //    audioOutputType.Reset();
+    //}
+    //availableTypes.Reset();
 
-    hr = pSinkWriter->AddStream(pAudioTypeOut, &streamIndex);
+    //hr = pSinkWriter->AddStream(pAudioTypeOut, &streamIndex);
 
 
     // Set the input media type.
@@ -1391,7 +1391,7 @@ HRESULT InitializeSinkWriter(IMFSinkWriter** ppWriter, DWORD* pStreamIndex)
 
     // NOTE: audioReader is an IMFMediaSource used to read the audio file
     //hr = audioReader->GetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_AUDIO_STREAM, pAudioTypeIn);
-    hr = pSinkWriter->SetInputMediaType(streamIndex, pAudioTypeIn, nullptr);
+    //hr = pSinkWriter->SetInputMediaType(streamIndex, pAudioTypeIn, nullptr);
     
 
     // Tell the sink writer to start accepting data.

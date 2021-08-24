@@ -143,7 +143,7 @@ void CGameFramework::CreateDirect3DDevice()
 		DXGI_ADAPTER_DESC1 dxgiAdapterDesc;
 		pd3dAdapter->GetDesc1(&dxgiAdapterDesc);
 		if (dxgiAdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) continue;
-		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_12_0, _uuidof(ID3D12Device), (void**)&m_pd3dDevice))) break;
+		if (SUCCEEDED(D3D12CreateDevice(pd3dAdapter, D3D_FEATURE_LEVEL_11_0, _uuidof(ID3D12Device), (void**)&m_pd3dDevice))) break;
 	}
 
 	if (!pd3dAdapter)
@@ -561,7 +561,7 @@ void CGameFramework::FrameAdvance()
 
 	//SaveDDSTextureToFile(m_pd3dCommandQueue, Texture2D, std::format(L"FrameCaptureDDSFile\\Screen{}.dds", i).c_str());
 	//마이크로소프트 사랑해요
-	SaveWICTextureToFile(m_pd3dCommandQueue, Texture2D, GUID_ContainerFormatJpeg, std::format(L"FrameCaptureDDSFile\\Screen{}.jpg", i).c_str());
+	SaveWICTextureToFile(m_pd3dCommandQueue, Texture2D, GUID_ContainerFormatJpeg, std::format(L"Screen{}.jpg", i).c_str());
 
 	Texture2D->Release();
 	//
