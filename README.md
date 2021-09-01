@@ -13,3 +13,7 @@ https://github.com/Juyeong11/Graduation_project
 
 - confluence
 https://terrorist.atlassian.net/wiki/spaces/GRADUATION/overview
+
+
+How Start.
+- build MiniEngine/ProjectTemplates/AppTemplate.sln
