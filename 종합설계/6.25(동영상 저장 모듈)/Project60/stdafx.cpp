@@ -6,6 +6,48 @@
 
 UINT gnCbvSrvDescriptorIncrementSize = 32;
 
+SOCKET client_socket;
+SOCKET server_socket;
+
+SOCKET GetClientSocket() { return client_socket; }
+SOCKET GetServerSocket() { return server_socket; }
+
+bool InitSocket() 
+{
+	std::wcout.imbue(std::locale("korean"));
+	WSAData WSAData;
+	WSAStartup(MAKEWORD(2, 3), &WSAData);
+	server_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	SOCKADDR_IN server_addr;
+	memset(&server_addr, sizeof(server_addr), 0);
+	server_addr.sin_family = AF_INET;
+	server_addr.sin_port = htons(SERVER_PORT);
+	server_addr.sin_addr.s_addr = INADDR_ANY;
+	//IP주소는 브로드캐스팅 주소로 해줘서 모두 다 받을 수 있도록 해줘야하고
+	//서버주소는 포트번호를 위한 것
+	bind(server_socket, reinterpret_cast<sockaddr*>(&server_addr), sizeof(server_addr));
+	listen(server_socket, SOMAXCONN);
+	int addr_size = sizeof(server_addr);
+	client_socket = accept(server_socket, reinterpret_cast<sockaddr*>(&server_addr), &addr_size);//서버는 사이즈를 받아야됨
+	
+
+	char recv_buffer[BUF_SIZE];
+	int recv_size = recv(client_socket, recv_buffer, BUF_SIZE, 0);
+	recv_buffer[recv_size] = 0;
+	std::cout << "Client Sent : [" << recv_buffer << "]" << std::endl;
+
+	return true;
+}
+
+bool ReleaseSocket()
+{
+	closesocket(client_socket);
+	closesocket(server_socket);
+	//mmo를 만들고 싶으면 게임서버  5대5 넷겜플
+	WSACleanup();
+	return true;
+}
 XMFLOAT4 RANDOM_COLOR()
 {
 	std::random_device rd;

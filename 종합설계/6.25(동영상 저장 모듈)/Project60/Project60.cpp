@@ -27,6 +27,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ LPWSTR    lpCmdLine,
     _In_ int       nCmdShow)
 {
+
+
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
@@ -47,14 +49,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    
+    InitSocket();
+
     // 기본 메시지 루프입니다:
     while (1)
     {
         if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT) break;
-            if (!::TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+            if (!::TranslateAccelerator(msg.hwnd, hAccelTable, &msg)) 
             {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
@@ -70,6 +73,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     gGameFramework.OnDestroy();
 
     gGameFramework.~CGameFramework();
+
+    ReleaseSocket();
+
 #if defined(_DEBUG)
     OutputDebugString(_T("메모리확인 시작\n"));
     IDXGIDebug1* pdxgiDebug = NULL;

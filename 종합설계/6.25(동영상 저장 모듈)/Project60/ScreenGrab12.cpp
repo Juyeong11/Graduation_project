@@ -1261,7 +1261,7 @@ const UINT32 VIDEO_FRAME_COUNT = 20 * VIDEO_FPS;
 
 // Buffer to hold the video frame data.
 // 이게 사진 한 장이고
-DWORD videoFrameBuffer[60][VIDEO_PELS];
+DWORD videoFrameBuffer[VIDEO_PELS];
 
 const UINT32 SAMPLES_PER_SECOND = 44100;
 const UINT32 AVG_BYTES_PER_SECOND = 6003;
@@ -1509,7 +1509,7 @@ void DecodingWAV()
         {
             IMFSinkWriter* pSinkWriter = NULL;
             DWORD stream;
-
+            
             hr = InitializeSinkWriter(&pSinkWriter, &stream);
             if (SUCCEEDED(hr))
             {
@@ -2032,18 +2032,29 @@ HRESULT DirectX::SaveWICTextureToFile(
         const UINT stride = GetStride(640, 32);
         
         
-        std::cout << stride * 480 <<std::endl;
+        //std::cout << stride * 480 <<std::endl;
         
         static int a = 0;
 
-        source.Get()->CopyPixels(0,stride, 1228800,(BYTE*)&videoFrameBuffer[a][0]);
+        source.Get()->CopyPixels(0,stride, 1228800,(BYTE*)&videoFrameBuffer);
         a++;
-        
+        //이 정보를 클라이언트로 넘겨주자
+
+        int ret = send(GetClientSocket(), (char*)videoFrameBuffer, sizeof(videoFrameBuffer), 0);
+
+        if (SOCKET_ERROR == ret) {
+            int err_code = WSAGetLastError();
+            std::cout << "Send Error : " << err_code << std::endl;
+            //display_error(err_code);
+            exit(-1);
+        }
+        std::cout << "Server Sent : [" << videoFrameBuffer << "]" << std::endl;
+
         //1228800 
-        if (a == 60) {
+        /*if (a == 60) {
             a = 0;
             DecodingWAV();
-        }
+        }*/
 
 
         if (FAILED(hr))

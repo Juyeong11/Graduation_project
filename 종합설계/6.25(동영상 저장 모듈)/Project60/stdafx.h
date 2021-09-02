@@ -40,6 +40,9 @@
 #include<DirectXPackedVector.h>
 #include<DirectXColors.h>
 #include<DirectXCollision.h>
+
+#include<WS2tcpip.h>	
+
 #include"d3dx12.h"
 
 
@@ -55,6 +58,8 @@ using namespace DirectX;
 using namespace DirectX::PackedVector;
 
 using Microsoft::WRL::ComPtr;
+
+#pragma comment(lib,"WS2_32.LIB")	
 
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib,"d3d12.lib")
@@ -75,6 +80,18 @@ constexpr int FRAME_BUFFER_WIDTH{ 800 };
 constexpr int FRAME_BUFFER_HEIGHT{ 600 };
 
 constexpr float EPSILON = 1.0e-10f;
+
+//네트워크
+constexpr int BUF_SIZE = 1024;
+constexpr short SERVER_PORT = 3333;
+
+
+
+bool InitSocket();
+bool ReleaseSocket();
+
+SOCKET GetClientSocket();
+SOCKET GetServerSocket();
 
 XMFLOAT4 RANDOM_COLOR();
 extern ID3D12Resource *CreateBufferResource(ID3D12Device* pd3dDevice, ID3D12GraphicsCommandList* pd3dCommandList, void* pData, UINT nBytes,
