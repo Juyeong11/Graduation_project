@@ -1,0 +1,110 @@
+WMV 파일에서 오디오 클립 추출
+
+------------------------------------------
+IMFSourceReader 인터페이스 함수
+
+Flush
+
+GetCurrentMediaType
+
+GetNativeMediaType
+
+GetPresentationAttribute
+
+GetServiceForStream
+
+GetStreamSelection
+
+ReadSample
+
+SetCurrentMediaType
+
+SetCurrentPosition
+
+SetStreamSelection
+
+------------------------------------------
+HRESULT CoInitializeEx( 
+  LPVOID prReserved, 
+  DWORD dwCoInit
+);
+ COM 라이브러리 초기화 함수
+
+MFStartup( 
+  ULONG Version, 
+  DWORD dwFlags
+)
+ dwFlags-> SOCKET하고 관련이 있는거 같음 네트워크에서 사용하는게 소켓아닌가?
+
+HRESULT MFCreateSourceReaderFromURL(
+  LPCWSTR         pwszURL, 		->열려고 하는 미디어 파일의 URL
+  IMFAttributes   *pAttributes,	->이 매개변수를 사용하여 소스 판독기(==소스 리더)를 구성할 수 있음
+  IMFSourceReader **ppSourceReader
+);
+
+IMFMediaType <- IMFAttributes
+ 미디어 형식에 대한 설명을 나타낸다
+
+HRESULT MFCreateMediaType(
+  IMFMediaType **ppMFType
+);
+빈 미디어 유형을 만듭니다.
+
+----------------------------------------------------
+미디어 파일(Source)에서 압축되지않은 오디오 스트림을 뽑아내는 방법
+
+1. 오디오 스트림을 설정 (샘플에서 ConfigureAudioStream함수)
+
+	1-1. MFCreateMediaType을 이용해 미디어 타입을 만든다.
+
+	1-2. IMFAttributes::SetGUID함수를 이용해 미디어 타입을 정의 한다.
+		HRESULT SetGUID(
+		 REFGUID guidKey, -> 아래 Value에 맞는 키를 적어주면된다. Value가 미디어 타입일 경우 주로 MF_MT_MAJOR_TYPE 사용
+		 REFGUID guidValue -> MFMediaType_Audio,Video, Stream등 다양한 타입이 있고
+		);
+		각 타입 마다 하위 유형이 있다 오디오의 경우는 MFAudioFormat_MP3, PCM, AAC.. 등 이 있고 알맞는 하위 유형을 정해주면 될듯?
+
+		    if (SUCCEEDED(hr))
+		    {
+		        hr = pPartialType->SetGUID(MF_MT_MAJOR_TYPE, MFMediaType_Audio);
+		    }
+
+		    if (SUCCEEDED(hr))
+		    {
+		        hr = pPartialType->SetGUID(MF_MT_SUBTYPE, MFAudioFormat_PCM);
+		    }
+		이런식으로 된다.
+		
+
+	1-3. IMFSourceReader::SetCurrentMediaType()을 이용해 정의해준 미디어 타입을 소스 리더에 설정한다.
+		HRESULT SetCurrentMediaType(
+		  DWORD        dwStreamIndex, -> 0~0xFFFFFFFB or MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READER_FIRST_AUDIO_STREAM을 인자로 넣을 수 있다
+		  DWORD        *pdwReserved,  -> 생략되고 NULL값이 들어감
+		  IMFMediaType *pMediaType  -> 위에서 정의해준 미디어 타입
+		);
+
+	1-4 IMFSourceReader::GetCurrentMediaType()을 이용해 소스리더의 스트림의 현재 미디어 유형을 pUncompressedAudioType변수에 가지고 옵니다.
+
+	1-5. IMFSourceReader::SetStreamSelection()을 이용해 스트림을 선택한다.
+		HRESULT SetStreamSelection(
+		  DWORD dwStreamIndex, -> 0~0xFFFFFFFB or MF_SOURCE_READER_FIRST_VIDEO_STREAM, MF_SOURCE_READER_FIRST_AUDIO_STREAM을 인자로 넣을 수 있다
+		  BOOL  fSelected -> 스트림을 선택하려면 TRUE 스트림 선택을 취소하려면 FALSE
+		);
+		* 일부 미디어 파일에는 동일한 유형의 여러 스트림이 포함되어 있습니다. 예를 들어 파일에 여러 언어에 대한 오디오 스트림이 포함될 수 있습니다. 이 방법을 사용하여 선택한 스트림을 변경할 수 있습니다. 각 스트림에 대한 정보를 얻으려면 IMFSourceReader::GetPresentationAttribute 또는 IMFSourceReader::GetNativeMediaType 을 호출하십시오 .
+		* 스트림 중 하나의 데이터가 필요하지 않은 경우 해당 스트림을 선택 해제하는 것이 좋습니다. 스트림을 선택하면 미디어 소스가 읽지 않은 데이터의 대기열을 유지하고 대기열이 무한정 커져 메모리를 소모할 수 있습니다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
