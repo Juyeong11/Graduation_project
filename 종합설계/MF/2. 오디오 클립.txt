@@ -93,18 +93,95 @@ HRESULT MFCreateMediaType(
 		* 일부 미디어 파일에는 동일한 유형의 여러 스트림이 포함되어 있습니다. 예를 들어 파일에 여러 언어에 대한 오디오 스트림이 포함될 수 있습니다. 이 방법을 사용하여 선택한 스트림을 변경할 수 있습니다. 각 스트림에 대한 정보를 얻으려면 IMFSourceReader::GetPresentationAttribute 또는 IMFSourceReader::GetNativeMediaType 을 호출하십시오 .
 		* 스트림 중 하나의 데이터가 필요하지 않은 경우 해당 스트림을 선택 해제하는 것이 좋습니다. 스트림을 선택하면 미디어 소스가 읽지 않은 데이터의 대기열을 유지하고 대기열이 무한정 커져 메모리를 소모할 수 있습니다.
 
+	1-6. 얻어온 오디오 타입을 대입해주고 끝
+
+	        *ppPCMAudio = pUncompressedAudioType; -> Set해줄 때 사용했던 변수로 하면 동작 안함 Set할 때 변수랑 Get할 변수가 따로 필요한듯
+	        (*ppPCMAudio)->AddRef();
+
+
+2. 출력할 오디오 파일의 헤더를 적는다.(WriteWaveHeader) -> 미디어 유형에 따라 다르게 설정하면 다른 출력결과를 얻을 수 있을 것 같다.
+
+	2-1. WAVEFORMATEX 파형 오디오 데이터의 포맷을 정의한다. (MFCreateWaveFormatExFromMFMediaType 함수 사용)
+		모든 오디오 데이터 형식에 공통적인 형식 정보만 이 구조에 포함됩니다.
+		typedef struct tWAVEFORMATEX {
+		  WORD  wFormatTag;
+		  WORD  nChannels;
+		  DWORD nSamplesPerSec;
+		  DWORD nAvgBytesPerSec;
+		  WORD  nBlockAlign;
+		  WORD  wBitsPerSample;
+		  WORD  cbSize;
+		} WAVEFORMATEX, *PWAVEFORMATEX, *NPWAVEFORMATEX, *LPWAVEFORMATEX;
+		
+		
+		HRESULT MFCreateWaveFormatExFromMFMediaType( Media Foundation오디오 미디어 유형을 위의 WAVEFORMATEX 구조로 변환합니다.
+		  IMFMediaType *pMFType,
+		  WAVEFORMATEX **ppWF,
+		  UINT32       *pcbSize,
+		  UINT32       Flags //생략
+		);
+	
+
+`	2-2 RIFF헤더를 만들고 fmt Chunk를 시작한다
+		wave파일은 크게 3개의 파트로 구성되어있다 -> RIFF(미디어 재생을 위해 마이크로소프트가 만든 내부데이터 포맷), FMT(샘플당 바이트수, 채널같은 정보들), DATA(PCM데이터 실제 음원)이다
+	
+		WriteFile함수를 이용해 정의 해준 헤더를 적어 주고 헤더의 크기를 정한다.
+
+
+3. 디코딩할 최대 오디오 양을 바이트 단위로 계산합니다.
+	
+	3-1 오디오 블럭크기와 bytes/second의 수를 오디오 포맷으로 부터 구합니다.
+		UINT32 MFGetAttributeUINT32( //guidkey에 해당하는 값이 pAttributes에 있는 속성인 경우 반환해 줍니다.
+		  IMFAttributes *pAttributes, -> 앞서 정의했던 미디어 타입을 넣습니다.
+		  REFGUID       guidKey,	-> GUID상수로 어떤 것을 구할지 넣어줍니다. MF_MT_AUDIO_BLOCK_ALIGNMENT(해당 유형의 따른 한 블록 크기?) MF_MT_AUDIO_AVG_BYTES_PER_SECOND(해당 유형의 초당 평균 바이트 수)
+		  UINT32        unDefault
+		);
+
+	3-2 구한 초당 바이트수를 가지고 오디오클립의 사이즈를 구합니다.
+		int MulDiv( //두 개의 32비트 값을 곱한 다음 64비트 결과를 세 번째 32비트 값으로 나눕니다. 최종 결과는 가장 가까운 정수로 반올림됩니다.
+		  int nNumber,
+		  int nNumerator,
+		  int nDenominator
+		);
+
+	3-3 구한 크기가 최대 DWORD값보다 크다면 최대 DWORD값으로 만들어 줍니다.
+
+	3-4 부분 오디오 프레임을 쓰지 않도록 오디오 블록 크기로 반올림해줍니다. 마지막에 남은 프레임이 블록보다 작은 프레임일 경우를 막아줌
 
 
 
+4. 소스 파일(비디오)에서 PCM오디오 데이터를 디코딩하여 WAVE파일에 씁니다.
+	
+	IMFSample -> 미디어 데이터의 컨테이너 개체인 미디어 샘플을 나타냅니다 비디오의 경우 샘플에는 하나의 비도 프레임이 포함됩니다.
+		       오디오의 경우 샘플에는 단일 오디오 샘플이 아닌 여러 오디오 샘플이 포함됩니다.
 
+	IMFMediaBuffer -> 미디어 샘플에는 0개 이상의 버퍼가 있습니다. 각 버퍼는 메모리 블록을 관리하며 IMFMediaBuffer 인터페이스로 표시됩니다
+			버퍼는 인덱스 값으로 액세스 할 수 있습니다.
 
+	4-1 IMFSourceReader::ReadSample을 이용해 원본에서 샘플을 읽어 옵니다.
 
+		HRESULT ReadSample(// 미디어 소스에서 샘플을 읽습니다.
+		  DWORD     dwStreamIndex, //데이터를 가져올 스트림입니다. 0~0xFFFFFFFE
+		  DWORD     dwControlFlags,
+		  DWORD     *pdwActualStreamIndex,
+		  DWORD     *pdwStreamFlags,
+		  LONGLONG  *pllTimestamp,
+		  IMFSample **ppSample
+		);
 
+	4-2 IMFSourceReader::ConvertToContiguousBuffer을 이용해 여러 버퍼가 있는 샘플을 단일 버퍼로 변환합니다. -> pBuffer
 
+	4-3 pBuffer-> IMFMediaBuffer::Lock 읽기, 쓰기를 위해 호출자에게 버퍼의 메모리에 관한 액세스 권한을 부여합니다.
 
+		HRESULT Lock(
+		  BYTE  **ppbBuffer, 	// 	버퍼시작에 대한 포인터
+		  DWORD *pcbMaxLength,	//	최대 데이터양
+		  DWORD *pcbCurrentLength//	버퍼에 있는 유효한 데이터 길이(byte단위)
+		);
 
+	4-3 pAudioData에 있는 데이터를 cbBuffer만큼 출력 합니다. 그 뒤 버퍼의 락을 풀어 줍니다.
 
+	4-4 이 과정을 오디오 데이터의 크기가 지정된 최대 오디오 크기가 될때 까지 반복하여 줍니다.
 
-
-
+5. 올바른 크기로RIFF헤더를 수정한다. -> 마지막으로 데이터 크기와 생략된 8바이트를 추가해 준다는데 아직 이해 못함 구조에 익숙해지면 이해될듯
 
