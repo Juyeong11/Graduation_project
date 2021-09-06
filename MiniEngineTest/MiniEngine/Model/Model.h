@@ -149,6 +149,7 @@ public:
     void Render(Renderer::MeshSorter& sorter) const;
 
     void Resize(float newRadius);
+    void SetPosition(Math::Vector3 v);
     Math::Vector3 GetCenter() const;
     Math::Scalar GetRadius() const;
     Math::BoundingSphere GetBoundingSphere() const;

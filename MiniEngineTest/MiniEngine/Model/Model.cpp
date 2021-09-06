@@ -248,6 +248,14 @@ void ModelInstance::Resize( float newRadius )
     m_Locator.SetScale(newRadius / m_Model->m_BoundingSphere.GetRadius());
 }
 
+void ModelInstance::SetPosition(Vector3 v)
+{
+    if (m_Model == nullptr)
+        return;
+
+    m_Locator.SetTranslation(v);
+}
+
 Vector3 ModelInstance::GetCenter() const
 {
     if (m_Model == nullptr)
