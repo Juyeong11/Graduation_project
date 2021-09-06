@@ -54,7 +54,7 @@ private:
     D3D12_RECT m_MainScissor;
 
     vector<ModelInstance> m_ModelInsts;
-    ModelInstance m_ModelInst;
+    ModelInstance m_pointOfFirstSightView;
     ShadowCamera m_SunShadowCamera;
 
 };
@@ -148,7 +148,7 @@ void BeatSlime::Startup( void )
     PostEffects::EnableAdaptation = true;
     SSAO::Enable = true;
 
-    m_ModelInsts.reserve(100);
+    m_ModelInsts.reserve(200);
 
     //renderer init
     Renderer::Initialize();
@@ -173,20 +173,21 @@ void BeatSlime::Startup( void )
 #else
         //m_ModelInst = Renderer::LoadModel(L"glTF-Sample-Models-master/2.0/BoxAnimated/glTF/BoxAnimated.gltf", forceRebuild);
 
-        m_ModelInst = Renderer::LoadModel(L"Models/Cells/Cell.gltf", forceRebuild);
-        m_ModelInst.Resize(100.0f * m_ModelInst.GetRadius());
-        m_ModelInst.SetPosition(Vector3(100.f,100.f,0.f));
+        m_pointOfFirstSightView = Renderer::LoadModel(L"Models/Cells/Cell.gltf", forceRebuild);
+        m_pointOfFirstSightView.Resize(0.0f);
+        m_pointOfFirstSightView.SetPosition(Vector3(100.f,100.f,0.f));
 
-        for (int i = 0; i < 30; i++)
+        for (int low = 0; low < 8; low++)
         {
-            ModelInstance tmp = Renderer::LoadModel(L"Models/Cells/Cell.gltf", forceRebuild);
-            m_ModelInsts.push_back(tmp);
-            m_ModelInsts[m_ModelInsts.size()-1].Resize(30.f);
-            m_ModelInsts[m_ModelInsts.size() - 1].SetPosition(Vector3(i*45.f, 0.f, (float)i*(15.f * sqrt(3.0f))));
-
+            for (int i = 0; i < 10; i++)
+            {
+                ModelInstance tmp = Renderer::LoadModel(L"Models/Cells/Cell.gltf", forceRebuild);
+                m_ModelInsts.push_back(tmp);
+                m_ModelInsts[m_ModelInsts.size() - 1].Resize(30.f);
+                m_ModelInsts[m_ModelInsts.size() - 1].SetPosition(Vector3(i * 45.f , 0.f, (float)i * 15.f * sqrt(3.0f) - ((float)low * 30.f * sqrt(3.0f))));
+            }
         }
-
-        OrientedBox obb = m_ModelInst.GetBoundingBox();
+        OrientedBox obb = m_pointOfFirstSightView.GetBoundingBox();
         float modelRadius = Length(obb.GetDimensions()) * 0.5f;
         const Vector3 eye = obb.GetCenter() + Vector3(modelRadius * 0.5f, 0.0f, 0.0f);
 
@@ -196,9 +197,9 @@ void BeatSlime::Startup( void )
     }
     else // if model load by CommandLine Arguments ex: -model directory/model.gltf
     {
-        m_ModelInst = Renderer::LoadModel(gltfFileName, forceRebuild);
-        m_ModelInst.LoopAllAnimations();
-        m_ModelInst.Resize(10.0f);
+        m_pointOfFirstSightView = Renderer::LoadModel(gltfFileName, forceRebuild);
+        m_pointOfFirstSightView.LoopAllAnimations();
+        m_pointOfFirstSightView.Resize(10.0f);
 
         MotionBlur::Enable = false;
     }
@@ -208,14 +209,14 @@ void BeatSlime::Startup( void )
     if (gltfFileName.size() == 0)
         m_CameraController.reset(new FlyingFPSCamera(m_Camera, Vector3(kYUnitVector)));
     else
-        m_CameraController.reset(new OrbitCamera(m_Camera, m_ModelInst.GetBoundingSphere(), Vector3(kYUnitVector)));
+        m_CameraController.reset(new OrbitCamera(m_Camera, m_pointOfFirstSightView.GetBoundingSphere(), Vector3(kYUnitVector)));
 
 }
 
 void BeatSlime::Cleanup( void )
 {
     // Free up resources in an orderly fashion
-    m_ModelInst = nullptr;
+    m_pointOfFirstSightView = nullptr;
     m_ModelInsts.clear();
 
     g_IBLTextures.clear();
@@ -250,7 +251,7 @@ void BeatSlime::Update( float deltaT )
     GraphicsContext& gfxContext = GraphicsContext::Begin(L"Scene Update");
 
     //Model Update
-    m_ModelInst.Update(gfxContext, deltaT);
+    m_pointOfFirstSightView.Update(gfxContext, deltaT);
 
     for (auto& object : m_ModelInsts)
         object.Update(gfxContext, deltaT);
@@ -283,7 +284,7 @@ void BeatSlime::RenderScene(void)
 
     ParticleEffectManager::Update(gfxContext.GetComputeContext(), Graphics::GetFrameTime());
 
-    if (m_ModelInst.IsNull())
+    if (m_pointOfFirstSightView.IsNull())
     {
 #ifdef LEGACY_RENDERER
         Sponza::RenderScene(gfxContext, m_Camera, viewport, scissor);
@@ -298,7 +299,7 @@ void BeatSlime::RenderScene(void)
         float sinphi = sinf(g_SunInclination * 3.14159f * 0.5f);
 
         Vector3 SunDirection = Normalize(Vector3(costheta * cosphi, sinphi, sintheta * cosphi));
-        Vector3 ShadowBounds = Vector3(m_ModelInst.GetRadius());
+        Vector3 ShadowBounds = Vector3(m_pointOfFirstSightView.GetRadius());
         //m_SunShadowCamera.UpdateMatrix(-SunDirection, m_ModelInst.GetCenter(), ShadowBounds,
         m_SunShadowCamera.UpdateMatrix(-SunDirection, Vector3(0, -500.0f, 0), Vector3(5000, 3000, 3000),
             (uint32_t)g_ShadowBuffer.GetWidth(), (uint32_t)g_ShadowBuffer.GetHeight(), 16);
@@ -321,7 +322,7 @@ void BeatSlime::RenderScene(void)
         sorter.SetDepthStencilTarget(g_SceneDepthBuffer);
         sorter.AddRenderTarget(g_SceneColorBuffer);
 
-        m_ModelInst.Render(sorter);
+        m_pointOfFirstSightView.Render(sorter);
 
         for (auto& object : m_ModelInsts)
             object.Render(sorter);
@@ -346,7 +347,7 @@ void BeatSlime::RenderScene(void)
                 shadowSorter.SetCamera(m_SunShadowCamera);
                 shadowSorter.SetDepthStencilTarget(g_ShadowBuffer);
 
-                m_ModelInst.Render(shadowSorter);
+                m_pointOfFirstSightView.Render(shadowSorter);
 
                 for (auto& object : m_ModelInsts)
                     object.Render(shadowSorter);
