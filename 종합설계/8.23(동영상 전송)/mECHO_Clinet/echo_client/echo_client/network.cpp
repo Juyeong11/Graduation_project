@@ -100,7 +100,7 @@ int main()
 		//서버에서 보내는 것을 수신
         static int a = 0;
 
-		char recv_buffer[BUF_SIZE];
+		
 		int recv_size = recv(server_socket, (char*)videoFrameBuffer[a], 4915200, 0);
 
 		//recv_buffer[recv_size] = 0;
