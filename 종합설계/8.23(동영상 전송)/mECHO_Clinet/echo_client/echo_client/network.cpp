@@ -89,6 +89,7 @@ int main()
 																// 만약 8바이트 크기인데 4바이트만 보냈다면 운영체제에서 8바이트를 읽으면 읽지 않아야하는 부분을 읽을 수 있다
 
     char buffer[BUF_SIZE];
+
     cout << "Enter Text : ";
     cin.getline(buffer, BUF_SIZE);
 
