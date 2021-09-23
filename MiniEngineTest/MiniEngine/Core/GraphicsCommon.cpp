@@ -163,7 +163,7 @@ void Graphics::InitializeCommonState(void)
 
     // Default rasterizer states
     RasterizerDefault.FillMode = D3D12_FILL_MODE_SOLID;
-    RasterizerDefault.CullMode = D3D12_CULL_MODE_BACK;
+    RasterizerDefault.CullMode = D3D12_CULL_MODE_NONE;
     RasterizerDefault.FrontCounterClockwise = TRUE;
     RasterizerDefault.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
     RasterizerDefault.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;

@@ -173,7 +173,7 @@ void BeatSlime::Startup( void )
 #else
         //m_ModelInst = Renderer::LoadModel(L"glTF-Sample-Models-master/2.0/BoxAnimated/glTF/BoxAnimated.gltf", forceRebuild);
 
-        m_pointOfFirstSightView = Renderer::LoadModel(L"Models/Cells/Cell.gltf", forceRebuild);
+        m_pointOfFirstSightView = Renderer::LoadModel(L"Models/Grass/flower.gltf", forceRebuild);
         m_pointOfFirstSightView.Resize(0.0f);
         m_pointOfFirstSightView.SetPosition(Vector3(100.f,100.f,0.f));
 
@@ -181,7 +181,7 @@ void BeatSlime::Startup( void )
         {
             for (int i = 0; i < 10; i++)
             {
-                ModelInstance tmp = Renderer::LoadModel(L"Models/Cells/Cell.gltf", forceRebuild);
+                ModelInstance tmp = Renderer::LoadModel(L"Models/Grass/flower.gltf", forceRebuild);
                 m_ModelInsts.push_back(tmp);
                 m_ModelInsts[m_ModelInsts.size() - 1].Resize(30.f);
                 m_ModelInsts[m_ModelInsts.size() - 1].SetPosition(Vector3(i * 45.f , 0.f, (float)i * 15.f * sqrt(3.0f) - ((float)low * 30.f * sqrt(3.0f))));
