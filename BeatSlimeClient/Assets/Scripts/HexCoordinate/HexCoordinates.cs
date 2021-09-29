@@ -45,6 +45,12 @@ public struct HexCoordinates
 		this.z = z;
 	}
 
+	public void plus(int x, int z)
+    {
+		this.x += x;
+		this.z += z;
+    }
+
 	public override string ToString()
 	{
 		return "(" + X.ToString() + ", " + Y.ToString() + ", " + Z.ToString() + ")";
