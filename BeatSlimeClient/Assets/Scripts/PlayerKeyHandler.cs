@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerKeyHandler : MonoBehaviour
 {
     public HexCell selfCoord;
+
     public void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q))

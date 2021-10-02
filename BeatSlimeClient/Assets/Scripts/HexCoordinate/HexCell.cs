@@ -3,6 +3,7 @@ using UnityEngine;
 public class HexCell : MonoBehaviour
 {
     public HexCoordinates coordinates;
+
     public void Start()
     {
 
@@ -27,7 +28,7 @@ public class HexCell : MonoBehaviour
             Debug.LogError("HexPlus Error (x+y+z != 0)");
         }
         coordinates.plus(x, z);
-
         refelectPosition();
+
     }
 }
