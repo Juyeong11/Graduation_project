@@ -13,22 +13,39 @@ public class Move : MonoBehaviour
     public float rotateSpd = 100.0f;
 
     Vector3 DesPos = new Vector3(0, 0.5f, 0);
+
+    
+    float tempo;
+    float tempoCounter = 0;
+
+    SoundEffectManager SoundEffect;
     private void Start()
     {
         animator = GetComponentInChildren<Animator>();
         animator.SetBool("IsWalk", false);
+
+        SoundManager.instance.PlayBGM("BAD_SEC");
+        tempoCounter = tempo = 60 / (float)SoundManager.instance.GetBGMBpm("BAD_SEC");
+
+        SoundEffect = FindObjectOfType<SoundEffectManager>();
     }
 
     private void Update()
     {
-
+        tempoCounter -= Time.deltaTime;
+        if(tempoCounter < 0)
+        if(tempoCounter < 0)
+        {
+            tempoCounter = tempo;
+            SoundEffect.BeatEffect();
+        }
         if (Input.GetKeyDown(KeyCode.Q))
         {
-
             selfCoord.plus(-1, 0, 1);
             animator.SetBool("IsWalk", true);
 
             DesPos = selfCoord.DesPos;
+            SoundManager.instance.PlaySFX("Move");
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
@@ -36,7 +53,7 @@ public class Move : MonoBehaviour
             animator.SetBool("IsWalk", true);
 
             DesPos = selfCoord.DesPos;
-
+            SoundManager.instance.PlaySFX("Move");
         }
         else if (Input.GetKeyDown(KeyCode.E))
         {
@@ -44,7 +61,7 @@ public class Move : MonoBehaviour
             animator.SetBool("IsWalk", true);
 
             DesPos = selfCoord.DesPos;
-
+            SoundManager.instance.PlaySFX("Move");
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
@@ -52,7 +69,7 @@ public class Move : MonoBehaviour
             animator.SetBool("IsWalk", true);
 
             DesPos = selfCoord.DesPos;
-
+            SoundManager.instance.PlaySFX("Move");
         }
         else if (Input.GetKeyDown(KeyCode.X))
         {
@@ -60,6 +77,7 @@ public class Move : MonoBehaviour
             animator.SetBool("IsWalk", true);
 
             DesPos = selfCoord.DesPos;
+            SoundManager.instance.PlaySFX("Move");
 
         }
         else if (Input.GetKeyDown(KeyCode.D))
@@ -68,7 +86,7 @@ public class Move : MonoBehaviour
             animator.SetBool("IsWalk", true);
 
             DesPos = selfCoord.DesPos;
-
+            SoundManager.instance.PlaySFX("Move");
         }
 
         Vector3 pos = transform.position;
