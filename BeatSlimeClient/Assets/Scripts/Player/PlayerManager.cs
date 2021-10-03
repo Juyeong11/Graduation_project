@@ -19,7 +19,6 @@ public class PlayerManager : MonoBehaviour
     public HexCellPosition selfCoord;
     public HexGrid grid;
 
-
     void Start()
     {
         state = playerState.Idle;
@@ -30,18 +29,25 @@ public class PlayerManager : MonoBehaviour
     void Update()
     {
         KeyHandler();
+    }
 
+    void FixedUpdate()
+    {
         //DEBUG
-        gameObject.transform.position = new Vector3(gameObject.transform.position.x,gameObject.transform.position.y - 2f * Time.deltaTime, gameObject.transform.position.z);
+        if (GameManager.data.isGameStart)
+            gameObject.transform.position = new Vector3(gameObject.transform.position.x, 2f * GameManager.data.beatCounter / GameManager.data.beatTimes, gameObject.transform.position.z);
+        else
+            gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 2f * Time.fixedDeltaTime, gameObject.transform.position.z);
+
         if (gameObject.transform.position.y < 0f)
         {
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x, 2f, gameObject.transform.position.z);
             if (isFly)
             {
                 onPlayerStand.Invoke();
                 isFly = false;
             }
         }
+
     }
 
     void KeyHandler()
@@ -53,7 +59,7 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.W))
         {
-            if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y-1, selfCoord.coordinates.Z + 1).state != cellState.None)
+            if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).state != cellState.None)
                 selfCoord.plus(0, -1, 1);
         }
         else if (Input.GetKeyDown(KeyCode.E))

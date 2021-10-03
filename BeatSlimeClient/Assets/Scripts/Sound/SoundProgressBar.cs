@@ -16,9 +16,11 @@ public class SoundProgressBar : MonoBehaviour
     // Update is called once per frame
     private void FixedUpdate()
     {
-        Debug.Log(SoundManager.instance.GetMusicProgress());
+        if (GameManager.data.isGameStart)
+        {
+            //Debug.Log(SoundManager.instance.GetMusicProgress());
 
-        rectTransform.localScale = new Vector3(SoundManager.instance.GetMusicProgress(),1,1);
-
+            rectTransform.localScale = new Vector3(SoundManager.instance.GetMusicProgress(), 1, 1);
+        }
     }
 }
