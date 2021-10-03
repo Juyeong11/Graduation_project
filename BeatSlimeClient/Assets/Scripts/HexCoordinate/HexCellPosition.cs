@@ -1,13 +1,8 @@
 using UnityEngine;
 
-public class HexCell : MonoBehaviour
+public class HexCellPosition : MonoBehaviour
 {
     public HexCoordinates coordinates;
-
-    public void Start()
-    {
-
-    }
 
     public void setInitPosition(int x, int z)
     {
@@ -29,6 +24,10 @@ public class HexCell : MonoBehaviour
         }
         coordinates.plus(x, z);
         refelectPosition();
+    }
 
+    public (int,int,int) Get()
+    {
+        return (coordinates.X, coordinates.Y, coordinates.Z);
     }
 }
