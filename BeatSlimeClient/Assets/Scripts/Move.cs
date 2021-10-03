@@ -33,7 +33,7 @@ public class Move : MonoBehaviour
     private void Update()
     {
         tempoCounter -= Time.deltaTime;
-        Debug.Log(tempoCounter);
+        if(tempoCounter < 0)
         if(tempoCounter < 0)
         {
             tempoCounter = tempo;

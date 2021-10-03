@@ -54,6 +54,11 @@ public class SoundManager : MonoBehaviour
         }
         return 0;
     }
+
+    public float GetMusicProgress()
+    {
+        return (bgmPlayer.time / bgmPlayer.clip.length);
+    }
     public void StopBGM()
     {
         bgmPlayer.Stop();
