@@ -59,6 +59,27 @@ public class SoundManager : MonoBehaviour
     {
         return (bgmPlayer.time / bgmPlayer.clip.length);
     }
+
+    public float GetMusicLength(string songName)
+    {
+        for (int i = 0; i < bgm.Length; ++i)
+        {
+            if (songName == bgm[i].name)
+            {
+                return bgm[i].clip.length;
+            }
+        }
+        return 0;
+    }
+    public float GetMusicLength()
+    {
+        return bgmPlayer.clip.length;
+    }
+    public int GetMusicLapsedTime()
+    {
+        return (int)(bgmPlayer.time * 1000);
+    }
+
     public void StopBGM()
     {
         bgmPlayer.Stop();
