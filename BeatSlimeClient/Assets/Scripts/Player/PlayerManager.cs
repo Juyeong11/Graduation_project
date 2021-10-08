@@ -13,16 +13,18 @@ public class PlayerManager : MonoBehaviour
     public UnityEvent onPlayerFly;
     private bool isFly = false;
 
-    private playerState state;
+    public playerState state;
     public PlayerKeyHandler handle;     //Invalid
 
     public HexCellPosition selfCoord;
+    public HexDirection selfDirection;
     public HexGrid grid;
 
     void Start()
     {
         grid = GameManager.data.grid;
         state = playerState.Idle;
+        selfDirection = HexDirection.Up;
         onPlayerFly.Invoke();
         isFly = true;
     }
@@ -71,42 +73,42 @@ public class PlayerManager : MonoBehaviour
             GameManager.data.setMoved();
             if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).state != cellState.None)
                 selfCoord.plus(-1, 0, 1);
-
+            selfDirection = HexDirection.LeftUp;
         }
         else if (Input.GetKeyDown(KeyCode.W) && KeyCheck())
         {
             GameManager.data.setMoved();
             if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).state != cellState.None)
                 selfCoord.plus(0, -1, 1);
-
+            selfDirection = HexDirection.Up;
         }
         else if (Input.GetKeyDown(KeyCode.E) && KeyCheck())
         {
             GameManager.data.setMoved();
             if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).state != cellState.None)
                 selfCoord.plus(1, -1, 0);
-
+            selfDirection = HexDirection.RightUp;
         }
         else if (Input.GetKeyDown(KeyCode.A) && KeyCheck())
         {
             GameManager.data.setMoved();
             if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).state != cellState.None)
                 selfCoord.plus(-1, 1, 0);
-
+            selfDirection = HexDirection.LeftDown;
         }
         else if (Input.GetKeyDown(KeyCode.S) && KeyCheck())
         {
             GameManager.data.setMoved();
             if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z - 1).state != cellState.None)
                 selfCoord.plus(0, 1, -1);
-
+            selfDirection = HexDirection.Down;
         }
         else if (Input.GetKeyDown(KeyCode.D) && KeyCheck())
         {
             GameManager.data.setMoved();
             if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).state != cellState.None)
                 selfCoord.plus(1, 0, -1);
-
+            selfDirection = HexDirection.RightDown;
         }
     }
 

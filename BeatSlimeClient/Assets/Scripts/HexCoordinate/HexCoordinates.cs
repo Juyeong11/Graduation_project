@@ -1,5 +1,15 @@
 using UnityEngine;
 
+public enum HexDirection
+{
+	LeftUp,
+	Up,
+	RightUp,
+	LeftDown,
+	Down,
+	RightDown,
+}
+
 [System.Serializable]
 public struct HexCoordinates
 {

@@ -11,17 +11,16 @@ public enum enemyState
 
 public class EnemyManager : MonoBehaviour
 {
-    private enemyState state;
+    public enemyState state;
     public int enemyHp;
     public int enemyMaxHp;
 
     public HexCellPosition selfCoord;
     public HexGrid grid;
 
-    //얘네 int가 아니라 다른거여야 할 필요가 있을지도
-    public Dictionary<Beat, int> enemyMovingList;
-    public Dictionary<Beat, int> enemyAttackList;
-    public Dictionary<Beat, int> enemyNoteList;
+    public List<EMoving> enemyMovingList;
+    public List<EAttack> enemyAttackList;
+    public List<ENote> enemyNoteList;
 
     void Start()
     {
