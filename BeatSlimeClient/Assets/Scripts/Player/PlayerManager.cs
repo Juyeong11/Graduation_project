@@ -12,7 +12,6 @@ public class PlayerManager : MonoBehaviour
     public UnityEvent onPlayerStand;
     public UnityEvent onPlayerFly;
     private bool isFly = false;
-    private bool alreadyMoved = false;
 
     private playerState state;
     public PlayerKeyHandler handle;     //Invalid
@@ -22,6 +21,7 @@ public class PlayerManager : MonoBehaviour
 
     void Start()
     {
+        grid = GameManager.data.grid;
         state = playerState.Idle;
         onPlayerFly.Invoke();
         isFly = true;

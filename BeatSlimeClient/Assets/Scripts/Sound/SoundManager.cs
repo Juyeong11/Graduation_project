@@ -28,7 +28,7 @@ public class SoundManager : MonoBehaviour
     [SerializeField] AudioSource[] sfxPlayer = null;
     // Start is called before the first frame update
 
-    private void Start()
+    private void Awake()
     {
         instance = this;
     }

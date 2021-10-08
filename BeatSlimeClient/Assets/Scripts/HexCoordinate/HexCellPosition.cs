@@ -30,4 +30,9 @@ public class HexCellPosition : MonoBehaviour
     {
         return (coordinates.X, coordinates.Y, coordinates.Z);
     }
+
+    public void setCellPositionByPivotTransform()
+    {
+        //enemy용, 피벗에서 가장 가까운 HexCell좌표를 찾아서 Coordinate를 그 좌표로 지정
+    }
 }

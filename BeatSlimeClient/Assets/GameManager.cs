@@ -6,7 +6,10 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager data;
 
-    public PlayerManager player;
+    public GameObject player;
+    public GameObject enemy;
+    public GameObject tilemap;
+    public HexGrid grid;
 
     public SoundManager soundManager;
     public SoundEffectManager soundEffectManager;
@@ -22,8 +25,13 @@ public class GameManager : MonoBehaviour
     public int nowSongTime;
     public int timeByBar;
     public int timeByBeat;
-    public int nowBars;
-    public int nowBeats;
+    public int timeBy24Beat;
+    public int timeBy32Beat;
+    //public int nowBars;
+    //public int nowBeats;
+    //public int now24Beats;
+    //public int now32Beats;
+    public Beat nowBeat;
     public int beatCounter = 0;
 
     public int offsetTime;
@@ -32,44 +40,51 @@ public class GameManager : MonoBehaviour
 
     public int alreadyMoved;
 
-    void Start()
+    void Awake()
     {
+        print("Start");
         data = this;
         isGameStart = false;
         alreadyMoved = 0;
+
+        nowBeat = new Beat();
 
         bpm = SoundManager.instance.GetBGMBpm(SongName);
         totalSongTime = (int)(SoundManager.instance.GetMusicLength(SongName) * 1000f);
         nowSongTime = 0;
         timeByBeat = (int)(1000f * 60f / bpm);
         timeByBar = timeByBeat * barCounts;
+        timeBy24Beat = timeByBeat / 6;
+        timeBy32Beat = timeByBeat / 8;
     }
 
-    public void PlaySound()
+    void Start()
     {
-        if (!isGameStart)
-        {
-            soundManager.PlayBGM(SongName);
-            soundEffectManager.BeatEffect();
-            beatCounter = timeByBeat;
-            isGameStart = true;
-        }
+        //DEBUG
+        enemy.GetComponent<HexCellPosition>().setInitPosition(2, 1);
     }
 
     void FixedUpdate()
     {
         if (isGameStart)
         {
-            int prevBeats = nowBeats;
+            int prevBeats = nowBeat.addBeat;
 
             nowSongTime = SoundManager.instance.GetMusicLapsedTime() - offsetTime;
             if (nowSongTime > 0)
             {
-                nowBars = nowSongTime / timeByBar;
-                nowBeats = (nowSongTime / timeByBeat) % barCounts;
+                nowBeat.Set(nowSongTime / timeByBar,
+                    (nowSongTime / timeByBeat) % barCounts,
+                    (nowSongTime / timeBy24Beat) % 6,
+                    (nowSongTime / timeBy32Beat) % 8);
+                //nowBars = nowSongTime / timeByBar;
+                //nowBeats = (nowSongTime / timeByBeat) % barCounts;
+                //now24Beats = (nowSongTime / timeBy24Beat) % 6;
+                //now32Beats = (nowSongTime / timeBy32Beat) % 8;
+
                 beatCounter -= (int)(Time.deltaTime * 1000f);
 
-                if (prevBeats != nowBeats)
+                if (prevBeats != nowBeat.addBeat)
                 {
                     soundEffectManager.BeatEffect();
                     beatCounter = timeByBeat;
@@ -78,6 +93,16 @@ public class GameManager : MonoBehaviour
 
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
+        }
+    }
+    public void PlaySound()
+    {
+        if (!isGameStart)
+        {
+            soundManager.PlayBGM(SongName);
+            soundEffectManager.BeatEffect();
+            beatCounter = timeByBeat;
+            isGameStart = true;
         }
     }
 

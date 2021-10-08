@@ -112,6 +112,7 @@ public class HexGrid : MonoBehaviour
     }
     public void Start()
     {
+        //맵 생성
         for (int x = xMinLength; x <= xMaxLength; ++x)
         {
             for (int y = yMinLength; y <= yMaxLength; ++y)
@@ -120,7 +121,7 @@ public class HexGrid : MonoBehaviour
                 {
                     if (x + y + z == 0)
                     {
-                        print(cellType[0]);
+                        //print(cellType[0]);
                         GameObject tmpcell = Instantiate(cellType[0]); // <- 나중에 string name으로 바꿔야?
                         tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z);
                         tmpcell.name = "cell"+x+y+z;
