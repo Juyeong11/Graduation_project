@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ST_move : MonoBehaviour
 {
-    Vector3 PlayerPos;
+    Vector3 PlayerPos = new Vector3(MinPos, MinPos, 0f);
 
 
     const float Displacement = 1 - 0.01f;
@@ -12,33 +12,13 @@ public class ST_move : MonoBehaviour
     const float MaxPos = 3.5f * Displacement;
     const float MinPos = -3.5f * Displacement;
     // Start is called before the first frame update
-    void Start()
-    {
-        PlayerPos = new Vector3(MinPos, MaxPos, 0f);
-    }
+
 
     // Update is called once per frame
-    void Update()
+    public void SetPos(short x, short y)
     {
-        if (Input.GetKeyUp(KeyCode.W))
-        {
-            PlayerPos.y += Displacement;
-        }
-        if (Input.GetKeyUp(KeyCode.S))
-        {
-            PlayerPos.y -= Displacement;
-
-        }
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            PlayerPos.x -= Displacement;
-
-        }
-        if (Input.GetKeyUp(KeyCode.D))
-        {
-            PlayerPos.x += Displacement;
-
-        }
+        PlayerPos.x = x - 3.5f;
+        PlayerPos.y = y - 3.5f;
         PlayerPos.x = Mathf.Clamp(PlayerPos.x, MinPos, MaxPos);
         PlayerPos.y = Mathf.Clamp(PlayerPos.y, MinPos, MaxPos);
         gameObject.transform.position = PlayerPos;
