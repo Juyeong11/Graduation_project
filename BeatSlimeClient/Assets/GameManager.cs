@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager data;
+    public PatternManager PM;
 
     public GameObject player;
     public GameObject enemy;
@@ -26,7 +27,7 @@ public class GameManager : MonoBehaviour
     public int timeByBar;
     public int timeByBeat;
     public int timeBy24Beat;
-    public int timeBy32Beat;
+    public int timeBy16Beat;
     //public int nowBars;
     //public int nowBeats;
     //public int now24Beats;
@@ -55,13 +56,14 @@ public class GameManager : MonoBehaviour
         timeByBeat = (int)(1000f * 60f / bpm);
         timeByBar = timeByBeat * barCounts;
         timeBy24Beat = timeByBeat / 6;
-        timeBy32Beat = timeByBeat / 8;
+        timeBy16Beat = timeByBeat / 4;
     }
 
     void Start()
     {
         //DEBUG
-        enemy.GetComponent<HexCellPosition>().setInitPosition(2, 1);
+        enemy.GetComponent<HexCellPosition>().setInitPosition(1, 1);
+        PM = PatternManager.data;
     }
 
     void FixedUpdate()
@@ -73,14 +75,9 @@ public class GameManager : MonoBehaviour
             nowSongTime = SoundManager.instance.GetMusicLapsedTime() - offsetTime;
             if (nowSongTime > 0)
             {
-                nowBeat.Set(nowSongTime / timeByBar,
-                    (nowSongTime / timeByBeat) % barCounts,
-                    (nowSongTime / timeBy24Beat) % 6,
-                    (nowSongTime / timeBy32Beat) % 8);
-                //nowBars = nowSongTime / timeByBar;
-                //nowBeats = (nowSongTime / timeByBeat) % barCounts;
-                //now24Beats = (nowSongTime / timeBy24Beat) % 6;
-                //now32Beats = (nowSongTime / timeBy32Beat) % 8;
+                nowBeat.SetBeatTime(nowSongTime);
+
+                Debug.Log(nowBeat.ToString() + " : now");
 
                 beatCounter -= (int)(Time.deltaTime * 1000f);
 
@@ -95,6 +92,17 @@ public class GameManager : MonoBehaviour
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
         }
     }
+
+    IEnumerator AutoPatternSetter()
+    {
+        while (isGameStart)
+        {
+            PM.PeekPattern(nowBeat);
+            PM.ServePattern(nowBeat);
+            yield return null;
+        }
+    }
+
     public void PlaySound()
     {
         if (!isGameStart)
@@ -103,6 +111,7 @@ public class GameManager : MonoBehaviour
             soundEffectManager.BeatEffect();
             beatCounter = timeByBeat;
             isGameStart = true;
+            StartCoroutine(AutoPatternSetter());
         }
     }
 
@@ -126,7 +135,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Cutting");
+            //Debug.Log("Cutting");
         }
         return 0;
     }
@@ -135,11 +144,11 @@ public class GameManager : MonoBehaviour
     {
         if (beatCounter <= JudgementTiming)
         {
-            Debug.Log("Judge : -" + beatCounter);
+            //Debug.Log("Judge : -" + beatCounter);
         }
         else if (timeByBeat - beatCounter <= JudgementTiming)
         {
-            Debug.Log("Judge : +" + (timeByBeat - beatCounter));
+            //Debug.Log("Judge : +" + (timeByBeat - beatCounter));
         }
 
         alreadyMoved = JudgementTiming*2;

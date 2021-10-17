@@ -22,6 +22,7 @@ public class EnemyManager : MonoBehaviour
     public List<EAttack> enemyAttackList;
     public List<ENote> enemyNoteList;
 
+
     void Start()
     {
         grid = GameManager.data.grid;
@@ -31,5 +32,11 @@ public class EnemyManager : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void PatternServe()
+    {
+        //패턴 번호따라 애니메이션 등
+        grid.EnemyAttack(PatternManager.data.CastedPattern);
     }
 }

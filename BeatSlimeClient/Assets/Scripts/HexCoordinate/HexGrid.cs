@@ -134,4 +134,8 @@ public class HexGrid : MonoBehaviour
 
     }
 
+    public void EnemyAttack(Pattern p)
+    {
+        Debug.Log(p.rhythmBeat.ToString() + ", " + GameManager.data.nowBeat.ToString() + " " + "Damage!");
+    }
 }
