@@ -1059,6 +1059,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfc4ddcdd8014844d92d4926a96fda18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  state: 0
   enemyHp: 0
   enemyMaxHp: 0
   selfCoord: {fileID: 582958228}
@@ -1257,6 +1258,79 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &727645556
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 727645558}
+  - component: {fileID: 727645557}
+  m_Layer: 0
+  m_Name: PatternManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &727645557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727645556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92474badfed793b4098fe1e9d510e74d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SetSkill:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 582958232}
+        m_TargetAssemblyTypeName: EnemyManager, Assembly-CSharp
+        m_MethodName: PatternSet
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  CastSkill:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 582958232}
+        m_TargetAssemblyTypeName: EnemyManager, Assembly-CSharp
+        m_MethodName: PatternServe
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!4 &727645558
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 727645556}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1191372855
 GameObject:
   m_ObjectHideFlags: 0
@@ -1537,8 +1611,10 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  state: 0
   handle: {fileID: 1519395714}
   selfCoord: {fileID: 1519395713}
+  selfDirection: 0
   grid: {fileID: 1387123430}
 --- !u!23 &1519395716
 MeshRenderer:
@@ -2303,6 +2379,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76009d66e956dfb4cbb766c3683ae496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PM: {fileID: 0}
   player: {fileID: 1519395712}
   enemy: {fileID: 582958227}
   tilemap: {fileID: 1387123429}
@@ -2319,7 +2396,7 @@ MonoBehaviour:
   timeByBar: 0
   timeByBeat: 0
   timeBy24Beat: 0
-  timeBy32Beat: 0
+  timeBy16Beat: 0
   beatCounter: 0
   offsetTime: 156
   JudgementTiming: 60
