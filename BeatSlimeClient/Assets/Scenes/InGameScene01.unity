@@ -1287,6 +1287,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92474badfed793b4098fe1e9d510e74d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SetSkill:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 582958232}
+        m_TargetAssemblyTypeName: EnemyManager, Assembly-CSharp
+        m_MethodName: PatternSet
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   CastSkill:
     m_PersistentCalls:
       m_Calls:

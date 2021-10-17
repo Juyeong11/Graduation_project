@@ -18,9 +18,11 @@ public class EnemyManager : MonoBehaviour
     public HexCellPosition selfCoord;
     public HexGrid grid;
 
+    //Invalid
     public List<EMoving> enemyMovingList;
     public List<EAttack> enemyAttackList;
     public List<ENote> enemyNoteList;
+    //
 
 
     void Start()
@@ -34,9 +36,22 @@ public class EnemyManager : MonoBehaviour
         
     }
 
+    public void Beat()
+    {
+        grid.ePosition = selfCoord.coordinates;
+    }
+
+    public void PatternSet()
+    {
+        //여기서 애니메이션 처리
+        grid.WarningCell(PatternManager.data.SettedPattern);
+
+        //노트 타입따라 다른 애니메이션 만들 때 패턴 설정도 해 줘야 함 (id 사용)
+    }
+
     public void PatternServe()
     {
-        //패턴 번호따라 애니메이션 등
+        //여기서 장판데미지 처리
         grid.EnemyAttack(PatternManager.data.CastedPattern);
     }
 }

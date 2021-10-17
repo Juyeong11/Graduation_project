@@ -77,12 +77,18 @@ public class GameManager : MonoBehaviour
             {
                 nowBeat.SetBeatTime(nowSongTime);
 
-                Debug.Log(nowBeat.ToString() + " : now");
+                //Debug.Log(nowBeat.ToString() + " : now");
 
                 beatCounter -= (int)(Time.deltaTime * 1000f);
 
+                PM.PeekPattern(nowBeat);
+                PM.ServePattern(nowBeat);
+
                 if (prevBeats != nowBeat.addBeat)
                 {
+                    player.GetComponent<PlayerManager>().Beat();
+                    enemy.GetComponent<EnemyManager>().Beat();
+                    grid.Beat();
                     soundEffectManager.BeatEffect();
                     beatCounter = timeByBeat;
                 }
@@ -93,15 +99,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    IEnumerator AutoPatternSetter()
-    {
-        while (isGameStart)
-        {
-            PM.PeekPattern(nowBeat);
-            PM.ServePattern(nowBeat);
-            yield return null;
-        }
-    }
+    //IEnumerator AutoPatternSetter()
+    //{
+    //    while (isGameStart)
+    //    {
+    //        PM.PeekPattern(nowBeat);
+    //        PM.ServePattern(nowBeat);
+    //        yield return null;
+    //    }
+    //}
 
     public void PlaySound()
     {
@@ -111,7 +117,7 @@ public class GameManager : MonoBehaviour
             soundEffectManager.BeatEffect();
             beatCounter = timeByBeat;
             isGameStart = true;
-            StartCoroutine(AutoPatternSetter());
+            //StartCoroutine(AutoPatternSetter());
         }
     }
 
@@ -151,7 +157,7 @@ public class GameManager : MonoBehaviour
             //Debug.Log("Judge : +" + (timeByBeat - beatCounter));
         }
 
-        alreadyMoved = JudgementTiming*2;
+        alreadyMoved = JudgementTiming * 2;
     }
 
 }

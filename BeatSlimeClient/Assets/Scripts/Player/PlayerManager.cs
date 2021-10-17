@@ -57,6 +57,11 @@ public class PlayerManager : MonoBehaviour
 
     }
 
+    public void Beat()
+    {
+        grid.pPosition = selfCoord.coordinates;
+    }
+
     bool KeyCheck()
     {
         if (GameManager.data.getIsGoodTiming() != 0)

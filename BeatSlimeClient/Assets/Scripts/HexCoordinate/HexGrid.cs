@@ -15,18 +15,21 @@ public class Cell
     public int x;
     public int y;
     public int z;
+
+    public int duration = 0;
     public cellState state
     {
         get;
+        set;
     }
     public string sprite;
 
     public Cell()
     {
         obejct = null;
-        x = 0;
-        y = 0;
-        z = 0;
+        x = 1000;
+        y = 1000;
+        z = 1000;
         state = cellState.None;
         sprite = "none";
     }
@@ -44,6 +47,30 @@ public class Cell
     public (int,int,int) getCoordinate()
     {
         return (x, y, z);
+    }
+
+    public void Warning()
+    {
+        
+    }
+
+    public void Damage(int d)
+    {
+        duration = d;
+        state = cellState.Damaged;
+    }
+
+    public void Beat()
+    {
+
+        if (duration <= 0)
+        {
+            state = cellState.Normal;
+        }
+        else
+        {
+            duration--;
+        }
     }
 }
 
@@ -72,9 +99,42 @@ public class CellMap
             }
         }
 
-        //Debug.LogError(">Invalid coordinate<");
+        Debug.LogError(">Invalid coordinate<");
         return new Cell();
     }
+
+    public Cell Get(int x, int z)
+    {
+        foreach (var v in cellMaps)
+        {
+            if (v.getCoordinate().Item1 == x &&
+                v.getCoordinate().Item2 == -(x+z) &&
+                v.getCoordinate().Item3 == z)
+            {
+                return v;
+            }
+        }
+
+        Debug.LogError(">Invalid coordinate<");
+        return new Cell();
+    }
+
+    public Cell Get(HexCoordinates H)
+    {
+        foreach (var v in cellMaps)
+        {
+            if (v.getCoordinate().Item1 == H.X &&
+                v.getCoordinate().Item2 == H.Y &&
+                v.getCoordinate().Item3 == H.Z)
+            {
+                return v;
+            }
+        }
+
+        Debug.LogError(">Invalid coordinate<");
+        return new Cell();
+    }
+
 }
 
 [System.Serializable]
@@ -93,8 +153,14 @@ public class HexGrid : MonoBehaviour
     public List<GameObject> cellType;
     public CellMap cellMaps;
 
+    //위치
+    public HexCoordinates pPosition;
+    public HexCoordinates ePosition;
+
+    public List<List<HexCoordinates>> RedZones;
+
     public HexGrid()
-    {
+    { 
         // LintJson 넣고 Json에서 읽어올 예정
 
         cellMaps = new CellMap();
@@ -106,12 +172,26 @@ public class HexGrid : MonoBehaviour
         zMinLength = -3;
     }
 
+    public void Beat()
+    {
+        if (cellMaps.Get(pPosition).state == cellState.Damaged)
+        {
+            Debug.Log("Player Damaged!");
+        }
+        foreach(var cell in cellMaps.cellMaps)
+        {
+            cell.Beat();
+        }
+    }
+
     public override string ToString()
     {
         return "override this!";
     }
     public void Start()
     {
+        RedZones = new List<List<HexCoordinates>>();
+
         //맵 생성
         for (int x = xMinLength; x <= xMaxLength; ++x)
         {
@@ -134,8 +214,36 @@ public class HexGrid : MonoBehaviour
 
     }
 
+
+    //DEBUG----------------------------------------이 아래로 다 고쳐야함
+    Dictionary<int, HexCoordinates> cellStoredPos = new Dictionary<int, HexCoordinates>();
+
+    public void WarningCell(Pattern p)
+    {
+        //위치 세팅하면 저장해야함
+        HexCoordinates RedZone = new HexCoordinates();
+
+        //DEBUG - 이대로 두면 안 됨
+        if (p.noteType == 1)
+        {
+            RedZone = pPosition;
+        }
+
+        //foreach(var coord in RedZone)
+        {
+            RedZone.plus(p.pivot.X, p.pivot.Z);
+            //Debug.Log(RedZone.ToString());
+            cellMaps.Get(RedZone).Warning();
+            cellStoredPos.Add(p.id,RedZone);
+        }
+    }
+
     public void EnemyAttack(Pattern p)
     {
-        Debug.Log(p.rhythmBeat.ToString() + ", " + GameManager.data.nowBeat.ToString() + " " + "Damage!");
+        //주의! 세팅된 위치가 아니라 다른 위치 쓰면 안됨
+
+        Debug.Log(p.rhythmBeat.ToString() + ", " + cellStoredPos[p.id]);
+
+        cellMaps.Get(cellStoredPos[p.id]).Damage(1);
     }
 }

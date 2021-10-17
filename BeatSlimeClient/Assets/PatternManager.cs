@@ -6,10 +6,12 @@ using UnityEngine.Events;
 public class PatternManager : MonoBehaviour
 {
     public static PatternManager data;
+    public UnityEvent SetSkill;
     public UnityEvent CastSkill;
     public List<Pattern> pattern;
     public List<Pattern> settedPattern;
 
+    public Pattern SettedPattern;
     public Pattern CastedPattern;
 
     private void Awake()
@@ -47,6 +49,8 @@ public class PatternManager : MonoBehaviour
         int patNums = 0;
         while(pattern.Count > 0 && pattern[0].GetAppearBeat() <= b)
         {
+            SettedPattern = pattern[0];
+            SetSkill.Invoke();
             settedPattern.Add(pattern[0]);
             pattern.RemoveAt(0);
             patNums++;

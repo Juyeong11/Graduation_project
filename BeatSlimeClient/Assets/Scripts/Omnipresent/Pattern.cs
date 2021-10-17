@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Pattern
 {
+    public static int id_ = 0;
+    public int id;
     public Beat rhythmBeat;
     public Beat warningBeatOffset;
     public int noteType;
@@ -15,6 +17,8 @@ public class Pattern
 
     public Pattern(Dictionary<string, object> datas, int prebar)
     {
+        id_++;
+        id = id_;
         rhythmBeat = new Beat();
         warningBeatOffset = new Beat();
 
