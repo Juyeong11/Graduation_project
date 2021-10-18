@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
     //public int nowBeats;
     //public int now24Beats;
     //public int now32Beats;
-    public Beat nowBeat;
+    [SerializeField] Beat nowBeat;
     public int beatCounter = 0;
 
     public int offsetTime;

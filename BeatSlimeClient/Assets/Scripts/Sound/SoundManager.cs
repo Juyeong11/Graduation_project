@@ -26,6 +26,10 @@ public class SoundManager : MonoBehaviour
 
     [SerializeField] AudioSource bgmPlayer = null;
     [SerializeField] AudioSource[] sfxPlayer = null;
+
+    float pAnimUnitBPM = 45f;
+    public Animator pAnimation;
+    public Animator eAnimation;
     // Start is called before the first frame update
 
     private void Awake()
@@ -38,6 +42,7 @@ public class SoundManager : MonoBehaviour
         {
             if (p_bgmName == bgm[i].name)
             {
+                pAnimation.SetFloat("Speed", bgm[i].bpm / pAnimUnitBPM);
                 bgmPlayer.clip = bgm[i].clip;
                 bgmPlayer.Play();
             }

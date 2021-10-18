@@ -46,7 +46,7 @@ public class PlayerManager : MonoBehaviour
         else
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 2f * Time.fixedDeltaTime, gameObject.transform.position.z);
 
-        if (gameObject.transform.position.y < 0.5f)
+        if (gameObject.transform.position.y < -0.1f)
         {
             if (isFly)
             {
@@ -120,6 +120,8 @@ public class PlayerManager : MonoBehaviour
 
     void resetPosition()
     {
-        gameObject.transform.position = new Vector3(gameObject.transform.position.x, (2f * GameManager.data.beatCounter / GameManager.data.timeByBeat) + 0.5f, gameObject.transform.position.z);
+        //gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0f, gameObject.transform.position.z);
+
+        gameObject.transform.position = new Vector3(gameObject.transform.position.x, (2f * GameManager.data.beatCounter / GameManager.data.timeByBeat) - 0.1f, gameObject.transform.position.z);
     }
 }
