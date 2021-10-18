@@ -120,6 +120,8 @@ public class PlayerManager : MonoBehaviour
 
     void resetPosition()
     {
+        //gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0f, gameObject.transform.position.z);
+
         gameObject.transform.position = new Vector3(gameObject.transform.position.x, (2f * GameManager.data.beatCounter / GameManager.data.timeByBeat) - 0.1f, gameObject.transform.position.z);
     }
 }
