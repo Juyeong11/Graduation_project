@@ -93,7 +93,7 @@ public:
 		if (ret == SOCKET_ERROR)
 		{
 			int error_num = WSAGetLastError();
-			if(ERROR_IO_PENDING != error_num)
+			if (ERROR_IO_PENDING != error_num)
 				error_display(error_num);
 		}
 	}
@@ -146,7 +146,7 @@ void send_remove_object(int c_id, int victim)
 	packet.id = victim;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_REMOVE_OBJECT;
-	
+
 	clients[c_id].do_send(sizeof(packet), &packet);
 
 }
@@ -176,7 +176,7 @@ void process_packet(int client_id, unsigned char* ps)
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(ps);
 		strcpy_s(cl.name, packet->name);
 
-		
+		cout << "Client[" << cl._id << "]" << " login\n";
 		send_login_ok_packet(client_id);
 
 		for (auto& other : clients) {
@@ -220,6 +220,8 @@ void process_packet(int client_id, unsigned char* ps)
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(ps);
 		short& x = cl.x;
 		short& y = cl.y;
+		cout << "Client[" << cl._id << "]" << " move to " << x << ", " << y << endl;
+
 		switch (packet->direction)
 		{
 		case 0: if (y > 0) y--;  break;
@@ -232,7 +234,7 @@ void process_packet(int client_id, unsigned char* ps)
 			break;
 		}
 		for (auto& cl : clients) {
-			if(cl.in_use)
+			if (cl.in_use)
 				send_move_packet(cl._id, client_id);
 		}
 
@@ -275,7 +277,7 @@ int main()
 		//PULONG_PTR iocp_key;
 		LONG64 iocp_key;
 		WSAOVERLAPPED* p_over;
-		
+
 		BOOL ret = GetQueuedCompletionStatus(h_iocp, &num_byte, (PULONG_PTR)&iocp_key, &p_over, INFINITE);
 		//cout << "GQCS ACCEPT\n";
 
@@ -287,7 +289,7 @@ int main()
 
 		int err = WSAGetLastError();
 
-		if ( err == ERROR_NETNAME_DELETED || err == WSAECONNABORTED) {
+		if (err == ERROR_NETNAME_DELETED || err == WSAECONNABORTED) {
 			cout << "비정상 종료" << endl;
 			//에러 정보를 받아서 제대로 해줘야 한다.
 			Disconnect(client_id);
@@ -295,7 +297,7 @@ int main()
 				delete exp_over;
 			continue;
 		}
-		else if(err == 0 && num_byte == 0 ) {
+		else if (err == 0 && num_byte == 0) {
 			cout << "정상 종료" << endl;
 
 			Disconnect(client_id);
@@ -372,7 +374,7 @@ int main()
 	}
 
 	for (auto& cl : clients) {
-		if(cl.in_use)
+		if (cl.in_use)
 			Disconnect(cl._id);
 	}
 	closesocket(s_socket);
