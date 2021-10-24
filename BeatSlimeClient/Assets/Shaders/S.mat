@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: S
-  m_Shader: {fileID: -6465566751694194690, guid: 8e43b2560ae7e23469f753a25995b7db, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 5680b5c6f9690f94cba00493a86d8ffe, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -25,6 +25,14 @@ Material:
         m_Offset: {x: 0, y: 0}
     - Texture2D_23fa33c195464093bdb854883d68ca47:
         m_Texture: {fileID: 2800000, guid: f27f834e762abdc418fca3e2c9feb197, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_52cf47bd6fb345189129abfdbc1c7593:
+        m_Texture: {fileID: 2800000, guid: f27f834e762abdc418fca3e2c9feb197, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_5f647bf3261a47378c12702210fdac8d:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_8904a014422d4310b2c5b629de5d0cf0:
@@ -46,15 +54,22 @@ Material:
     m_Floats:
     - Vector1_0643bd79b6d34d6ba43c621e955e6ebc: 0
     - Vector1_2a2f10dbef6b4e11b6ba4bfa37944ece: 0
+    - Vector1_439f4192612540408d182d81359cefd0: 0.2
     - Vector1_5a7263454ce64b13922beb551a5eb50b: 0
     - Vector1_5a7423fe00184ffd919bcb6dea621de1: 100
+    - Vector1_5f9d4ffde00e44699e1a12e862ea3c60: 0.5
+    - Vector1_9ac32e8ade8c4b1cb19d19cc9554c0f6: 0
     - Vector1_a32530b4aec64eafbd2e58794f19eab2: 0.5
+    - Vector1_c19d6514ed374c20a0c13156acde8e3d: 0
     - Vector1_d878b6d133dd435186a2afbb2f40e61e: 5
     - Vector1_f02c61ab0fce4f5e892210445f379a33: 0
     - Vector1_fe8a26b8bc554111806af711d98cd7a2: 1
+    - Vector1_fedc7aafb8d541e5ac25fe3f2baa587f: 5
     m_Colors:
+    - Color_658ca3492a0d4c5294b395208005e893: {r: 1, g: 1, b: 1, a: 0}
     - Color_7c268a0deac4477ea042f3db115b9e81: {r: 0, g: 0, b: 0, a: 0}
     - Color_80f2f21e62d545028c502d0b7230bedf: {r: 0, g: 0, b: 0, a: 0}
+    - Color_a6281e42145b4ce6ab00d5a53f34258d: {r: 0, g: 0, b: 0, a: 0}
     - Vector3_a6f594321f8b4cac9c9b9040309eb6f9: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
 --- !u!114 &7175430182457760525
