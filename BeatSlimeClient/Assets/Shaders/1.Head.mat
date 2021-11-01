@@ -22,7 +22,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: 1.Head
   m_Shader: {fileID: -6465566751694194690, guid: 5680b5c6f9690f94cba00493a86d8ffe, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _MAIN_LIGHT_CALCULATE_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _SHADOWS_SOFT
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -50,6 +50,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     - Texture2D_52cf47bd6fb345189129abfdbc1c7593:
         m_Texture: {fileID: 2800000, guid: f4e01a160c2a1174eb831c5553db62b7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_826ffeab11d94f6ea5f4e5dc1039d644:
+        m_Texture: {fileID: 2800000, guid: cf375cd7f41c9b04a814a342ea80f581, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
@@ -109,6 +113,9 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - BOOLEAN_936EB16E0FF04BACA0145C6EA56C779E: 0
+    - BOOLEAN_E8520ACDE2B547839AB81B7F913DE9C5: 0
+    - BOOLEAN_FF9AF917765D41C083B3F28E8C390F81: 0
     - Brightness_Rim: 2
     - Rim_Power: 3.87
     - Toon_Ramp_Offset: 0.348
