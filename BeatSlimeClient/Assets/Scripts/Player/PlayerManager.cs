@@ -20,7 +20,15 @@ public class PlayerManager : MonoBehaviour
     public HexDirection selfDirection;
     public HexGrid grid;
 
-    void Start()
+    public void Start()
+    {
+        grid = GameManager.data.grid;
+        state = playerState.Idle;
+        selfDirection = HexDirection.Up;
+        onPlayerFly.Invoke();
+        isFly = true;
+    }
+    public void LoginOk()
     {
         grid = GameManager.data.grid;
         state = playerState.Idle;
@@ -70,50 +78,119 @@ public class PlayerManager : MonoBehaviour
         }
         return false;
     }
-
+    public void PlayerMove(int x,int y, int z)
+    {
+        //GameManager.data.setMoved();
+       // if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).state != cellState.None)
+            selfCoord.SetPosition(x, y, z);
+        //selfDirection = HexDirection.LeftUp;
+    }
     void KeyHandler()
     {
         if (Input.GetKeyDown(KeyCode.Q) && KeyCheck())
         {
-            GameManager.data.setMoved();
-            if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).state != cellState.None)
-                selfCoord.plus(-1, 0, 1);
-            selfDirection = HexDirection.LeftUp;
+            if (GameManager.data.Net.isOnline)
+            {
+                // 서버에 이동 전송
+                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.LEFTUP);
+                selfDirection = HexDirection.LeftUp;
+
+            }
+            else
+            {
+                GameManager.data.setMoved();
+                if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).state != cellState.None)
+                    selfCoord.plus(-1, 0, 1);
+                selfDirection = HexDirection.LeftUp;
+            }
+
+
+          
         }
         else if (Input.GetKeyDown(KeyCode.W) && KeyCheck())
         {
-            GameManager.data.setMoved();
-            if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).state != cellState.None)
-                selfCoord.plus(0, -1, 1);
-            selfDirection = HexDirection.Up;
+            if (GameManager.data.Net.isOnline)
+            {
+                // 서버에 이동 전송
+                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.UP);
+                selfDirection = HexDirection.Up;
+
+            }
+            else
+            {
+                GameManager.data.setMoved();
+                if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).state != cellState.None)
+                    selfCoord.plus(0, -1, 1);
+                selfDirection = HexDirection.Up;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.E) && KeyCheck())
         {
-            GameManager.data.setMoved();
-            if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).state != cellState.None)
-                selfCoord.plus(1, -1, 0);
-            selfDirection = HexDirection.RightUp;
+            if (GameManager.data.Net.isOnline)
+            {
+                // 서버에 이동 전송
+                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
+                selfDirection = HexDirection.RightUp;
+
+            }
+            else
+            {
+                GameManager.data.setMoved();
+                if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).state != cellState.None)
+                    selfCoord.plus(1, -1, 0);
+                selfDirection = HexDirection.RightUp;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.A) && KeyCheck())
         {
-            GameManager.data.setMoved();
-            if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).state != cellState.None)
-                selfCoord.plus(-1, 1, 0);
-            selfDirection = HexDirection.LeftDown;
+            if (GameManager.data.Net.isOnline)
+            {
+                // 서버에 이동 전송
+                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
+                selfDirection = HexDirection.LeftDown;
+
+            }
+            else
+            {
+                GameManager.data.setMoved();
+                if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).state != cellState.None)
+                    selfCoord.plus(-1, 1, 0);
+                selfDirection = HexDirection.LeftDown;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.S) && KeyCheck())
         {
-            GameManager.data.setMoved();
-            if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z - 1).state != cellState.None)
-                selfCoord.plus(0, 1, -1);
-            selfDirection = HexDirection.Down;
+            if (GameManager.data.Net.isOnline)
+            {
+                // 서버에 이동 전송
+                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.DOWN);
+                selfDirection = HexDirection.Down;
+
+            }
+            else
+            {
+                GameManager.data.setMoved();
+                if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z - 1).state != cellState.None)
+                    selfCoord.plus(0, 1, -1);
+                selfDirection = HexDirection.Down;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.D) && KeyCheck())
         {
-            GameManager.data.setMoved();
-            if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).state != cellState.None)
-                selfCoord.plus(1, 0, -1);
-            selfDirection = HexDirection.RightDown;
+            if (GameManager.data.Net.isOnline)
+            {
+                // 서버에 이동 전송
+                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
+                selfDirection = HexDirection.RightDown;
+
+            }
+            else
+            {
+                GameManager.data.setMoved();
+                if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).state != cellState.None)
+                    selfCoord.plus(1, 0, -1);
+                selfDirection = HexDirection.RightDown;
+            }
         }
     }
 

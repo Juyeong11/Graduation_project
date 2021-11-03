@@ -41,6 +41,8 @@ public class GameManager : MonoBehaviour
 
     public int alreadyMoved;
 
+    public Network Net = new Network();
+
     void Awake()
     {
         print("Start");
@@ -64,11 +66,13 @@ public class GameManager : MonoBehaviour
         //DEBUG
         enemy.GetComponent<HexCellPosition>().setInitPosition(1, 1);
         PM = PatternManager.data;
+
+        Net.CreateAndConnect();
     }
 
     void FixedUpdate()
     {
-        if (isGameStart)
+        if (isGameStart && !Net.isOnline)
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -97,8 +101,56 @@ public class GameManager : MonoBehaviour
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
         }
-    }
+        else
+        {
+            // 네트워크 메세지 큐
+            if (Network.MessQueue.Count > 0)
+            {
+                byte[] data = Network.MessQueue.Dequeue();
 
+                byte type = data[1];
+
+                switch (type)
+                {
+                    case Protocol.CONSTANTS.SC_PACKET_LOGIN_OK:
+                        {
+                            Protocol.sc_packet_login_ok p = Protocol.sc_packet_login_ok.SetByteToVar(data);
+
+                            player.GetComponent<PlayerManager>().LoginOk();
+                            //PutPlayerObject(p.type, p.id, p.x, p.y);
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_MOVE:
+                        {
+                            Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
+                            //Debug.Log("이동");
+                            //MoveObject(p.type, p.id, p.x, p.y);
+                            Debug.Log(p.x + "," + p.y + ", "+ p.z);
+                            player.GetComponent<PlayerManager>().PlayerMove(p.x, p.y, p.z);
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
+                        {
+                            Protocol.sc_packet_put_object p = Protocol.sc_packet_put_object.SetByteToVar(data);
+
+                            //PutObject(p.type, p.id, p.x, p.y);
+
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_REMOVE_OBJECT:
+                        {
+                            Protocol.sc_packet_remove_object p = Protocol.sc_packet_remove_object.SetByteToVar(data);
+
+                            //ReMoveObject(p.id);
+                        }
+                        break;
+                    default:
+                        Debug.Log("이상한 타입이네");
+                        break;
+                }
+            }
+        }
+    }
     //IEnumerator AutoPatternSetter()
     //{
     //    while (isGameStart)

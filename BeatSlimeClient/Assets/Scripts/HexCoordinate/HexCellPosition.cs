@@ -25,7 +25,11 @@ public class HexCellPosition : MonoBehaviour
         coordinates.plus(x, z);
         refelectPosition();
     }
-
+    public void SetPosition(int x, int y, int z)
+    {
+        coordinates.setCoordinates(x, z);
+        refelectPosition();
+    }
     public (int,int,int) Get()
     {
         return (coordinates.X, coordinates.Y, coordinates.Z);
