@@ -1,12 +1,17 @@
 #pragma once
+
+
+
 class Enemy {
 	short x, y, z;
-	int id;
 	bool isActive;
 public:
-	void update()
-	{
-
+	int _id;
+	Enemy(int id) :x(0), y(0), z(0), _id(id) {
+		isActive = false;
 	}
+	void PutObject(char* buf, int& buf_start);
+	void update(char* buf, int& buf_start);
+
 
 };

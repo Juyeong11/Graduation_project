@@ -49,7 +49,7 @@ public class Network
 
         Socket tempSocket = (Socket)ar.AsyncState;
         IPEndPoint severEP = (IPEndPoint)tempSocket.RemoteEndPoint;
-        if (severEP == null)
+        if (severEP == null && tempSocket != null)
         {
             Debug.Log("재연결 시도");
             StartConnect();
@@ -78,7 +78,8 @@ public class Network
         }
         catch (SocketException ex)
         {
-            Debug.Log(ex.NativeErrorCode);
+           // if(ex.)
+            Debug.Log(ex.SocketErrorCode);
             CreateAndConnect();
         }
     }

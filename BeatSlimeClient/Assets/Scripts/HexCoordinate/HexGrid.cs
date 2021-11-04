@@ -176,6 +176,7 @@ public class HexGrid : MonoBehaviour
     {
         if (cellMaps.Get(pPosition).state == cellState.Damaged)
         {
+            if(!GameManager.data.Net.isOnline)
             Debug.Log("Player Damaged!");
         }
         foreach(var cell in cellMaps.cellMaps)

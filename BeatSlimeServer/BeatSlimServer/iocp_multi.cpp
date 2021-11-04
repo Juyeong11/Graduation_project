@@ -5,6 +5,8 @@
 #include <vector>
 #include<thread>
 #include<mutex>
+#include"Enemy.h"
+
 #include "protocol.h"
 using namespace std;
 #pragma comment (lib, "WS2_32.LIB")
@@ -118,6 +120,7 @@ public:
 };
 
 array <CLIENT, MAX_USER> clients;
+vector <Enemy> Enemys;
 
 int get_new_id()
 {
@@ -187,7 +190,7 @@ void Disconnect(int c_id)
 		};
 		cl.state_lock.unlock();
 		send_remove_object(cl._id, c_id);
-
+		clients[c_id].x = clients[c_id].y = clients[c_id].z = 0;
 	}
 }
 void process_packet(int client_id, unsigned char* ps)
@@ -200,7 +203,7 @@ void process_packet(int client_id, unsigned char* ps)
 	case CS_PACKET_LOGIN:
 	{
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(ps);
-		strcpy_s(cl.name, packet->name);
+		//strcpy_s(cl.name, packet->name);
 
 		cout << "Client[" << cl._id << "]" << " login\n";
 		send_login_ok_packet(client_id);
@@ -217,7 +220,7 @@ void process_packet(int client_id, unsigned char* ps)
 
 			sc_packet_put_object packet;
 			packet.id = client_id;
-			strcpy_s(packet.name, cl.name);
+			//strcpy_s(packet.name, cl.name);
 			packet.object_type = PLAPER;
 			packet.size = sizeof(packet);
 			packet.type = SC_PACKET_PUT_OBJECT;
@@ -241,7 +244,7 @@ void process_packet(int client_id, unsigned char* ps)
 
 			sc_packet_put_object packet;
 			packet.id = other._id;
-			strcpy_s(packet.name, other.name);
+			//strcpy_s(packet.name, other.name);
 			packet.object_type = PLAPER;
 			packet.size = sizeof(packet);
 			packet.type = SC_PACKET_PUT_OBJECT;
@@ -252,6 +255,18 @@ void process_packet(int client_id, unsigned char* ps)
 
 			cl.do_send(sizeof(packet), &packet);
 		}
+
+		char buf[256];
+		int bufStart = 0;
+
+
+		for (auto& En : Enemys) {
+			En.PutObject(buf, bufStart);
+		}
+		for (auto& cl : clients) {
+			cl.do_send(bufStart, buf);
+		}
+
 	}
 	break;
 	case CS_PACKET_MOVE:
@@ -261,7 +276,7 @@ void process_packet(int client_id, unsigned char* ps)
 		short& x = cl.x;
 		short& y = cl.y;
 		short& z = cl.z;
-		cout << "Client[" << cl._id << "]" << " move to " << x <<", " << y << ", " << z << endl;
+		cout << "Client[" << cl._id << "]" << " move to " << x << ", " << y << ", " << z << endl;
 
 		switch (packet->direction)
 		{
@@ -439,21 +454,44 @@ int main()
 		clients[i]._id = i;
 	}
 
+
+	Enemys.reserve(4);
+	for (int i = 0; i < 4; ++i)
+	{
+		Enemys.emplace_back(i);
+	}
+
 	vector<thread> worker_threads;
 
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(worker);
 
+
+	char buf[256];
+	int bufStart = 0;
+
 	while (true) {
 		//game loop
+		memset(buf, 0, sizeof(buf));
+		bufStart = 0;
 
+		for (auto& En : Enemys) {
+			En.update(buf, bufStart);
+		}
+
+		if (bufStart)
+			for (auto& cl : clients) {
+				cl.do_send(bufStart, buf);
+			}
+		SleepEx(1000, true);
 	}
+
 	for (auto& th : worker_threads)
 	{
 		th.join();
 	}
 
-	
+
 	for (auto& cl : clients) {
 		if (ST_INGAME == cl._state)
 			Disconnect(cl._id);

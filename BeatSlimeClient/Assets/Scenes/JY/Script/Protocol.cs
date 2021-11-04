@@ -20,6 +20,7 @@ namespace Protocol
         public const byte SC_PACKET_MOVE = 2;
         public const byte SC_PACKET_PUT_OBJECT = 3;
         public const byte SC_PACKET_REMOVE_OBJECT = 4;
+        public const byte SC_PACKET_MOVE_OBJECT = 5;
     }
     
 
@@ -65,8 +66,8 @@ namespace Protocol
         public byte size;
         public byte type;
 
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
-        public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];
+/*        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
+        public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
     }
 
 
@@ -112,6 +113,16 @@ namespace Protocol
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_move_object : ISerializeble<sc_packet_move_object>
+    {
+        public byte size;
+        public byte type;
+        public int id;
+        public short x, y, z;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class sc_packet_put_object : ISerializeble<sc_packet_put_object>
     {
         public byte size;
@@ -119,6 +130,9 @@ namespace Protocol
         public int id;
         public short x, y, z;
         public byte obj_type;
+
+/*        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
+        public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
     }
 
     [Serializable]

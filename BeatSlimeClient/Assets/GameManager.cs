@@ -63,7 +63,10 @@ public class GameManager : MonoBehaviour
         timeBy24Beat = timeByBeat / 6;
         timeBy16Beat = timeByBeat / 4;
     }
-
+    private void OnApplicationQuit()
+    {
+        Net.CloseSocket();
+    }
     void Start()
     {
         //DEBUG
@@ -106,6 +109,33 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            int prevBeats = nowBeat.addBeat;
+
+            nowSongTime = SoundManager.instance.GetMusicLapsedTime() - offsetTime;
+            if (nowSongTime > 0)
+            {
+                nowBeat.SetBeatTime(nowSongTime);
+
+                //Debug.Log(nowBeat.ToString() + " : now");
+
+                beatCounter -= (int)(Time.deltaTime * 1000f);
+
+                PM.PeekPattern(nowBeat);
+                PM.ServePattern(nowBeat);
+
+                if (prevBeats != nowBeat.addBeat)
+                {
+                    Players[myPlayerID].GetComponent<PlayerManager>().Beat();
+                    enemy.GetComponent<EnemyManager>().Beat();
+                    grid.Beat();
+                    soundEffectManager.BeatEffect();
+                    beatCounter = timeByBeat;
+                }
+            }
+
+            if (alreadyMoved > 0)
+                alreadyMoved -= (int)(Time.deltaTime * 1000f);
+
             // 네트워크 메세지 큐
             if (Network.MessQueue.Count > 0)
             {
@@ -120,23 +150,32 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_login_ok p = Protocol.sc_packet_login_ok.SetByteToVar(data);
 
                             myPlayerID = p.id;
-                            Players[p.id] = Instantiate(ObjectPool.instance.PlayerPrefeb, transform.position, Quaternion.identity);
+                            Players[p.id] = player;
                             //PutPlayerObject(p.type, p.id, p.x, p.y);
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
+                            Debug.Log("이동");
+                            //MoveObject(p.type, p.id, p.x, p.y);
+                            Debug.Log(p.x + "," + p.y + ", " + p.z);
+
+                            //Debug.Log(p.id+"이동");
+                            Players[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_MOVE_OBJECT:
+                        {
+                            Protocol.sc_packet_move_object p = Protocol.sc_packet_move_object.SetByteToVar(data);
                             //Debug.Log("이동");
                             //MoveObject(p.type, p.id, p.x, p.y);
-                            Debug.Log(p.x + "," + p.y + ", "+ p.z);
-                            if (myPlayerID == p.id)
-                                player.GetComponent<PlayerManager>().PlayerMove(p.x, p.y, p.z);
-                            else
-                            {
-                                Debug.Log("이동");
-                                Players[p.id].transform.position = new Vector3(p.x, p.y, p.z);
-                            }
+                            //Debug.Log(p.x + "," + p.y + ", " + p.z);
+
+                            //Debug.Log(p.id + "이동");
+                            Enemys[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
@@ -148,17 +187,21 @@ public class GameManager : MonoBehaviour
                             {
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
-                                        Debug.Log("플레이어 넣음");
+                                        Debug.Log(p.id + ", " + p.x + ", "+  p.y + ", " + p.z + ", " + "플레이어 넣음");
                                         Players[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                         Players[p.id].SetActive(true);
-                                        Players[p.id].transform.position = new Vector3(p.x, p.y, p.z);
+                                        Players[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
+
+                                        Players[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         break;
                                     }
                                 case (byte)Protocol.OBJECT_TYPE.ENEMY:
                                     {
+                                       // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
+
                                         Enemys[p.id] = ObjectPool.instance.EnemyObjectQueue.Dequeue();
                                         Enemys[p.id].SetActive(true);
-                                        Enemys[p.id].transform.position = new Vector3(p.x, p.y, p.z);
+                                        Enemys[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                     }
                                     break;
                             }

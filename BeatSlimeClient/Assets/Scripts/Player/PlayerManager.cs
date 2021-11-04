@@ -25,7 +25,7 @@ public class PlayerManager : MonoBehaviour
         grid = GameManager.data.grid;
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
-        onPlayerFly.Invoke();
+        //onPlayerFly.Invoke();
         isFly = true;
     }
     public void LoginOk()
@@ -33,36 +33,35 @@ public class PlayerManager : MonoBehaviour
         grid = GameManager.data.grid;
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
-        onPlayerFly.Invoke();
+        //onPlayerFly.Invoke();
         isFly = true;
     }
 
-    void Update()
-    {
-        if (GameManager.data.isGameStart)
-        {
-            KeyHandler();
-        }
 
-    }
 
     void FixedUpdate()
     {
         //DEBUG
-        if (GameManager.data.isGameStart)
-            resetPosition();
-        else
-            gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - 2f * Time.fixedDeltaTime, gameObject.transform.position.z);
+        //if (GameManager.data.isGameStart)
+        //    resetPosition();
+        //else
+        //   gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y -2.f*Time.deltaTime, gameObject.transform.position.z);
 
-        if (gameObject.transform.position.y < -0.1f)
+/*        if (gameObject.transform.position.y < -0.1f)
         {
             if (isFly)
             {
                 onPlayerStand.Invoke();
                 isFly = false;
             }
-        }
+        }*/
 
+        if (GameManager.data.Net.isOnline)
+            GameManager.data.PlaySound();
+        if (GameManager.data.isGameStart)
+        {
+            KeyHandler();
+        }
     }
 
     public void Beat()
@@ -91,7 +90,10 @@ public class PlayerManager : MonoBehaviour
         {
             if (GameManager.data.Net.isOnline)
             {
+                //Debug.Log("키 전송");
                 // 서버에 이동 전송
+                GameManager.data.setMoved();
+
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.LEFTUP);
                 selfDirection = HexDirection.LeftUp;
 
@@ -111,6 +113,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (GameManager.data.Net.isOnline)
             {
+                GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.UP);
                 selfDirection = HexDirection.Up;
@@ -128,6 +131,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (GameManager.data.Net.isOnline)
             {
+                GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
                 selfDirection = HexDirection.RightUp;
@@ -145,6 +149,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (GameManager.data.Net.isOnline)
             {
+                GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
                 selfDirection = HexDirection.LeftDown;
@@ -162,6 +167,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (GameManager.data.Net.isOnline)
             {
+                GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.DOWN);
                 selfDirection = HexDirection.Down;
@@ -179,6 +185,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (GameManager.data.Net.isOnline)
             {
+                GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
                 selfDirection = HexDirection.RightDown;

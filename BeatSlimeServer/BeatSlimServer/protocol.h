@@ -13,7 +13,8 @@ const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
 const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_REMOVE_OBJECT = 4;
-const char SC_PACKET_TIMER = 5;
+const char SC_PACKET_MOVE_OBJECT = 5;
+const char SC_PACKET_TIMER = 6;
 
 const short SERVER_PORT = 4000;
 
@@ -30,7 +31,7 @@ enum OBJECT_TYPE
 struct cs_packet_login {
 	unsigned char size;
 	char	type;
-	char	name[MAX_NAME_SIZE];
+	//char	name[MAX_NAME_SIZE];
 };
 
 struct cs_packet_move {
@@ -59,6 +60,12 @@ struct sc_packet_move {
 	int		id;
 	short  x, y, z;
 };
+struct sc_packet_move_object {
+	unsigned char size;
+	char type;
+	int		id;
+	short  x, y, z;
+};
 
 struct sc_packet_put_object {
 	unsigned char size;
@@ -66,7 +73,7 @@ struct sc_packet_put_object {
 	int id;
 	short x, y,z;
 	char object_type;
-	char	name[MAX_NAME_SIZE];
+	//char	name[MAX_NAME_SIZE];
 };
 
 struct sc_packet_remove_object {
