@@ -64,6 +64,7 @@ public:
 
 
 enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME };
+
 class CLIENT {
 public:
 	char name[MAX_NAME_SIZE];
@@ -142,7 +143,7 @@ void send_login_ok_packet(int c_id)
 	packet.type = SC_PACKET_LOGIN_OK;
 	packet.x = clients[c_id].x;
 	packet.y = clients[c_id].y;
-	packet.z = clients[mover].z;
+	packet.z = clients[c_id].z;
 
 	clients[c_id].do_send(sizeof(packet), &packet);
 }
@@ -217,7 +218,7 @@ void process_packet(int client_id, unsigned char* ps)
 			sc_packet_put_object packet;
 			packet.id = client_id;
 			strcpy_s(packet.name, cl.name);
-			packet.object_type = 0;
+			packet.object_type = PLAPER;
 			packet.size = sizeof(packet);
 			packet.type = SC_PACKET_PUT_OBJECT;
 			packet.x = cl.x;
@@ -241,7 +242,7 @@ void process_packet(int client_id, unsigned char* ps)
 			sc_packet_put_object packet;
 			packet.id = other._id;
 			strcpy_s(packet.name, other.name);
-			packet.object_type = 0;
+			packet.object_type = PLAPER;
 			packet.size = sizeof(packet);
 			packet.type = SC_PACKET_PUT_OBJECT;
 			packet.x = other.x;
@@ -402,6 +403,7 @@ void worker()
 		//빠져나가는 조건 만들 것
 	}
 }
+
 int main()
 {
 	wcout.imbue(locale("korean"));
@@ -442,6 +444,10 @@ int main()
 	for (int i = 0; i < 6; ++i)
 		worker_threads.emplace_back(worker);
 
+	while (true) {
+		//game loop
+
+	}
 	for (auto& th : worker_threads)
 	{
 		th.join();

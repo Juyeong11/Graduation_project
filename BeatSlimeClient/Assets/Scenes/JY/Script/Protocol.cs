@@ -28,6 +28,10 @@ namespace Protocol
         UP, DOWN, LEFTUP, RIGHTUP, LEFTDOWN, RIGHTDOWN
     };
 
+    enum OBJECT_TYPE
+    {
+        PLAPER, ENEMY
+    };
     public class ISerializeble<T> where T : class
     {
         public ISerializeble() { }

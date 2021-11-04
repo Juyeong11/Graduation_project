@@ -20,6 +20,11 @@ const short SERVER_PORT = 4000;
 enum DIR {
 	UP, DOWN, LEFTUP, RIGHTUP, LEFTDOWN, RIGHTDOWN
 };
+
+enum OBJECT_TYPE
+{
+	PLAPER, ENEMY
+};
 #pragma pack (push, 1)
 // Client -> Server
 struct cs_packet_login {
