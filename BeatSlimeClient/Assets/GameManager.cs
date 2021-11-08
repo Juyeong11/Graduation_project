@@ -225,8 +225,8 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_REMOVE_OBJECT:
                         {
                             Protocol.sc_packet_remove_object p = Protocol.sc_packet_remove_object.SetByteToVar(data);
-
-
+                            ObjectPool.instance.EnemyObjectQueue.Enqueue(Players[p.id]);
+                            Players[p.id].SetActive(false);
                             //다른 플레이어면 다른플레이어 풀에
                             //적이면 적풀에 넣자
                             //ReMoveObject(p.id);
