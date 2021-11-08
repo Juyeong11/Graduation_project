@@ -13,9 +13,9 @@ void Enemy::update(char* buf,int& buf_start)
 	pk.size = sizeof(pk);
 	pk.type = SC_PACKET_MOVE_OBJECT;
 	pk.x = uid(rd);
-	pk.y =uid(rd);
-	pk.z = uid(rd) - 2;
-
+	pk.y = uid(rd);
+	pk.z = uid(rd);
+	pk.direction = uid(rd);
 	memcpy(buf + buf_start, &pk, sizeof(pk));
 
 	buf_start += sizeof(pk);

@@ -78,6 +78,11 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        //if (!isGameStart)
+        //{
+        //    PlaySound();
+        //    offsetTime = 0;
+        //}
         if (isGameStart && !Net.isOnline)
         {
             int prevBeats = nowBeat.addBeat;
@@ -134,7 +139,7 @@ public class GameManager : MonoBehaviour
             }
 
             if (alreadyMoved > 0)
-                alreadyMoved -= (int)(Time.deltaTime * 1000f);
+                alreadyMoved -= (int)(Time.deltaTime * 10000f);
 
             // 네트워크 메세지 큐
             if (Network.MessQueue.Count > 0)
@@ -152,6 +157,13 @@ public class GameManager : MonoBehaviour
                             myPlayerID = p.id;
                             Players[p.id] = player;
                             //PutPlayerObject(p.type, p.id, p.x, p.y);
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_GAME_START:
+                        {
+                            Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
+
+                            PlaySound();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
@@ -175,19 +187,21 @@ public class GameManager : MonoBehaviour
 
                             //Debug.Log(p.id + "이동");
                             Enemys[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                            Enemys[p.id].GetComponent<HexCellPosition>().setDirection(p.direction);
+                            //Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
 
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
                         {
                             Protocol.sc_packet_put_object p = Protocol.sc_packet_put_object.SetByteToVar(data);
-                            Debug.Log(p.obj_type);
+
                             //PutObject(p.type, p.id, p.x, p.y);
                             switch (p.obj_type)
                             {
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
-                                        Debug.Log(p.id + ", " + p.x + ", "+  p.y + ", " + p.z + ", " + "플레이어 넣음");
+                                        Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "플레이어 넣음");
                                         Players[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                         Players[p.id].SetActive(true);
                                         Players[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
@@ -197,7 +211,7 @@ public class GameManager : MonoBehaviour
                                     }
                                 case (byte)Protocol.OBJECT_TYPE.ENEMY:
                                     {
-                                       // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
+                                        Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
 
                                         Enemys[p.id] = ObjectPool.instance.EnemyObjectQueue.Dequeue();
                                         Enemys[p.id].SetActive(true);
@@ -211,6 +225,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_REMOVE_OBJECT:
                         {
                             Protocol.sc_packet_remove_object p = Protocol.sc_packet_remove_object.SetByteToVar(data);
+
 
                             //다른 플레이어면 다른플레이어 풀에
                             //적이면 적풀에 넣자
@@ -236,14 +251,16 @@ public class GameManager : MonoBehaviour
 
     public void PlaySound()
     {
+
         if (!isGameStart)
         {
-            soundManager.PlayBGM(SongName);
+        soundManager.PlayBGM(SongName);
             soundEffectManager.BeatEffect();
             beatCounter = timeByBeat;
             isGameStart = true;
-            //StartCoroutine(AutoPatternSetter());
         }
+        //StartCoroutine(AutoPatternSetter());
+
     }
 
     public int getIsGoodTiming()
@@ -252,7 +269,7 @@ public class GameManager : MonoBehaviour
         {
             if (beatCounter <= JudgementTiming)
             {
-                return -1;  //일찍 누름
+                return 1;  //일찍 누름
             }
             else if (timeByBeat - beatCounter <= JudgementTiming)
             {

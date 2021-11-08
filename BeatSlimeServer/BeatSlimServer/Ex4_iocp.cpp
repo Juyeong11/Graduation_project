@@ -9,7 +9,7 @@ int main()
 	wcout.imbue(locale("korean"));
 	WSADATA WSAData;
 	int ret = WSAStartup(MAKEWORD(2, 2), &WSAData);
-	if (ret != 0) error_display(WSAGetLastError());
+	if(ret != 0) error_display(WSAGetLastError());
 
 	{
 		Network* net = Network::GetInstance();
@@ -35,30 +35,27 @@ int main()
 		for (int i = 0; i < 6; ++i)
 			worker_threads.emplace_back(&Network::worker, net);
 
+
+		Enemys.reserve(4);
+		for (int i = 0; i < 4; ++i)
+		{
+			Enemys.emplace_back(i);
+		}
+
 		char buf[256];
 		int bufStart = 0;
 
 		while (true) {
 			//game loop
-			if (net->nPlayer != 3) {
-				SleepEx(1000, true);
-				continue;
-			}
 			memset(buf, 0, sizeof(buf));
 			bufStart = 0;
 
-			for (auto& En : net->Enemys) {
+			for (auto& En : Enemys) {
 				En.update(buf, bufStart);
 			}
 
 			if (bufStart)
-				for (auto& cl : net->clients) {
-					cl.state_lock.lock();
-					if (ST_INGAME != cl.state) {
-						cl.state_lock.unlock();
-						continue;
-					}
-					cl.state_lock.unlock();
+				for (auto& cl : clients) {
 					cl.do_send(bufStart, buf);
 				}
 			SleepEx(1000, true);

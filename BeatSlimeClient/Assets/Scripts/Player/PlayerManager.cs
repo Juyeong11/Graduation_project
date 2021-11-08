@@ -39,7 +39,7 @@ public class PlayerManager : MonoBehaviour
 
 
 
-    void FixedUpdate()
+    void Update()
     {
         //DEBUG
         //if (GameManager.data.isGameStart)
@@ -47,17 +47,20 @@ public class PlayerManager : MonoBehaviour
         //else
         //   gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y -2.f*Time.deltaTime, gameObject.transform.position.z);
 
-/*        if (gameObject.transform.position.y < -0.1f)
-        {
-            if (isFly)
-            {
-                onPlayerStand.Invoke();
-                isFly = false;
-            }
-        }*/
+        /*        if (gameObject.transform.position.y < -0.1f)
+                {
+                    if (isFly)
+                    {
+                        onPlayerStand.Invoke();
+                        isFly = false;
+                    }
+                }*/
 
-        if (GameManager.data.Net.isOnline)
-            GameManager.data.PlaySound();
+        //if (GameManager.data.Net.isOnline)
+        //{
+        //    GameManager.data.PlaySound();
+        //}
+
         if (GameManager.data.isGameStart)
         {
             KeyHandler();

@@ -14,7 +14,8 @@ const char SC_PACKET_MOVE = 2;
 const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_REMOVE_OBJECT = 4;
 const char SC_PACKET_MOVE_OBJECT = 5;
-const char SC_PACKET_TIMER = 6;
+const char SC_PACKET_GAME_START = 6;
+const char SC_PACKET_TIMER = 7;
 
 const short SERVER_PORT = 4000;
 
@@ -24,7 +25,7 @@ enum DIR {
 
 enum OBJECT_TYPE
 {
-	PLAPER, ENEMY
+	PLAYER, ENEMY
 };
 #pragma pack (push, 1)
 // Client -> Server
@@ -64,6 +65,7 @@ struct sc_packet_move_object {
 	unsigned char size;
 	char type;
 	int		id;
+	char direction;
 	short  x, y, z;
 };
 
@@ -87,5 +89,11 @@ struct sc_packet_timer
 	unsigned char size;
 	char type;
 	double timestamp;
+};
+
+struct sc_packet_game_start
+{
+	unsigned char size;
+	char type;
 };
 #pragma pack(pop)

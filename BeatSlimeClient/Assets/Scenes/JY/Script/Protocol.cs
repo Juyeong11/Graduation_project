@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Protocol
 {
-    
+
     public class CONSTANTS
     {
 
@@ -21,9 +21,9 @@ namespace Protocol
         public const byte SC_PACKET_PUT_OBJECT = 3;
         public const byte SC_PACKET_REMOVE_OBJECT = 4;
         public const byte SC_PACKET_MOVE_OBJECT = 5;
-    }
-    
+        public const byte SC_PACKET_GAME_START = 6;
 
+    }
     enum DIR
     {
         UP, DOWN, LEFTUP, RIGHTUP, LEFTDOWN, RIGHTDOWN
@@ -118,6 +118,7 @@ namespace Protocol
         public byte size;
         public byte type;
         public int id;
+        public byte direction;
         public short x, y, z;
     }
 
@@ -151,5 +152,13 @@ namespace Protocol
         public byte size;
         public byte type;
         public double timestamp;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_game_start : ISerializeble<sc_packet_game_start>
+    {
+        public byte size;
+        public byte type;
     }
 }

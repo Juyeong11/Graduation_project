@@ -42,9 +42,12 @@ public class SoundManager : MonoBehaviour
         {
             if (p_bgmName == bgm[i].name)
             {
-                pAnimation.SetFloat("Speed", bgm[i].bpm / pAnimUnitBPM);
-                bgmPlayer.clip = bgm[i].clip;
-                bgmPlayer.Play();
+
+                    pAnimation.SetFloat("Speed", bgm[i].bpm / pAnimUnitBPM);
+                    bgmPlayer.clip = bgm[i].clip;
+
+                    bgmPlayer.Play();
+
             }
         }
     }
