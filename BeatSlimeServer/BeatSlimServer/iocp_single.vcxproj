@@ -24,6 +24,7 @@
     <ProjectGuid>{5f73a3fe-e76c-40a0-a22a-3cba0f7d9f70}</ProjectGuid>
     <RootNamespace>iocpsingle</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>BeatSlimServer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -139,10 +140,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="iocp_single.cpp" />
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="iocp_multi.cpp" />
+    <ClCompile Include="Network.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Client.h" />
+    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="Network.h" />
     <ClInclude Include="protocol.h" />
+    <ClInclude Include="stdfx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

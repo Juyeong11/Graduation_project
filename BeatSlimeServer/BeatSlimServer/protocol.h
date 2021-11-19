@@ -7,53 +7,93 @@ const int  MAX_USER = 10;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
+const char CS_PACKET_TIMER = 3;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
 const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_REMOVE_OBJECT = 4;
+const char SC_PACKET_MOVE_OBJECT = 5;
+const char SC_PACKET_GAME_START = 6;
+const char SC_PACKET_TIMER = 7;
 
 const short SERVER_PORT = 4000;
 
+enum DIR {
+	UP, DOWN, LEFTUP, RIGHTUP, LEFTDOWN, RIGHTDOWN
+};
+
+enum OBJECT_TYPE
+{
+	PLAYER, ENEMY
+};
 #pragma pack (push, 1)
+// Client -> Server
 struct cs_packet_login {
 	unsigned char size;
 	char	type;
-	char	name[MAX_NAME_SIZE];
+	//char	name[MAX_NAME_SIZE];
 };
 
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
-	char	direction;			// 0 : up,  1: down, 2:left, 3:right
+	char	direction;
 };
 
+struct cs_packet_timer
+{
+	unsigned char size;
+	char type;
+	double timestamp;
+};
+// Server -> Client
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
-	short	x, y;
+	short	x, y, z;
 };
 
 struct sc_packet_move {
 	unsigned char size;
 	char type;
 	int		id;
-	short  x, y;
+	short  x, y, z;
+};
+struct sc_packet_move_object {
+	unsigned char size;
+	char type;
+	int		id;
+	char direction;
+	short  x, y, z;
 };
 
 struct sc_packet_put_object {
 	unsigned char size;
 	char type;
 	int id;
-	short x, y;
+	short x, y,z;
 	char object_type;
-	char	name[MAX_NAME_SIZE];
+	//char	name[MAX_NAME_SIZE];
 };
 
 struct sc_packet_remove_object {
 	unsigned char size;
 	char type;
 	int id;
+};
+
+struct sc_packet_timer
+{
+	unsigned char size;
+	char type;
+	double timestamp;
+};
+
+struct sc_packet_game_start
+{
+	unsigned char size;
+	char type;
 };
 #pragma pack(pop)

@@ -13,9 +13,33 @@ public class HexCellPosition : MonoBehaviour
 
     public void refelectPosition()
     {
-        gameObject.transform.localPosition = new Vector3(coordinates.X * 0.866f, gameObject.transform.localPosition.y, coordinates.X * 0.5f + coordinates.Z * 1f);
+        gameObject.transform.position = new Vector3(coordinates.X * 0.866f, 0.25f, coordinates.X * 0.5f + coordinates.Z * 1f);
     }
+    public void setDirection(byte dir)
+    {
+        switch(dir)
+        {
+            case (byte)Protocol.DIR.DOWN:
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, 60f, 0f));
+                break;
+            case (byte)Protocol.DIR.RIGHTDOWN:
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3( 0f, 120f, 0f));
+                break;
+            case (byte)Protocol.DIR.LEFTUP:
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3( 0f, 180f, 0f));
+                break;
+            case (byte)Protocol.DIR.UP:
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3( 0f, -120f, 0f));
+                break;
+            case (byte)Protocol.DIR.RIGHTUP:
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3( 0f, -60f, 0f));
+                break;
+            case (byte)Protocol.DIR.LEFTDOWN:
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
+                break;
 
+        }
+    }
     public void plus(int x, int y, int z)
     {
         if (x+y+z != 0)
@@ -25,7 +49,11 @@ public class HexCellPosition : MonoBehaviour
         coordinates.plus(x, z);
         refelectPosition();
     }
-
+    public void SetPosition(int x, int y, int z)
+    {
+        coordinates.setCoordinates(x, z);
+        refelectPosition();
+    }
     public (int,int,int) Get()
     {
         return (coordinates.X, coordinates.Y, coordinates.Z);
