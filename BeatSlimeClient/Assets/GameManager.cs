@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour
         if (!isGameStart)
         {
             PlaySound();
-            offsetTime = 0;
+            //offsetTime = 0;
         }
         if (isGameStart && !Net.isOnline)
         {
