@@ -78,11 +78,11 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        //if (!isGameStart)
-        //{
-        //    PlaySound();
-        //    offsetTime = 0;
-        //}
+        if (!isGameStart)
+        {
+            PlaySound();
+            offsetTime = 0;
+        }
         if (isGameStart && !Net.isOnline)
         {
             int prevBeats = nowBeat.addBeat;
@@ -254,7 +254,7 @@ public class GameManager : MonoBehaviour
 
         if (!isGameStart)
         {
-        soundManager.PlayBGM(SongName);
+            soundManager.PlayBGM(SongName);
             soundEffectManager.BeatEffect();
             beatCounter = timeByBeat;
             isGameStart = true;
