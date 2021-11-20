@@ -15,7 +15,9 @@ AudioMixerController:
   m_SuspendThreshold: -80
   m_EnableSuspend: 1
   m_UpdateMode: 0
-  m_ExposedParameters: []
+  m_ExposedParameters:
+  - guid: 1f72fe3d1b7144d4faa0a32b50e67415
+    name: MyExposedParam
   m_AudioMixerGroupViews:
   - guids:
     - 0809382d46e8e714daaf2640d34bd5b8
@@ -43,6 +45,7 @@ AudioMixerGroupController:
   m_Send: 00000000000000000000000000000000
   m_Effects:
   - {fileID: 24400004}
+  - {fileID: 7352896413773439342}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
@@ -70,8 +73,30 @@ AudioMixerSnapshotController:
   m_Name: Snapshot
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: 823f9fb58cf2c58478826db7db58dfc0
-  m_FloatValues: {}
+  m_FloatValues:
+    fa40f403363db3746866c41c4e138245: 1.21
+    b1bb3b44674503b46b61df811c48cc89: 0.832
+    ed1378a6e045493458b4609ee811ac03: 0.231
+    d8c722f6a306dad488387359d8f8039c: 0.248
+    a9db32bc5b2b9a249b0affa76953a113: 0.248
+    1f72fe3d1b7144d4faa0a32b50e67415: 0.28
   m_TransitionOverrides: {}
+--- !u!244 &28571405483591176
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 7f6b49d68bde6684699efb49be9e10e2
+  m_EffectName: audioplugin_HitSignMaker
+  m_MixLevel: 46c87cf04affb5d4e87566bea86fa547
+  m_Parameters:
+  - m_ParameterName: Angle Delta
+    m_GUID: d8c722f6a306dad488387359d8f8039c
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!243 &264131543118663330
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
@@ -119,24 +144,6 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
---- !u!244 &5825437382013994172
-AudioMixerEffectController:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_EffectID: 0a79ff2283160c04da10adefb2e2ebd9
-  m_EffectName: audioplugin_HitMaker
-  m_MixLevel: 9dcaa43c9ea7edb44ab509c2bc20f331
-  m_Parameters:
-  - m_ParameterName: Gain
-    m_GUID: 614ce669c3e71d24fba10684feacdb54
-  - m_ParameterName: Delay Feedback
-    m_GUID: c5faeae365e255948b05daae69a60adb
-  m_SendTarget: {fileID: 0}
-  m_EnableWetMix: 0
-  m_Bypass: 0
 --- !u!244 &6081355473912037209
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -165,12 +172,28 @@ AudioMixerGroupController:
   m_Pitch: fa40f403363db3746866c41c4e138245
   m_Send: 00000000000000000000000000000000
   m_Effects:
+  - {fileID: 28571405483591176}
   - {fileID: 6081355473912037209}
-  - {fileID: 5825437382013994172}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
+--- !u!244 &7352896413773439342
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: b91d6531200ecd94a95a13f58d12d1b0
+  m_EffectName: audioplugin_HitSignMaker
+  m_MixLevel: 5e882932712f0c54fafd5262f66c40fc
+  m_Parameters:
+  - m_ParameterName: Angle Delta
+    m_GUID: 1f72fe3d1b7144d4faa0a32b50e67415
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!243 &7684504199864074472
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
