@@ -1,5 +1,27 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!244 &-7076878466157367834
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: c8309af01d217f340abcfb511141a0cc
+  m_EffectName: audioplugin_HitDistortionMaker
+  m_MixLevel: 43560d7ad8e76964dbbec921f5d096ad
+  m_Parameters:
+  - m_ParameterName: Drive
+    m_GUID: 1501ca1510942ed45bf355d20ff73cb0
+  - m_ParameterName: Range
+    m_GUID: 95e2b49a6b61039418e40c777889f0f4
+  - m_ParameterName: Blend
+    m_GUID: 3885650a65b15e64b9fc3dda05023e97
+  - m_ParameterName: Volume
+    m_GUID: ba7c2973bdb18e94da4b713d91518826
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!241 &24100000
 AudioMixerController:
   m_ObjectHideFlags: 0
@@ -16,6 +38,8 @@ AudioMixerController:
   m_EnableSuspend: 1
   m_UpdateMode: 0
   m_ExposedParameters:
+  - guid: 3885650a65b15e64b9fc3dda05023e97
+    name: Blend
   - guid: 1ac686ea1f9167147a6a2d7190853d46
     name: SinDelta
   m_AudioMixerGroupViews:
@@ -40,7 +64,8 @@ AudioMixerGroupController:
   m_Effects:
   - {fileID: 24400004}
   - {fileID: 4806574526986489910}
-  - {fileID: 1724711803960977792}
+  - {fileID: -7076878466157367834}
+  - {fileID: 569469110007745246}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0
@@ -69,37 +94,39 @@ AudioMixerSnapshotController:
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: e36f2c44c4a59f44f91c47dcad0c78cd
   m_FloatValues:
+    1ae5141237b0e9149be7a0272ea412c8: 0.504
     6bafcb82990e9814fba2f1d34b328124: 0.06
+    ba7c2973bdb18e94da4b713d91518826: 0.145
     f3fcf0b386db1e9429728d0c222926e0: 0
     06ecd1e32ec1a3e40a997573d3639dba: 0.034
     08ecc3f350a315b469ddbf29bc04be78: 0
-    1e1d1ef8dbfe7a34399c457309d035ab: -0.24066469
+    1501ca1510942ed45bf355d20ff73cb0: 0.299
+    f8632ed5c9c2284408b69af3ac282ace: 0.146
+    1e1d1ef8dbfe7a34399c457309d035ab: -0.14136884
     b39a4d193e2647648af3876cf9d619bb: 0.35
     1e2baaa948d57ab40939fa0027cb1bc9: 0.248
-    1ac686ea1f9167147a6a2d7190853d46: 0.085
+    3885650a65b15e64b9fc3dda05023e97: 0.419
+    95e2b49a6b61039418e40c777889f0f4: 0.3
+    1ac686ea1f9167147a6a2d7190853d46: 0.145
     d451b47cba1ed9e43ab9197b8c85d0e3: 0
     d3b3b38ef95e30e44978caa354489e49: 0.06
     15dbf51f749463b4c81f9315741ab392: 0.624
   m_TransitionOverrides: {}
---- !u!244 &1724711803960977792
+--- !u!244 &569469110007745246
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  m_EffectID: 8edb0ebdeb76ef1428d31cc7103352e6
-  m_EffectName: audioplugin_HitDistortionMaker
-  m_MixLevel: d50704e6c0ecf2045a1e9e8ee30c5be2
+  m_EffectID: db18a519910d6444f9f54b967ce06d02
+  m_EffectName: audioplugin_HitMaker
+  m_MixLevel: e970cbde2896be044885b24f7ab9e111
   m_Parameters:
-  - m_ParameterName: Drive
-    m_GUID: 6bafcb82990e9814fba2f1d34b328124
-  - m_ParameterName: Range
-    m_GUID: d3b3b38ef95e30e44978caa354489e49
-  - m_ParameterName: Blend
-    m_GUID: 15dbf51f749463b4c81f9315741ab392
-  - m_ParameterName: Volume
-    m_GUID: b39a4d193e2647648af3876cf9d619bb
+  - m_ParameterName: Gain
+    m_GUID: 1ae5141237b0e9149be7a0272ea412c8
+  - m_ParameterName: Delay Feedback
+    m_GUID: f8632ed5c9c2284408b69af3ac282ace
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
