@@ -27,6 +27,7 @@ public class SoundManager : MonoBehaviour
     [SerializeField] AudioSource bgmPlayer = null;
     [SerializeField] AudioSource[] sfxPlayer = null;
 
+
     float pAnimUnitBPM = 45f;
     public Animator pAnimation;
     public Animator eAnimation;
@@ -47,7 +48,7 @@ public class SoundManager : MonoBehaviour
                     bgmPlayer.clip = bgm[i].clip;
 
                     bgmPlayer.Play();
-
+               GameManager.data.gameObject.GetComponent<BeatManager>().MusicStart(bgmPlayer);
             }
         }
     }

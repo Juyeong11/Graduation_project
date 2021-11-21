@@ -16,6 +16,8 @@ public class GameManager : MonoBehaviour
     public SoundEffectManager soundEffectManager;
     public SoundProgressBar soundProgressBar;
 
+    public BeatManager beatManager;
+
     public bool isGameStart;
 
     public string SongName;
