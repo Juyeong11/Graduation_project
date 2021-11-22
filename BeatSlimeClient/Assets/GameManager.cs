@@ -83,7 +83,7 @@ public class GameManager : MonoBehaviour
         if (!isGameStart && Input.GetKeyDown("z"))
         {
             PlaySound();
-            offsetTime = 0;
+            //offsetTime = 0;
         }
         if (isGameStart && !Net.isOnline)
         {
