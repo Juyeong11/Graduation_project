@@ -8,20 +8,26 @@ namespace Protocol
     public class CONSTANTS
     {
 
+        public const short SERVER_PORT = 4000;
+
+        public const int WORLD_HEIGHT = 2000;
+        public const int WORLD_WIDTH = 2000;
         public const int MAX_NAME_SIZE = 20;
-        public const int MAX_CLIENT = 10;
+        public const int MAX_USER = 5000;
+        public const int MAX_NPC = 4;
+        public const int NPC_ID_START = MAX_USER;
+        public const int NPC_ID_END = MAX_USER + MAX_NPC - 1;
+        public const int MAX_OBJECT = MAX_USER + MAX_NPC;
 
         public const byte CS_PACKET_LOGIN = 1;
         public const byte CS_PACKET_MOVE = 2;
-        public const byte CS_PACKET_TIMER = 3;
-
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
         public const byte SC_PACKET_PUT_OBJECT = 3;
         public const byte SC_PACKET_REMOVE_OBJECT = 4;
-        public const byte SC_PACKET_MOVE_OBJECT = 5;
-        public const byte SC_PACKET_GAME_START = 6;
+        public const byte SC_PACKET_GAME_START = 5;
+        public const byte SC_PACKET_ATTACK = 6;
 
     }
     enum DIR
@@ -66,8 +72,8 @@ namespace Protocol
         public byte size;
         public byte type;
 
-/*        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
-        public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
+        /*        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
+                public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
     }
 
 
@@ -81,14 +87,6 @@ namespace Protocol
         public byte direction;
     }
 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class cs_packet_timer : ISerializeble<cs_packet_timer>
-    {
-        public byte size;
-        public byte type;
-        public double timestamp;
-    }
     //Server -> Client
 
     [Serializable]
@@ -110,16 +108,15 @@ namespace Protocol
         public int id;
         public short x, y, z;
     }
-
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class sc_packet_move_object : ISerializeble<sc_packet_move_object>
+    public class sc_packet_attack : ISerializeble<sc_packet_attack>
     {
         public byte size;
         public byte type;
         public int id;
+        public int target_id;
         public byte direction;
-        public short x, y, z;
     }
 
     [Serializable]
@@ -132,8 +129,8 @@ namespace Protocol
         public short x, y, z;
         public byte obj_type;
 
-/*        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
-        public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
+        /*        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
+                public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
     }
 
     [Serializable]
@@ -143,15 +140,6 @@ namespace Protocol
         public byte size;
         public byte type;
         public int id;
-    }
-
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class sc_packet_timer : ISerializeble<sc_packet_timer>
-    {
-        public byte size;
-        public byte type;
-        public double timestamp;
     }
 
     [Serializable]

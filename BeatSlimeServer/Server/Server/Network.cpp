@@ -1,0 +1,595 @@
+#include "stdfx.h"
+
+
+#include "Network.h"
+
+Network* Network::instance = nullptr;
+
+Network* Network::GetInstance()
+{
+	return instance;
+}
+
+void error_display(const char* err_p, int err_no)
+{
+	WCHAR* lpMsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL, err_no,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR)&lpMsgBuf, 0, 0);
+	std::cout << err_p << std::endl;
+	std::wcout << lpMsgBuf << std::endl;
+	//while (true);
+	LocalFree(lpMsgBuf);
+}
+
+void Network::send_login_ok(int c_id)
+{
+	sc_packet_login_ok packet;
+	packet.id = c_id;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_LOGIN_OK;
+	packet.x = clients[c_id]->x;
+	packet.y = clients[c_id]->y;
+	packet.z = clients[c_id]->z;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+}
+
+void Network::send_move_object(int c_id, int mover)
+{
+	sc_packet_move packet;
+	packet.id = mover;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_MOVE;
+	packet.x = clients[mover]->x;
+	packet.y = clients[mover]->y;
+	packet.z = clients[mover]->z;
+
+	//packet.move_time = clients[mover]->last_move_time;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+}
+void Network::send_attack_player(int c_id, int target)
+{
+	sc_packet_attack packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_ATTACK;
+	packet.id = c_id;
+	packet.target_id = target;
+	packet.direction = DOWN;
+	//packet.move_time = clients[mover]->last_move_time;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[target])->do_send(ex_over);
+}
+
+void Network::send_put_object(int c_id, int target) {
+	sc_packet_put_object packet;
+
+	//strcpy_s(packet.name, clients[target]->name);
+	packet.id = target;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_PUT_OBJECT;
+	packet.object_type = clients[target]->type;
+	packet.x = clients[target]->x;
+	packet.y = clients[target]->y;
+	packet.z = clients[target]->z;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+
+	if (true == is_npc(target) && false == reinterpret_cast<Npc*>(clients[target])->is_active) {
+		reinterpret_cast<Npc*>(clients[target])->is_active = true;
+		timer_event t;
+		t.ev = EVENT_ENEMY_MOVE;
+		t.obj_id = target;
+		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+		timer_queue.push(t);
+	}
+}
+
+void Network::send_remove_object(int c_id, int victim)
+{
+	sc_packet_remove_object packet;
+	packet.id = victim;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_REMOVE_OBJECT;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+
+	if (true == is_npc(victim)) {
+		reinterpret_cast<Npc*>(clients[victim])->is_active = false;
+	}
+}
+
+void Network::disconnect_client(int c_id)
+{
+	if (c_id >= MAX_USER)
+		std::cout << "disconnect_client : unexpected id range" << std::endl;
+	Client& client = *reinterpret_cast<Client*>(clients[c_id]);
+
+	client.vl.lock();
+	std::unordered_set <int> my_vl = client.viewlist;
+	client.vl.unlock();
+	for (auto other : my_vl) {
+		if (true == is_npc(other)) continue;
+
+		Client& target = *reinterpret_cast<Client*>(clients[other]);
+		if (ST_INGAME != target.state)
+			continue;
+		target.vl.lock();
+		if (0 != target.viewlist.count(c_id)) {
+			target.viewlist.erase(c_id);
+			target.vl.unlock();
+			send_remove_object(other, c_id);
+		}
+		else target.vl.unlock();
+	}
+	clients[c_id]->state_lock.lock();
+	closesocket(reinterpret_cast<Client*>(clients[c_id])->socket);
+	clients[c_id]->state = ST_FREE;
+	clients[c_id]->state_lock.unlock();
+}
+
+int Network::get_new_id()
+{
+	for (int i = 0; i < MAX_USER; ++i) {
+		clients[i]->state_lock.lock();
+		if (ST_FREE == clients[i]->state) {
+			clients[i]->state = ST_ACCEPT;
+			clients[i]->state_lock.unlock();
+			return i;
+		}
+		clients[i]->state_lock.unlock();
+	}
+	std::cout << "Maximum Number of Clients Overflow!!\n";
+	return -1;
+}
+
+void Network::do_npc_move(int npc_id) {
+
+	//움직이기 전 시야 리스트
+	std::unordered_set<int> old_viewlist;
+	//움직인 후 시야 리스트
+	std::unordered_set<int> new_viewlist;
+
+	std::unordered_set<int> can_attacklist;
+
+	//해당 NPC는 모든 플레이어에 대한 viewlist를 만든다.
+	//이것도 섹터로 나누고 혹시 NPC가 뷰리스트를 가지고 있으면 안되나? 이 부분부터 다시보자
+	for (int i = 0; i < MAX_USER; ++i) {
+		Client* obj = reinterpret_cast<Client*>(clients[i]);
+		if (obj->state != ST_INGAME) continue;
+
+
+		if (true == is_near(npc_id, obj->id))
+			old_viewlist.insert(obj->id);
+	}
+	//이동을 하고 주위 플레이어들에게 알려줘야 한다.
+	short& x = clients[npc_id]->x;
+	short& y = clients[npc_id]->y;
+	short& z = clients[npc_id]->z;
+	switch (rand() % 4) {
+
+	case DIR::LEFTUP:		if (true) { x--; z++; break; }
+	case DIR::UP:			if (true) { y--; z++;  break; }
+	case DIR::RIGHTUP:		if (true) { x++; y--; break; }
+	case DIR::LEFTDOWN:		if (true) { x--; y++; break; }
+	case DIR::DOWN:			if (true) { y++; z--; break; }
+	case DIR::RIGHTDOWN:	if (true) { x++; z--; break; }
+	default:
+		std::cout << "Invalid move in client id : " << npc_id << std::endl;
+		exit(-1);
+	}
+	x = std::clamp((int)x,-2,2);
+	y = std::clamp((int)y,-2,2);
+	z = std::clamp((int)z,-2,2);
+
+	//해당 NPC는 모든 플레이어에 대한 viewlist를 만든다.
+	for (int i = 0; i < MAX_USER; ++i) {
+		Client* obj = reinterpret_cast<Client*>(clients[i]);
+		if (obj->state != ST_INGAME) continue;
+
+		if (true == is_near(npc_id, obj->id))
+		{
+			new_viewlist.insert(obj->id);
+			if (true == can_attack(npc_id, obj->id))
+				can_attacklist.insert(obj->id);
+		}
+	}
+	// new old 뷰 리스트들에는
+
+	// 새로 시야에 들어온 플레이어
+	for (auto pl : new_viewlist) {
+		if (0 == old_viewlist.count(pl)) {
+			Client* client = reinterpret_cast<Client*>(clients[pl]);
+			client->vl.lock();
+			client->viewlist.insert(npc_id);
+			client->vl.unlock();
+
+			send_put_object(pl, npc_id);
+		}
+		else {
+			send_move_object(pl, npc_id);
+		}
+	}
+	//시야에서 사라진 플레이어
+	for (auto pl : old_viewlist) {
+		if (0 == new_viewlist.count(pl)) {
+			Client* client = reinterpret_cast<Client*>(clients[pl]);
+			client->vl.lock();
+			client->viewlist.erase(npc_id);
+			client->vl.unlock();
+			send_remove_object(pl, npc_id);
+		}
+	}
+
+	for (auto pl : can_attacklist) {
+		if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
+			timer_event t;
+			t.ev = EVENT_ENEMY_ATTACK;
+			t.obj_id = npc_id;
+			t.target_id = pl;
+			t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
+			timer_queue.push(t);
+		}
+	}
+	if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
+		timer_event t;
+		t.ev = EVENT_ENEMY_MOVE;
+		t.obj_id = npc_id;
+		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+		timer_queue.push(t);
+	}
+}
+
+void Network::do_npc_attack(int npc_id, int target_id) {
+
+	// 피격에 대한 알고리즘
+
+	// 패킷 전송
+	send_attack_player(npc_id, target_id);
+
+}
+void Network::process_packet(int client_id, unsigned char* p)
+{
+	unsigned char packet_type = p[1];
+	Client& cl = *reinterpret_cast<Client*>(clients[client_id]);
+
+	switch (packet_type)
+	{
+	case CS_PACKET_LOGIN:
+	{
+		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
+		//strcpy_s(cl.name, packet->name);
+		send_login_ok(client_id);
+
+		cl.state_lock.lock();
+		cl.state = ST_INGAME;
+		cl.state_lock.unlock();
+
+		//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			Client* other = reinterpret_cast<Client*>(clients[i]);
+			if (i == client_id) continue;
+			other->state_lock.lock();
+			if (ST_INGAME != other->state) {
+				other->state_lock.unlock();
+				continue;
+			}
+			other->state_lock.unlock();
+
+			if (false == is_near(other->id, client_id))
+				continue;
+
+			// 새로 들어온 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
+			other->vl.lock();
+			other->viewlist.insert(client_id);
+			other->vl.unlock();
+
+			send_put_object(other->id, client_id);
+		}
+
+		//새로 접속한 클라이언트에게 현재 객체들의 현황을 알려줌
+		for (auto* other : clients) {
+			//여기서 NPC도 알려줘야지
+
+			if (other->id == client_id) continue;
+			other->state_lock.lock();
+			if (ST_INGAME != other->state) {
+				other->state_lock.unlock();
+				continue;
+			}
+			other->state_lock.unlock();
+
+			if (false == is_near(other->id, client_id))
+				continue;
+
+			// 기존에 있던 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
+			cl.vl.lock();
+			cl.viewlist.insert(other->id);
+			cl.vl.unlock();
+
+			send_put_object(client_id, other->id);
+		}
+	}
+	break;
+	case CS_PACKET_MOVE:
+	{
+		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
+		//cl.last_move_time = packet->move_time;
+		short& x = cl.x;
+		short& y = cl.y;
+		short& z = cl.z;
+		switch (packet->direction) {
+		case DIR::LEFTUP:		if (true) { x--; z++; break; }
+		case DIR::UP:			if (true) { y--; z++;  break; }
+		case DIR::RIGHTUP:		if (true) { x++; y--; break; }
+		case DIR::LEFTDOWN:		if (true) { x--; y++; break; }
+		case DIR::DOWN:			if (true) { y++; z--; break; }
+		case DIR::RIGHTDOWN:	if (true) { x++; z--; break; }
+		default:
+			std::cout << "Invalid move in client " << client_id << std::endl;
+			exit(-1);
+		}
+
+		// 이동한 클라이언트에 대한 nearlist 생성
+		// 꼭 unordered_set이여야 할까?
+		// 얼마나 추가될지 모르고, 데이터는 id이기 때문에 중복없음이 보장되있다. id로 구분안하는 경우가 있나?
+		// 섹터를 나누어 근처에 있는지 검색해 속도를 높이자
+		std::unordered_set<int> nearlist;
+		for (auto* other : clients) {
+			if (other->id == client_id)
+				continue;
+			if (ST_INGAME != other->state)
+				continue;
+			if (false == is_near(client_id, other->id))
+				continue;
+
+			nearlist.insert(other->id);
+		}
+
+		send_move_object(cl.id, cl.id);
+
+		//lock시간을 줄이기 위해 자료를 복사해서 사용
+		cl.vl.lock();
+		std::unordered_set<int> my_vl{ cl.viewlist };
+		cl.vl.unlock();
+
+
+		// 움직임으로써 시야에 들어온 플레이어 확인 및 추가
+		for (int other : nearlist) {
+			// cl의 뷰리스트에 없으면
+			if (0 == my_vl.count(other)) {
+				// cl의 뷰리스트에 추가하고
+				cl.vl.lock();
+				cl.viewlist.insert(other);
+				cl.vl.unlock();
+				// 보였으니 그리라고 패킷을 보낸다.
+				send_put_object(cl.id, other);
+
+				//npc는 send를 안한다.
+				//npc는 뷰리스트가 없고 자신을 볼 수 있는 플레이어가 있다면 isActive변수를 통해 움직인다.
+				//플레이어에게 보인 NPC의 움직임 이벤트를 시작한다.
+				if (true == is_npc(other)) {
+					//lock이 있어야 하나? atomic으로하자
+					//reinterpret_cast<Npc*>(clients[other])->is_active = true;
+					//timer_event t;
+					//t.ev = EVENT_NPC_MOVE;
+					//t.obj_id = other;
+					//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+					//timer_queue.push(t);
+					continue;
+				}
+
+				Client* otherPlayer = reinterpret_cast<Client*>(clients[other]);
+				// 나한테 보이면 상대에게도 보인다는 뜻이니
+				// 상대 뷰리스트도 확인한다.
+				otherPlayer->vl.lock();
+
+				// 상대 뷰리스트에 없으면
+				if (0 == otherPlayer->viewlist.count(cl.id)) {
+					// 뷰리스트에 추가하고 cl을 그리라고 전송
+					otherPlayer->viewlist.insert(cl.id);
+					otherPlayer->vl.unlock();
+					send_put_object(other, cl.id);
+				}
+				// 상대 뷰리스트에 있으면 이동 패킷 전송
+				else {
+					otherPlayer->vl.unlock();
+					send_move_object(other, cl.id);
+				}
+
+			}
+			//계속 시야에 존재하는 플레이어 처리
+			else {
+
+				if (true == is_npc(other)) continue;
+				Client* otherPlayer = reinterpret_cast<Client*>(clients[other]);
+				otherPlayer->vl.lock();
+				//상대방에 뷰리스트에 내가 있는지 확인
+				if (0 != otherPlayer->viewlist.count(cl.id))
+				{
+					otherPlayer->vl.unlock();
+
+					send_move_object(other, cl.id);
+				}
+				else {
+					otherPlayer->viewlist.insert(cl.id);
+					otherPlayer->vl.unlock();
+
+					send_put_object(other, cl.id);
+				}
+			}
+		}
+
+
+		// 움직임으로써 시야에서 빠진 플레이어 확인 및 제거
+		for (int other : my_vl) {
+			// nearlist에 없으면
+			if (0 == nearlist.count(other)) {
+				// 나한테서 지우고
+				cl.vl.lock();
+				cl.viewlist.erase(other);
+				cl.vl.unlock();
+				send_remove_object(cl.id, other);
+
+				//npc는 view리스트를 가지고 있지 않다.
+				if (true == is_npc(other)) {
+					//reinterpret_cast<Npc*>(clients[other])->is_active = false;
+					continue;
+				}
+				Client* otherPlayer = reinterpret_cast<Client*>(clients[other]);
+
+				// 상대방도 나를 지운다.
+				otherPlayer->vl.lock();
+				//있다면 지움
+				if (0 != otherPlayer->viewlist.count(cl.id)) {
+
+					otherPlayer->viewlist.erase(cl.id);
+					otherPlayer->vl.unlock();
+
+					send_remove_object(other, cl.id);
+				}
+				else otherPlayer->vl.unlock();
+			}
+
+		}
+	}
+	break;
+	default:
+		std::cout << "이상한 패킷 수신\n";
+		break;
+	}
+}
+
+void Network::worker()
+{
+	while (true) {
+		DWORD num_byte;
+		LONG64 iocp_key;
+		WSAOVERLAPPED* p_over;
+		BOOL ret = GetQueuedCompletionStatus(g_h_iocp, &num_byte, (PULONG_PTR)&iocp_key, &p_over, INFINITE);
+
+		int client_id = static_cast<int>(iocp_key);
+		EXP_OVER* exp_over = reinterpret_cast<EXP_OVER*>(p_over);
+
+		if (FALSE == ret) {
+
+			error_display("GQCS", WSAGetLastError());
+
+			disconnect_client(client_id);
+			if (exp_over->_comp_op == OP_SEND)
+				exp_over_pool.push(exp_over);
+			continue;
+		}
+
+		switch (exp_over->_comp_op)
+		{
+		case OP_RECV:
+		{
+			if (num_byte == 0) {
+				disconnect_client(client_id);
+				continue;
+			}
+			//하나의 소켓에 대해 Recv호출은 언제나 하나 -> EXP_OVER(버퍼, WSAOVERLAPPED) 재사용 가능
+			//패킷이 중간에 잘려진 채로 도착할 수 있다. -> 버퍼에 놔두었다가 다음에 온 데이터와 결합 -> 이전에 받은 크기를 기억해 그 위치부터 받기 시작하자
+			//패킷이 여러 개 한번에 도착할 수 있다.	 -> 첫 번째가 사이즈이니 잘라서 처리하자
+			Client& cl = *reinterpret_cast<Client*>(clients[client_id]);
+
+			int remain_data = cl.prev_recv_size + num_byte;
+			unsigned char* packet_start = exp_over->_net_buf;
+			int packet_size = packet_start[0];
+
+			while (packet_size <= remain_data) {
+				process_packet(client_id, packet_start);
+				remain_data -= packet_size;
+				packet_start += packet_size;
+				if (remain_data > 0)
+					packet_size = packet_start[0];
+			}
+
+
+			cl.prev_recv_size = remain_data;
+			if (remain_data) {
+				memcpy_s(&exp_over->_net_buf, remain_data, packet_start, remain_data);
+			}
+
+			cl.do_recv();
+		}
+		break;
+		case OP_SEND:
+		{
+			if (num_byte != exp_over->_wsa_buf.len) {
+				std::cout << num_byte << " 송신버퍼 가득 참\n";
+				std::cout << "클라이언트 연결 끊음\n";
+				disconnect_client(client_id);
+			}
+			exp_over_pool.push(exp_over);
+		}
+		break;
+		case OP_ACCEPT:
+		{
+			std::cout << "Accept Completed.\n";
+			SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->_net_buf)); // 확장 overlapped구조체에 넣어 두었던 소캣을 꺼낸다
+			int new_id = get_new_id();
+			if (-1 == new_id) continue;
+
+			Client& cl = *(reinterpret_cast<Client*>(clients[new_id]));
+			cl.x = 0;
+			cl.y = 0;
+			cl.z = 0;
+			cl.id = new_id;
+			cl.prev_recv_size = 0;
+			cl.recv_over._comp_op = OP_RECV;
+			//cl._state = ST_INGAME;
+			cl.recv_over._wsa_buf.buf = reinterpret_cast<char*>(cl.recv_over._net_buf);
+			cl.recv_over._wsa_buf.len = sizeof(cl.recv_over._net_buf);
+			ZeroMemory(&cl.recv_over._wsa_over, sizeof(cl.recv_over._wsa_over));
+			cl.socket = c_socket;
+
+			CreateIoCompletionPort(reinterpret_cast<HANDLE>(c_socket), g_h_iocp, new_id, 0);
+
+			cl.do_recv();
+
+			// exp_over 재활용
+			ZeroMemory(&exp_over->_wsa_over, sizeof(exp_over->_wsa_over));
+			c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+			//char* 버퍼를 socket*로 바꿔 소켓을 가르킬 수 있도록 한다. 소켓도 포인터인디?
+			*(reinterpret_cast<SOCKET*>(exp_over->_net_buf)) = c_socket;
+
+			AcceptEx(g_s_socket, c_socket, exp_over->_net_buf + sizeof(SOCKET), 0, sizeof(SOCKADDR_IN) + 16,
+				sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->_wsa_over);
+		}
+		break;
+		case OP_ENEMY_MOVE:
+			do_npc_move(client_id);
+			exp_over_pool.push(exp_over);
+			break;
+		case OP_ENEMY_ATTACK: {
+			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			do_npc_attack(client_id, target_id);
+			exp_over_pool.push(exp_over); 
+		}
+			break;
+		default:
+			break;
+		}
+	}
+}

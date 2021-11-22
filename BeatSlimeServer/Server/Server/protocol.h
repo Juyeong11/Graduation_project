@@ -1,34 +1,28 @@
 #pragma once
 
-const int WORLD_HEIGHT = 8;
-const int WORLD_WIDTH = 8;
+const short SERVER_PORT = 4000;
+
+const int  WORLD_HEIGHT = 8;
+const int  WORLD_WIDTH = 8;
 const int  MAX_NAME_SIZE = 20;
-const int  MAX_USER = 10;
+const int  MAX_USER = 5000;
+const int MAX_NPC = 4;
+constexpr int NPC_ID_START = MAX_USER;
+constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
+constexpr int MAX_OBJECT = MAX_USER + MAX_NPC;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
-const char CS_PACKET_TIMER = 3;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
 const char SC_PACKET_PUT_OBJECT = 3;
 const char SC_PACKET_REMOVE_OBJECT = 4;
-const char SC_PACKET_MOVE_OBJECT = 5;
-const char SC_PACKET_GAME_START = 6;
-const char SC_PACKET_TIMER = 7;
+const char SC_PACKET_GAME_START = 5;
+const char SC_PACKET_ATTACK = 6;
 
-const short SERVER_PORT = 4000;
-
-enum DIR {
-	UP, DOWN, LEFTUP, RIGHTUP, LEFTDOWN, RIGHTDOWN
-};
-
-enum OBJECT_TYPE
-{
-	PLAYER, ENEMY
-};
 #pragma pack (push, 1)
-// Client -> Server
+//client -> server
 struct cs_packet_login {
 	unsigned char size;
 	char	type;
@@ -38,35 +32,33 @@ struct cs_packet_login {
 struct cs_packet_move {
 	unsigned char size;
 	char	type;
-	char	direction;
+	char	direction;			// 0 : up,  1: down, 2:left, 3:right
+	//int		move_time;
 };
 
-struct cs_packet_timer
-{
-	unsigned char size;
-	char type;
-	double timestamp;
-};
-// Server -> Client
+//server->client
 struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
-	short	x, y, z;
+	short	x, y,z;
 };
 
 struct sc_packet_move {
 	unsigned char size;
 	char type;
 	int		id;
-	short  x, y, z;
+	short  x, y,z;
+	//int		move_time;
 };
-struct sc_packet_move_object {
+
+struct sc_packet_attack {
 	unsigned char size;
 	char type;
-	int		id;
+	int	id;
+	int	target_id;
 	char direction;
-	short  x, y, z;
+	//int		move_time;
 };
 
 struct sc_packet_put_object {
@@ -82,13 +74,6 @@ struct sc_packet_remove_object {
 	unsigned char size;
 	char type;
 	int id;
-};
-
-struct sc_packet_timer
-{
-	unsigned char size;
-	char type;
-	double timestamp;
 };
 
 struct sc_packet_game_start
