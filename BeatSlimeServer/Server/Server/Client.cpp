@@ -13,12 +13,17 @@ void Client::do_recv()
 	if (SOCKET_ERROR == ret) {
 		int error_num = WSAGetLastError();
 		if (ERROR_IO_PENDING != error_num)
-			error_display(error_num);
+			error_display("recv", error_num);
 	}
 }
 
-void Client::do_send(int num_bytes, void* mess)
+void Client::do_send(EXP_OVER* ex_over)
 {
-	EXP_OVER* ex_over = new EXP_OVER(OP_SEND, num_bytes, mess);
-	WSASend(socket, &ex_over->_wsa_buf, 1, 0, 0, &ex_over->_wsa_over, NULL);
+	//EXP_OVER* ex_over = new EXP_OVER(OP_SEND, num_bytes, mess);
+	int ret = WSASend(socket, &ex_over->_wsa_buf, 1, 0, 0, &ex_over->_wsa_over, NULL);
+	if (SOCKET_ERROR == ret) {
+		int error_num = WSAGetLastError();
+		if (ERROR_IO_PENDING != error_num)
+			error_display("send", error_num);
+	}
 }

@@ -45,8 +45,8 @@ public class GameManager : MonoBehaviour
 
     //
     public Network Net = new Network();
-    GameObject[] Players = new GameObject[Protocol.CONSTANTS.MAX_CLIENT];
-    GameObject[] Enemys = new GameObject[4];// 수정
+    GameObject[] Objects = new GameObject[Protocol.CONSTANTS.MAX_OBJECT];
+
     int myPlayerID = -1;
     void Awake()
     {
@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!isGameStart)
+        if (!isGameStart && Input.GetKeyDown("z"))
         {
             PlaySound();
             offsetTime = 0;
@@ -114,7 +114,7 @@ public class GameManager : MonoBehaviour
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
         }
-        else
+        else if(isGameStart && Net.isOnline)
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -132,7 +132,7 @@ public class GameManager : MonoBehaviour
 
                 if (prevBeats != nowBeat.addBeat)
                 {
-                    Players[myPlayerID].GetComponent<PlayerManager>().Beat();
+                    Objects[myPlayerID].GetComponent<PlayerManager>().Beat();
                     enemy.GetComponent<EnemyManager>().Beat();
                     grid.Beat();
                     soundEffectManager.BeatEffect();
@@ -142,7 +142,9 @@ public class GameManager : MonoBehaviour
 
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 10000f);
-
+        }
+        if (Net.isOnline)
+        {
             // 네트워크 메세지 큐
             if (Network.MessQueue.Count > 0)
             {
@@ -157,8 +159,9 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_login_ok p = Protocol.sc_packet_login_ok.SetByteToVar(data);
 
                             myPlayerID = p.id;
-                            Players[p.id] = player;
+                            Objects[p.id] = player;
                             //PutPlayerObject(p.type, p.id, p.x, p.y);
+                            PlaySound();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:
@@ -171,26 +174,22 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
-                            Debug.Log("이동");
-                            //MoveObject(p.type, p.id, p.x, p.y);
-                            Debug.Log(p.x + "," + p.y + ", " + p.z);
+                           
 
                             //Debug.Log(p.id+"이동");
-                            Players[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                            Objects[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
 
                         }
                         break;
-                    case Protocol.CONSTANTS.SC_PACKET_MOVE_OBJECT:
+                    case Protocol.CONSTANTS.SC_PACKET_ATTACK:
                         {
-                            Protocol.sc_packet_move_object p = Protocol.sc_packet_move_object.SetByteToVar(data);
-                            //Debug.Log("이동");
+                            Protocol.sc_packet_attack p = Protocol.sc_packet_attack.SetByteToVar(data);
+                            Debug.Log(p.id+"가 " + p.target_id + "를 공격");
                             //MoveObject(p.type, p.id, p.x, p.y);
                             //Debug.Log(p.x + "," + p.y + ", " + p.z);
 
-                            //Debug.Log(p.id + "이동");
-                            Enemys[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            Enemys[p.id].GetComponent<HexCellPosition>().setDirection(p.direction);
-                            //Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
+                            //Debug.Log(p.id+"이동");
+                            Objects[p.id].GetComponent<HexCellPosition>().setDirection(p.direction);
 
                         }
                         break;
@@ -204,20 +203,20 @@ public class GameManager : MonoBehaviour
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
                                         Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "플레이어 넣음");
-                                        Players[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
-                                        Players[p.id].SetActive(true);
-                                        Players[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
+                                        Objects[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
+                                        Objects[p.id].SetActive(true);
+                                        Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 
-                                        Players[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        Objects[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         break;
                                     }
                                 case (byte)Protocol.OBJECT_TYPE.ENEMY:
                                     {
                                         Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
 
-                                        Enemys[p.id] = ObjectPool.instance.EnemyObjectQueue.Dequeue();
-                                        Enemys[p.id].SetActive(true);
-                                        Enemys[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        Objects[p.id] = ObjectPool.instance.EnemyObjectQueue.Dequeue();
+                                        Objects[p.id].SetActive(true);
+                                        Objects[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                     }
                                     break;
                             }
@@ -227,8 +226,17 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_REMOVE_OBJECT:
                         {
                             Protocol.sc_packet_remove_object p = Protocol.sc_packet_remove_object.SetByteToVar(data);
-                            ObjectPool.instance.EnemyObjectQueue.Enqueue(Players[p.id]);
-                            Players[p.id].SetActive(false);
+                            if(p.id< Protocol.CONSTANTS.MAX_USER)
+                            {
+                                ObjectPool.instance.PlayerObjectQueue.Enqueue(Objects[p.id]);
+                                Objects[p.id].SetActive(false);
+                            }
+                            else
+                            {
+                                ObjectPool.instance.EnemyObjectQueue.Enqueue(Objects[p.id]);
+                                Objects[p.id].SetActive(false);
+                            }
+
                             //다른 플레이어면 다른플레이어 풀에
                             //적이면 적풀에 넣자
                             //ReMoveObject(p.id);

@@ -26,7 +26,7 @@ public class ObjectPool : MonoBehaviour
     {
         instance = this;
 
-        PlayerObjectQueue = InsertQueue(Protocol.CONSTANTS.MAX_CLIENT - 1, OtherPlayerPrefeb, null);
+        PlayerObjectQueue = InsertQueue(Protocol.CONSTANTS.MAX_USER - 1, OtherPlayerPrefeb, null);
         EnemyObjectQueue = InsertQueue(4, EnemyPrefeb, null);
     }
 

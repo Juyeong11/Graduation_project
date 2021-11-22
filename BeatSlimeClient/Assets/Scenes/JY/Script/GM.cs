@@ -17,7 +17,7 @@ public class GM : MonoBehaviour
     {
         Net.CreateAndConnect();
 
-        Players = new GameObject[Protocol.CONSTANTS.MAX_CLIENT];
+        Players = new GameObject[Protocol.CONSTANTS.MAX_USER];
     }
     private void OnApplicationQuit()
     {
