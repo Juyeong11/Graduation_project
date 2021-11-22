@@ -2033,7 +2033,10 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 95814edcc2775b24c9c6d13a403b6790, type: 2}
+  - {fileID: 2100000, guid: 7fbeab3b0c7cfb845bf99cc08c659a29, type: 2}
+  - {fileID: 2100000, guid: 7f9729d9ca2d7ea45be94f7891fd71aa, type: 2}
+  - {fileID: 2100000, guid: b90dbd13360f909498107f37ef909fd9, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2058,7 +2061,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 973877516759717424, guid: 094e06574aa6a4c4991b6f9390e54f7b, type: 3}
+  m_Mesh: {fileID: -3292925553009838691, guid: 3964bfee3edde514daafffe5e67ac4a5, type: 3}
   m_Bones: []
   m_BlendShapeWeights:
   - 0
@@ -2833,7 +2836,7 @@ MonoBehaviour:
   timeBy16Beat: 0
   beatCounter: 0
   offsetTime: 156
-  JudgementTiming: 80
+  JudgementTiming: 100
   alreadyMoved: 0
 --- !u!114 &2121429944
 MonoBehaviour:
