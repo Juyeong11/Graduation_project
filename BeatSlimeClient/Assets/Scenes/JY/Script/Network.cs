@@ -25,6 +25,7 @@ public class Network
 
         int index = 0;
 
+        //.수정필요
         while (index < strLength)
         {
             int size = receiveBytes[index];
@@ -104,6 +105,16 @@ public class Network
         pk.type = Protocol.CONSTANTS.CS_PACKET_MOVE;
 
         pk.direction = dir;
+
+        ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
+    public void SendreadPacket()
+    {
+        Protocol.cs_packet_read_map pk = new Protocol.cs_packet_read_map();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_read_map));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_READ_MAP;
+
 
         ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }

@@ -242,6 +242,27 @@ public class GameManager : MonoBehaviour
                             //ReMoveObject(p.id);
                         }
                         break;
+                    case Protocol.CONSTANTS.SC_PACKET_MAP_DATA:
+                        {
+                            int size = data[0];
+                            Debug.Log(size);
+                            int index = 0;
+
+                            ArrayList shells = new ArrayList(); 
+                            while (index < size - 2)
+                            {
+                                Protocol.Map shell = Protocol.Map.SetByteToMap(data, index + 2);
+                                index += 24;
+                                shells.Add(shell);
+                            }
+                            foreach (Protocol.Map s in shells)
+                                Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
+                            index = 0;
+                            //다른 플레이어면 다른플레이어 풀에
+                            //적이면 적풀에 넣자
+                            //ReMoveObject(p.id);
+                        }
+                        break;
                     default:
                         Debug.Log("이상한 타입이네");
                         break;

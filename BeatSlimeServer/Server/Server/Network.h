@@ -1,13 +1,17 @@
 #pragma once
 
 #include <WS2tcpip.h>
-#include<MSWSock.h>
+#include <MSWSock.h>
+#include <windows.h> 
+#include <sqlext.h>
+
+#pragma comment (lib, "WS2_32.LIB")
+#pragma comment (lib, "MSWSock.LIB")
 
 #include"protocol.h"
 #include"Client.h"
 
-#pragma comment (lib, "WS2_32.LIB")
-#pragma comment (lib, "MSWSock.LIB")
+
 
 void error_display(const char* err_p,int err_no);
 
@@ -26,7 +30,7 @@ struct timer_event {
 };
 
 
-
+class DataBase;
 class Network
 {
 private:
@@ -35,41 +39,9 @@ public:
 	static Network* GetInstance();
 	HANDLE g_h_iocp;
 	SOCKET g_s_socket;
-	Network() {
-		//인스턴스는 한 개만!!
-		assert(instance == nullptr);
-		instance = this;
-
-		for (int i = 0; i < MAX_USER; ++i) {
-			clients[i] = new Client;
-		}
-		for (int i = MAX_USER; i <= NPC_ID_END; ++i) {
-			clients[i] = new Npc();
-		}
-		for (int i = 0; i < MAX_OBJECT; ++i) {
-			clients[i]->id = i;
-		}
-		for (int i = 0; i < MAX_OBJECT; ++i) {
-			exp_over_pool.push(new EXP_OVER);
-		}
-		Initialize_NPC();
-	}
-	~Network() {
-		//스레드가 종료된 후 이기 때문에 락을 할 필요가 없다
-	//accpet상태일 때 문제가 생긴다
-		for (int i = 0; i < MAX_USER; ++i)
-			if (ST_INGAME == clients[i]->state)
-				disconnect_client(clients[i]->id);
-
-		for (int i = 0; i < MAX_OBJECT; ++i) {
-			delete clients[i];
-		}
-		for (int i = 0; i < MAX_OBJECT; ++i) {
-			EXP_OVER* ex;
-			exp_over_pool.try_pop(ex);
-			delete ex;
-		}
-	}
+	DataBase* DB;
+	Network();
+	~Network();
 
 
 	void start_accept() {
@@ -89,6 +61,7 @@ public:
 	void send_attack_player(int client_id, int target_id);
 	void send_put_object(int client_id, int target_id);
 	void send_remove_object(int client_id, int victim_id);
+	void send_map_data(int client_id,char* data, int nShell);
 	void disconnect_client(int client_id);
 
 	bool is_near(int a, int b)

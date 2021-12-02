@@ -80,11 +80,11 @@ public class PlayerManager : MonoBehaviour
         }
         return false;
     }
-    public void PlayerMove(int x,int y, int z)
+    public void PlayerMove(int x, int y, int z)
     {
         //GameManager.data.setMoved();
-       // if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).state != cellState.None)
-            selfCoord.SetPosition(x, y, z);
+        // if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).state != cellState.None)
+        selfCoord.SetPosition(x, y, z);
         //selfDirection = HexDirection.LeftUp;
     }
     void KeyHandler()
@@ -110,7 +110,7 @@ public class PlayerManager : MonoBehaviour
             }
 
 
-          
+
         }
         else if (Input.GetKeyDown(KeyCode.W) && KeyCheck())
         {
@@ -201,6 +201,10 @@ public class PlayerManager : MonoBehaviour
                     selfCoord.plus(1, 0, -1);
                 selfDirection = HexDirection.RightDown;
             }
+        }
+        else if (Input.GetKeyDown(KeyCode.BackQuote))
+        {
+            GameManager.data.Net.SendreadPacket();
         }
     }
 

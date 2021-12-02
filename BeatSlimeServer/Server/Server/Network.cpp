@@ -1,6 +1,7 @@
 #include "stdfx.h"
 
 
+#include "DataBase.h"
 #include "Network.h"
 
 Network* Network::instance = nullptr;
@@ -23,7 +24,42 @@ void error_display(const char* err_p, int err_no)
 	//while (true);
 	LocalFree(lpMsgBuf);
 }
+Network::Network() {
+	//인스턴스는 한 개만!!
+	assert(instance == nullptr);
+	instance = this;
 
+	for (int i = 0; i < MAX_USER; ++i) {
+		clients[i] = new Client;
+	}
+	for (int i = MAX_USER; i <= NPC_ID_END; ++i) {
+		clients[i] = new Npc();
+	}
+	for (int i = 0; i < MAX_OBJECT; ++i) {
+		clients[i]->id = i;
+	}
+	for (int i = 0; i < MAX_OBJECT; ++i) {
+		exp_over_pool.push(new EXP_OVER);
+	}
+	Initialize_NPC();
+	DB = new DataBase;
+}
+Network::~Network() {
+	//스레드가 종료된 후 이기 때문에 락을 할 필요가 없다
+//accpet상태일 때 문제가 생긴다
+	for (int i = 0; i < MAX_USER; ++i)
+		if (ST_INGAME == clients[i]->state)
+			disconnect_client(clients[i]->id);
+
+	for (int i = 0; i < MAX_OBJECT; ++i) {
+		delete clients[i];
+	}
+	for (int i = 0; i < MAX_OBJECT; ++i) {
+		EXP_OVER* ex;
+		exp_over_pool.try_pop(ex);
+		delete ex;
+	}
+}
 void Network::send_login_ok(int c_id)
 {
 	sc_packet_login_ok packet;
@@ -117,6 +153,21 @@ void Network::send_remove_object(int c_id, int victim)
 	}
 }
 
+void Network::send_map_data(int c_id, char* data, int nShell)
+{
+	sc_packet_map_data packet;
+	packet.size = nShell * sizeof(Map) + 2;
+	packet.type = SC_PACKET_MAP_DATA;
+	memcpy(packet.buf, reinterpret_cast<char*>(data), packet.size - 2);
+
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, packet.size, &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+
+}
+
 void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
@@ -196,9 +247,9 @@ void Network::do_npc_move(int npc_id) {
 		std::cout << "Invalid move in client id : " << npc_id << std::endl;
 		exit(-1);
 	}
-	x = std::clamp((int)x,-2,2);
-	y = std::clamp((int)y,-2,2);
-	z = std::clamp((int)z,-2,2);
+	x = std::clamp((int)x, -2, 2);
+	y = std::clamp((int)y, -2, 2);
+	z = std::clamp((int)z, -2, 2);
 
 	//해당 NPC는 모든 플레이어에 대한 viewlist를 만든다.
 	for (int i = 0; i < MAX_USER; ++i) {
@@ -473,6 +524,20 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 	}
 	break;
+	case CS_PACKET_READ_MAP:
+	{
+		DB->read_map_data();
+		int MAX_SEND_NUM = 3;
+		int size = DB->map_data.size();
+
+		int n = size / MAX_SEND_NUM;
+		int m = size % MAX_SEND_NUM;
+		for (int i = 0; i < n; ++i)
+			send_map_data(client_id, reinterpret_cast<char*>(&(DB->map_data[i])), MAX_SEND_NUM);
+
+		send_map_data(client_id, reinterpret_cast<char*>(&(DB->map_data[n* MAX_SEND_NUM])), m);
+	}
+	break;
 	default:
 		std::cout << "이상한 패킷 수신\n";
 		break;
@@ -585,9 +650,9 @@ void Network::worker()
 		case OP_ENEMY_ATTACK: {
 			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			do_npc_attack(client_id, target_id);
-			exp_over_pool.push(exp_over); 
+			exp_over_pool.push(exp_over);
 		}
-			break;
+							break;
 		default:
 			break;
 		}
