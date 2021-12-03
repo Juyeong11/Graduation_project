@@ -528,14 +528,51 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		DB->read_map_data();
 		int MAX_SEND_NUM = 3;
-		int size = DB->map_data.size();
+		int size = DB->db_map_data.size();
 
 		int n = size / MAX_SEND_NUM;
 		int m = size % MAX_SEND_NUM;
-		for (int i = 0; i < n; ++i)
-			send_map_data(client_id, reinterpret_cast<char*>(&(DB->map_data[i])), MAX_SEND_NUM);
+		for (int i = 0; i < n; i++)
+			send_map_data(client_id, reinterpret_cast<char*>(&(DB->db_map_data[i * MAX_SEND_NUM])), MAX_SEND_NUM);
 
-		send_map_data(client_id, reinterpret_cast<char*>(&(DB->map_data[n* MAX_SEND_NUM])), m);
+		send_map_data(client_id, reinterpret_cast<char*>(&(DB->db_map_data[n * MAX_SEND_NUM])), m);
+	}
+	break;
+	case CS_PACKET_WRITE_MAP:
+	{
+		cs_packet_write_map* pk = reinterpret_cast<cs_packet_write_map*>(p);
+		if (pk->id != -1)
+			DB->client_map_data[pk->id] = Map{ pk->id, pk->x, pk->y,pk->z,pk->w,pk->color,pk->block_type };
+		else {
+			std::cout << "맵 수신 완료 update 및 insert 시작\n";
+			DB->read_map_data();
+
+			//DB->db_map_data; -> 여기서 찾았는데 해당 id의 값이 없으면 삽입
+
+			for (const std::pair<int, Map>& m : DB->client_map_data) {
+				auto re = std::find_if(DB->db_map_data.cbegin(), DB->db_map_data.cend(), [&](const Map& a) {
+					return a.id == m.first;
+					});
+				if (re == DB->db_map_data.cend()) {
+					//삽입해야할 데이터
+					DB->insert_map_data(m.second);
+				}
+				else {
+					if (*re == m.second) {
+						//유지된 데이터
+					}
+					else {
+						//업데이트해야할 데이터
+						DB->update_map_data(m.second);
+
+					}
+				}
+			}
+
+			// 삽입해야할 것
+
+			// 수정해야할 것
+		}
 	}
 	break;
 	default:

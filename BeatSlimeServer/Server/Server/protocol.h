@@ -14,6 +14,7 @@ constexpr int MAX_OBJECT = MAX_USER + MAX_NPC;
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_READ_MAP = 3;
+const char CS_PACKET_WRITE_MAP = 4;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -41,6 +42,13 @@ struct cs_packet_move {
 struct cs_packet_read_map {
 	unsigned char size;
 	char	type;
+};
+struct cs_packet_write_map {
+	unsigned char size;
+	char	type;
+	int id;
+	int x, y, z, w;
+	int color, block_type;
 };
 
 //server->client

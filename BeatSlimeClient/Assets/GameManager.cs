@@ -80,6 +80,25 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (Input.GetKeyDown("1"))
+        {
+            ArrayList Shells = new ArrayList();
+            // 맵정보를 arrayList에 담아서 Send하면 블록 하나하나 정보를 클라이언트에 보낸다.
+            for (int i = 0; i < 10; ++i)
+            {
+                Protocol.Map a = new Protocol.Map();
+                a.id = i;
+                a.x = a.y = a.z = a.w = i;
+                a.color = a.type = 0;
+                Shells.Add(a);
+            }
+
+            Net.SendWriteMapPacket(Shells);
+        }
+        else if (Input.GetKeyDown(KeyCode.BackQuote))
+        {
+            Net.SendreadPacket();
+        }
         if (!isGameStart && Input.GetKeyDown("z"))
         {
             PlaySound();
@@ -184,7 +203,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_ATTACK:
                         {
                             Protocol.sc_packet_attack p = Protocol.sc_packet_attack.SetByteToVar(data);
-                            Debug.Log(p.id+"가 " + p.target_id + "를 공격");
+                            //Debug.Log(p.id+"가 " + p.target_id + "를 공격");
                             //MoveObject(p.type, p.id, p.x, p.y);
                             //Debug.Log(p.x + "," + p.y + ", " + p.z);
 
@@ -202,7 +221,7 @@ public class GameManager : MonoBehaviour
                             {
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
-                                        Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "플레이어 넣음");
+                                       // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "플레이어 넣음");
                                         Objects[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                         Objects[p.id].SetActive(true);
                                         Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
@@ -212,7 +231,7 @@ public class GameManager : MonoBehaviour
                                     }
                                 case (byte)Protocol.OBJECT_TYPE.ENEMY:
                                     {
-                                        Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
+                                       // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
 
                                         Objects[p.id] = ObjectPool.instance.EnemyObjectQueue.Dequeue();
                                         Objects[p.id].SetActive(true);
@@ -252,15 +271,19 @@ public class GameManager : MonoBehaviour
                             while (index < size - 2)
                             {
                                 Protocol.Map shell = Protocol.Map.SetByteToMap(data, index + 2);
-                                index += 24;
+                                index += 28;
                                 shells.Add(shell);
                             }
                             foreach (Protocol.Map s in shells)
+<<<<<<< Updated upstream
                             {
 
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
                             }
                             index = 0;
+=======
+                                Debug.Log(s.id + ", "+ s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
+>>>>>>> Stashed changes
 
                             //다른 플레이어면 다른플레이어 풀에
                             //적이면 적풀에 넣자

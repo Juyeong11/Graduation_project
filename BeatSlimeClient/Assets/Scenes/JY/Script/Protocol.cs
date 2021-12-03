@@ -22,6 +22,7 @@ namespace Protocol
         public const byte CS_PACKET_LOGIN = 1;
         public const byte CS_PACKET_MOVE = 2;
         public const byte CS_PACKET_READ_MAP = 3;
+        public const byte CS_PACKET_WRITE_MAP = 4;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -72,6 +73,7 @@ namespace Protocol
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class Map
     {
+        public int id;
         public int x, y, z, w;
         public int color, type;
 
@@ -114,6 +116,17 @@ namespace Protocol
     {
         public byte size;
         public byte type;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_write_map : ISerializeble<cs_packet_write_map>
+    {
+        public byte size;
+        public byte type;
+        public int id;
+        public int x, y, z, w;
+        public int color, block_type;
     }
     //Server -> Client
 

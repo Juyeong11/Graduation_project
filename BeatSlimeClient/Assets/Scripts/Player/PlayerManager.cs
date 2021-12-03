@@ -251,10 +251,7 @@ public class PlayerManager : MonoBehaviour
                 selfDirection = HexDirection.RightDown;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.BackQuote))
-        {
-            GameManager.data.Net.SendreadPacket();
-        }
+
     }
 
 
