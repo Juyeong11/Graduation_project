@@ -3,18 +3,81 @@ using UnityEngine;
 public class HexCellPosition : MonoBehaviour
 {
     public HexCoordinates coordinates;
+    public HexCoordinates preCoordinates;
 
-    public void setInitPosition(int x, int z)
+    float preBeatedTime;
+
+    public void setInitPosition(int x, int z,int w=0)
     {
-        coordinates.setCoordinates(x, z);
+        preCoordinates.setCoordinates(x, z, w);
+        coordinates.setCoordinates(x, z,w);
 
-        gameObject.transform.localPosition = new Vector3(coordinates.X * 0.866f, 0f, coordinates.X * 0.5f + coordinates.Z * 1f);
+        gameObject.transform.localPosition = new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W), coordinates.X * 0.5f + coordinates.Z * 1f);
     }
 
-    public void refelectPosition()
+    public void reflectPosition()
     {
-        gameObject.transform.position = new Vector3(coordinates.X * 0.866f, 0.25f, coordinates.X * 0.5f + coordinates.Z * 1f);
+        //gameObject.transform.position = new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W) , coordinates.X * 0.5f + coordinates.Z * 1f);
     }
+
+    static public float calculateWPosition(int w)
+    {
+        return w * 0.2f;
+    }
+
+    //¿©±â¼­ Lerp
+    public Vector3 calculatePlayerPosition()
+    {
+        int beatTime = GameManager.data.timeByBeat;
+
+        float tick = LerpSquare((Time.time - preBeatedTime) * 1000f / beatTime);
+        float newX;
+        float newY;
+        float newZ;
+
+        newX = Mathf.Lerp(preCoordinates.X * 0.866f, coordinates.X * 0.866f, tick);
+        newZ = Mathf.Lerp(preCoordinates.X * 0.5f + preCoordinates.Z, coordinates.X * 0.5f + coordinates.Z, tick);
+        newY = SlimeWLerp(calculateWPosition(preCoordinates.W), calculateWPosition(coordinates.W), tick);
+
+        if (tick >= 1f)
+        {
+            preCoordinates = coordinates;
+        }
+
+        return new Vector3(newX, newY, newZ);
+    }
+
+    public float LerpSquare(float tick)
+    {
+        if (tick < 0.3f)
+            return 0f;
+        else if (tick < 0.7f)
+        {
+            return (tick - 0.3f) * 2.5f;
+        }
+        else
+            return 1f;
+    }
+    
+    public void beat()
+    {
+
+    }
+
+    public float SlimeWLerp(float a, float b, float t)
+    {
+        float skyHigh = (a+b)*0.5f + 2f;
+
+        if (t <0.5f)
+        {
+            return Mathf.Lerp(a, skyHigh, t);
+        }
+        else
+        {
+            return Mathf.Lerp(skyHigh, b, t);
+        }
+    }
+
     public void setDirection(byte dir)
     {
         switch(dir)
@@ -40,23 +103,32 @@ public class HexCellPosition : MonoBehaviour
 
         }
     }
-    public void plus(int x, int y, int z)
+    public void plus(int x, int y, int z,int w=0)
     {
+        preBeatedTime = Time.time;
         if (x+y+z != 0)
         {
             Debug.LogError("HexPlus Error (x+y+z != 0)");
         }
-        coordinates.plus(x, z);
-        refelectPosition();
+        preCoordinates = coordinates;
+        coordinates.plus(x, z, w);
+        reflectPosition();
     }
-    public void SetPosition(int x, int y, int z)
+    public void SetPosition(int x, int y, int z, int w=0)
     {
-        coordinates.setCoordinates(x, z);
-        refelectPosition();
+        preBeatedTime = Time.time;
+
+        if (x + y + z != 0)
+        {
+            Debug.LogError("HexSetting Error (x+y+z != 0)");
+        }
+        preCoordinates = coordinates;
+        coordinates.setCoordinates(x, z, w);
+        reflectPosition();
     }
-    public (int,int,int) Get()
+    public (int,int,int,int) Get()
     {
-        return (coordinates.X, coordinates.Y, coordinates.Z);
+        return (coordinates.X, coordinates.Y, coordinates.Z, coordinates.W);
     }
 
     public void setCellPositionByPivotTransform()

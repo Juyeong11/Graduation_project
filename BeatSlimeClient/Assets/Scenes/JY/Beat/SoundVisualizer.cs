@@ -15,8 +15,8 @@ public class SoundVisualizer : MonoBehaviour
     public float highCut = 0.6f;
     public float updateTime = 0.05f;
 
-    AudioSource audioSource;
-    LineRenderer line;
+    public AudioSource audioSource;
+    public LineRenderer line;
 
     float[] spectrum = new float[NUM_SAMPLES];
     float[] coef = new float[NUM_SAMPLES];
@@ -26,8 +26,8 @@ public class SoundVisualizer : MonoBehaviour
 
     private void Start()
     {
-        audioSource = GameObject.FindObjectOfType<AudioSource>();
-        line = GetComponent<LineRenderer>();
+        //audioSource = GameObject.FindObjectOfType<AudioSource>();
+        //line = GetComponent<LineRenderer>();
 
         lineVertNum = (int) ((highCut - lowCut) * NUM_SAMPLES);
         lineVertPositions = new Vector3[lineVertNum + 2];

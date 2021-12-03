@@ -256,8 +256,12 @@ public class GameManager : MonoBehaviour
                                 shells.Add(shell);
                             }
                             foreach (Protocol.Map s in shells)
+                            {
+
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
+                            }
                             index = 0;
+
                             //다른 플레이어면 다른플레이어 풀에
                             //적이면 적풀에 넣자
                             //ReMoveObject(p.id);

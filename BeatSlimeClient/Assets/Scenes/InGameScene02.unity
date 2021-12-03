@@ -686,7 +686,7 @@ MonoBehaviour:
   m_BindingMode: 1
   m_FollowOffset: {x: 0, y: 2.5, z: -3.5}
   m_XDamping: 1
-  m_YDamping: 1
+  m_YDamping: 10
   m_ZDamping: 1
   m_AngularDampingMode: 0
   m_PitchDamping: 0
@@ -732,6 +732,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!120 &166966214 stripped
+LineRenderer:
+  m_CorrespondingSourceObject: {fileID: 7978099203250689494, guid: f495758b2fbce4f43bc0d893e78998ba, type: 3}
+  m_PrefabInstance: {fileID: 1073835861}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &230468060
 GameObject:
   m_ObjectHideFlags: 0
@@ -761,8 +766,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e109649717511ad4d9bca6bcfc9dc7cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CreateStickNum: 64
-  interval: 28
+  CreateStickNum: 128
+  interval: 14
   Sticks: []
   Yellow: {fileID: 1584590191250358178, guid: 9291db5ed1bf9994d8fb68a8686e13d7, type: 3}
 --- !u!4 &230468062
@@ -910,7 +915,7 @@ MonoBehaviour:
   m_Priority: 10
   m_StandbyUpdate: 2
   m_LookAt: {fileID: 0}
-  m_Follow: {fileID: 1267902175}
+  m_Follow: {fileID: 1519395718}
   m_Lens:
     FieldOfView: 60
     OrthographicSize: 5
@@ -934,7 +939,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400982002}
   m_LocalRotation: {x: 0.2164396, y: 0, z: 0, w: 0.97629607}
-  m_LocalPosition: {x: 0, y: 7.5, z: -3.5}
+  m_LocalPosition: {x: 0, y: 3.5, z: -3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 132048414}
@@ -1152,6 +1157,11 @@ MonoBehaviour:
   coordinates:
     x: 0
     z: 0
+    w: 0
+  preCoordinates:
+    x: 0
+    z: 0
+    w: 0
 --- !u!4 &582958231
 Transform:
   m_ObjectHideFlags: 0
@@ -1161,7 +1171,7 @@ Transform:
   m_GameObject: {fileID: 582958227}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 5, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 1605067730}
   m_Father: {fileID: 0}
@@ -1677,6 +1687,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: BeatCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 7978099203250689481, guid: f495758b2fbce4f43bc0d893e78998ba, type: 3}
+      propertyPath: line
+      value: 
+      objectReference: {fileID: 166966214}
+    - target: {fileID: 7978099203250689481, guid: f495758b2fbce4f43bc0d893e78998ba, type: 3}
+      propertyPath: audioSource
+      value: 
+      objectReference: {fileID: 1931281404}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f495758b2fbce4f43bc0d893e78998ba, type: 3}
 --- !u!1001 &1234013394
@@ -1758,7 +1776,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1267902175}
   - component: {fileID: 1267902178}
-  - component: {fileID: 1267902177}
   - component: {fileID: 1267902176}
   m_Layer: 0
   m_Name: PlayerAnimWrapper
@@ -1775,7 +1792,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1267902174}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 5, z: 0}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1519395718}
@@ -1797,18 +1814,11 @@ MonoBehaviour:
   coordinates:
     x: 0
     z: 0
---- !u!114 &1267902177
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1267902174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f31ac69e6ac592b4484ce5b0faea01fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+    w: 0
+  preCoordinates:
+    x: 0
+    z: 0
+    w: 0
 --- !u!114 &1267902178
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1864,10 +1874,11 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
   state: 0
-  handle: {fileID: 1267902177}
+  handle: {fileID: 0}
   selfCoord: {fileID: 1267902176}
   selfDirection: 0
   grid: {fileID: 1387123430}
+  PlayerTransform: {fileID: 1519395718}
 --- !u!1 &1387123429
 GameObject:
   m_ObjectHideFlags: 0
@@ -1897,15 +1908,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bb0d87920b3ec24eacb460dc23ca478, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadFile: 
+  MakeMapWithoutMapPacket: 1
   cellType:
   - {fileID: 7589257941424137537, guid: aa3a9b9def515dd4681bde4e79274aa4, type: 3}
   pPosition:
     x: 0
     z: 0
+    w: 0
   ePosition:
     x: 0
     z: 0
+    w: 0
 --- !u!4 &1387123431
 Transform:
   m_ObjectHideFlags: 0
@@ -2510,7 +2523,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930881972}
   m_LocalRotation: {x: 0.2164396, y: 0, z: 0, w: 0.97629607}
-  m_LocalPosition: {x: 0, y: 7.5, z: -3.5}
+  m_LocalPosition: {x: 0, y: 3.5, z: -3.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

@@ -32,4 +32,6 @@ public class ENote
     public Beat when;
     //어떤 스킬을
     public int which;
+    //누구에게
+    public int who;
 }

@@ -15,6 +15,8 @@ public struct HexCoordinates
 {
 	[SerializeField]
 	private int x, z;
+	[SerializeField]
+	private int w;
 	public int X {
 		get
 		{
@@ -39,36 +41,48 @@ public struct HexCoordinates
 		}
 	}
 
-	public HexCoordinates(int x, int z)
+	public int W
+    {
+        get
+        {
+			return w;
+        }
+		set { w = value; }
+    }
+
+	public HexCoordinates(int x, int z, int w=0)
 	{
 		this.x = x;
 		this.z = z;
+		this.w = w;
 	}
 
-	public static HexCoordinates FromOffsetCoordinates(int x, int z)
+	public static HexCoordinates FromOffsetCoordinates(int x, int z, int w=0)
 	{
-		return new HexCoordinates(x, z);
+		return new HexCoordinates(x, z, w);
 	}
 
-	public void setCoordinates(int x, int z)
+	public void setCoordinates(int x, int z, int w=0)
     {
 		this.x = x;
 		this.z = z;
+		this.w = w;
 	}
 
-	public void plus(int x, int z)
+	public void plus(int x, int z, int w=0)
     {
 		this.x += x;
 		this.z += z;
+		this.w += w;
     }
 
 	public override string ToString()
 	{
-		return "(" + X.ToString() + ", " + Y.ToString() + ", " + Z.ToString() + ")";
+		return "(" + X.ToString() + ", " + Y.ToString() + ", " + Z.ToString() + ", " + W.ToString() + ")";
 	}
 
 	public string ToStringOnSeparateLines()
 	{
-		return X.ToString() + "\n" + Y.ToString() + "\n" + Z.ToString();
+		return X.ToString() + "\n" + Y.ToString() + "\n" + Z.ToString() + "\n\n" + W.ToString();
 	}
 }

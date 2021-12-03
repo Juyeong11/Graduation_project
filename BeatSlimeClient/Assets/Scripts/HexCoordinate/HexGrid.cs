@@ -15,6 +15,7 @@ public class Cell
     public int x;
     public int y;
     public int z;
+    public int w;
 
     public int duration = 0;
     public cellState state
@@ -30,23 +31,25 @@ public class Cell
         x = 1000;
         y = 1000;
         z = 1000;
+        w = 1000;
         state = cellState.None;
         sprite = "none";
     }
 
-    public Cell(GameObject cell, int x, int y,int z, cellState state, string sp)
+    public Cell(GameObject cell, int x, int y,int z, int w, cellState state, string sp)
     {
         obejct = cell;
         this.x = x;
         this.y = y;
         this.z = z;
+        this.w = w;
         this.state = state;
         sprite = sp;
     }
 
-    public (int,int,int) getCoordinate()
+    public (int,int,int, int) getCoordinate()
     {
-        return (x, y, z);
+        return (x, y, z, w);
     }
 
     public void Warning()
@@ -78,13 +81,13 @@ public class CellMap
 {
     public List<Cell> cellMaps = new List<Cell>();
 
-    public void Add(GameObject cell,int x, int y,int z)
+    public void Add(GameObject cell,int x, int y,int z,int w=0)
     {
-        cellMaps.Add(new Cell(cell, x, y, z, cellState.Normal, "default"));
+        cellMaps.Add(new Cell(cell, x, y, z,w, cellState.Normal, "default"));
     }
-    public void Add(GameObject cell, int x, int y, int z, cellState state, string name)
+    public void Add(GameObject cell, int x, int y, int z, int w, cellState state, string name)
     {
-        cellMaps.Add(new Cell(cell, x, y, z, state, name));
+        cellMaps.Add(new Cell(cell, x, y, z,w, state, name));
     }
 
     public Cell Get(int x,int y,int z)
@@ -140,7 +143,7 @@ public class CellMap
 [System.Serializable]
 public class HexGrid : MonoBehaviour
 {
-    public string loadFile;
+    public bool MakeMapWithoutMapPacket;
 
     private int xMaxLength;
     private int yMaxLength;
@@ -191,29 +194,59 @@ public class HexGrid : MonoBehaviour
     }
     public void Start()
     {
+        int color = 0;
         RedZones = new List<List<HexCoordinates>>();
 
-        //맵 생성
-        for (int x = xMinLength; x <= xMaxLength; ++x)
+        if (MakeMapWithoutMapPacket)
         {
-            for (int y = yMinLength; y <= yMaxLength; ++y)
+            //맵 생성
+            for (int x = xMinLength; x <= xMaxLength; ++x)
             {
-                for (int z = zMinLength; z <= zMaxLength; ++z)
+                for (int y = yMinLength; y <= yMaxLength; ++y)
                 {
-                    if (x + y + z == 0)
+                    for (int z = zMinLength; z <= zMaxLength; ++z)
                     {
-                        //print(cellType[0]);
-                        GameObject tmpcell = Instantiate(cellType[0]); // <- 나중에 string name으로 바꿔야?
-                        tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z);
-                        tmpcell.name = "cell"+x+y+z;
-                        tmpcell.transform.parent = gameObject.transform;
-                        cellMaps.Add(tmpcell,x,y,z);
+                        if (x + y + z == 0)
+                        {
+                            //print(cellType[0]);
+                            GameObject tmpcell = Instantiate(cellType[color]); // <- 나중에 string name으로 바꿔야?
+                            int w = Random.Range(0, 3);
+                            tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
+                            tmpcell.name = "cell" + x + y + z;
+                            tmpcell.transform.parent = gameObject.transform;
+                            cellMaps.Add(tmpcell, x, y, z, w);
+                        }
                     }
                 }
             }
         }
-
     }
+
+    public void P_MakeHexMap(int x,int y,int z,int color, int type)
+    {
+        if (!MakeMapWithoutMapPacket)
+        {
+            if (x + y + z == 0)
+            {
+                //print(cellType[0]);
+                GameObject tmpcell = Instantiate(cellType[color]); // <- 나중에 string name으로 바꿔야?
+                tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z);
+                tmpcell.name = "cell" + x + y + z;
+                tmpcell.transform.parent = gameObject.transform;
+                cellMaps.Add(tmpcell, x, y, z);
+            }
+            else
+            {
+                Debug.LogError(">>InValid HexCoordinate Error From MAP Packet<<");
+            }
+        }
+
+        else
+        {
+            Debug.LogError(">>Flag_MakeMapWithoutMapPacket<<");
+        }
+    }
+
 
 
     //DEBUG----------------------------------------이 아래로 다 고쳐야함

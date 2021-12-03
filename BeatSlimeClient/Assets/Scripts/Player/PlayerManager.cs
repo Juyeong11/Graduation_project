@@ -20,6 +20,7 @@ public class PlayerManager : MonoBehaviour
     public HexDirection selfDirection;
     public HexGrid grid;
 
+    public Transform PlayerTransform;
     public void Start()
     {
         grid = GameManager.data.grid;
@@ -64,12 +65,28 @@ public class PlayerManager : MonoBehaviour
         if (GameManager.data.isGameStart)
         {
             KeyHandler();
+            PlayerWCheck();
         }
+    }
+
+    public void PlayerWCheck()
+    {
+        if (selfCoord.coordinates.W != grid.cellMaps.Get(selfCoord.coordinates).w + 1)
+        {
+            Debug.LogError(">Player W Coordinate Error!<");
+            print("Self W : " + selfCoord.coordinates.W);
+            selfCoord.coordinates.W = grid.cellMaps.Get(selfCoord.coordinates).w + 1;
+        }
+        PlayerTransform.position = selfCoord.calculatePlayerPosition();
+
+        Debug.Log("z : " + gameObject.transform.position.z);
+
     }
 
     public void Beat()
     {
         grid.pPosition = selfCoord.coordinates;
+        selfCoord.beat();
     }
 
     bool KeyCheck()
@@ -105,7 +122,12 @@ public class PlayerManager : MonoBehaviour
             {
                 GameManager.data.setMoved();
                 if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).state != cellState.None)
-                    selfCoord.plus(-1, 0, 1);
+                {
+                    if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).w <= selfCoord.coordinates.W)
+                    {
+                        selfCoord.plus(-1, 0, 1, grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).w - selfCoord.coordinates.W + 1);
+                    }
+                }
                 selfDirection = HexDirection.LeftUp;
             }
 
@@ -126,7 +148,12 @@ public class PlayerManager : MonoBehaviour
             {
                 GameManager.data.setMoved();
                 if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).state != cellState.None)
-                    selfCoord.plus(0, -1, 1);
+                {
+                    if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).w <= selfCoord.coordinates.W)
+                    {
+                        selfCoord.plus(0, -1, 1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y -1, selfCoord.coordinates.Z + 1).w - selfCoord.coordinates.W + 1);
+                    }
+                }
                 selfDirection = HexDirection.Up;
             }
         }
@@ -144,7 +171,13 @@ public class PlayerManager : MonoBehaviour
             {
                 GameManager.data.setMoved();
                 if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).state != cellState.None)
-                    selfCoord.plus(1, -1, 0);
+                {
+                    if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).w <= selfCoord.coordinates.W)
+                    {
+                        selfCoord.plus(1, -1, 0, grid.cellMaps.Get(selfCoord.coordinates.X+1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
+                    }
+                    
+                }
                 selfDirection = HexDirection.RightUp;
             }
         }
@@ -162,7 +195,13 @@ public class PlayerManager : MonoBehaviour
             {
                 GameManager.data.setMoved();
                 if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).state != cellState.None)
-                    selfCoord.plus(-1, 1, 0);
+                {
+                    if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).w <= selfCoord.coordinates.W)
+                    {
+                        selfCoord.plus(-1, 1, 0, grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
+                    }
+
+                }
                 selfDirection = HexDirection.LeftDown;
             }
         }
@@ -180,7 +219,12 @@ public class PlayerManager : MonoBehaviour
             {
                 GameManager.data.setMoved();
                 if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z - 1).state != cellState.None)
-                    selfCoord.plus(0, 1, -1);
+                {
+                    if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z -1).w <= selfCoord.coordinates.W)
+                    {
+                        selfCoord.plus(0, 1, -1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z-1).w - selfCoord.coordinates.W + 1);
+                    }
+                }
                 selfDirection = HexDirection.Down;
             }
         }
@@ -198,7 +242,12 @@ public class PlayerManager : MonoBehaviour
             {
                 GameManager.data.setMoved();
                 if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).state != cellState.None)
-                    selfCoord.plus(1, 0, -1);
+                {
+                    if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w <= selfCoord.coordinates.W)
+                    {
+                        selfCoord.plus(1, 0, -1, grid.cellMaps.Get(selfCoord.coordinates.X+1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w - selfCoord.coordinates.W + 1);
+                    }
+                }
                 selfDirection = HexDirection.RightDown;
             }
         }

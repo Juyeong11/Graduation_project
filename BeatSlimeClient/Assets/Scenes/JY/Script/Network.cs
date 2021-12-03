@@ -52,7 +52,7 @@ public class Network
         IPEndPoint severEP = (IPEndPoint)tempSocket.RemoteEndPoint;
         if (severEP == null && tempSocket != null)
         {
-            Debug.Log("재연결 시도");
+            //Debug.Log("재연결 시도");
             StartConnect();
             return;
         }
