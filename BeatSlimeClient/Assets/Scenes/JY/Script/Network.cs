@@ -16,8 +16,11 @@ public class Network
     Socket ClientSocket;
 
     byte[] receiveBytes = new byte[BUFSIZE];
+    byte[] tempBytes = new byte[BUFSIZE*2];
 
     public bool isOnline = false;
+
+    int pre_buf_size = 0;
     void receiveComplet(System.IAsyncResult ar)
     {
         Socket c_Socket = (Socket)ar.AsyncState;
@@ -25,18 +28,43 @@ public class Network
 
         int index = 0;
 
-        //.수정필요
-        while (index < strLength)
+        //이전에 받던 데이터가 있으면
+        if(pre_buf_size != 0)
         {
-            int size = receiveBytes[index];
+            Buffer.BlockCopy(receiveBytes, 0, tempBytes, pre_buf_size, strLength);
+            //Array.Clear(receiveBytes, 0, receiveBytes.Length);
+           
+        }
+        else
+        {
+            Buffer.BlockCopy(receiveBytes, 0, tempBytes, 0, strLength);
+        }
+        //.수정필요
+        while (true)
+        {
+            int size = tempBytes[index];
+            if (index + size > strLength + pre_buf_size)
+            {
+                //패킷이 덜 옴
+                Buffer.BlockCopy(tempBytes, 0, tempBytes, index, strLength - index);
+                pre_buf_size = strLength - index;
+                break;
+            }
             //Debug.Log(size);
             byte[] temp = new byte[size];
-            Buffer.BlockCopy(receiveBytes, index, temp, 0, size);
+            Buffer.BlockCopy(tempBytes, index, temp, 0, size);
             index += size;
-
+           
+            if(index == strLength + pre_buf_size)
+            {
+                pre_buf_size = 0;
+                MessQueue.Enqueue(temp);
+                break;
+            }
             MessQueue.Enqueue(temp);
         }
 
+        
         ClientSocket.BeginReceive(receiveBytes, 0, BUFSIZE, SocketFlags.None, new System.AsyncCallback(receiveComplet), ClientSocket);
     }
     void sendComplet(System.IAsyncResult ar)
@@ -79,7 +107,7 @@ public class Network
         }
         catch (SocketException ex)
         {
-           // if(ex.)
+            // if(ex.)
             Debug.Log(ex.SocketErrorCode);
             CreateAndConnect();
         }
@@ -117,5 +145,41 @@ public class Network
 
 
         ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+    public void SendWriteMapPacket(ArrayList datas)
+    {
+        foreach (Protocol.Map m in datas)
+        {
+            Protocol.cs_packet_write_map pk = new Protocol.cs_packet_write_map();
+            pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_write_map));
+            pk.type = Protocol.CONSTANTS.CS_PACKET_WRITE_MAP;
+
+            pk.id = m.id;
+            pk.x = m.x;
+            pk.y = m.y;
+            pk.z = m.z;
+            pk.w = m.w;
+
+            pk.color = m.color;
+            pk.block_type = m.type;
+
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+        }
+
+        Protocol.cs_packet_write_map end_pk = new Protocol.cs_packet_write_map();
+        end_pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_write_map));
+        end_pk.type = Protocol.CONSTANTS.CS_PACKET_WRITE_MAP;
+
+        end_pk.id = -1;
+        end_pk.x = -1;
+        end_pk.y = -1;
+        end_pk.z = -1;
+        end_pk.w = -1;
+
+        end_pk.color = -1;
+        end_pk.block_type = -1;
+
+        ClientSocket.BeginSend(end_pk.GetBytes(), 0, end_pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+
     }
 }
