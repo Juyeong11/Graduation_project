@@ -103,7 +103,7 @@ public class Network
     {
         try
         {
-            ClientSocket.BeginConnect(IPAddress.Loopback, 4000, new AsyncCallback(connectComplet), ClientSocket);
+            ClientSocket.BeginConnect("121.139.87.12", 9000, new AsyncCallback(connectComplet), ClientSocket);
         }
         catch (SocketException ex)
         {

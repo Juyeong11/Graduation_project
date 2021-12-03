@@ -79,7 +79,7 @@ public class PlayerManager : MonoBehaviour
         }
         PlayerTransform.position = selfCoord.calculatePlayerPosition();
 
-        Debug.Log("z : " + gameObject.transform.position.z);
+        //Debug.Log("z : " + gameObject.transform.position.z);
 
     }
 

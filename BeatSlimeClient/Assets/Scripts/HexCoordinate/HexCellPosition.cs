@@ -12,7 +12,16 @@ public class HexCellPosition : MonoBehaviour
         preCoordinates.setCoordinates(x, z, w);
         coordinates.setCoordinates(x, z,w);
 
-        gameObject.transform.localPosition = new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W), coordinates.X * 0.5f + coordinates.Z * 1f);
+        gameObject.transform.localPosition = getRealPosition();
+    }
+
+    static public Vector3 getRealPosition(float x, float z, int w)
+    {
+        return new Vector3(x * 0.866f, calculateWPosition(w), x * 0.5f + z * 1f);
+    }
+    public Vector3 getRealPosition()
+    {
+        return new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W), coordinates.X * 0.5f + coordinates.Z * 1f);
     }
 
     public void reflectPosition()
@@ -112,7 +121,7 @@ public class HexCellPosition : MonoBehaviour
         }
         preCoordinates = coordinates;
         coordinates.plus(x, z, w);
-        reflectPosition();
+        //reflectPosition();
     }
     public void SetPosition(int x, int y, int z, int w=0)
     {
@@ -124,7 +133,7 @@ public class HexCellPosition : MonoBehaviour
         }
         preCoordinates = coordinates;
         coordinates.setCoordinates(x, z, w);
-        reflectPosition();
+        //reflectPosition();
     }
     public (int,int,int,int) Get()
     {

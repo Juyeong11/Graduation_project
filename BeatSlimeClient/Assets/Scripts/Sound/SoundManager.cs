@@ -28,6 +28,7 @@ public class SoundManager : MonoBehaviour
     [SerializeField] AudioSource[] sfxPlayer = null;
 
 
+    //40frame = 45bpm
     float pAnimUnitBPM = 45f;
     public Animator pAnimation;
     public Animator eAnimation;

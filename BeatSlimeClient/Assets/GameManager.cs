@@ -5,6 +5,9 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager data;
+
+    public int mapCellid = 0;
+
     public PatternManager PM;
 
     public GameObject player;
@@ -48,7 +51,7 @@ public class GameManager : MonoBehaviour
     GameObject[] Objects = new GameObject[Protocol.CONSTANTS.MAX_OBJECT];
 
     int myPlayerID = -1;
-    ArrayList Mapdata = new ArrayList();
+    public ArrayList Mapdata = new ArrayList();
 
     void Awake()
     {
@@ -261,6 +264,7 @@ public class GameManager : MonoBehaviour
                             int index = 0;
 
                             Mapdata.Clear();
+
                             while (index < size - 2)
                             {
                                 Protocol.Map shell = Protocol.Map.SetByteToMap(data, index + 2);
@@ -269,10 +273,9 @@ public class GameManager : MonoBehaviour
                             }
                             foreach (Protocol.Map s in Mapdata)
                             {
-
+                                grid.P_MakeHexMap(s);
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
                             }
-
 
                             //다른 플레이어면 다른플레이어 풀에
                             //적이면 적풀에 넣자

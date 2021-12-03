@@ -103,7 +103,7 @@ public class CellMap
         }
 
         Debug.LogError(">Invalid coordinate<");
-        return new Cell();
+        return null;
     }
 
     public Cell Get(int x, int z)
@@ -119,7 +119,7 @@ public class CellMap
         }
 
         Debug.LogError(">Invalid coordinate<");
-        return new Cell();
+        return null;
     }
 
     public Cell Get(HexCoordinates H)
@@ -135,7 +135,7 @@ public class CellMap
         }
 
         Debug.LogError(">Invalid coordinate<");
-        return new Cell();
+        return null;
     }
 
 }
@@ -212,9 +212,20 @@ public class HexGrid : MonoBehaviour
                             GameObject tmpcell = Instantiate(cellType[color]); // <- 나중에 string name으로 바꿔야?
                             int w = Random.Range(0, 3);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
-                            tmpcell.name = "cell" + x + y + z;
+                            tmpcell.name = "cell" + GameManager.data.mapCellid;
                             tmpcell.transform.parent = gameObject.transform;
                             cellMaps.Add(tmpcell, x, y, z, w);
+
+                            Protocol.Map p_tempcell = new Protocol.Map();
+                            p_tempcell.type = 0;
+                            p_tempcell.x = x;
+                            p_tempcell.y = y;
+                            p_tempcell.z = z;
+                            p_tempcell.w = w;
+                            p_tempcell.color = 0;
+                            p_tempcell.id = GameManager.data.mapCellid++;
+
+                            GameManager.data.Mapdata.Add(p_tempcell);
                         }
                     }
                 }
@@ -222,18 +233,19 @@ public class HexGrid : MonoBehaviour
         }
     }
 
-    public void P_MakeHexMap(int x,int y,int z,int color, int type)
+    public void P_MakeHexMap(Protocol.Map map)
     {
         if (!MakeMapWithoutMapPacket)
         {
-            if (x + y + z == 0)
+            if (map.x + map.y + map.z == 0)
             {
                 //print(cellType[0]);
-                GameObject tmpcell = Instantiate(cellType[color]); // <- 나중에 string name으로 바꿔야?
-                tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z);
-                tmpcell.name = "cell" + x + y + z;
+                GameObject tmpcell = Instantiate(cellType[map.color]); // <- 나중에 string name으로 바꿔야?
+                tmpcell.GetComponent<HexCellPosition>().setInitPosition(map.x, map.z,map.w);
+                tmpcell.name = "cell" + map.id;
+                GameManager.data.mapCellid = map.id+1;
                 tmpcell.transform.parent = gameObject.transform;
-                cellMaps.Add(tmpcell, x, y, z);
+                cellMaps.Add(tmpcell, map.x, map.y, map.z,map.w);
             }
             else
             {
