@@ -275,15 +275,11 @@ public class GameManager : MonoBehaviour
                                 shells.Add(shell);
                             }
                             foreach (Protocol.Map s in shells)
-<<<<<<< Updated upstream
                             {
 
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
                             }
-                            index = 0;
-=======
-                                Debug.Log(s.id + ", "+ s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
->>>>>>> Stashed changes
+
 
                             //다른 플레이어면 다른플레이어 풀에
                             //적이면 적풀에 넣자
