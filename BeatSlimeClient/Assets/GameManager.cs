@@ -48,6 +48,8 @@ public class GameManager : MonoBehaviour
     GameObject[] Objects = new GameObject[Protocol.CONSTANTS.MAX_OBJECT];
 
     int myPlayerID = -1;
+    ArrayList Mapdata = new ArrayList();
+
     void Awake()
     {
         print("Start");
@@ -82,23 +84,14 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown("1"))
         {
-            ArrayList Shells = new ArrayList();
-            // 맵정보를 arrayList에 담아서 Send하면 블록 하나하나 정보를 클라이언트에 보낸다.
-            for (int i = 0; i < 10; ++i)
-            {
-                Protocol.Map a = new Protocol.Map();
-                a.id = i;
-                a.x = a.y = a.z = a.w = i;
-                a.color = a.type = 0;
-                Shells.Add(a);
-            }
-
-            Net.SendWriteMapPacket(Shells);
+            if(Mapdata.Count != 0)
+                Net.SendWriteMapPacket(Mapdata);
         }
         else if (Input.GetKeyDown(KeyCode.BackQuote))
         {
             Net.SendreadPacket();
         }
+
         if (!isGameStart && Input.GetKeyDown("z"))
         {
             PlaySound();
@@ -267,14 +260,14 @@ public class GameManager : MonoBehaviour
                             Debug.Log(size);
                             int index = 0;
 
-                            ArrayList shells = new ArrayList(); 
+                            Mapdata.Clear();
                             while (index < size - 2)
                             {
                                 Protocol.Map shell = Protocol.Map.SetByteToMap(data, index + 2);
                                 index += 28;
-                                shells.Add(shell);
+                                Mapdata.Add(shell);
                             }
-                            foreach (Protocol.Map s in shells)
+                            foreach (Protocol.Map s in Mapdata)
                             {
 
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
