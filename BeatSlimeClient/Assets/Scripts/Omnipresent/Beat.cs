@@ -107,6 +107,16 @@ public class Beat
         tmp.add24 -= b.add24;
         return tmp;
     }
+    public static Beat operator +(Beat a, Beat b)
+    {
+
+        Beat tmp = (Beat)a.MemberwiseClone();
+        tmp.bar += b.bar;
+        tmp.addBeat += b.addBeat;
+        tmp.add16 += b.add16;
+        tmp.add24 += b.add24;
+        return tmp;
+    }
 
     public static bool operator <=(Beat a, Beat b)
     {

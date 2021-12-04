@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     //public int nowBeats;
     //public int now24Beats;
     //public int now32Beats;
-    [SerializeField] Beat nowBeat;
+    public Beat nowBeat;
     public int beatCounter = 0;
 
     public int offsetTime;
@@ -95,11 +95,21 @@ public class GameManager : MonoBehaviour
             Net.SendreadPacket();
         }
 
-        if (!isGameStart && Input.GetKeyDown("z"))
+        if (Input.GetKeyDown("z"))
         {
-            PlaySound();
-            //offsetTime = 0;
+            if (!isGameStart)
+            {
+                PlaySound();
+                //offsetTime = 0;
+            }
+            else
+            {
+                int randomTickForTest = Random.Range(1, 6);
+                enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat,new Beat(0, randomTickForTest),player);
+                player.GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
+            }
         }
+
         if (isGameStart && !Net.isOnline)
         {
             int prevBeats = nowBeat.addBeat;

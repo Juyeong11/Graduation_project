@@ -11,6 +11,8 @@ public enum enemyState
 
 public class EnemyManager : MonoBehaviour
 {
+    public Animator selfAnim;
+
     public enemyState state;
     public int enemyHp;
     public int enemyMaxHp;
@@ -21,8 +23,9 @@ public class EnemyManager : MonoBehaviour
     //Invalid
     public List<EMoving> enemyMovingList;
     public List<EAttack> enemyAttackList;
-    public List<ENote> enemyNoteList;
+
     //
+    public List<BeatBall> enemyNoteList;
 
 
     void Start()
@@ -53,5 +56,13 @@ public class EnemyManager : MonoBehaviour
     {
         //여기서 장판데미지 처리
         grid.EnemyAttack(PatternManager.data.CastedPattern);
+    }
+
+    public void BeatPatternServe(Beat NowBeat,Beat offset,GameObject destination)
+    {
+        selfAnim.SetTrigger("Attack");
+
+        //오브젝트 풀 만들어서 풀링하기
+        enemyNoteList[0].Init(NowBeat, offset, gameObject, destination);
     }
 }

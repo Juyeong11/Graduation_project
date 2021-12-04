@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
 public enum playerState
 {
@@ -24,11 +25,16 @@ public class PlayerManager : MonoBehaviour
 
     public Transform PlayerTransform;
 
+    bool playerAttacking;
+    List<(Beat,float)> SettledBallBeats;
+
     public void Start()
     {
+        playerAttacking = false;
         grid = GameManager.data.grid;
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
+        SettledBallBeats = new List<(Beat,float)>();
         //onPlayerFly.Invoke();
         isFly = true;
     }
@@ -45,7 +51,6 @@ public class PlayerManager : MonoBehaviour
     {
         JumpTrigger.SetTrigger("Jump");
     }
-
 
     void Update()
     {
@@ -71,9 +76,12 @@ public class PlayerManager : MonoBehaviour
 
         if (GameManager.data.isGameStart)
         {
+            playerAttacking = false;
+
             KeyHandler();
             PlayerRotateToLookAt();
             PlayerWCheck();
+            BallBeatCheck();
         }
     }
 
@@ -166,6 +174,11 @@ public class PlayerManager : MonoBehaviour
     }
     void KeyHandler()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            playerAttacking = true;
+        }
+
         if (Input.GetKeyDown(KeyCode.Q) && KeyCheck(KeyCode.Q))
         {
             if (GameManager.data.Net.isOnline)
@@ -298,11 +311,37 @@ public class PlayerManager : MonoBehaviour
 
     }
 
-
     void resetPosition()
     {
         //gameObject.transform.position = new Vector3(gameObject.transform.position.x, 0f, gameObject.transform.position.z);
 
         gameObject.transform.position = new Vector3(gameObject.transform.position.x, (2f * GameManager.data.beatCounter / GameManager.data.timeByBeat) - 0.1f, gameObject.transform.position.z);
+    }
+
+    public void SetBallBeat(Beat now,Beat b)
+    {
+        Debug.Log(GameManager.data.timeByBeat / (float)b.GetBeatTime() * 0.75f);
+        SettledBallBeats.Add((now + b, GameManager.data.timeByBeat / (float)b.GetBeatTime() * 0.75f));
+    }
+    public void BallBeatCheck()
+    {
+        if (SettledBallBeats.Count > 0)
+        {
+            if (SettledBallBeats[0].Item1.GetBeatTime() + GameManager.data.JudgementTiming < GameManager.data.nowBeat.GetBeatTime())
+            {
+                //놓침
+                Debug.Log("반격 실패");
+                VFXManager.data.HitSounder(SettledBallBeats[0].Item2);
+                SettledBallBeats.RemoveAt(0);
+            }
+            else if (SettledBallBeats[0].Item1.GetBeatTime() - GameManager.data.JudgementTiming < GameManager.data.nowBeat.GetBeatTime()
+                && playerAttacking)
+            {
+                //공격
+                Debug.Log("반격 성공!");
+                VFXManager.data.HitSounder(1);
+                SettledBallBeats.RemoveAt(0);
+            }
+        }
     }
 }
