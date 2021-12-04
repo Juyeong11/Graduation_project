@@ -156,7 +156,7 @@ public class GameManager : MonoBehaviour
             }
 
             if (alreadyMoved > 0)
-                alreadyMoved -= (int)(Time.deltaTime * 10000f);
+                alreadyMoved -= (int)(Time.deltaTime * 1000f);
         }
         if (Net.isOnline)
         {
@@ -193,7 +193,7 @@ public class GameManager : MonoBehaviour
 
                             //Debug.Log(p.id+"¿Ãµø");
                             Objects[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-
+                            Objects[p.id].GetComponent<PlayerManager>().JumpTrig();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_ATTACK:
@@ -342,11 +342,11 @@ public class GameManager : MonoBehaviour
     {
         if (beatCounter <= JudgementTiming)
         {
-            //Debug.Log("Judge : -" + beatCounter);
+            Debug.Log("Judge : -" + beatCounter);
         }
         else if (timeByBeat - beatCounter <= JudgementTiming)
         {
-            //Debug.Log("Judge : +" + (timeByBeat - beatCounter));
+            Debug.Log("Judge : +" + (timeByBeat - beatCounter));
         }
 
         alreadyMoved = JudgementTiming * 2;

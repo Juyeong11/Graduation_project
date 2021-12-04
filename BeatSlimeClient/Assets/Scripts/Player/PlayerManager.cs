@@ -9,8 +9,10 @@ public enum playerState
 
 public class PlayerManager : MonoBehaviour
 {
+    public Animator JumpTrigger;
     public UnityEvent onPlayerStand;
     public UnityEvent onPlayerFly;
+
     private bool isFly = false;
 
     public playerState state;
@@ -21,6 +23,7 @@ public class PlayerManager : MonoBehaviour
     public HexGrid grid;
 
     public Transform PlayerTransform;
+
     public void Start()
     {
         grid = GameManager.data.grid;
@@ -38,6 +41,10 @@ public class PlayerManager : MonoBehaviour
         isFly = true;
     }
 
+    public void JumpTrig()
+    {
+        JumpTrigger.SetTrigger("Jump");
+    }
 
 
     void Update()
@@ -65,6 +72,7 @@ public class PlayerManager : MonoBehaviour
         if (GameManager.data.isGameStart)
         {
             KeyHandler();
+            PlayerRotateToLookAt();
             PlayerWCheck();
         }
     }
@@ -83,14 +91,66 @@ public class PlayerManager : MonoBehaviour
 
     }
 
+    public void PlayerRotateToLookAt()
+    {
+        switch(selfDirection)
+        {
+            case HexDirection.LeftUp:
+                //시야 벡터를 외적해야지 각도를 외적하면 당연히 틀리지
+                //Vector3 c = Vector3.Cross(transform.rotation.eulerAngles, new Vector3(0, -120, 0));
+                //transform.Rotate(0, c.x * 3f, 0);
+
+                transform.rotation = Quaternion.Euler(new Vector3(0, -120, 0));
+                break;
+            case HexDirection.Up:
+                transform.rotation = Quaternion.Euler(new Vector3(0, -90, 0));
+                break;
+            case HexDirection.RightUp:
+                transform.rotation = Quaternion.Euler(new Vector3(0, -30, 0));
+                break;
+            case HexDirection.Down:
+                transform.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
+                break;
+            case HexDirection.LeftDown:
+                transform.rotation = Quaternion.Euler(new Vector3(0, 120, 0));
+                break;
+            case HexDirection.RightDown:
+                transform.rotation = Quaternion.Euler(new Vector3(0, 30, 0));
+                break;
+        }
+    }
+
     public void Beat()
     {
+        //Debug.Log("BEAT");
         grid.pPosition = selfCoord.coordinates;
         selfCoord.beat();
     }
 
-    bool KeyCheck()
+    bool KeyCheck(KeyCode k)
     {
+        switch (k)
+        {
+            case KeyCode.Q:
+                selfDirection = HexDirection.LeftUp;
+                break;
+            case KeyCode.W:
+                selfDirection = HexDirection.Up;
+                break;
+            case KeyCode.E:
+                selfDirection = HexDirection.RightUp;
+                break;
+            case KeyCode.A:
+                selfDirection = HexDirection.LeftDown;
+                break;
+            case KeyCode.S:
+                selfDirection = HexDirection.Down;
+                break;
+            case KeyCode.D:
+                selfDirection = HexDirection.RightDown;
+                break;
+        }
+
         if (GameManager.data.getIsGoodTiming() != 0)
         {
             return true;
@@ -106,7 +166,7 @@ public class PlayerManager : MonoBehaviour
     }
     void KeyHandler()
     {
-        if (Input.GetKeyDown(KeyCode.Q) && KeyCheck())
+        if (Input.GetKeyDown(KeyCode.Q) && KeyCheck(KeyCode.Q))
         {
             if (GameManager.data.Net.isOnline)
             {
@@ -115,8 +175,6 @@ public class PlayerManager : MonoBehaviour
                 GameManager.data.setMoved();
 
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.LEFTUP);
-                selfDirection = HexDirection.LeftUp;
-
             }
             else
             {
@@ -126,23 +184,18 @@ public class PlayerManager : MonoBehaviour
                     if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).w <= selfCoord.coordinates.W)
                     {
                         selfCoord.plus(-1, 0, 1, grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).w - selfCoord.coordinates.W + 1);
+                        JumpTrig();
                     }
                 }
-                selfDirection = HexDirection.LeftUp;
             }
-
-
-
         }
-        else if (Input.GetKeyDown(KeyCode.W) && KeyCheck())
+        else if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
         {
             if (GameManager.data.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.UP);
-                selfDirection = HexDirection.Up;
-
             }
             else
             {
@@ -152,20 +205,18 @@ public class PlayerManager : MonoBehaviour
                     if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).w <= selfCoord.coordinates.W)
                     {
                         selfCoord.plus(0, -1, 1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y -1, selfCoord.coordinates.Z + 1).w - selfCoord.coordinates.W + 1);
+                        JumpTrig();
                     }
                 }
-                selfDirection = HexDirection.Up;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.E) && KeyCheck())
+        else if (Input.GetKeyDown(KeyCode.E) && KeyCheck(KeyCode.E))
         {
             if (GameManager.data.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
-                selfDirection = HexDirection.RightUp;
-
             }
             else
             {
@@ -175,21 +226,19 @@ public class PlayerManager : MonoBehaviour
                     if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).w <= selfCoord.coordinates.W)
                     {
                         selfCoord.plus(1, -1, 0, grid.cellMaps.Get(selfCoord.coordinates.X+1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
+                        JumpTrig();
                     }
                     
                 }
-                selfDirection = HexDirection.RightUp;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.A) && KeyCheck())
+        else if (Input.GetKeyDown(KeyCode.A) && KeyCheck(KeyCode.A))
         {
             if (GameManager.data.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
-                selfDirection = HexDirection.LeftDown;
-
             }
             else
             {
@@ -199,21 +248,18 @@ public class PlayerManager : MonoBehaviour
                     if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).w <= selfCoord.coordinates.W)
                     {
                         selfCoord.plus(-1, 1, 0, grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
+                        JumpTrig();
                     }
-
                 }
-                selfDirection = HexDirection.LeftDown;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.S) && KeyCheck())
+        else if (Input.GetKeyDown(KeyCode.S) && KeyCheck(KeyCode.S))
         {
             if (GameManager.data.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.DOWN);
-                selfDirection = HexDirection.Down;
-
             }
             else
             {
@@ -223,20 +269,18 @@ public class PlayerManager : MonoBehaviour
                     if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z -1).w <= selfCoord.coordinates.W)
                     {
                         selfCoord.plus(0, 1, -1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z-1).w - selfCoord.coordinates.W + 1);
+                        JumpTrig();
                     }
                 }
-                selfDirection = HexDirection.Down;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.D) && KeyCheck())
+        else if (Input.GetKeyDown(KeyCode.D) && KeyCheck(KeyCode.D))
         {
             if (GameManager.data.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
                 GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
-                selfDirection = HexDirection.RightDown;
-
             }
             else
             {
@@ -246,9 +290,9 @@ public class PlayerManager : MonoBehaviour
                     if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w <= selfCoord.coordinates.W)
                     {
                         selfCoord.plus(1, 0, -1, grid.cellMaps.Get(selfCoord.coordinates.X+1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w - selfCoord.coordinates.W + 1);
+                        JumpTrig();
                     }
                 }
-                selfDirection = HexDirection.RightDown;
             }
         }
 
