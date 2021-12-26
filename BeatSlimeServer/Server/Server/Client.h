@@ -50,6 +50,7 @@ public:
 	char name[MAX_NAME_SIZE];
 	int		id;
 	short	x, y,z;
+	int direction;
 	char		type;
 	//volatile«ÿ¡‡æﬂ «—¥Ÿ.
 	volatile STATE state;

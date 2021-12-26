@@ -87,7 +87,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown("1"))
         {
-            if(Mapdata.Count != 0)
+            if (Mapdata.Count != 0)
                 Net.SendWriteMapPacket(Mapdata);
         }
         else if (Input.GetKeyDown(KeyCode.BackQuote))
@@ -95,20 +95,20 @@ public class GameManager : MonoBehaviour
             Net.SendreadPacket();
         }
 
-        if (Input.GetKeyDown("z"))
-        {
-            if (!isGameStart)
-            {
-                PlaySound();
-                //offsetTime = 0;
-            }
-            else
-            {
-                int randomTickForTest = Random.Range(1, 6);
-                enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat,new Beat(0, randomTickForTest),player);
-                player.GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
-            }
-        }
+            //if (Input.GetKeyDown("z"))
+            //{
+            //    if (!isGameStart)
+            //    {
+            //        PlaySound();
+            //        //offsetTime = 0;
+            //    }
+            //    else
+            //    {
+            //        int randomTickForTest = Random.Range(1, 6);
+            //        enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), player);
+            //        player.GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
+            //    }
+            //}
 
         if (isGameStart && !Net.isOnline)
         {
@@ -139,7 +139,7 @@ public class GameManager : MonoBehaviour
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
         }
-        else if(isGameStart && Net.isOnline)
+        else if (isGameStart && Net.isOnline)
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -199,11 +199,13 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
-                           
+
 
                             //Debug.Log(p.id+"이동");
+                            Objects[p.id].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
                             Objects[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            Objects[p.id].GetComponent<PlayerManager>().JumpTrig();
+                            if (p.id < Protocol.CONSTANTS.MAX_USER)
+                                Objects[p.id].GetComponent<PlayerManager>().JumpTrig();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_ATTACK:
@@ -214,8 +216,11 @@ public class GameManager : MonoBehaviour
                             //Debug.Log(p.x + "," + p.y + ", " + p.z);
 
                             //Debug.Log(p.id+"이동");
-                            Objects[p.id].GetComponent<HexCellPosition>().setDirection(p.direction);
+                            //Objects[p.id].GetComponent<HexCellPosition>().setDirection(p.direction);
 
+                            int randomTickForTest = 4;//Random.Range(1, 6);
+                            enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[p.target_id]);
+                            Objects[p.target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
@@ -227,7 +232,7 @@ public class GameManager : MonoBehaviour
                             {
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
-                                       // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "플레이어 넣음");
+                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "플레이어 넣음");
                                         Objects[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                         Objects[p.id].SetActive(true);
                                         Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
@@ -237,9 +242,10 @@ public class GameManager : MonoBehaviour
                                     }
                                 case (byte)Protocol.OBJECT_TYPE.ENEMY:
                                     {
-                                       // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
+                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
 
-                                        Objects[p.id] = ObjectPool.instance.EnemyObjectQueue.Dequeue();
+                                        //Objects[p.id] = ObjectPool.instance.EnemyObjectQueue.Dequeue();
+                                        Objects[p.id] = enemy;
                                         Objects[p.id].SetActive(true);
                                         Objects[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                     }
@@ -251,7 +257,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_REMOVE_OBJECT:
                         {
                             Protocol.sc_packet_remove_object p = Protocol.sc_packet_remove_object.SetByteToVar(data);
-                            if(p.id< Protocol.CONSTANTS.MAX_USER)
+                            if (p.id < Protocol.CONSTANTS.MAX_USER)
                             {
                                 ObjectPool.instance.PlayerObjectQueue.Enqueue(Objects[p.id]);
                                 Objects[p.id].SetActive(false);
