@@ -2993,6 +2993,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2360529953391192935, guid: 062baae922b7b2e479b97ba3ba7406d1, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 98cff5c876beda8408cfe349c553715f, type: 2}
     - target: {fileID: 7354045492482313764, guid: 062baae922b7b2e479b97ba3ba7406d1, type: 3}
       propertyPath: m_Name
       value: Slime_Idle

@@ -20,19 +20,26 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SlimeColorBlue
-  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
+  m_Name: SlimeColorBlue 1
+  m_Shader: {fileID: -6465566751694194690, guid: a10fd6a43ebf7644b8e4d30af873ca15, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2000
-  stringTagMap:
-    RenderType: Opaque
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - Texture2D_0b8f2eaf79564673b5b67d4f18b09292:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Texture2D_5f647bf3261a47378c12702210fdac8d:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BaseMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -90,6 +97,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - Vector1_0643bd79b6d34d6ba43c621e955e6ebc: 0
+    - Vector1_2a2f10dbef6b4e11b6ba4bfa37944ece: 0
+    - Vector1_5a7263454ce64b13922beb551a5eb50b: 0
+    - Vector1_5a7423fe00184ffd919bcb6dea621de1: 5
+    - Vector1_a32530b4aec64eafbd2e58794f19eab2: 0.5
+    - Vector1_f02c61ab0fce4f5e892210445f379a33: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -117,6 +130,10 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
+    - Color_7c268a0deac4477ea042f3db115b9e81: {r: 0, g: 0, b: 0, a: 0}
+    - Color_80f2f21e62d545028c502d0b7230bedf: {r: 0, g: 0, b: 0, a: 0}
+    - Color_af53bbc795ce48758a930b8cf9947bd7: {r: 0.45660377, g: 0.89460534, b: 1, a: 0}
+    - Vector3_a6f594321f8b4cac9c9b9040309eb6f9: {r: 1, g: 2, b: 2, a: 0}
     - _BaseColor: {r: 0.54732996, g: 0.8050339, b: 0.9150943, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
