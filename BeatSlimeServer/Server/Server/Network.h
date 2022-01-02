@@ -58,7 +58,7 @@ public:
 
 	void send_login_ok(int client_id);
 	void send_move_object(int client_id, int mover_id);
-	void send_attack_player(int client_id, int target_id);
+	void send_attack_player(int client_id, int target_id, int receiver);
 	void send_put_object(int client_id, int target_id);
 	void send_remove_object(int client_id, int victim_id);
 	void send_map_data(int client_id,char* data, int nShell);
@@ -91,15 +91,15 @@ public:
 	void Initialize_NPC() {
 		for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
 			sprintf_s(clients[i]->name, "NPC%d", i);
-			clients[i]->x = rand() % WORLD_WIDTH;
-			clients[i]->z = rand() % WORLD_HEIGHT;
+			clients[i]->x = 0;
+			clients[i]->z = 0;
 			clients[i]->id = i;
 			clients[i]->state = ST_INGAME;
 			clients[i]->type = ENEMY; // NPC
 		}
 	}
 	void do_npc_move(int npc_id);
-	void do_npc_attack(int npc_id,int target_id);
+	void do_npc_attack(int npc_id,int target_id, int receiver);
 
 	void do_timer() {
 		using namespace std;
@@ -134,7 +134,6 @@ public:
 				else {
 					//기껏 뺐는데 다시 넣는거 좀 비효율 적이다.
 					//다시 넣지 않는 방법으로 최적화 필요
-					//모르겠다..
 					timer_queue.push(ev);
 					break;
 				}

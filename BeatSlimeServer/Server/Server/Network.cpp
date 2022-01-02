@@ -85,6 +85,7 @@ void Network::send_move_object(int c_id, int mover)
 	packet.x = clients[mover]->x;
 	packet.y = clients[mover]->y;
 	packet.z = clients[mover]->z;
+	packet.dir = clients[mover]->direction;
 
 	//packet.move_time = clients[mover]->last_move_time;
 
@@ -93,7 +94,7 @@ void Network::send_move_object(int c_id, int mover)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
-void Network::send_attack_player(int c_id, int target)
+void Network::send_attack_player(int c_id, int target, int receiver)
 {
 	sc_packet_attack packet;
 	packet.size = sizeof(packet);
@@ -106,7 +107,7 @@ void Network::send_attack_player(int c_id, int target)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[target])->do_send(ex_over);
+	reinterpret_cast<Client*>(ex_over, clients[receiver])->do_send(ex_over);
 }
 
 void Network::send_put_object(int c_id, int target) {
@@ -214,81 +215,18 @@ int Network::get_new_id()
 
 void Network::do_npc_move(int npc_id) {
 
-	//움직이기 전 시야 리스트
-	std::unordered_set<int> old_viewlist;
-	//움직인 후 시야 리스트
-	std::unordered_set<int> new_viewlist;
-
 	std::unordered_set<int> can_attacklist;
 
-	//해당 NPC는 모든 플레이어에 대한 viewlist를 만든다.
-	//이것도 섹터로 나누고 혹시 NPC가 뷰리스트를 가지고 있으면 안되나? 이 부분부터 다시보자
 	for (int i = 0; i < MAX_USER; ++i) {
 		Client* obj = reinterpret_cast<Client*>(clients[i]);
 		if (obj->state != ST_INGAME) continue;
 
 
-		if (true == is_near(npc_id, obj->id))
-			old_viewlist.insert(obj->id);
-	}
-	//이동을 하고 주위 플레이어들에게 알려줘야 한다.
-	short& x = clients[npc_id]->x;
-	short& y = clients[npc_id]->y;
-	short& z = clients[npc_id]->z;
-	switch (rand() % 4) {
-
-	case DIR::LEFTUP:		if (true) { x--; z++; break; }
-	case DIR::UP:			if (true) { y--; z++;  break; }
-	case DIR::RIGHTUP:		if (true) { x++; y--; break; }
-	case DIR::LEFTDOWN:		if (true) { x--; y++; break; }
-	case DIR::DOWN:			if (true) { y++; z--; break; }
-	case DIR::RIGHTDOWN:	if (true) { x++; z--; break; }
-	default:
-		std::cout << "Invalid move in client id : " << npc_id << std::endl;
-		exit(-1);
-	}
-	x = std::clamp((int)x, -2, 2);
-	y = std::clamp((int)y, -2, 2);
-	z = std::clamp((int)z, -2, 2);
-
-	//해당 NPC는 모든 플레이어에 대한 viewlist를 만든다.
-	for (int i = 0; i < MAX_USER; ++i) {
-		Client* obj = reinterpret_cast<Client*>(clients[i]);
-		if (obj->state != ST_INGAME) continue;
-
-		if (true == is_near(npc_id, obj->id))
-		{
-			new_viewlist.insert(obj->id);
 			if (true == can_attack(npc_id, obj->id))
 				can_attacklist.insert(obj->id);
-		}
+		
 	}
-	// new old 뷰 리스트들에는
-
-	// 새로 시야에 들어온 플레이어
-	for (auto pl : new_viewlist) {
-		if (0 == old_viewlist.count(pl)) {
-			Client* client = reinterpret_cast<Client*>(clients[pl]);
-			client->vl.lock();
-			client->viewlist.insert(npc_id);
-			client->vl.unlock();
-
-			send_put_object(pl, npc_id);
-		}
-		else {
-			send_move_object(pl, npc_id);
-		}
-	}
-	//시야에서 사라진 플레이어
-	for (auto pl : old_viewlist) {
-		if (0 == new_viewlist.count(pl)) {
-			Client* client = reinterpret_cast<Client*>(clients[pl]);
-			client->vl.lock();
-			client->viewlist.erase(npc_id);
-			client->vl.unlock();
-			send_remove_object(pl, npc_id);
-		}
-	}
+	
 
 	for (auto pl : can_attacklist) {
 		if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
@@ -298,6 +236,7 @@ void Network::do_npc_move(int npc_id) {
 			t.target_id = pl;
 			t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
 			timer_queue.push(t);
+			break;
 		}
 	}
 	if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
@@ -305,17 +244,33 @@ void Network::do_npc_move(int npc_id) {
 		t.ev = EVENT_ENEMY_MOVE;
 		t.obj_id = npc_id;
 		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
-		timer_queue.push(t);
+		//timer_queue.push(t);
 	}
 }
 
-void Network::do_npc_attack(int npc_id, int target_id) {
+void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 
 	// 피격에 대한 알고리즘
 
 	// 패킷 전송
-	send_attack_player(npc_id, target_id);
+	Client* cl = reinterpret_cast<Client*>(clients[target_id]);
+	cl->vl.lock();
+	std::unordered_set cp_vl = cl->viewlist;
+	cl->vl.unlock();
+	for (int id : cp_vl) {
+		if(is_player(id))
+			send_attack_player(npc_id, target_id, id);
+	}
+	send_attack_player(npc_id, target_id, target_id);
 
+	if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
+		timer_event t;
+		t.ev = EVENT_ENEMY_ATTACK;
+		t.obj_id = npc_id;
+		t.target_id = target_id;
+		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
+		timer_queue.push(t);
+	}
 }
 void Network::process_packet(int client_id, unsigned char* p)
 {
@@ -388,6 +343,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		short& x = cl.x;
 		short& y = cl.y;
 		short& z = cl.z;
+		cl.direction = packet->direction;
 		switch (packet->direction) {
 		case DIR::LEFTUP:		if (true) { x--; z++; break; }
 		case DIR::UP:			if (true) { y--; z++;  break; }
@@ -686,7 +642,7 @@ void Network::worker()
 			break;
 		case OP_ENEMY_ATTACK: {
 			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
-			do_npc_attack(client_id, target_id);
+			do_npc_attack(client_id, target_id, target_id);
 			exp_over_pool.push(exp_over);
 		}
 							break;

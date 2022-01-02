@@ -6,7 +6,7 @@ const int  WORLD_HEIGHT = 8;
 const int  WORLD_WIDTH = 8;
 const int  MAX_NAME_SIZE = 20;
 const int  MAX_USER = 5000;
-const int MAX_NPC = 4;
+const int MAX_NPC = 1;
 constexpr int NPC_ID_START = MAX_USER;
 constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
 constexpr int MAX_OBJECT = MAX_USER + MAX_NPC;
@@ -63,6 +63,7 @@ struct sc_packet_move {
 	unsigned char size;
 	char type;
 	int		id;
+	int dir;
 	short  x, y,z;
 	//int		move_time;
 };

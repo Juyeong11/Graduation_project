@@ -147,6 +147,7 @@ namespace Protocol
         public byte size;
         public byte type;
         public int id;
+        public int dir;
         public short x, y, z;
     }
     [Serializable]
