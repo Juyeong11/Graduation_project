@@ -105,9 +105,9 @@ void DataBase::insert_map_data(const Map& shell)
 	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
 	
-	std::wstring command= std::format(L"INSERT INTO Map (id, x, y, z, w, color, type) VALUES ({}, {}, {}, {}, {}, {}, {})", shell.id, shell.x, shell.y, shell.z, shell.w, shell.color, shell.type);
+	//std::wstring command= std::format(L"INSERT INTO Map (id, x, y, z, w, color, type) VALUES ({}, {}, {}, {}, {}, {}, {})", shell.id, shell.x, shell.y, shell.z, shell.w, shell.color, shell.type);
 
-	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
+	//retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 	}
 	else
@@ -126,10 +126,10 @@ void DataBase::update_map_data(const Map& shell)
 {
 	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
-	std::wstring command = std::format(L"UPDATE Map SET id = {}, x = {}, y = {}, z = {}, w = {}, color = {}, type = {} WHERE id = {}\n SELECT * FROM Map", shell.id, shell.x, shell.y, shell.z, shell.w, shell.color, shell.type, shell.id);
+	//std::wstring command = std::format(L"UPDATE Map SET id = {}, x = {}, y = {}, z = {}, w = {}, color = {}, type = {} WHERE id = {}\n SELECT * FROM Map", shell.id, shell.x, shell.y, shell.z, shell.w, shell.color, shell.type, shell.id);
 
 
-	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
+	//retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 	}
 	else
