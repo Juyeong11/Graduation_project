@@ -12,11 +12,16 @@ public class MapMaker : MonoBehaviour
     public int dir = 0;
     public int w = 0;
 
+    static public int cellId = 0;
+
+    public List<Protocol.Map> Mapdata = new List<Protocol.Map>();
+
     // Update is called once per frame
     void Update()
     {
         if (mapMakingOn)
         {
+            
             if (Input.GetKeyDown(KeyCode.U))
             {
                 dir = 1;
@@ -49,20 +54,49 @@ public class MapMaker : MonoBehaviour
             {
                 w++;
             }
-            if (Input.GetKeyDown(KeyCode.Minus))  //-
+            if (Input.GetKeyDown(KeyCode.Alpha0))  //-
             {
                 dir = 0;
             }
-            if (Input.GetKeyDown(KeyCode.End))  //+
+            if (Input.GetKeyDown(KeyCode.Minus))  //-
+            {
+                if (type >= 1)
+                {
+                    type--;
+                    GameObject tmpcell = Instantiate(grid.cellType[type]);
+                    tmpcell.name = "tmpTile";// + GameManager.data.mapCellid;
+                    tmpcell.transform.parent = grid.transform;
+                    tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z, w);
+
+                    Destroy(tmp);
+                    tmp = tmpcell;
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.Equals))  //=
+            {
+                if (type < grid.cellType.Count - 1)
+                {
+                    type++;
+
+                    GameObject tmpcell = Instantiate(grid.cellType[type]);
+                    tmpcell.name = "tmpTile";// + GameManager.data.mapCellid;
+                    tmpcell.transform.parent = grid.transform;
+                    tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z, w);
+
+                    Destroy(tmp);
+                    tmp = tmpcell;
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.Insert))  //Insert
             {
                 switch(dir)
                 {
                     case 1:
-                        if (grid.cellMaps.Get(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1) == null)
+                        if (grid.cellMaps.map_Get(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1) == null)
                         {
                             GameObject tmpcell = Instantiate(grid.cellType[type]);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1, w);
-                            tmpcell.name = "cell" + GameManager.data.mapCellid;
+                            tmpcell.name = "cell";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
                             grid.cellMaps.Add(tmpcell, playerPosition.coordinates.X - 1, playerPosition.coordinates.Y, playerPosition.coordinates.Z + 1, w);
 
@@ -73,9 +107,11 @@ public class MapMaker : MonoBehaviour
                             p_tempcell.z = playerPosition.coordinates.Z + 1;
                             p_tempcell.w = w;
                             p_tempcell.color = type;
-                            p_tempcell.id = GameManager.data.mapCellid++;
+                            //p_tempcell.id = GameManager.data.mapCellid++;
+                            p_tempcell.id = cellId++;
 
-                            GameManager.data.Mapdata.Add(p_tempcell);
+                            //GameManager.data.Mapdata.Add(p_tempcell);
+                            Mapdata.Add(p_tempcell);
                             Debug.Log("@@@@@@@@@@@@@@@");
                         }
                         else
@@ -84,11 +120,11 @@ public class MapMaker : MonoBehaviour
                         }
                         break;
                     case 2:
-                        if (grid.cellMaps.Get(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1) == null)
+                        if (grid.cellMaps.map_Get(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1) == null)
                         {
                             GameObject tmpcell = Instantiate(grid.cellType[type]);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1, w);
-                            tmpcell.name = "cell" + GameManager.data.mapCellid;
+                            tmpcell.name = "cell";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
                             grid.cellMaps.Add(tmpcell, playerPosition.coordinates.X, playerPosition.coordinates.Y, playerPosition.coordinates.Z + 1, w);
 
@@ -99,9 +135,11 @@ public class MapMaker : MonoBehaviour
                             p_tempcell.z = playerPosition.coordinates.Z + 1;
                             p_tempcell.w = w;
                             p_tempcell.color = type;
-                            p_tempcell.id = GameManager.data.mapCellid++;
+                            //p_tempcell.id = GameManager.data.mapCellid++;
+                            p_tempcell.id = cellId++;
 
-                            GameManager.data.Mapdata.Add(p_tempcell);
+                            //GameManager.data.Mapdata.Add(p_tempcell);
+                            Mapdata.Add(p_tempcell);
                             Debug.Log("@@@@@@@@@@@@@@@");
                         }
                         else
@@ -110,11 +148,11 @@ public class MapMaker : MonoBehaviour
                         }
                         break;
                     case 3:
-                        if (grid.cellMaps.Get(playerPosition.coordinates.X+1, playerPosition.coordinates.Z) == null)
+                        if (grid.cellMaps.map_Get(playerPosition.coordinates.X+1, playerPosition.coordinates.Z) == null)
                         {
                             GameObject tmpcell = Instantiate(grid.cellType[type]);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X+1, playerPosition.coordinates.Z, w);
-                            tmpcell.name = "cell" + GameManager.data.mapCellid;
+                            tmpcell.name = "cell";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
                             grid.cellMaps.Add(tmpcell, playerPosition.coordinates.X+1, playerPosition.coordinates.Y-1, playerPosition.coordinates.Z, w);
 
@@ -125,9 +163,11 @@ public class MapMaker : MonoBehaviour
                             p_tempcell.z = playerPosition.coordinates.Z;
                             p_tempcell.w = w;
                             p_tempcell.color = type;
-                            p_tempcell.id = GameManager.data.mapCellid++;
+                            //p_tempcell.id = GameManager.data.mapCellid++;
+                            p_tempcell.id = cellId++;
 
-                            GameManager.data.Mapdata.Add(p_tempcell);
+                            //GameManager.data.Mapdata.Add(p_tempcell);
+                            Mapdata.Add(p_tempcell);
                             Debug.Log("@@@@@@@@@@@@@@@");
                         }
                         else
@@ -136,11 +176,11 @@ public class MapMaker : MonoBehaviour
                         }
                         break;
                     case 4:
-                        if (grid.cellMaps.Get(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z) == null)
+                        if (grid.cellMaps.map_Get(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z) == null)
                         {
                             GameObject tmpcell = Instantiate(grid.cellType[type]);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z, w);
-                            tmpcell.name = "cell" + GameManager.data.mapCellid;
+                            tmpcell.name = "cell";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
                             grid.cellMaps.Add(tmpcell, playerPosition.coordinates.X - 1, playerPosition.coordinates.Y+1, playerPosition.coordinates.Z, w);
 
@@ -151,9 +191,11 @@ public class MapMaker : MonoBehaviour
                             p_tempcell.z = playerPosition.coordinates.Z;
                             p_tempcell.w = w;
                             p_tempcell.color = type;
-                            p_tempcell.id = GameManager.data.mapCellid++;
+                            //p_tempcell.id = GameManager.data.mapCellid++;
+                            p_tempcell.id = cellId++;
 
-                            GameManager.data.Mapdata.Add(p_tempcell);
+                            //GameManager.data.Mapdata.Add(p_tempcell);
+                            Mapdata.Add(p_tempcell);
                             Debug.Log("@@@@@@@@@@@@@@@");
                         }
                         else
@@ -162,11 +204,11 @@ public class MapMaker : MonoBehaviour
                         }
                         break;
                     case 5:
-                        if (grid.cellMaps.Get(playerPosition.coordinates.X, playerPosition.coordinates.Z-1) == null)
+                        if (grid.cellMaps.map_Get(playerPosition.coordinates.X, playerPosition.coordinates.Z-1) == null)
                         {
                             GameObject tmpcell = Instantiate(grid.cellType[type]);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z-1, w);
-                            tmpcell.name = "cell" + GameManager.data.mapCellid;
+                            tmpcell.name = "cell";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
                             grid.cellMaps.Add(tmpcell, playerPosition.coordinates.X, playerPosition.coordinates.Y+1, playerPosition.coordinates.Z-1, w);
 
@@ -177,9 +219,11 @@ public class MapMaker : MonoBehaviour
                             p_tempcell.z = playerPosition.coordinates.Z-1;
                             p_tempcell.w = w;
                             p_tempcell.color = type;
-                            p_tempcell.id = GameManager.data.mapCellid++;
+                            //p_tempcell.id = GameManager.data.mapCellid++;
+                            p_tempcell.id = cellId++;
 
-                            GameManager.data.Mapdata.Add(p_tempcell);
+                            //GameManager.data.Mapdata.Add(p_tempcell);
+                            Mapdata.Add(p_tempcell);
                             Debug.Log("@@@@@@@@@@@@@@@");
                         }
                         else
@@ -188,11 +232,11 @@ public class MapMaker : MonoBehaviour
                         }
                         break;
                     case 6:
-                        if (grid.cellMaps.Get(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z-1) == null)
+                        if (grid.cellMaps.map_Get(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z-1) == null)
                         {
                             GameObject tmpcell = Instantiate(grid.cellType[type]);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z-1, w);
-                            tmpcell.name = "cell" + GameManager.data.mapCellid;
+                            tmpcell.name = "cell";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
                             grid.cellMaps.Add(tmpcell, playerPosition.coordinates.X + 1, playerPosition.coordinates.Y, playerPosition.coordinates.Z-1, w);
 
@@ -203,9 +247,11 @@ public class MapMaker : MonoBehaviour
                             p_tempcell.z = playerPosition.coordinates.Z - 1;
                             p_tempcell.w = w;
                             p_tempcell.color = type;
-                            p_tempcell.id = GameManager.data.mapCellid++;
+                            //p_tempcell.id = GameManager.data.mapCellid++;
+                            p_tempcell.id = cellId++;
 
-                            GameManager.data.Mapdata.Add(p_tempcell);
+                            //GameManager.data.Mapdata.Add(p_tempcell);
+                            Mapdata.Add(p_tempcell);
                             Debug.Log("@@@@@@@@@@@@@@@");
                         }
                         else

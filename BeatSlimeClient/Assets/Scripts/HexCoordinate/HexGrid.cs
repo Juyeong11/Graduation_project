@@ -106,7 +106,7 @@ public class CellMap
         return null;
     }
 
-    public Cell Get(int x, int z)
+    public Cell map_Get(int x, int z)
     {
         foreach (var v in cellMaps)
         {
@@ -118,7 +118,7 @@ public class CellMap
             }
         }
 
-        Debug.LogError(">Invalid coordinate<");
+        //Debug.LogError(">MapTool<");
         return null;
     }
 
@@ -144,6 +144,7 @@ public class CellMap
 public class HexGrid : MonoBehaviour
 {
     public bool MakeMapWithoutMapPacket;
+    public bool TMP;
 
     private int xMaxLength;
     private int yMaxLength;
@@ -197,7 +198,7 @@ public class HexGrid : MonoBehaviour
         int color = 0;
         RedZones = new List<List<HexCoordinates>>();
 
-        if (MakeMapWithoutMapPacket)
+        if (MakeMapWithoutMapPacket && !TMP)
         {
             //맵 생성
             for (int x = xMinLength; x <= xMaxLength; ++x)
@@ -212,7 +213,8 @@ public class HexGrid : MonoBehaviour
                             GameObject tmpcell = Instantiate(cellType[color]); // <- 나중에 string name으로 바꿔야?
                             int w = Random.Range(0, 3);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
-                            tmpcell.name = "cell" + GameManager.data.mapCellid;
+                            if (GameManager.data)
+                                tmpcell.name = "cell" + GameManager.data.mapCellid;
                             tmpcell.transform.parent = gameObject.transform;
                             cellMaps.Add(tmpcell, x, y, z, w);
 
@@ -223,9 +225,11 @@ public class HexGrid : MonoBehaviour
                             p_tempcell.z = z;
                             p_tempcell.w = w;
                             p_tempcell.color = 0;
-                            p_tempcell.id = GameManager.data.mapCellid++;
+                            if (GameManager.data)
+                                p_tempcell.id = GameManager.data.mapCellid++;
 
-                            GameManager.data.Mapdata.Add(p_tempcell);
+                            if (GameManager.data)
+                                GameManager.data.Mapdata.Add(p_tempcell);
                         }
                     }
                 }
