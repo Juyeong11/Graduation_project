@@ -155,6 +155,9 @@ public class HexGrid : MonoBehaviour
 
     //Cell 종류
     public List<GameObject> cellType;
+    //장식 종류
+    public List<GameObject> LandType;
+
     public CellMap cellMaps;
 
     //위치

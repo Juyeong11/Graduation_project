@@ -52,14 +52,14 @@ public class MapMakersController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Z))
         {
             var CT = CCO.GetCinemachineComponent<CinemachineTransposer>();
-            CT.m_FollowOffset.y += 0.1f;
-            CT.m_FollowOffset.z -= 0.1f;
+            CT.m_FollowOffset.y += 0.3f;
+            CT.m_FollowOffset.z -= 0.3f;
         }
         if (Input.GetKeyDown(KeyCode.X))
         {
             var CT = CCO.GetCinemachineComponent<CinemachineTransposer>();
-            CT.m_FollowOffset.y -= 0.1f;
-            CT.m_FollowOffset.z += 0.1f;
+            CT.m_FollowOffset.y -= 0.3f;
+            CT.m_FollowOffset.z += 0.3f;
         }
 
 

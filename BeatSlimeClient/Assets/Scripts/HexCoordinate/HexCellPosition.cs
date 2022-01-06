@@ -5,14 +5,29 @@ public class HexCellPosition : MonoBehaviour
     public HexCoordinates coordinates;
     public HexCoordinates preCoordinates;
 
+    public float landOffsetX = 0;
+    public float landOffsetY = 0;
+    public float landOffsetZ = 0;
+    public float landOffsetRotate = 0;
+
     float preBeatedTime;
 
+    public void landOffSetter(float x, float y, float z, float r)
+    {
+        landOffsetX = x;
+        landOffsetY = y;
+        landOffsetZ = z;
+        landOffsetRotate = r;
+
+        gameObject.transform.rotation = Quaternion.Euler(new Vector3(0, landOffsetRotate, 0));
+    }
     public void setInitPosition(int x, int z,int w=0)
     {
         preCoordinates.setCoordinates(x, z, w);
         coordinates.setCoordinates(x, z,w);
 
         gameObject.transform.localPosition = getRealPosition();
+
     }
 
     static public Vector3 getRealPosition(float x, float z, int w)
@@ -21,7 +36,9 @@ public class HexCellPosition : MonoBehaviour
     }
     public Vector3 getRealPosition()
     {
-        return new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W), coordinates.X * 0.5f + coordinates.Z * 1f);
+        return new Vector3(coordinates.X * 0.866f + landOffsetX,
+            calculateWPosition(coordinates.W) + landOffsetY,
+            coordinates.X * 0.5f + coordinates.Z * 1f + landOffsetZ);
     }
 
     public void reflectPosition()
