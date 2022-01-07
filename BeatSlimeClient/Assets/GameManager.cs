@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     public BeatManager beatManager;
 
     public bool isGameStart;
+    public bool bGameStart;
 
     public string SongName;
 
@@ -95,20 +96,25 @@ public class GameManager : MonoBehaviour
             Net.SendreadPacket();
         }
 
-            //if (Input.GetKeyDown("z"))
-            //{
-            //    if (!isGameStart)
-            //    {
-            //        PlaySound();
-            //        //offsetTime = 0;
-            //    }
-            //    else
-            //    {
-            //        int randomTickForTest = Random.Range(1, 6);
-            //        enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), player);
-            //        player.GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
-            //    }
-            //}
+        //if (Input.GetKeyDown("z"))
+        //{
+        //    if (!isGameStart)
+        //    {
+        //        PlaySound();
+        //        //offsetTime = 0;
+        //    }
+        //    else
+        //    {
+        //        int randomTickForTest = Random.Range(1, 6);
+        //        enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), player);
+        //        player.GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
+        //    }
+        //}
+
+        if (bGameStart)
+        {
+            PlaySound();
+        }
 
         if (isGameStart && !Net.isOnline)
         {
