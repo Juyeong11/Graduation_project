@@ -1,19 +1,10 @@
 #pragma once
 
-#include <WS2tcpip.h>
-#include <MSWSock.h>
-#include <windows.h> 
-#include <sqlext.h>
 
-#pragma comment (lib, "WS2_32.LIB")
-#pragma comment (lib, "MSWSock.LIB")
 
 #include"protocol.h"
 #include"Client.h"
 
-
-
-void error_display(const char* err_p,int err_no);
 
 enum EVENT_TYPE { EVENT_ENEMY_MOVE, EVENT_ENEMY_ATTACK };
 struct timer_event {
@@ -31,6 +22,9 @@ struct timer_event {
 
 
 class DataBase;
+class GameRoom;
+class MapInfo;
+class Portal;
 class Network
 {
 private:
@@ -61,7 +55,9 @@ public:
 	void send_attack_player(int client_id, int target_id, int receiver);
 	void send_put_object(int client_id, int target_id);
 	void send_remove_object(int client_id, int victim_id);
-	void send_map_data(int client_id,char* data, int nShell);
+	void send_map_data(int client_id, char* data, int nShell);
+	void send_change_scene(int client_id, int map_type);
+	void send_game_start(int client_id, int ids[3]);
 	void disconnect_client(int client_id);
 
 	bool is_near(int a, int b)
@@ -89,17 +85,17 @@ public:
 	int get_new_id();
 
 	void Initialize_NPC() {
-		for (int i = NPC_ID_START; i <= NPC_ID_END; ++i) {
+		for (int i = NPC_ID_START; i < NPC_ID_END; ++i) {
 			sprintf_s(clients[i]->name, "NPC%d", i);
 			clients[i]->x = 0;
 			clients[i]->z = 0;
 			clients[i]->id = i;
-			clients[i]->state = ST_INGAME;
+			clients[i]->state = ST_ACCEPT;
 			clients[i]->type = ENEMY; // NPC
 		}
 	}
 	void do_npc_move(int npc_id);
-	void do_npc_attack(int npc_id,int target_id, int receiver);
+	void do_npc_attack(int npc_id, int target_id, int receiver);
 
 	void do_timer() {
 		using namespace std;
@@ -108,9 +104,9 @@ public:
 
 			timer_event ev;
 			while (!timer_queue.empty()) {
-				
+
 				timer_queue.try_pop(ev);
-					
+
 				if (ev.start_time <= system_clock::now()) {
 					//이벤트 시작
 					EXP_OVER* ex_over;// = new EXP_OVER;
@@ -123,12 +119,12 @@ public:
 						break;
 					case EVENT_ENEMY_ATTACK:
 						ex_over->_comp_op = OP_ENEMY_ATTACK;
-						*reinterpret_cast<int*>(ex_over->_net_buf)= ev.target_id;
+						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
 						break;
 					default:
 						break;
 					}
-					
+
 					PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);// 두번째 인자가 0이 되면 소캣 종료로 취급이 된다. 1로해주자
 				}
 				else {
@@ -138,7 +134,7 @@ public:
 					break;
 				}
 			}
-			
+
 			//큐가 비었거나
 			this_thread::sleep_for(10ms);
 		}
@@ -149,7 +145,12 @@ public:
 private:
 	concurrency::concurrent_priority_queue<timer_event> timer_queue;
 	concurrency::concurrent_queue<EXP_OVER*> exp_over_pool;
-	std::array<Gameobject*, MAX_OBJECT> clients;//흠..
+	std::array<Gameobject*, MAX_OBJECT> clients;// 200, 200 맵을 존으로 나누어 뷰 리스트 제작할 것
 	EXP_OVER accept_ex;
+
+private:
+	std::array<GameRoom*, MAX_GAME_ROOM_NUM> game_room;
+	std::array<MapInfo*, MAP_NUM> maps;
+	std::array<Portal*, PORTAL_NUM> portals;
 };
 

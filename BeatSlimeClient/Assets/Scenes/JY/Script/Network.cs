@@ -80,7 +80,7 @@ public class Network
         IPEndPoint severEP = (IPEndPoint)tempSocket.RemoteEndPoint;
         if (severEP == null && tempSocket != null)
         {
-            //Debug.Log("재연결 시도");
+            Debug.Log("재연결 시도");
             StartConnect();
             return;
         }
@@ -133,6 +133,18 @@ public class Network
         pk.type = Protocol.CONSTANTS.CS_PACKET_MOVE;
 
         pk.direction = dir;
+
+        ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
+    public void SendReadyPacket(byte isReady)
+    {
+
+        Protocol.cs_packet_ready pk = new Protocol.cs_packet_ready();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_ready));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_READY;
+
+        pk.is_ready = isReady;
 
         ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }

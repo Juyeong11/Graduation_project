@@ -23,6 +23,7 @@ namespace Protocol
         public const byte CS_PACKET_MOVE = 2;
         public const byte CS_PACKET_READ_MAP = 3;
         public const byte CS_PACKET_WRITE_MAP = 4;
+        public const byte CS_PACKET_READY = 5;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -31,6 +32,7 @@ namespace Protocol
         public const byte SC_PACKET_GAME_START = 5;
         public const byte SC_PACKET_ATTACK = 6;
         public const byte SC_PACKET_MAP_DATA = 7;
+        public const byte SC_PACKET_CHANGE_SCENE = 8;
     }
     enum DIR
     {
@@ -99,7 +101,14 @@ namespace Protocol
                 public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
     }
 
-
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_ready : ISerializeble<cs_packet_ready>
+    {
+        public byte size;
+        public byte type;
+        public byte is_ready;
+    }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -190,8 +199,20 @@ namespace Protocol
     {
         public byte size;
         public byte type;
+        public int player_id;
+        public int id1;
+        public int id2;
+        public int id3;
     }
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_change_scene : ISerializeble<sc_packet_change_scene>
+    {
+        public byte size;
+        public byte type;
+        public char scene_num;
 
+    }
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class sc_packet_map_data : ISerializeble<sc_packet_map_data>

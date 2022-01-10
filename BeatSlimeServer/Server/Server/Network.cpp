@@ -1,6 +1,6 @@
 #include "stdfx.h"
 
-
+#include"Map.h"
 #include "DataBase.h"
 #include "Network.h"
 
@@ -11,19 +11,7 @@ Network* Network::GetInstance()
 	return instance;
 }
 
-void error_display(const char* err_p, int err_no)
-{
-	WCHAR* lpMsgBuf;
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, err_no,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)&lpMsgBuf, 0, 0);
-	std::cout << err_p << std::endl;
-	std::wcout << lpMsgBuf << std::endl;
-	//while (true);
-	LocalFree(lpMsgBuf);
-}
+
 Network::Network() {
 	//인스턴스는 한 개만!!
 	assert(instance == nullptr);
@@ -32,8 +20,17 @@ Network::Network() {
 	for (int i = 0; i < MAX_USER; ++i) {
 		clients[i] = new Client;
 	}
-	for (int i = MAX_USER; i <= NPC_ID_END; ++i) {
-		clients[i] = new Npc();
+	for (int i = SKILL_TRADER_ID_START; i < SKILL_TRADER_ID_END; ++i) {
+		clients[i] = new SkillTrader();
+	}
+	for (int i = CURATOR_ID_START; i < CURATOR_ID_END; ++i) {
+		clients[i] = new Curator();
+	}
+	for (int i = WITCH_ID_START; i < WITCH_ID_END; ++i) {
+		clients[i] = new Witch();
+	}
+	for (int i = BOSS2_ID_START; i < BOSS2_ID_END; ++i) {
+		clients[i] = new Boss2();
 	}
 	for (int i = 0; i < MAX_OBJECT; ++i) {
 		clients[i]->id = i;
@@ -43,6 +40,20 @@ Network::Network() {
 	}
 	Initialize_NPC();
 	DB = new DataBase;
+
+	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
+		game_room[i] = new GameRoom;
+	}
+	for (int i = 0; i < MAP_NUM; ++i) {
+		maps[i] = new MapInfo;
+	}
+	maps[FIELD_MAP]->SetMap("Map\\Field_Map");
+	maps[WITCH_MAP]->SetMap("Map\\Witch_Map");
+
+	// 포탈의 위치를 나타내는 자료필요
+	for (int i = 0; i < PORTAL_NUM; ++i) {
+		portals[i] = new Portal(2,-2);
+	}
 }
 Network::~Network() {
 	//스레드가 종료된 후 이기 때문에 락을 할 필요가 없다
@@ -75,7 +86,34 @@ void Network::send_login_ok(int c_id)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
+void Network::send_change_scene(int c_id, int map_type)
+{
+	sc_packet_change_scene packet;
+	packet.type = SC_PACKET_CHANGE_SCENE;
+	packet.size = sizeof(packet);
+	packet.scene_num = map_type;
 
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+}
+
+void Network::send_game_start(int c_id, int ids[3])
+{
+	sc_packet_game_start packet;
+	packet.type = SC_PACKET_GAME_START;
+	packet.size = sizeof(packet);
+	packet.player_id = c_id;
+	packet.id1 = ids[0];
+	packet.id2 = ids[1];
+	packet.id3 = ids[2];
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+}
 void Network::send_move_object(int c_id, int mover)
 {
 	sc_packet_move packet;
@@ -528,6 +566,56 @@ void Network::process_packet(int client_id, unsigned char* p)
 			// 삽입해야할 것
 
 			// 수정해야할 것
+		}
+	}
+	break;
+	case CS_PACKET_READY:
+	{
+		// 올바른 위치에서 ready했는지 확인
+		cs_packet_ready* packet = reinterpret_cast<cs_packet_ready*>(p);
+
+		
+		if (packet->is_ready) {
+			for (auto* p : portals) {
+				if (false == p->isPortal(cl.x, cl.z)) continue;
+				// 포탈에 들어오거나 나가서 plaer_ids를 수정해야하는 경우는 해당 패킷이 왔을 때 딱 한번 발생한다. -> lock을 한 번만 하면됨
+				//그래서 player_ids를 복사해 수정한 후 복사하는 방법을 lock횟수가 같기 때문에 그냥 lock을 건다.
+				
+				// 동시에 포탈 범위에 들어오면 버그 생길 듯
+				p->id_lock.lock();
+				p->player_ids.insert(cl.id);
+
+				// 준비 이펙트 전송
+				if (p->player_ids.size() >= MAX_IN_GAME_PLAYER) {
+					// 씬 전환
+					int ids[3];
+					int i=0;
+					for (int id : p->player_ids) {
+						ids[i] = id;
+						i++;
+						if (i > 3) break;
+					}
+					for (int id : p->player_ids) {
+					send_change_scene(id, p->map_type);
+
+					std::this_thread::sleep_for(std::chrono::seconds(5)); // 로딩시간 나중에 바꿀것
+					send_game_start(id, ids);
+					}
+					std::cout << "시작" << std::endl;
+				}
+				p->id_lock.unlock();
+				break;
+			}
+		}
+		else {
+			for (auto* p : portals) {
+				if (0 == p->player_ids.count(client_id)) continue;
+				p->id_lock.lock();
+				p->player_ids.erase(cl.id);
+				p->id_lock.unlock();
+
+				break;
+			}
 		}
 	}
 	break;
