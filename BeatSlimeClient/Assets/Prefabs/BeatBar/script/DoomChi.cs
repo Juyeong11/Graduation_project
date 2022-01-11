@@ -15,18 +15,18 @@ public class DoomChi : MonoBehaviour
 
     public void Update()
     {
-        if (!anim.enabled)
-        {
-            float b = spinner.transform.localEulerAngles.z % 90;
-            if (b > 70f)
-            {
-                gameObject.transform.localScale = new Vector3(0.2f + ((-70f + b) * 0.002f), 0.2f + ((-70f + b) * 0.002f), 1f);
-            }
-            else
-            {
-                gameObject.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
-            }
-        }
+        //if (!anim.enabled)
+        //{
+        //    float b = spinner.transform.localEulerAngles.z % 90;
+        //    if (b > 70f)
+        //    {
+        //        gameObject.transform.localScale = new Vector3(0.2f + ((-70f + b) * 0.002f), 0.2f + ((-70f + b) * 0.002f), 1f);
+        //    }
+        //    else
+        //    {
+        //        gameObject.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
+        //    }
+        //}
     }
 
     public void SetStart(float BPM, float Time)
@@ -35,7 +35,7 @@ public class DoomChi : MonoBehaviour
         selftag.color = new Color(selftag.color.r, selftag.color.g, selftag.color.b, 1f);
         selfImage.color = new Color(selfImage.color.r, selfImage.color.g, selfImage.color.b, 1f);
         selfImage.transform.localScale = new Vector3(1.8f, 1.8f, 1f);
-        selftag.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
+        selftag.transform.localScale = new Vector3(0.3f, 0.3f, 1f);
         firstTime = (60f / BPM) - Time % (60f / BPM);
         this.BPM = BPM;
         //StartCoroutine(doomchi());
@@ -56,6 +56,8 @@ public class DoomChi : MonoBehaviour
 
     public void noteEnd()
     {
+
+        gameObject.SetActive(true);
         anim.enabled = true;
         anim.SetTrigger("End");
     }
@@ -72,19 +74,21 @@ public class DoomChi : MonoBehaviour
 
     public void notePerfect()
     {
+        gameObject.SetActive(true);
         anim.enabled = true;
         anim.SetTrigger("Perfect");
     }
 
     public void noteGood()
     {
+        gameObject.SetActive(true);
         anim.enabled = true;
         anim.SetTrigger("Good");
     }
 
     IEnumerator real()
     {
-        gameObject.transform.position = new Vector3(1000f, 1000f,0f);
+        //gameObject.transform.position = new Vector3(1000f, 1000f,0f);
         anim.SetTrigger("Q");
         yield return new WaitForSeconds(2f);
         anim.ResetTrigger("Q");
