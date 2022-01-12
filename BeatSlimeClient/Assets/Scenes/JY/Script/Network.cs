@@ -137,14 +137,24 @@ public class Network
         ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
 
-    public void SendReadyPacket(byte isReady)
+    public void SendChangeSceneReadyPacket(byte isReady)
     {
 
-        Protocol.cs_packet_ready pk = new Protocol.cs_packet_ready();
-        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_ready));
-        pk.type = Protocol.CONSTANTS.CS_PACKET_READY;
+        Protocol.cs_packet_change_scene_ready pk = new Protocol.cs_packet_change_scene_ready();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_change_scene_ready));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_CHANGE_SCENE_READY;
 
         pk.is_ready = isReady;
+
+        ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
+    public void SendGameStartReadyPacket()
+    {
+
+        Protocol.cs_packet_game_start_ready pk = new Protocol.cs_packet_game_start_ready();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_game_start_ready));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_GAME_START_READY;
 
         ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }

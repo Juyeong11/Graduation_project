@@ -2,43 +2,14 @@
 
 const short SERVER_PORT = 4000;
 
-const int MAX_IN_GAME_PLAYER = 1;
 
-const int WORLD_HEIGHT = 8;
-const int WORLD_WIDTH = 8;
-const int MAX_NAME_SIZE = 20;
-const int MAX_USER = 5000;
-const int MAX_SKILL_TRADER = 0;
-const int MAX_CURATOR = 0;
-const int MAX_WITCH = 5;
-const int MAX_BOSS2 = 5;
-const int MAX_NPC = MAX_SKILL_TRADER + MAX_CURATOR + MAX_WITCH + MAX_BOSS2;
-
-constexpr int NPC_ID_START = MAX_USER;
-constexpr int NPC_ID_END = MAX_USER + MAX_NPC;
-constexpr int MAX_OBJECT = MAX_USER + MAX_NPC;
-
-constexpr int SKILL_TRADER_ID_START = MAX_USER;
-constexpr int SKILL_TRADER_ID_END = SKILL_TRADER_ID_START + MAX_SKILL_TRADER;
-
-constexpr int CURATOR_ID_START = SKILL_TRADER_ID_END;
-constexpr int CURATOR_ID_END = CURATOR_ID_START + MAX_CURATOR;
-
-constexpr int WITCH_ID_START = CURATOR_ID_END;
-constexpr int WITCH_ID_END = WITCH_ID_START + MAX_WITCH;
-
-constexpr int BOSS2_ID_START = WITCH_ID_END;
-constexpr int BOSS2_ID_END = BOSS2_ID_START + MAX_BOSS2;
-
-const int MAP_NUM = 2;
-const int PORTAL_NUM = 1;
-const int MAX_GAME_ROOM_NUM = 5;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_READ_MAP = 3;
 const char CS_PACKET_WRITE_MAP = 4;
-const char CS_PACKET_READY = 5;
+const char CS_PACKET_CHANGE_SCENE_READY = 5;
+const char CS_PACKET_GAME_START_READY = 6;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -77,10 +48,15 @@ struct cs_packet_write_map {
 	int color, block_type;
 };
 
-struct cs_packet_ready {
+struct cs_packet_change_scene_ready {
 	unsigned char size;
 	char	type;
 	char is_ready;
+};
+
+struct cs_packet_game_start_ready {
+	unsigned char size;
+	char	type;
 };
 
 //server->client

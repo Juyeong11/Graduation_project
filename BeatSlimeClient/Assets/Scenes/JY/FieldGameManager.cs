@@ -46,6 +46,7 @@ public class FieldGameManager : MonoBehaviour
 
         if (Net.isOnline)
         {
+            isGameStart = true;
             // 네트워크 메세지 큐
             if (Network.MessQueue.Count > 0)
             {

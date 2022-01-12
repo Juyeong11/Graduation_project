@@ -8,9 +8,11 @@ class MapInfo {
 	int size;
 public:
 	int* map;
+	int bpm;
+
 	void SetMap(std::string file_name);
 	int GetTileType(int x, int z);
-	
+
 	~MapInfo()
 	{
 		delete[] map;
@@ -33,13 +35,19 @@ public:
 	int map_type;
 	float bpm;
 	std::chrono::system_clock::time_point start_time{};
+	// atomic으로는 동시에 게임 시작하는걸 막을 수가 없을 듯
+	std::mutex state_lock;
 	bool isGaming;
+	int player_ids[MAX_IN_GAME_PLAYER];
+	std::mutex ready_lock;
+	int ready_player_cnt;
+	//std::mutex id_insert_lock;
 
-	Gameobject* boss;
-	Gameobject** players;
+	int boss_id;
 	GameRoom();
 
-	void GameStart(int mapType, float BPM, Gameobject* Boss, Gameobject** Players);
+	void GameRoomInit(int mapType, float BPM, int Boss, int* Players);
+	bool FindPlayer(int id);
 };
 
 class Portal
@@ -47,10 +55,14 @@ class Portal
 public:
 	int x, y, z;
 	const int range = 1;
-	int map_type;
+	MAP_TYPE map_type;
 	std::unordered_set<int> player_ids;
 	std::mutex id_lock;
-	Portal(int _x, int _z) :x(_x), z(_z) { y = -z - x; map_type = WITCH_MAP; };
+	std::atomic_int ready_player_cnt;
+	Portal(int _x, int _z) :x(_x), z(_z) {
+		y = -z - x; map_type = WITCH_MAP;
+		ready_player_cnt = 0;
+	};
 
 	bool isPortal(int _x, int _z)
 	{
@@ -61,6 +73,12 @@ public:
 	}
 
 	bool findPlayer(int id) {
-
+		id_lock.lock();
+		if (player_ids.contains(id)) {
+			id_lock.unlock();
+			return true;
+		}
+		id_lock.unlock();
+		return false;
 	}
 };

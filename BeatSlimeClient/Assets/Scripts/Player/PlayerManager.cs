@@ -97,13 +97,13 @@ public class PlayerManager : MonoBehaviour
             selfCoord.coordinates.X == 2 && selfCoord.coordinates.Z == -2)
         {
             if (isReady) return;
-            FieldGameManager.Net.SendReadyPacket(1);
+            //FieldGameManager.Net.SendReadyPacket(1);
             isReady = true;
             return;
         }
         else if (isReady)
         {
-            FieldGameManager.Net.SendReadyPacket(0);
+            //FieldGameManager.Net.SendReadyPacket(0);
         }
         isReady = false;
     }

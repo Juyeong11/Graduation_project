@@ -37,9 +37,6 @@ public:
 	}
 };
 
-enum TYPE {
-	PLAYER, ENEMY
-};
 enum DIR {
 	UP, DOWN, LEFTUP, RIGHTUP, LEFTDOWN, RIGHTDOWN
 };
@@ -51,7 +48,7 @@ public:
 	short	x, y,z;
 	int map_number;
 	int direction;
-	char		type;
+	GO_TYPE		type;
 	//volatile«ÿ¡‡æﬂ «—¥Ÿ.
 	volatile STATE state;
 	std::mutex state_lock;

@@ -83,7 +83,9 @@ public:
 		return (id >= 0) && (id < MAX_USER);
 	}
 	int get_new_id();
+	int get_npc_id(int monsterType);
 
+	int get_game_room_id();
 	void Initialize_NPC() {
 		for (int i = NPC_ID_START; i < NPC_ID_END; ++i) {
 			sprintf_s(clients[i]->name, "NPC%d", i);
@@ -91,7 +93,7 @@ public:
 			clients[i]->z = 0;
 			clients[i]->id = i;
 			clients[i]->state = ST_ACCEPT;
-			clients[i]->type = ENEMY; // NPC
+			
 		}
 	}
 	void do_npc_move(int npc_id);

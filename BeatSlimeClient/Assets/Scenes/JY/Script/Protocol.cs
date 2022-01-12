@@ -23,7 +23,8 @@ namespace Protocol
         public const byte CS_PACKET_MOVE = 2;
         public const byte CS_PACKET_READ_MAP = 3;
         public const byte CS_PACKET_WRITE_MAP = 4;
-        public const byte CS_PACKET_READY = 5;
+        public const byte CS_PACKET_CHANGE_SCENE_READY = 5;
+        public const byte CS_PACKET_GAME_START_READY = 6;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -103,11 +104,18 @@ namespace Protocol
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class cs_packet_ready : ISerializeble<cs_packet_ready>
+    public class cs_packet_change_scene_ready : ISerializeble<cs_packet_change_scene_ready>
     {
         public byte size;
         public byte type;
         public byte is_ready;
+    }
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_game_start_ready : ISerializeble<cs_packet_game_start_ready>
+    {
+        public byte size;
+        public byte type;
     }
 
     [Serializable]

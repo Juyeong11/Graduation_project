@@ -52,7 +52,7 @@ Network::Network() {
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
-		portals[i] = new Portal(2,-2);
+		portals[i] = new Portal(2, -2);
 	}
 }
 Network::~Network() {
@@ -247,7 +247,51 @@ int Network::get_new_id()
 		}
 		clients[i]->state_lock.unlock();
 	}
-	std::cout << "Maximum Number of Clients Overflow!!\n";
+	std::cout << "1 : Maximum Number of Clients Overflow!!\n";
+	return -1;
+}
+int Network::get_npc_id(int monsterType) {
+	switch (monsterType)
+	{
+	case WITCH:
+		for (int i = WITCH_ID_START; i < WITCH_ID_END; ++i) {
+			clients[i]->state_lock.lock();
+			if (ST_ACCEPT == clients[i]->state) {
+				clients[i]->state = ST_INGAME;
+				clients[i]->state_lock.unlock();
+				return i;
+			}
+			clients[i]->state_lock.unlock();
+		}
+		std::cout << "2 : Maximum Number of Monster Overflow!!\n";
+		return -1;
+
+		break;
+	case BOSS2:
+		break;
+	case SKILL_TRADER:
+		break;
+	case CURATOR:
+		break;
+	default:
+		std::cout << "wrong npc type\n";
+		return -1;
+		break;
+	}
+
+}
+int Network::get_game_room_id()
+{
+	for (int i = 0; i < MAX_GAME_ROOM_NUM;++i) {
+		game_room[i]->state_lock.lock();
+		if (false == game_room[i]->isGaming) {
+			game_room[i]->isGaming = true;
+			game_room[i]->state_lock.unlock();
+			return i;
+		}
+		game_room[i]->state_lock.unlock();
+	}
+	std::cout << "3 : Maximum Number of Game Room Overflow!!\n";
 	return -1;
 }
 
@@ -260,11 +304,11 @@ void Network::do_npc_move(int npc_id) {
 		if (obj->state != ST_INGAME) continue;
 
 
-			if (true == can_attack(npc_id, obj->id))
-				can_attacklist.insert(obj->id);
-		
+		if (true == can_attack(npc_id, obj->id))
+			can_attacklist.insert(obj->id);
+
 	}
-	
+
 
 	for (auto pl : can_attacklist) {
 		if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
@@ -296,7 +340,7 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 	std::unordered_set cp_vl = cl->viewlist;
 	cl->vl.unlock();
 	for (int id : cp_vl) {
-		if(is_player(id))
+		if (is_player(id))
 			send_attack_player(npc_id, target_id, id);
 	}
 	send_attack_player(npc_id, target_id, target_id);
@@ -569,39 +613,41 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 	}
 	break;
-	case CS_PACKET_READY:
+	case CS_PACKET_CHANGE_SCENE_READY:
 	{
 		// 올바른 위치에서 ready했는지 확인
-		cs_packet_ready* packet = reinterpret_cast<cs_packet_ready*>(p);
+		cs_packet_change_scene_ready* packet = reinterpret_cast<cs_packet_change_scene_ready*>(p);
 
-		
+
 		if (packet->is_ready) {
 			for (auto* p : portals) {
 				if (false == p->isPortal(cl.x, cl.z)) continue;
 				// 포탈에 들어오거나 나가서 plaer_ids를 수정해야하는 경우는 해당 패킷이 왔을 때 딱 한번 발생한다. -> lock을 한 번만 하면됨
 				//그래서 player_ids를 복사해 수정한 후 복사하는 방법을 lock횟수가 같기 때문에 그냥 lock을 건다.
-				
-				// 동시에 포탈 범위에 들어오면 버그 생길 듯
+
 				p->id_lock.lock();
 				p->player_ids.insert(cl.id);
 
 				// 준비 이펙트 전송
+				int ids[MAX_IN_GAME_PLAYER];
 				if (p->player_ids.size() >= MAX_IN_GAME_PLAYER) {
 					// 씬 전환
-					int ids[3];
-					int i=0;
-					for (int id : p->player_ids) {
+					int i = 0;
+					for (int id : p->player_ids) { // 이미 change 씬
 						ids[i] = id;
 						i++;
-						if (i > 3) break;
+						if (i > MAX_IN_GAME_PLAYER) break;
 					}
-					for (int id : p->player_ids) {
-					send_change_scene(id, p->map_type);
 
-					std::this_thread::sleep_for(std::chrono::seconds(5)); // 로딩시간 나중에 바꿀것
-					send_game_start(id, ids);
+					for (int id : p->player_ids) {
+						send_change_scene(id, p->map_type);
+
 					}
-					std::cout << "시작" << std::endl;
+					// 포탈에서 GameRoom으로 이동
+					int room_id = get_game_room_id();
+					int boss_id = get_npc_id(p->map_type);
+					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, boss_id, ids);
+					//std::cout << "시작" << std::endl;
 				}
 				p->id_lock.unlock();
 				break;
@@ -609,7 +655,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 		else {
 			for (auto* p : portals) {
-				if (0 == p->player_ids.count(client_id)) continue;
+				if (false == p->findPlayer(client_id)) continue;
 				p->id_lock.lock();
 				p->player_ids.erase(cl.id);
 				p->id_lock.unlock();
@@ -617,6 +663,26 @@ void Network::process_packet(int client_id, unsigned char* p)
 				break;
 			}
 		}
+	}
+	break;
+	case CS_PACKET_GAME_START_READY:
+	{
+		cs_packet_game_start_ready* packet = reinterpret_cast<cs_packet_game_start_ready*>(p);
+
+		for (auto* p : game_room) {
+			p->ready_lock.lock();
+			if (false == p->FindPlayer(client_id)) { p->ready_lock.unlock(); continue; }
+			p->ready_player_cnt++;
+			if (p->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
+
+				for (int id : p->player_ids) {
+					send_game_start(id, p->player_ids);
+				}
+			}
+			p->ready_lock.unlock();
+			break;
+		}
+
 	}
 	break;
 	default:

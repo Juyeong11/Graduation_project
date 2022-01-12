@@ -77,6 +77,9 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         if (!FieldGameManager.Net.isOnline) FieldGameManager.Net.CreateAndConnect();
+        else {
+            FieldGameManager.Net.SendGameStartReadyPacket();
+        }
         //DEBUG
         enemy.GetComponent<HexCellPosition>().setInitPosition(1, 1);
         PM = PatternManager.data;

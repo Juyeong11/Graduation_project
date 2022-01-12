@@ -28,15 +28,24 @@ int MapInfo::GetTileType(int x, int z)
 GameRoom::GameRoom() :bpm(0) {
 	isGaming = false;
 	map_type = -1;
+	ready_player_cnt = 0;
 }
 
-void GameRoom::GameStart(int mapType, float BPM, Gameobject* Boss, Gameobject** Players)
+void GameRoom::GameRoomInit(int mapType, float BPM, int Boss, int* Players)
 {
 	map_type = mapType;
 	bpm = BPM;
 	start_time = std::chrono::system_clock::now();
 	isGaming = true;
 
-	boss = Boss;
-	players = Players;
+	boss_id = Boss;
+	memcpy_s(player_ids,MAX_IN_GAME_PLAYER*sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
+}
+
+bool GameRoom::FindPlayer(int id)
+{
+	for (int p : player_ids) {
+		if (p == id) return true;
+	}
+	return false;
 }
