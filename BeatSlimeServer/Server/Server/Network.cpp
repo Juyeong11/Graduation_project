@@ -113,6 +113,11 @@ void Network::send_game_start(int c_id, int ids[3])
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+
+	for (int i = 0; i < MAX_IN_GAME_PLAYER;++i) {
+		send_put_object(c_id, ids[i]);
+	}
+
 }
 void Network::send_move_object(int c_id, int mover)
 {
@@ -168,7 +173,7 @@ void Network::send_put_object(int c_id, int target) {
 	if (true == is_npc(target) && false == reinterpret_cast<Npc*>(clients[target])->is_active) {
 		reinterpret_cast<Npc*>(clients[target])->is_active = true;
 		timer_event t;
-		t.ev = EVENT_ENEMY_MOVE;
+		t.ev = EVENT_BOSS_MOVE;
 		t.obj_id = target;
 		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
 		timer_queue.push(t);
@@ -313,7 +318,7 @@ void Network::do_npc_move(int npc_id) {
 	for (auto pl : can_attacklist) {
 		if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
 			timer_event t;
-			t.ev = EVENT_ENEMY_ATTACK;
+			t.ev = EVENT_BOSS_TARGETING_ATTACK;
 			t.obj_id = npc_id;
 			t.target_id = pl;
 			t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
@@ -323,7 +328,7 @@ void Network::do_npc_move(int npc_id) {
 	}
 	if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
 		timer_event t;
-		t.ev = EVENT_ENEMY_MOVE;
+		t.ev = EVENT_BOSS_MOVE;
 		t.obj_id = npc_id;
 		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
 		//timer_queue.push(t);
@@ -347,13 +352,19 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 
 	if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
 		timer_event t;
-		t.ev = EVENT_ENEMY_ATTACK;
+		t.ev = EVENT_BOSS_TARGETING_ATTACK;
 		t.obj_id = npc_id;
 		t.target_id = target_id;
 		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
 		timer_queue.push(t);
 	}
 }
+
+void Network::do_npc_tile_attack()
+{
+
+}
+
 void Network::process_packet(int client_id, unsigned char* p)
 {
 	unsigned char packet_type = p[1];
@@ -790,16 +801,22 @@ void Network::worker()
 				sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->_wsa_over);
 		}
 		break;
-		case OP_ENEMY_MOVE:
+		case OP_BOSS_MOVE:
 			do_npc_move(client_id);
 			exp_over_pool.push(exp_over);
 			break;
-		case OP_ENEMY_ATTACK: {
+		case OP_BOSS_TARGETING_ATTACK: 
+		{
 			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			do_npc_attack(client_id, target_id, target_id);
 			exp_over_pool.push(exp_over);
 		}
-							break;
+		break;
+		case OP_BOSS_TILE_ATTACK: 
+		{
+
+		}
+		break;
 		default:
 			break;
 		}

@@ -6,7 +6,7 @@
 #include"Client.h"
 
 
-enum EVENT_TYPE { EVENT_ENEMY_MOVE, EVENT_ENEMY_ATTACK };
+enum EVENT_TYPE { EVENT_BOSS_MOVE, EVENT_BOSS_TARGETING_ATTACK, EVENT_BOSS_TILE_ATTACK, EVENT_PLAYER_PARRYING};
 struct timer_event {
 	int obj_id;
 	int target_id;
@@ -98,6 +98,7 @@ public:
 	}
 	void do_npc_move(int npc_id);
 	void do_npc_attack(int npc_id, int target_id, int receiver);
+	void do_npc_tile_attack();
 
 	void do_timer() {
 		using namespace std;
@@ -116,11 +117,20 @@ public:
 					while (!exp_over_pool.try_pop(ex_over));
 					switch (ev.ev)
 					{
-					case EVENT_ENEMY_MOVE:
-						ex_over->_comp_op = OP_ENEMY_MOVE;
+
+					case EVENT_BOSS_MOVE:
+						ex_over->_comp_op = OP_BOSS_MOVE;
 						break;
-					case EVENT_ENEMY_ATTACK:
-						ex_over->_comp_op = OP_ENEMY_ATTACK;
+					case EVENT_BOSS_TARGETING_ATTACK:
+						ex_over->_comp_op = OP_BOSS_TARGETING_ATTACK;
+						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
+						break;
+					case EVENT_BOSS_TILE_ATTACK:
+						ex_over->_comp_op = OP_BOSS_TILE_ATTACK;
+						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
+						break;
+					case EVENT_PLAYER_PARRYING:
+						ex_over->_comp_op = OP_PLAYER_PARRYING;
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
 						break;
 					default:

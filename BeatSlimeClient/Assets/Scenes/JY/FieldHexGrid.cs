@@ -72,7 +72,8 @@ public class FieldHexGrid : MonoBehaviour
                         {
                             //print(cellType[0]);
                             GameObject tmpcell = Instantiate(cellType[color]); // <- 나중에 string name으로 바꿔야?
-                            int w = Random.Range(0, 3);
+                            //int w = Random.Range(0, 3);
+                            int w = 0;
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
                             tmpcell.name = "cell" + FieldGameManager.data.mapCellid;
                             tmpcell.transform.parent = gameObject.transform;

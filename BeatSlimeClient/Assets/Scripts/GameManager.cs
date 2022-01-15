@@ -84,6 +84,9 @@ public class GameManager : MonoBehaviour
         enemy.GetComponent<HexCellPosition>().setInitPosition(1, 1);
         PM = PatternManager.data;
         ids = new int[3];
+
+        //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));
+        EffectManager.instance.BossTileEffect1(0, 0, 0, 0);
     }
 
     void FixedUpdate()
@@ -243,6 +246,10 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_put_object p = Protocol.sc_packet_put_object.SetByteToVar(data);
                             int pid = ServerID_To_ClientID(p.id);
+                            if (pid == myPlayerID) {
+                                Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                break; 
+                            }
                             //PutObject(p.type, p.id, p.x, p.y);
                             switch (p.obj_type)
                             {
