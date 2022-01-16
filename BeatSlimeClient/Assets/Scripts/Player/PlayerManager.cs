@@ -112,8 +112,8 @@ public class PlayerManager : MonoBehaviour
     {
         if (selfCoord.coordinates.W != grid.cellMaps.Get(selfCoord.coordinates).w + 1)
         {
-            Debug.LogError(">Player W Coordinate Error!<");
-            print("Self W : " + selfCoord.coordinates.W);
+            Debug.LogError(">Player W Coordinate Error!< [ Self W : " + selfCoord.coordinates.W + ", Cell W : " + grid.cellMaps.Get(selfCoord.coordinates).w + 1 + " ]");
+            //print("Self W : " + selfCoord.coordinates.W);
             selfCoord.coordinates.W = grid.cellMaps.Get(selfCoord.coordinates).w + 1;
         }
         PlayerTransform.position = selfCoord.calculatePlayerPosition();

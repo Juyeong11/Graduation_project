@@ -47,6 +47,8 @@ public class GameManager : MonoBehaviour
 
     public int alreadyMoved;
 
+    public DoomChi MidNote;
+
     //
     GameObject[] Objects = new GameObject[4];
     int[] ids;
@@ -371,20 +373,24 @@ public class GameManager : MonoBehaviour
         {
             if (beatCounter <= JudgementTiming)
             {
+                MidNote.notePerfect();
                 return 1;  //일찍 누름
             }
             else if (timeByBeat - beatCounter <= JudgementTiming)
             {
+                MidNote.notePerfect();
                 return 1;   //늦게 누름
             }
             else
             {
+                MidNote.noteEnd();
                 Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
                 return 0;   //잘못 누름
             }
         }
         else
         {
+            MidNote.noteEnd();
             //Debug.Log("Cutting");
         }
         return 0;
@@ -395,6 +401,7 @@ public class GameManager : MonoBehaviour
         if (beatCounter <= JudgementTiming)
         {
             Debug.Log("Judge : -" + beatCounter);
+
         }
         else if (timeByBeat - beatCounter <= JudgementTiming)
         {

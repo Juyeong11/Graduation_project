@@ -91,6 +91,16 @@ namespace Protocol
             return s;
         }
     }
+
+    public class LandScape
+    {
+        public int id;
+        public int x, y, z, w;
+        public float offX, offY, offZ, offRotate;
+        public int color, type;
+
+    }
+
     //Client -> Server
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

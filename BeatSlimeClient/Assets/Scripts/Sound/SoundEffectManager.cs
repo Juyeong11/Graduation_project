@@ -10,7 +10,7 @@ public class SoundEffectManager : MonoBehaviour
 
     public void BeatEffect()
     {
-        LeftSpeakerAnimator.SetTrigger(beat);
-        RightSpeakerAnimator.SetTrigger(beat);
+        //LeftSpeakerAnimator.SetTrigger(beat);
+        //RightSpeakerAnimator.SetTrigger(beat);
     }
 }
