@@ -4,15 +4,30 @@ public class HexCellPosition : MonoBehaviour
 {
     public HexCoordinates coordinates;
     public HexCoordinates preCoordinates;
-    public HexDirection direction;
+
+    public float landOffsetX = 0;
+    public float landOffsetY = 0;
+    public float landOffsetZ = 0;
+    public float landOffsetRotate = 0;
+
     float preBeatedTime;
 
-    public void setInitPosition(int x, int z,int w=0)
+    public void landOffSetter(float x, float y, float z, float r)
+    {
+        landOffsetX = x;
+        landOffsetY = y;
+        landOffsetZ = z;
+        landOffsetRotate = r;
+
+        gameObject.transform.rotation = Quaternion.Euler(new Vector3(0, landOffsetRotate, 0));
+    }
+    public void setInitPosition(int x, int z, int w = 0)
     {
         preCoordinates.setCoordinates(x, z, w);
-        coordinates.setCoordinates(x, z,w);
+        coordinates.setCoordinates(x, z, w);
 
         gameObject.transform.localPosition = getRealPosition();
+
     }
 
     static public Vector3 getRealPosition(float x, float z, int w)
@@ -21,7 +36,9 @@ public class HexCellPosition : MonoBehaviour
     }
     public Vector3 getRealPosition()
     {
-        return new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W), coordinates.X * 0.5f + coordinates.Z * 1f);
+        return new Vector3(coordinates.X * 0.866f + landOffsetX,
+            calculateWPosition(coordinates.W) + landOffsetY,
+            coordinates.X * 0.5f + coordinates.Z * 1f + landOffsetZ);
     }
 
     public void reflectPosition()
@@ -67,7 +84,7 @@ public class HexCellPosition : MonoBehaviour
         else
             return 1f;
     }
-    
+
     public void beat()
     {
 
@@ -75,9 +92,9 @@ public class HexCellPosition : MonoBehaviour
 
     public float SlimeWLerp(float a, float b, float t)
     {
-        float skyHigh = (a+b)*0.5f + 2f;
+        float skyHigh = (a + b) * 0.5f + 2f;
 
-        if (t <0.5f)
+        if (t < 0.5f)
         {
             return Mathf.Lerp(a, skyHigh, t);
         }
@@ -89,35 +106,33 @@ public class HexCellPosition : MonoBehaviour
 
     public void setDirection(byte dir)
     {
-        switch(dir)
+        switch (dir)
         {
             case (byte)Protocol.DIR.DOWN:
                 gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, 60f, 0f));
                 break;
             case (byte)Protocol.DIR.RIGHTDOWN:
-                gameObject.transform.localRotation = Quaternion.Euler(new Vector3( 0f, 120f, 0f));
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, 120f, 0f));
                 break;
             case (byte)Protocol.DIR.LEFTUP:
-                gameObject.transform.localRotation = Quaternion.Euler(new Vector3( 0f, 180f, 0f));
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, 180f, 0f));
                 break;
             case (byte)Protocol.DIR.UP:
-                gameObject.transform.localRotation = Quaternion.Euler(new Vector3( 0f, -120f, 0f));
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -120f, 0f));
                 break;
             case (byte)Protocol.DIR.RIGHTUP:
-                gameObject.transform.localRotation = Quaternion.Euler(new Vector3( 0f, -60f, 0f));
+                gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, -60f, 0f));
                 break;
             case (byte)Protocol.DIR.LEFTDOWN:
                 gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
                 break;
 
         }
-        direction = (HexDirection)dir;
-
     }
-    public void plus(int x, int y, int z,int w=0)
+    public void plus(int x, int y, int z, int w = 0)
     {
         preBeatedTime = Time.time;
-        if (x+y+z != 0)
+        if (x + y + z != 0)
         {
             Debug.LogError("HexPlus Error (x+y+z != 0)");
         }
@@ -125,7 +140,7 @@ public class HexCellPosition : MonoBehaviour
         coordinates.plus(x, z, w);
         //reflectPosition();
     }
-    public void SetPosition(int x, int y, int z, int w=0)
+    public void SetPosition(int x, int y, int z, int w = 0)
     {
         preBeatedTime = Time.time;
 
@@ -137,7 +152,7 @@ public class HexCellPosition : MonoBehaviour
         coordinates.setCoordinates(x, z, w);
         //reflectPosition();
     }
-    public (int,int,int,int) Get()
+    public (int, int, int, int) Get()
     {
         return (coordinates.X, coordinates.Y, coordinates.Z, coordinates.W);
     }
