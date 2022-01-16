@@ -25,6 +25,8 @@ public class MapMaker : MonoBehaviour
     static public int cellId = 0;
     static public int landId = 0;
 
+    public GameObject recipt;
+
     public List<Protocol.Map> Mapdata = new List<Protocol.Map>();
     public List<Protocol.LandScape> LandScapedata = new List<Protocol.LandScape>();
 
@@ -76,6 +78,14 @@ public class MapMaker : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.M))
             {
                 landOffsetRotate += 10;
+            }
+            if (Input.GetKeyDown(KeyCode.F1))
+            {
+                recipt.SetActive(true);
+            }
+            if (Input.GetKeyUp(KeyCode.F1))
+            {
+                recipt.SetActive(false);
             }
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
@@ -178,7 +188,7 @@ public class MapMaker : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.Insert))  //Insert
             {
-                switch(dir)
+                switch (dir)
                 {
                     case 1:
                         if (cellMode)
@@ -272,10 +282,10 @@ public class MapMaker : MonoBehaviour
                         {
                             GameObject tmpcell = Instantiate(grid.LandType[landType]);
                             tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate);
-                            tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X , playerPosition.coordinates.Z + 1, w);
+                            tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
-                            grid.cellMaps.Add(tmpcell, playerPosition.coordinates.X, playerPosition.coordinates.Y-1, playerPosition.coordinates.Z + 1, w);
+                            grid.cellMaps.Add(tmpcell, playerPosition.coordinates.X, playerPosition.coordinates.Y - 1, playerPosition.coordinates.Z + 1, w);
 
                             Protocol.LandScape p_templand = new Protocol.LandScape();
                             p_templand.type = 0;
@@ -532,29 +542,188 @@ public class MapMaker : MonoBehaviour
                 }
                 dir = 0;
             }
+            if (Input.GetKeyDown(KeyCode.Delete))
+            {
+                if (cellMode)
+                {
+                    if (grid.cellMaps.map_Get(playerPosition.coordinates.X, playerPosition.coordinates.Z) != null)
+                    {
+                        if (grid.cellMaps.Remove(playerPosition.coordinates.X, playerPosition.coordinates.Z))
+                        {
+                            string id = Mapdata.Find(cell => cell.x == playerPosition.coordinates.X && cell.z == playerPosition.coordinates.Z).id.ToString();
+                            Mapdata.RemoveAll(cell => cell.x == playerPosition.coordinates.X && cell.z == playerPosition.coordinates.Z);
+                            GameObject.Find("cell" + id).SetActive(false);
+                            Debug.Log("@@@@@@DELETE@@@@@@");
+                        }
+                        else
+                        {
+                            Debug.LogError("@@@@@@cell delete error@@@@@@");
+                        }
+                        //Mapdata.Add();
 
+                    }
+                }
+                else
+                {
+                    int index = -1, finder = 0;
+                    string id = "-1";
+                    //맨 마지막 장식만 삭제
+                    foreach (var land in LandScapedata)
+                    {
+                        if (land.x == playerPosition.coordinates.X && land.z == playerPosition.coordinates.Z)
+                        {
+                            id = land.id.ToString();
+                            index = finder;
+                        }
+                        finder++;
+                    }
+                    if (index >= 0)
+                    {
+                        LandScapedata.RemoveAt(index);
+                        GameObject.Find("land" + id).SetActive(false);
+                        Debug.Log("@@@@@@LAND DELETE@@@@@@");
+                    }
+                }
+
+                {
+                    //switch (dir)
+                    //{
+                    //    case 1:
+                    //        if (cellMode)
+                    //        {
+                    //            if (grid.cellMaps.map_Get(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1) != null)
+                    //            {
+                    //                Protocol.Map tmp = null;
+                    //                foreach(var cell in Mapdata)
+                    //                {
+                    //                    if (cell.x == playerPosition.coordinates.X - 1 && cell.z == playerPosition.coordinates.Z)
+                    //                    {
+                    //                        tmp = cell;
+                    //                    }
+                    //                }
+                    //                if (grid.cellMaps.Remove(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1))
+                    //                {
+                    //                    Mapdata.Remove(tmp);
+                    //
+                    //                    Debug.Log("@@@@@@DELETE@@@@@@");
+                    //                }
+                    //                else
+                    //                {
+                    //                    Debug.LogError("@@@@@@cell delete error@@@@@@");
+                    //                }
+                    //                //Mapdata.Add();
+                    //
+                    //            }
+                    //        }
+                    //        else
+                    //        {  
+                    //            //LandScapedata.Add(p_templand);
+                    //            Debug.Log("@@@@@@LAND@@@@@@");
+                    //        }
+                    //        break;
+                    //    case 2:
+                    //        if (cellMode)
+                    //        {
+                    //            if (grid.cellMaps.map_Get(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1) != null)
+                    //            {
+                    //                //Mapdata.Add(p_tempcell);
+                    //                Debug.Log("@@@@@@@@@@@@@@@");
+                    //            }
+                    //
+                    //        }
+                    //        else
+                    //        {
+                    //            //LandScapedata.Add(p_templand);
+                    //            Debug.Log("@@@@@@LAND@@@@@@");
+                    //        }
+                    //        break;
+                    //    case 3:
+                    //        if (cellMode)
+                    //        {
+                    //            if (grid.cellMaps.map_Get(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z) != null)
+                    //            {
+                    //                //Mapdata.Add(p_tempcell);
+                    //                Debug.Log("@@@@@@@@@@@@@@@");
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            //LandScapedata.Add(p_templand);
+                    //            Debug.Log("@@@@@@LAND@@@@@@");
+                    //        }
+                    //        break;
+                    //    case 4:
+                    //        if (cellMode)
+                    //        {
+                    //            if (grid.cellMaps.map_Get(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z) != null)
+                    //            {
+                    //                //Mapdata.Add(p_tempcell);
+                    //                Debug.Log("@@@@@@@@@@@@@@@");
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            //LandScapedata.Add(p_templand);
+                    //            Debug.Log("@@@@@@LAND@@@@@@");
+                    //        }
+                    //        break;
+                    //    case 5:
+                    //        if (cellMode)
+                    //        {
+                    //            if (grid.cellMaps.map_Get(playerPosition.coordinates.X, playerPosition.coordinates.Z - 1) != null)
+                    //            {
+                    //                //Mapdata.Add(p_tempcell);
+                    //                Debug.Log("@@@@@@@@@@@@@@@");
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            //LandScapedata.Add(p_templand);
+                    //            Debug.Log("@@@@@@LAND@@@@@@");
+                    //        }
+                    //        break;
+                    //    case 6:
+                    //        if (cellMode)
+                    //        {
+                    //            if (grid.cellMaps.map_Get(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z - 1) != null)
+                    //            {
+                    //                //Mapdata.Add(p_tempcell);
+                    //                Debug.Log("@@@@@@@@@@@@@@@");
+                    //            }
+                    //        }
+                    //        else
+                    //        {
+                    //            //LandScapedata.Add(p_templand);
+                    //            Debug.Log("@@@@@@LAND@@@@@@");
+                    //        }
+                    //        break;
+                    //
+                    //}
+                }
+                dir = 0;
+            }
             switch (dir)
             {
                 case 0:
                     tmp.transform.position = new Vector3(1000f, 1000f, 1000f);
                     break;
                 case 1:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X-1, playerPosition.coordinates.Z+1, w);
+                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1, w);
                     break;
                 case 2:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z+1, w);
+                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1, w);
                     break;
                 case 3:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X+1, playerPosition.coordinates.Z, w);
+                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z, w);
                     break;
                 case 4:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X-1, playerPosition.coordinates.Z, w);
+                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z, w);
                     break;
                 case 5:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z-1, w);
+                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z - 1, w);
                     break;
                 case 6:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X+1, playerPosition.coordinates.Z-1, w);
+                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z - 1, w);
                     break;
                 default:
                     tmp.transform.position = new Vector3(1000f, 1000f, 1000f);

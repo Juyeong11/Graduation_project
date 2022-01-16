@@ -33,6 +33,7 @@ public class PatternManager : MonoBehaviour
 
         for (int i = 0; i < datas.Count; ++i)
         {
+            ///PATTERN LOAD
             if (datas[i]["noteType"].ToString() == "0")
                 continue;
 

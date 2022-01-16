@@ -90,6 +90,17 @@ public class CellMap
         cellMaps.Add(new Cell(cell, x, y, z,w, state, name));
     }
 
+    public bool Remove(int x, int z)
+    {
+        int cells = cellMaps.Count;
+        cellMaps.RemoveAll(cell => cell.x == x && cell.z == z);
+
+        if (cells == cellMaps.Count)
+            return false;
+
+        return true;
+    }
+
     public Cell Get(int x,int y,int z)
     {
         foreach(var v in cellMaps)

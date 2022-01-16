@@ -11,6 +11,7 @@ public class MovementNoteFactory : MonoBehaviour
     List<RectTransform> rightNote;
 
     List<float> moveNotesBeats;
+    List<float> attackNotesBeats;
 
     float bpm;
     float timeByBeat;
@@ -23,6 +24,7 @@ public class MovementNoteFactory : MonoBehaviour
         leftNote = new List<RectTransform>();
         rightNote = new List<RectTransform>();
         moveNotesBeats = new List<float>();
+        attackNotesBeats = new List<float>();   //적 유도 공격 시간들
 
         bpm = GameManager.data.bpm;
         timeByBeat = GameManager.data.timeByBeat;
@@ -59,7 +61,7 @@ public class MovementNoteFactory : MonoBehaviour
             if (moveNotesBeats.Count > 0)
             {
                 float beatPercentage = GameManager.data.nowSongTime;
-                if (beatPercentage >= moveNotesBeats[0])
+                if (beatPercentage >= moveNotesBeats[0] + GameManager.data.JudgementTiming *0.5f)
                 {
                     moveNotesBeats.RemoveAt(0);
                 }

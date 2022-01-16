@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
     public int alreadyMoved;
 
     public DoomChi MidNote;
-
+    public DoomChi MidANote;
     //
     public Network Net = new Network();
     GameObject[] Objects = new GameObject[Protocol.CONSTANTS.MAX_OBJECT];

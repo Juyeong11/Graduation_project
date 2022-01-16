@@ -323,6 +323,7 @@ public class PlayerManager : MonoBehaviour
         Debug.Log(GameManager.data.timeByBeat / (float)b.GetBeatTime() * 0.75f);
         SettledBallBeats.Add((now + b, GameManager.data.timeByBeat / (float)b.GetBeatTime() * 0.75f));
     }
+
     public void BallBeatCheck()
     {
         if (SettledBallBeats.Count > 0)
@@ -333,6 +334,7 @@ public class PlayerManager : MonoBehaviour
                 Debug.Log("반격 실패");
                 VFXManager.data.HitSounder(SettledBallBeats[0].Item2);
                 SettledBallBeats.RemoveAt(0);
+                GameManager.data.MidANote.noteEnd();
             }
             else if (SettledBallBeats[0].Item1.GetBeatTime() - GameManager.data.JudgementTiming < GameManager.data.nowBeat.GetBeatTime()
                 && playerAttacking)
@@ -341,6 +343,7 @@ public class PlayerManager : MonoBehaviour
                 Debug.Log("반격 성공!");
                 VFXManager.data.HitSounder(1);
                 SettledBallBeats.RemoveAt(0);
+                GameManager.data.MidANote.notePerfect();
             }
         }
     }
