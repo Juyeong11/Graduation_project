@@ -710,6 +710,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 				}
 				p->start_time = std::chrono::system_clock::now();
 				game_start(p->game_room_id);
+				std::cout << "게임 시작\n";
+
 			}
 			p->ready_lock.unlock();
 			break;

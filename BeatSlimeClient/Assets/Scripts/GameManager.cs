@@ -210,8 +210,11 @@ public class GameManager : MonoBehaviour
                             //Debug.Log(p.id+"이동");
                             Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
                             Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (pid < 3)// 플레이어 이면
+                            if (pid == myPlayerID)// 플레이어 이면
                                 Objects[pid].GetComponent<PlayerManager>().JumpTrig();
+                            else if(pid < 3)
+                                Objects[pid].GetComponent<InGameOtherPlayerManager>().JumpTrig();
+
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_ATTACK:
@@ -373,24 +376,24 @@ public class GameManager : MonoBehaviour
         {
             if (beatCounter <= JudgementTiming)
             {
-                MidNote.notePerfect();
+                //MidNote.notePerfect();
                 return 1;  //일찍 누름
             }
             else if (timeByBeat - beatCounter <= JudgementTiming)
             {
-                MidNote.notePerfect();
+                //MidNote.notePerfect();
                 return 1;   //늦게 누름
             }
             else
             {
-                MidNote.noteEnd();
+                //MidNote.noteEnd();
                 Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
                 return 0;   //잘못 누름
             }
         }
         else
         {
-            MidNote.noteEnd();
+            //MidNote.noteEnd();
             //Debug.Log("Cutting");
         }
         return 0;

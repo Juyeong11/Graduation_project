@@ -1753,6 +1753,11 @@ MonoBehaviour:
     x: 0
     z: 0
     w: 0
+  direction: 0
+  landOffsetX: 0
+  landOffsetY: 0
+  landOffsetZ: 0
+  landOffsetRotate: 0
 --- !u!114 &1227400883
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1966,8 +1971,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MakeMapWithoutMapPacket: 1
+  TMP: 0
   cellType:
   - {fileID: 7589257941424137537, guid: aa3a9b9def515dd4681bde4e79274aa4, type: 3}
+  LandType: []
   pPosition:
     x: 0
     z: 0
@@ -2318,10 +2325,18 @@ MonoBehaviour:
   mapMakingOn: 0
   playerPosition: {fileID: 1620409360}
   grid: {fileID: 1387123430}
+  cellMode: 1
   tmp: {fileID: 1971876085}
+  tmpLand: {fileID: 0}
   type: 0
+  landType: 0
   dir: 0
   w: 0
+  landOffsetX: 0
+  landOffsetY: 0
+  landOffsetZ: 0
+  landOffsetRotate: 0
+  Mapdata: []
 --- !u!4 &1639745175
 Transform:
   m_ObjectHideFlags: 0
@@ -2989,6 +3004,7 @@ MonoBehaviour:
   offsetTime: 156
   JudgementTiming: 100
   alreadyMoved: 0
+  MidNote: {fileID: 0}
 --- !u!114 &2121429944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3018,8 +3034,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00996ede74195104ca256f6924088fc6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerPrefeb: {fileID: 7354045492482313764, guid: 062baae922b7b2e479b97ba3ba7406d1, type: 3}
-  OtherPlayerPrefeb: {fileID: 919132148801423232}
+  PlayerPrefeb: {fileID: 919132148801423232}
+  OtherPlayerPrefeb: {fileID: 6558977205578625581, guid: 86fa78b2e24ba0e42addebbdb61b19eb, type: 3}
   EnemyPrefeb: {fileID: 1227400879}
 --- !u!4 &543450652987301178 stripped
 Transform:
