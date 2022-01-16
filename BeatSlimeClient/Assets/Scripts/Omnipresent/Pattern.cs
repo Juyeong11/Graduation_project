@@ -34,10 +34,10 @@ public class Pattern
         rhythmBeat.Set(prebar,
                                 int.Parse(datas["4th"].ToString()),
 
-                                int.Parse(datas["3rd"].ToString()) * 8 + int.Parse(datas["6th"].ToString()) * 4 +
-                                int.Parse(datas["12th"].ToString()) * 2 + int.Parse(datas["24th"].ToString()),
+                                int.Parse(datas["8th"].ToString()) * 2 + int.Parse(datas["16th"].ToString()),
 
-                                int.Parse(datas["8th"].ToString()) * 2 + int.Parse(datas["16th"].ToString()));
+                                int.Parse(datas["3rd"].ToString()) * 8 + int.Parse(datas["6th"].ToString()) * 4 +
+                                int.Parse(datas["12th"].ToString()) * 2 + int.Parse(datas["24th"].ToString()));
 
         switch(datas["speed"].ToString())
         {

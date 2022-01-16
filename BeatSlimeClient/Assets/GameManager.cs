@@ -344,6 +344,9 @@ public class GameManager : MonoBehaviour
             if (beatCounter <= JudgementTiming)
             {
                 MidNote.notePerfect();
+
+                //DEBUG : 패링 비트에는 아래 코드를
+                //MidANote.notePerfect();
                 return 1;  //일찍 누름
             }
             else if (timeByBeat - beatCounter <= JudgementTiming)
