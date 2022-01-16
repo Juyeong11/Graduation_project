@@ -1,6 +1,6 @@
 #include "stdfx.h"
 
-
+#include"Map.h"
 #include "DataBase.h"
 #include "Network.h"
 
@@ -11,19 +11,7 @@ Network* Network::GetInstance()
 	return instance;
 }
 
-void error_display(const char* err_p, int err_no)
-{
-	WCHAR* lpMsgBuf;
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, err_no,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)&lpMsgBuf, 0, 0);
-	std::cout << err_p << std::endl;
-	std::wcout << lpMsgBuf << std::endl;
-	//while (true);
-	LocalFree(lpMsgBuf);
-}
+
 Network::Network() {
 	//인스턴스는 한 개만!!
 	assert(instance == nullptr);
@@ -32,8 +20,17 @@ Network::Network() {
 	for (int i = 0; i < MAX_USER; ++i) {
 		clients[i] = new Client;
 	}
-	for (int i = MAX_USER; i <= NPC_ID_END; ++i) {
-		clients[i] = new Npc();
+	for (int i = SKILL_TRADER_ID_START; i < SKILL_TRADER_ID_END; ++i) {
+		clients[i] = new SkillTrader();
+	}
+	for (int i = CURATOR_ID_START; i < CURATOR_ID_END; ++i) {
+		clients[i] = new Curator();
+	}
+	for (int i = WITCH_ID_START; i < WITCH_ID_END; ++i) {
+		clients[i] = new Witch();
+	}
+	for (int i = BOSS2_ID_START; i < BOSS2_ID_END; ++i) {
+		clients[i] = new Boss2();
 	}
 	for (int i = 0; i < MAX_OBJECT; ++i) {
 		clients[i]->id = i;
@@ -43,6 +40,20 @@ Network::Network() {
 	}
 	Initialize_NPC();
 	DB = new DataBase;
+
+	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
+		game_room[i] = new GameRoom(i);
+	}
+	for (int i = 0; i < MAP_NUM; ++i) {
+		maps[i] = new MapInfo;
+	}
+	maps[FIELD_MAP]->SetMap("Map\\Field_Map");
+	maps[WITCH_MAP]->SetMap("Map\\Witch_Map");
+
+	// 포탈의 위치를 나타내는 자료필요
+	for (int i = 0; i < PORTAL_NUM; ++i) {
+		portals[i] = new Portal(2, -2);
+	}
 }
 Network::~Network() {
 	//스레드가 종료된 후 이기 때문에 락을 할 필요가 없다
@@ -75,7 +86,55 @@ void Network::send_login_ok(int c_id)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
+void Network::send_change_scene(int c_id, int map_type)
+{
+	sc_packet_change_scene packet;
+	packet.type = SC_PACKET_CHANGE_SCENE;
+	packet.size = sizeof(packet);
+	packet.scene_num = map_type;
 
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+}
+
+void Network::send_game_start(int c_id, int ids[3], int boss_id)
+{
+	sc_packet_game_start packet;
+	packet.type = SC_PACKET_GAME_START;
+	packet.size = sizeof(packet);
+	packet.player_id = c_id;
+	packet.id1 = ids[0];
+	packet.id2 = ids[1];
+	packet.id3 = ids[2];
+	packet.boss_id = boss_id;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+
+	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
+		send_put_object(c_id, ids[i]);
+	}
+
+}
+void Network::send_effect(int client_id,int actor_id, int target_id, int effect_type)
+{
+	sc_packet_effect packet;
+	packet.type = SC_PACKET_EFFECT;
+	packet.size = sizeof(packet);
+	packet.effect_type = effect_type;
+	packet.id = actor_id;
+	packet.target_id = target_id;
+	packet.dir = clients[actor_id]->direction;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[client_id])->do_send(ex_over);
+}
 void Network::send_move_object(int c_id, int mover)
 {
 	sc_packet_move packet;
@@ -126,15 +185,6 @@ void Network::send_put_object(int c_id, int target) {
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
-
-	if (true == is_npc(target) && false == reinterpret_cast<Npc*>(clients[target])->is_active) {
-		reinterpret_cast<Npc*>(clients[target])->is_active = true;
-		timer_event t;
-		t.ev = EVENT_ENEMY_MOVE;
-		t.obj_id = target;
-		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
-		timer_queue.push(t);
-	}
 }
 
 void Network::send_remove_object(int c_id, int victim)
@@ -209,7 +259,51 @@ int Network::get_new_id()
 		}
 		clients[i]->state_lock.unlock();
 	}
-	std::cout << "Maximum Number of Clients Overflow!!\n";
+	std::cout << "1 : Maximum Number of Clients Overflow!!\n";
+	return -1;
+}
+int Network::get_npc_id(int monsterType) {
+	switch (monsterType)
+	{
+	case WITCH:
+		for (int i = WITCH_ID_START; i < WITCH_ID_END; ++i) {
+			clients[i]->state_lock.lock();
+			if (ST_ACCEPT == clients[i]->state) {
+				clients[i]->state = ST_INGAME;
+				clients[i]->state_lock.unlock();
+				return i;
+			}
+			clients[i]->state_lock.unlock();
+		}
+		std::cout << "2 : Maximum Number of Monster Overflow!!\n";
+		return -1;
+
+		break;
+	case BOSS2:
+		break;
+	case SKILL_TRADER:
+		break;
+	case CURATOR:
+		break;
+	default:
+		std::cout << "wrong npc type\n";
+		return -1;
+		break;
+	}
+
+}
+int Network::get_game_room_id()
+{
+	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
+		game_room[i]->state_lock.lock();
+		if (false == game_room[i]->isGaming) {
+			game_room[i]->isGaming = true;
+			game_room[i]->state_lock.unlock();
+			return i;
+		}
+		game_room[i]->state_lock.unlock();
+	}
+	std::cout << "3 : Maximum Number of Game Room Overflow!!\n";
 	return -1;
 }
 
@@ -222,16 +316,16 @@ void Network::do_npc_move(int npc_id) {
 		if (obj->state != ST_INGAME) continue;
 
 
-			if (true == can_attack(npc_id, obj->id))
-				can_attacklist.insert(obj->id);
-		
+		if (true == can_attack(npc_id, obj->id))
+			can_attacklist.insert(obj->id);
+
 	}
-	
+
 
 	for (auto pl : can_attacklist) {
 		if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
 			timer_event t;
-			t.ev = EVENT_ENEMY_ATTACK;
+			t.ev = EVENT_BOSS_TARGETING_ATTACK;
 			t.obj_id = npc_id;
 			t.target_id = pl;
 			t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
@@ -241,7 +335,7 @@ void Network::do_npc_move(int npc_id) {
 	}
 	if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
 		timer_event t;
-		t.ev = EVENT_ENEMY_MOVE;
+		t.ev = EVENT_BOSS_MOVE;
 		t.obj_id = npc_id;
 		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
 		//timer_queue.push(t);
@@ -258,20 +352,26 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 	std::unordered_set cp_vl = cl->viewlist;
 	cl->vl.unlock();
 	for (int id : cp_vl) {
-		if(is_player(id))
+		if (is_player(id))
 			send_attack_player(npc_id, target_id, id);
 	}
 	send_attack_player(npc_id, target_id, target_id);
 
 	if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
 		timer_event t;
-		t.ev = EVENT_ENEMY_ATTACK;
+		t.ev = EVENT_BOSS_TARGETING_ATTACK;
 		t.obj_id = npc_id;
 		t.target_id = target_id;
 		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
 		timer_queue.push(t);
 	}
 }
+
+void Network::do_npc_tile_attack()
+{
+
+}
+
 void Network::process_packet(int client_id, unsigned char* p)
 {
 	unsigned char packet_type = p[1];
@@ -345,12 +445,24 @@ void Network::process_packet(int client_id, unsigned char* p)
 		short& z = cl.z;
 		cl.direction = packet->direction;
 		switch (packet->direction) {
-		case DIR::LEFTUP:		if (true) { x--; z++; break; }
-		case DIR::UP:			if (true) { y--; z++;  break; }
-		case DIR::RIGHTUP:		if (true) { x++; y--; break; }
-		case DIR::LEFTDOWN:		if (true) { x--; y++; break; }
-		case DIR::DOWN:			if (true) { y++; z--; break; }
-		case DIR::RIGHTDOWN:	if (true) { x++; z--; break; }
+		case DIR::LEFTUP:
+			if (true) { x--; z++; }
+			break;
+		case DIR::UP:
+			if (true) { y--; z++; }
+			break;
+		case DIR::RIGHTUP:
+			if (true) { x++; y--; }
+			break;
+		case DIR::LEFTDOWN:
+			if (true) { x--; y++; }
+			break;
+		case DIR::DOWN:
+			if (true) { y++; z--; }
+			break;
+		case DIR::RIGHTDOWN:
+			if (true) { x++; z--; }
+			break;
 		default:
 			std::cout << "Invalid move in client " << client_id << std::endl;
 			exit(-1);
@@ -531,6 +643,80 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 	}
 	break;
+	case CS_PACKET_CHANGE_SCENE_READY:
+	{
+		// 올바른 위치에서 ready했는지 확인
+		cs_packet_change_scene_ready* packet = reinterpret_cast<cs_packet_change_scene_ready*>(p);
+
+
+		if (packet->is_ready) {
+			for (auto* p : portals) {
+				if (false == p->isPortal(cl.x, cl.z)) continue;
+				// 포탈에 들어오거나 나가서 plaer_ids를 수정해야하는 경우는 해당 패킷이 왔을 때 딱 한번 발생한다. -> lock을 한 번만 하면됨
+				//그래서 player_ids를 복사해 수정한 후 복사하는 방법을 lock횟수가 같기 때문에 그냥 lock을 건다.
+
+				p->id_lock.lock();
+				p->player_ids.insert(cl.id);
+
+				// 준비 이펙트 전송
+				int ids[MAX_IN_GAME_PLAYER];
+				if (p->player_ids.size() >= MAX_IN_GAME_PLAYER) {
+					// 씬 전환
+					int i = 0;
+					for (int id : p->player_ids) { // 이미 change 씬
+						ids[i] = id;
+						i++;
+						if (i > MAX_IN_GAME_PLAYER) break;
+					}
+
+					for (int id : p->player_ids) {
+						send_change_scene(id, p->map_type);
+
+					}
+					// 포탈에서 GameRoom으로 이동
+					int room_id = get_game_room_id();
+					int boss_id = get_npc_id(p->map_type);
+					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, boss_id, ids);
+					//std::cout << "시작" << std::endl;
+				}
+				p->id_lock.unlock();
+				break;
+			}
+		}
+		else {
+			for (auto* p : portals) {
+				if (false == p->findPlayer(client_id)) continue;
+				p->id_lock.lock();
+				p->player_ids.erase(cl.id);
+				p->id_lock.unlock();
+
+				break;
+			}
+		}
+	}
+	break;
+	case CS_PACKET_GAME_START_READY:
+	{
+		cs_packet_game_start_ready* packet = reinterpret_cast<cs_packet_game_start_ready*>(p);
+
+		for (auto* p : game_room) {
+			p->ready_lock.lock();
+			if (false == p->FindPlayer(client_id)) { p->ready_lock.unlock(); continue; }
+			p->ready_player_cnt++;
+			if (p->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
+
+				for (int id : p->player_ids) {
+					send_game_start(id, p->player_ids, p->boss_id);
+				}
+				p->start_time = std::chrono::system_clock::now();
+				game_start(p->game_room_id);
+			}
+			p->ready_lock.unlock();
+			break;
+		}
+
+	}
+	break;
 	default:
 		std::cout << "이상한 패킷 수신\n";
 		break;
@@ -636,18 +822,117 @@ void Network::worker()
 				sizeof(SOCKADDR_IN) + 16, NULL, &exp_over->_wsa_over);
 		}
 		break;
-		case OP_ENEMY_MOVE:
+		case OP_BOSS_MOVE:
 			do_npc_move(client_id);
 			exp_over_pool.push(exp_over);
 			break;
-		case OP_ENEMY_ATTACK: {
+		case OP_BOSS_TARGETING_ATTACK:
+		{
 			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			do_npc_attack(client_id, target_id, target_id);
 			exp_over_pool.push(exp_over);
 		}
-							break;
+		break;
+		case OP_BOSS_TILE_ATTACK_START:
+		{
+			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			int pattern_type = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
+
+			// client_id -> boss_id
+			int pos_x = clients[client_id]->x;
+			int	pos_z = clients[client_id]->z;
+			int	pos_y = -pos_x - pos_z;
+			// 시작 위치를 중심으로 패턴 공격
+			// 공격 이펙트 보내고
+			// 서버에서 공격 처리할 이벤트 추가
+			switch (pattern_type)
+			{
+			case ONE_LINE:
+			{
+				int	dir = clients[client_id]->direction;
+
+				for (int i = 0; i < 8; ++i) {
+
+					timer_event t;
+					t.ev = EVENT_BOSS_TILE_ATTACK;
+					t.obj_id = client_id;
+					t.target_id = -1;
+					t.game_room_id = game_room_id;
+					t.x = MapInfo::HexCellAround[dir][0] * i + pos_x;
+					t.y = MapInfo::HexCellAround[dir][1] * i + pos_y;
+					t.z = MapInfo::HexCellAround[dir][2] * i + pos_z;
+					t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1 * i);
+					timer_queue.push(t);
+				}
+
+			}
+			break;
+			case SIX_LINE:
+				for (int dir = 0; dir < 6; ++dir) {
+					for (int i = 0; i < 8; ++i) {
+						timer_event t;
+						t.ev = EVENT_BOSS_TILE_ATTACK;
+						t.obj_id = client_id;
+						t.target_id = -1;
+						t.game_room_id = game_room_id;
+						t.x = MapInfo::HexCellAround[dir][0] * i + pos_x;
+						t.y = MapInfo::HexCellAround[dir][1] * i + pos_y;
+						t.z = MapInfo::HexCellAround[dir][2] * i + pos_z;
+						t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1 * i);
+						timer_queue.push(t);
+					}
+				}
+			break;
+			case AROUND:
+				break;
+			default:
+				std::cout << "wrong pattern type\n";
+				break;
+			}
+			//해당 게임 룸에 있는 모든 오브젝트한테 보내야됨
+			// gamestart도 여러번 들어가는듯
+			for (int id : game_room[game_room_id]->player_ids) {
+
+				send_effect(id, client_id, client_id, pattern_type);
+			}
+			exp_over_pool.push(exp_over);
+		}
+		break;
+		case OP_BOSS_TILE_ATTACK:
+		{
+			int pos_x = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			int pos_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
+			int pos_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)*2));
+			//do_npc_attack(client_id, target_id, target_id);
+			// 맞았을 때 처리
+			exp_over_pool.push(exp_over);
+		}
+		break;
 		default:
 			break;
 		}
+	}
+}
+
+void Network::game_start(int room_id)
+{
+	// mapinfo에서 패턴 읽어서 이벤트 등록
+	// 일단 지금은 bpm에 맞춰서 이벤트 등록
+	//int bpm = game_room[room_id]->bpm;
+	int bpm = 124;
+	int timeByBeat = 10 * 60 / (float)bpm; // 10 박자에 한번씩 범위 공격
+	int boss_id = game_room[room_id]->boss_id;
+
+	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
+
+	for (int i = 1; i < 10; ++i) {
+		timer_event t;
+		t.ev = EVENT_BOSS_TILE_ATTACK_START;
+		t.obj_id = boss_id;
+		t.target_id = rand() % 2;
+		t.game_room_id = room_id;
+		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		t.start_time = game_room[room_id]->start_time + std::chrono::seconds(timeByBeat * i);
+		timer_queue.push(t);
 	}
 }

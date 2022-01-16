@@ -2,19 +2,14 @@
 
 const short SERVER_PORT = 4000;
 
-const int  WORLD_HEIGHT = 8;
-const int  WORLD_WIDTH = 8;
-const int  MAX_NAME_SIZE = 20;
-const int  MAX_USER = 5000;
-const int MAX_NPC = 1;
-constexpr int NPC_ID_START = MAX_USER;
-constexpr int NPC_ID_END = MAX_USER + MAX_NPC - 1;
-constexpr int MAX_OBJECT = MAX_USER + MAX_NPC;
+
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_READ_MAP = 3;
 const char CS_PACKET_WRITE_MAP = 4;
+const char CS_PACKET_CHANGE_SCENE_READY = 5;
+const char CS_PACKET_GAME_START_READY = 6;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -23,6 +18,8 @@ const char SC_PACKET_REMOVE_OBJECT = 4;
 const char SC_PACKET_GAME_START = 5;
 const char SC_PACKET_ATTACK = 6;
 const char SC_PACKET_MAP_DATA = 7;
+const char SC_PACKET_CHANGE_SCENE = 8;
+const char SC_PACKET_EFFECT = 9;
 
 #pragma pack (push, 1)
 //client -> server
@@ -43,12 +40,24 @@ struct cs_packet_read_map {
 	unsigned char size;
 	char	type;
 };
+
 struct cs_packet_write_map {
 	unsigned char size;
 	char	type;
 	int id;
 	int x, y, z, w;
 	int color, block_type;
+};
+
+struct cs_packet_change_scene_ready {
+	unsigned char size;
+	char	type;
+	char is_ready;
+};
+
+struct cs_packet_game_start_ready {
+	unsigned char size;
+	char	type;
 };
 
 //server->client
@@ -96,8 +105,28 @@ struct sc_packet_game_start
 {
 	unsigned char size;
 	char type;
+	int player_id;
+	int id1;
+	int id2;
+	int id3;
+	int boss_id;
+};
+struct sc_packet_change_scene
+{
+	unsigned char size;
+	char type;
+	char scene_num;
 };
 
+struct sc_packet_effect 
+{
+	unsigned char size;
+	char type;
+	char effect_type;
+	char dir;
+	int id;
+	int target_id;
+};
 struct sc_packet_map_data
 {
 	unsigned char size;

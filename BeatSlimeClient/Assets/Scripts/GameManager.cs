@@ -50,9 +50,8 @@ public class GameManager : MonoBehaviour
     public DoomChi MidNote;
 
     //
-    public Network Net = new Network();
-    GameObject[] Objects = new GameObject[Protocol.CONSTANTS.MAX_OBJECT];
-
+    GameObject[] Objects = new GameObject[4];
+    int[] ids;
     int myPlayerID = -1;
     public ArrayList Mapdata = new ArrayList();
 
@@ -75,15 +74,18 @@ public class GameManager : MonoBehaviour
     }
     private void OnApplicationQuit()
     {
-        Net.CloseSocket();
+        FieldGameManager.Net.CloseSocket();
     }
     void Start()
     {
+        if (!FieldGameManager.Net.isOnline) FieldGameManager.Net.CreateAndConnect();
+        else {
+            FieldGameManager.Net.SendGameStartReadyPacket();
+        }
         //DEBUG
         enemy.GetComponent<HexCellPosition>().setInitPosition(1, 1);
         PM = PatternManager.data;
-
-        Net.CreateAndConnect();
+        ids = new int[4];
     }
 
     void FixedUpdate()
@@ -91,34 +93,20 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown("1"))
         {
             if (Mapdata.Count != 0)
-                Net.SendWriteMapPacket(Mapdata);
+                FieldGameManager.Net.SendWriteMapPacket(Mapdata);
         }
         else if (Input.GetKeyDown(KeyCode.BackQuote))
         {
-            Net.SendreadPacket();
+            FieldGameManager.Net.SendreadPacket();
         }
 
-        //if (Input.GetKeyDown("z"))
-        //{
-        //    if (!isGameStart)
-        //    {
-        //        PlaySound();
-        //        //offsetTime = 0;
-        //    }
-        //    else
-        //    {
-        //        int randomTickForTest = Random.Range(1, 6);
-        //        enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), player);
-        //        player.GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
-        //    }
-        //}
 
         if (bGameStart)
         {
             PlaySound();
         }
 
-        if (isGameStart && !Net.isOnline)
+        if (isGameStart && !FieldGameManager.Net.isOnline)
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -147,7 +135,7 @@ public class GameManager : MonoBehaviour
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
         }
-        else if (isGameStart && Net.isOnline)
+        else if (isGameStart && FieldGameManager.Net.isOnline)
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -176,7 +164,7 @@ public class GameManager : MonoBehaviour
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
         }
-        if (Net.isOnline)
+        if (FieldGameManager.Net.isOnline)
         {
             // 네트워크 메세지 큐
             if (Network.MessQueue.Count > 0)
@@ -201,6 +189,16 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
 
+                            ids[0] = p.id1;
+                            ids[1] = p.id2;
+                            ids[2] = p.id3;
+                            ids[3] = p.boss_id;
+                            int pid = ServerID_To_ClientID(p.player_id);
+                            Objects[pid] = player;
+                            myPlayerID = pid;
+                            Objects[3] = enemy;
+                            Objects[3].SetActive(true);
+                            
                             PlaySound();
                         }
                         break;
@@ -208,12 +206,12 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
-
+                            int pid = ServerID_To_ClientID(p.id);
                             //Debug.Log(p.id+"이동");
-                            Objects[p.id].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
-                            Objects[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (p.id < Protocol.CONSTANTS.MAX_USER)
-                                Objects[p.id].GetComponent<PlayerManager>().JumpTrig();
+                            Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
+                            Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                            if (pid < 3)// 플레이어 이면
+                                Objects[pid].GetComponent<PlayerManager>().JumpTrig();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_ATTACK:
@@ -226,38 +224,33 @@ public class GameManager : MonoBehaviour
                             //Debug.Log(p.id+"이동");
                             //Objects[p.id].GetComponent<HexCellPosition>().setDirection(p.direction);
 
+                            int target_id = ServerID_To_ClientID(p.target_id);
                             int randomTickForTest = 4;//Random.Range(1, 6);
-                            enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[p.target_id]);
-                            Objects[p.target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
+                            enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
+                            Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
                         {
                             Protocol.sc_packet_put_object p = Protocol.sc_packet_put_object.SetByteToVar(data);
-
+                            int pid = ServerID_To_ClientID(p.id);
+                            if (pid == myPlayerID) {
+                                Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                break; 
+                            }
                             //PutObject(p.type, p.id, p.x, p.y);
                             switch (p.obj_type)
                             {
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
                                         // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "플레이어 넣음");
-                                        Objects[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
-                                        Objects[p.id].SetActive(true);
-                                        Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
+                                        Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
+                                        Objects[pid].SetActive(true);
+                                        Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 
-                                        Objects[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         break;
                                     }
-                                case (byte)Protocol.OBJECT_TYPE.ENEMY:
-                                    {
-                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "마녀 넣음");
-
-                                        //Objects[p.id] = ObjectPool.instance.EnemyObjectQueue.Dequeue();
-                                        Objects[p.id] = enemy;
-                                        Objects[p.id].SetActive(true);
-                                        Objects[p.id].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                                    }
-                                    break;
                             }
 
                         }
@@ -265,15 +258,17 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_REMOVE_OBJECT:
                         {
                             Protocol.sc_packet_remove_object p = Protocol.sc_packet_remove_object.SetByteToVar(data);
-                            if (p.id < Protocol.CONSTANTS.MAX_USER)
+                            int pid = ServerID_To_ClientID(p.id);
+
+                            if (pid < 3)
                             {
-                                ObjectPool.instance.PlayerObjectQueue.Enqueue(Objects[p.id]);
-                                Objects[p.id].SetActive(false);
+                                ObjectPool.instance.PlayerObjectQueue.Enqueue(Objects[pid]);
+                                Objects[pid].SetActive(false);
                             }
                             else
                             {
-                                ObjectPool.instance.EnemyObjectQueue.Enqueue(Objects[p.id]);
-                                Objects[p.id].SetActive(false);
+                                ObjectPool.instance.EnemyObjectQueue.Enqueue(Objects[pid]);
+                                Objects[pid].SetActive(false);
                             }
 
                             //다른 플레이어면 다른플레이어 풀에
@@ -306,8 +301,35 @@ public class GameManager : MonoBehaviour
                             //ReMoveObject(p.id);
                         }
                         break;
+                    case Protocol.CONSTANTS.SC_PACKET_EFFECT:
+                        {
+                            Protocol.sc_packet_effect p = Protocol.sc_packet_effect.SetByteToVar(data);
+                            int pid = ServerID_To_ClientID(p.id);
+                            int tid = ServerID_To_ClientID(p.target_id);
+
+                            int start_x = Objects[pid].GetComponent<HexCellPosition>().coordinates.X;
+                            int start_y = Objects[pid].GetComponent<HexCellPosition>().coordinates.Y;
+                            int start_z = Objects[pid].GetComponent<HexCellPosition>().coordinates.Z;
+                            int start_w = Objects[pid].GetComponent<HexCellPosition>().coordinates.W;
+                            switch ((Protocol.PATTERN_TYPE)p.effect_type)
+                            {
+                                case Protocol.PATTERN_TYPE.ONE_LINE:
+                                    EffectManager.instance.BossTileEffect0(start_x, start_y, start_z, start_w, (HexDirection)p.dir);
+                                    break;
+                                case Protocol.PATTERN_TYPE.SIX_LINE:
+                                    EffectManager.instance.BossTileEffect1(start_x, start_y, start_z, start_w);
+                                    break;
+                                case Protocol.PATTERN_TYPE.AROUND:
+                                    break;
+                            }
+                            //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));
+
+                            //Debug.Log(start_x+ " " + start_y + " " + start_z + " " + start_w);
+                            //EffectManager.instance.BossTileEffect1(0, 0, 0, 0);
+                        }
+                            break;
                     default:
-                        Debug.Log("이상한 타입이네");
+                        Debug.Log("이상한 타입이네" + type);
                         break;
                 }
             }
@@ -322,7 +344,15 @@ public class GameManager : MonoBehaviour
     //        yield return null;
     //    }
     //}
-
+    int ServerID_To_ClientID(int id)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            if (id == ids[i]) return i;
+        }
+        Debug.Log("아이디가 없음");
+        return -1;
+    }
     public void PlaySound()
     {
 

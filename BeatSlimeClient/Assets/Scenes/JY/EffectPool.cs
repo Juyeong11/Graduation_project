@@ -2,16 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class ObjectInfo
+public class EffectPool : MonoBehaviour
 {
-    public GameObject goPrefeb;
-    public int count;
-    public Transform tfPoolParent;
-}
-public class ObjectPool : MonoBehaviour
-{
-    public static ObjectPool instance;
+
+    public static EffectPool instance;
 
 
     public Queue<GameObject> PlayerObjectQueue = new Queue<GameObject>();
@@ -19,14 +13,14 @@ public class ObjectPool : MonoBehaviour
 
 
     public GameObject PlayerPrefeb;
-    public GameObject OtherPlayerPrefeb;
+    public GameObject TileEffectPrefeb;
     public GameObject EnemyPrefeb;
     // Start is called before the first frame update
     void Start()
     {
         instance = this;
 
-        PlayerObjectQueue = InsertQueue(Protocol.CONSTANTS.MAX_USER - 1, OtherPlayerPrefeb, null);
+        PlayerObjectQueue = InsertQueue(10, TileEffectPrefeb, null);
     }
 
     Queue<GameObject> InsertQueue(int count, GameObject prefeb, Transform tr)
