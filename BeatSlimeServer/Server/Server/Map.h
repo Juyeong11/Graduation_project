@@ -7,6 +7,10 @@ class MapInfo {
 	int halfLength;
 	int size;
 public:
+	static constexpr int HexCellAround[6][3] = {
+	{ 1, -1, 0 }, { 1, 0, -1 }, { 0, 1, -1 },
+	{ -1, 1, 0 }, { -1, 0, 1 }, { 0, -1, 1 }
+	};
 	int* map;
 	int bpm;
 
@@ -32,19 +36,23 @@ class Gameobject;
 class GameRoom
 {
 public:
+	int game_room_id;
 	int map_type;
 	float bpm;
 	std::chrono::system_clock::time_point start_time{};
 	// atomic으로는 동시에 게임 시작하는걸 막을 수가 없을 듯
 	std::mutex state_lock;
 	bool isGaming;
+
 	int player_ids[MAX_IN_GAME_PLAYER];
+	int boss_id;
+
 	std::mutex ready_lock;
 	int ready_player_cnt;
 	//std::mutex id_insert_lock;
 
-	int boss_id;
 	GameRoom();
+	GameRoom(int id);
 
 	void GameRoomInit(int mapType, float BPM, int Boss, int* Players);
 	bool FindPlayer(int id);

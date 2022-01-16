@@ -42,7 +42,7 @@ Network::Network() {
 	DB = new DataBase;
 
 	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
-		game_room[i] = new GameRoom;
+		game_room[i] = new GameRoom(i);
 	}
 	for (int i = 0; i < MAP_NUM; ++i) {
 		maps[i] = new MapInfo;
@@ -99,7 +99,7 @@ void Network::send_change_scene(int c_id, int map_type)
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
 
-void Network::send_game_start(int c_id, int ids[3])
+void Network::send_game_start(int c_id, int ids[3], int boss_id)
 {
 	sc_packet_game_start packet;
 	packet.type = SC_PACKET_GAME_START;
@@ -108,16 +108,32 @@ void Network::send_game_start(int c_id, int ids[3])
 	packet.id1 = ids[0];
 	packet.id2 = ids[1];
 	packet.id3 = ids[2];
+	packet.boss_id = boss_id;
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 
-	for (int i = 0; i < MAX_IN_GAME_PLAYER;++i) {
+	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 		send_put_object(c_id, ids[i]);
 	}
 
+}
+void Network::send_effect(int client_id,int actor_id, int target_id, int effect_type)
+{
+	sc_packet_effect packet;
+	packet.type = SC_PACKET_EFFECT;
+	packet.size = sizeof(packet);
+	packet.effect_type = effect_type;
+	packet.id = actor_id;
+	packet.target_id = target_id;
+	packet.dir = clients[actor_id]->direction;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[client_id])->do_send(ex_over);
 }
 void Network::send_move_object(int c_id, int mover)
 {
@@ -169,15 +185,6 @@ void Network::send_put_object(int c_id, int target) {
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
-
-	if (true == is_npc(target) && false == reinterpret_cast<Npc*>(clients[target])->is_active) {
-		reinterpret_cast<Npc*>(clients[target])->is_active = true;
-		timer_event t;
-		t.ev = EVENT_BOSS_MOVE;
-		t.obj_id = target;
-		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
-		timer_queue.push(t);
-	}
 }
 
 void Network::send_remove_object(int c_id, int victim)
@@ -287,7 +294,7 @@ int Network::get_npc_id(int monsterType) {
 }
 int Network::get_game_room_id()
 {
-	for (int i = 0; i < MAX_GAME_ROOM_NUM;++i) {
+	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
 		game_room[i]->state_lock.lock();
 		if (false == game_room[i]->isGaming) {
 			game_room[i]->isGaming = true;
@@ -438,12 +445,24 @@ void Network::process_packet(int client_id, unsigned char* p)
 		short& z = cl.z;
 		cl.direction = packet->direction;
 		switch (packet->direction) {
-		case DIR::LEFTUP:		if (true) { x--; z++; break; }
-		case DIR::UP:			if (true) { y--; z++;  break; }
-		case DIR::RIGHTUP:		if (true) { x++; y--; break; }
-		case DIR::LEFTDOWN:		if (true) { x--; y++; break; }
-		case DIR::DOWN:			if (true) { y++; z--; break; }
-		case DIR::RIGHTDOWN:	if (true) { x++; z--; break; }
+		case DIR::LEFTUP:
+			if (true) { x--; z++; }
+			break;
+		case DIR::UP:
+			if (true) { y--; z++; }
+			break;
+		case DIR::RIGHTUP:
+			if (true) { x++; y--; }
+			break;
+		case DIR::LEFTDOWN:
+			if (true) { x--; y++; }
+			break;
+		case DIR::DOWN:
+			if (true) { y++; z--; }
+			break;
+		case DIR::RIGHTDOWN:
+			if (true) { x++; z--; }
+			break;
 		default:
 			std::cout << "Invalid move in client " << client_id << std::endl;
 			exit(-1);
@@ -687,8 +706,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 			if (p->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
 
 				for (int id : p->player_ids) {
-					send_game_start(id, p->player_ids);
+					send_game_start(id, p->player_ids, p->boss_id);
 				}
+				p->start_time = std::chrono::system_clock::now();
+				game_start(p->game_room_id);
 			}
 			p->ready_lock.unlock();
 			break;
@@ -805,20 +826,113 @@ void Network::worker()
 			do_npc_move(client_id);
 			exp_over_pool.push(exp_over);
 			break;
-		case OP_BOSS_TARGETING_ATTACK: 
+		case OP_BOSS_TARGETING_ATTACK:
 		{
 			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			do_npc_attack(client_id, target_id, target_id);
 			exp_over_pool.push(exp_over);
 		}
 		break;
-		case OP_BOSS_TILE_ATTACK: 
+		case OP_BOSS_TILE_ATTACK_START:
 		{
+			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			int pattern_type = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
 
+			// client_id -> boss_id
+			int pos_x = clients[client_id]->x;
+			int	pos_z = clients[client_id]->z;
+			int	pos_y = -pos_x - pos_z;
+			// 시작 위치를 중심으로 패턴 공격
+			// 공격 이펙트 보내고
+			// 서버에서 공격 처리할 이벤트 추가
+			switch (pattern_type)
+			{
+			case ONE_LINE:
+			{
+				int	dir = clients[client_id]->direction;
+
+				for (int i = 0; i < 8; ++i) {
+
+					timer_event t;
+					t.ev = EVENT_BOSS_TILE_ATTACK;
+					t.obj_id = client_id;
+					t.target_id = -1;
+					t.game_room_id = game_room_id;
+					t.x = MapInfo::HexCellAround[dir][0] * i + pos_x;
+					t.y = MapInfo::HexCellAround[dir][1] * i + pos_y;
+					t.z = MapInfo::HexCellAround[dir][2] * i + pos_z;
+					t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1 * i);
+					timer_queue.push(t);
+				}
+
+			}
+			break;
+			case SIX_LINE:
+				for (int dir = 0; dir < 6; ++dir) {
+					for (int i = 0; i < 8; ++i) {
+						timer_event t;
+						t.ev = EVENT_BOSS_TILE_ATTACK;
+						t.obj_id = client_id;
+						t.target_id = -1;
+						t.game_room_id = game_room_id;
+						t.x = MapInfo::HexCellAround[dir][0] * i + pos_x;
+						t.y = MapInfo::HexCellAround[dir][1] * i + pos_y;
+						t.z = MapInfo::HexCellAround[dir][2] * i + pos_z;
+						t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1 * i);
+						timer_queue.push(t);
+					}
+				}
+			break;
+			case AROUND:
+				break;
+			default:
+				std::cout << "wrong pattern type\n";
+				break;
+			}
+			//해당 게임 룸에 있는 모든 오브젝트한테 보내야됨
+			// gamestart도 여러번 들어가는듯
+			for (int id : game_room[game_room_id]->player_ids) {
+
+				send_effect(id, client_id, client_id, pattern_type);
+			}
+			exp_over_pool.push(exp_over);
+		}
+		break;
+		case OP_BOSS_TILE_ATTACK:
+		{
+			int pos_x = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			int pos_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
+			int pos_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)*2));
+			//do_npc_attack(client_id, target_id, target_id);
+			// 맞았을 때 처리
+			exp_over_pool.push(exp_over);
 		}
 		break;
 		default:
 			break;
 		}
+	}
+}
+
+void Network::game_start(int room_id)
+{
+	// mapinfo에서 패턴 읽어서 이벤트 등록
+	// 일단 지금은 bpm에 맞춰서 이벤트 등록
+	//int bpm = game_room[room_id]->bpm;
+	int bpm = 124;
+	int timeByBeat = 10 * 60 / (float)bpm; // 10 박자에 한번씩 범위 공격
+	int boss_id = game_room[room_id]->boss_id;
+
+	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
+
+	for (int i = 1; i < 10; ++i) {
+		timer_event t;
+		t.ev = EVENT_BOSS_TILE_ATTACK_START;
+		t.obj_id = boss_id;
+		t.target_id = rand() % 2;
+		t.game_room_id = room_id;
+		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		t.start_time = game_room[room_id]->start_time + std::chrono::seconds(timeByBeat * i);
+		timer_queue.push(t);
 	}
 }

@@ -6,10 +6,15 @@
 #include"Client.h"
 
 
-enum EVENT_TYPE { EVENT_BOSS_MOVE, EVENT_BOSS_TARGETING_ATTACK, EVENT_BOSS_TILE_ATTACK, EVENT_PLAYER_PARRYING};
+enum EVENT_TYPE { EVENT_BOSS_MOVE, EVENT_BOSS_TARGETING_ATTACK, EVENT_PLAYER_PARRYING, 
+	EVENT_BOSS_TILE_ATTACK_START, EVENT_BOSS_TILE_ATTACK
+};
+enum PATTERN_TYPE{ONE_LINE, SIX_LINE, AROUND };
 struct timer_event {
 	int obj_id;
 	int target_id;
+	int game_room_id;
+	int x, y,z;
 	std::chrono::system_clock::time_point start_time;
 	EVENT_TYPE ev;
 	//int target_id;
@@ -57,7 +62,8 @@ public:
 	void send_remove_object(int client_id, int victim_id);
 	void send_map_data(int client_id, char* data, int nShell);
 	void send_change_scene(int client_id, int map_type);
-	void send_game_start(int client_id, int ids[3]);
+	void send_game_start(int client_id, int ids[3],int boss_id);
+	void send_effect(int client_id, int actor_id,int target_id,int effect_type);
 	void disconnect_client(int client_id);
 
 	bool is_near(int a, int b)
@@ -93,6 +99,7 @@ public:
 			clients[i]->z = 0;
 			clients[i]->id = i;
 			clients[i]->state = ST_ACCEPT;
+			clients[i]->direction = DOWN;
 			
 		}
 	}
@@ -125,9 +132,17 @@ public:
 						ex_over->_comp_op = OP_BOSS_TARGETING_ATTACK;
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
 						break;
+					case EVENT_BOSS_TILE_ATTACK_START:
+						ex_over->_comp_op = OP_BOSS_TILE_ATTACK_START;
+						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.target_id;// 타겟 id가 패턴 종류 구분
+
+						break;
 					case EVENT_BOSS_TILE_ATTACK:
 						ex_over->_comp_op = OP_BOSS_TILE_ATTACK;
-						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
+						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.x;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.y;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)*2) = ev.z;
 						break;
 					case EVENT_PLAYER_PARRYING:
 						ex_over->_comp_op = OP_PLAYER_PARRYING;
@@ -154,6 +169,8 @@ public:
 	void process_packet(int client_id, unsigned char* p);
 
 	void worker();
+
+	void game_start(int room_id);
 private:
 	concurrency::concurrent_priority_queue<timer_event> timer_queue;
 	concurrency::concurrent_queue<EXP_OVER*> exp_over_pool;

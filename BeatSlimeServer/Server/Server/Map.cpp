@@ -1,5 +1,5 @@
 #include"stdfx.h"
-#include"Client.h"
+#include"Network.h"
 #include"Map.h"
 
 void MapInfo::SetMap(std::string file_name)
@@ -29,17 +29,12 @@ GameRoom::GameRoom() :bpm(0) {
 	isGaming = false;
 	map_type = -1;
 	ready_player_cnt = 0;
+	game_room_id = -1;
 }
-
-void GameRoom::GameRoomInit(int mapType, float BPM, int Boss, int* Players)
-{
-	map_type = mapType;
-	bpm = BPM;
-	start_time = std::chrono::system_clock::now();
-	isGaming = true;
-
-	boss_id = Boss;
-	memcpy_s(player_ids,MAX_IN_GAME_PLAYER*sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
+GameRoom::GameRoom(int id) : game_room_id(id) {
+	isGaming = false;
+	map_type = -1;
+	ready_player_cnt = 0;
 }
 
 bool GameRoom::FindPlayer(int id)
@@ -48,4 +43,15 @@ bool GameRoom::FindPlayer(int id)
 		if (p == id) return true;
 	}
 	return false;
+}
+
+void GameRoom::GameRoomInit(int mapType, float BPM, int Boss, int* Players)
+{
+	map_type = mapType;
+	bpm = BPM;
+	
+	isGaming = true;
+
+	boss_id = Boss;
+	memcpy_s(player_ids,MAX_IN_GAME_PLAYER*sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
 }

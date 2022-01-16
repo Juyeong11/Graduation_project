@@ -34,10 +34,11 @@ namespace Protocol
         public const byte SC_PACKET_ATTACK = 6;
         public const byte SC_PACKET_MAP_DATA = 7;
         public const byte SC_PACKET_CHANGE_SCENE = 8;
+        public const byte SC_PACKET_EFFECT = 9;
     }
     enum DIR
     {
-        UP, DOWN, LEFTUP, RIGHTUP, LEFTDOWN, RIGHTDOWN
+        LEFTUP, UP, RIGHTUP, LEFTDOWN, DOWN, RIGHTDOWN
     };
 
     enum OBJECT_TYPE
@@ -45,7 +46,7 @@ namespace Protocol
         PLAPER, ENEMY
     };
 
-
+    enum PATTERN_TYPE { ONE_LINE, SIX_LINE, AROUND };
     public class ISerializeble<T> where T : class
     {
         public ISerializeble() { }
@@ -180,6 +181,18 @@ namespace Protocol
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_effect : ISerializeble<sc_packet_effect>
+    {
+        public byte size;
+        public byte type;
+        public byte effect_type;
+        public byte dir;
+        public int id;
+        public int target_id;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class sc_packet_put_object : ISerializeble<sc_packet_put_object>
     {
         public byte size;
@@ -211,6 +224,7 @@ namespace Protocol
         public int id1;
         public int id2;
         public int id3;
+        public int boss_id;
     }
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

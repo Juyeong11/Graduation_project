@@ -19,6 +19,7 @@ const char SC_PACKET_GAME_START = 5;
 const char SC_PACKET_ATTACK = 6;
 const char SC_PACKET_MAP_DATA = 7;
 const char SC_PACKET_CHANGE_SCENE = 8;
+const char SC_PACKET_EFFECT = 9;
 
 #pragma pack (push, 1)
 //client -> server
@@ -108,12 +109,23 @@ struct sc_packet_game_start
 	int id1;
 	int id2;
 	int id3;
+	int boss_id;
 };
 struct sc_packet_change_scene
 {
 	unsigned char size;
 	char type;
 	char scene_num;
+};
+
+struct sc_packet_effect 
+{
+	unsigned char size;
+	char type;
+	char effect_type;
+	char dir;
+	int id;
+	int target_id;
 };
 struct sc_packet_map_data
 {

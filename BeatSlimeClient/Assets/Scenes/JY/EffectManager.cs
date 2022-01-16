@@ -19,7 +19,7 @@ public class EffectManager : MonoBehaviour
         return new Vector3(x * 0.866f, w + 0.2f, x * 0.5f + z * 1f);
     }
     // 1방향 공격
-    public IEnumerator BossTileEffect0(int start_x, int start_y, int start_z, int start_w, HexDirection dir)
+    public IEnumerator OneLineTileEffect(int start_x, int start_y, int start_z, int start_w, HexDirection dir)
     {
         float t = 0.0f;
         int MAX_LENGTH = 6;
@@ -33,12 +33,16 @@ public class EffectManager : MonoBehaviour
         }
 
     }
+    public void BossTileEffect0(int start_x, int start_y, int start_z, int start_w, HexDirection dir)
+    {
+        StartCoroutine(OneLineTileEffect(start_x, start_y, start_z, start_w,dir));
+    }
     // 6방향 공격
     public void BossTileEffect1(int start_x, int start_y, int start_z, int start_w)
     {
         for (int i = 0; i < 6; ++i)
         {
-            StartCoroutine(BossTileEffect0(start_x, start_y, start_z, start_w, (HexDirection)i));
+            StartCoroutine(OneLineTileEffect(start_x, start_y, start_z, start_w, (HexDirection)i));
         }
     }
 
