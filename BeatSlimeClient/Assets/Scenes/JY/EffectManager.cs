@@ -6,6 +6,7 @@ public class EffectManager : MonoBehaviour
 {
     static public EffectManager instance;
     public GameObject TileEffectPrefab;
+    public GameObject PlayerAttackEffectPrefab;
 
     int[,] around = new int[6, 3] { { 1, -1, 0 }, { 1, 0, -1 }, { 0, 1, -1 }, { -1, 1, 0 }, { -1, 0, 1 }, { 0, -1, 1 } };
     // Start is called before the first frame update
@@ -35,7 +36,7 @@ public class EffectManager : MonoBehaviour
     }
     public void BossTileEffect0(int start_x, int start_y, int start_z, int start_w, HexDirection dir)
     {
-        StartCoroutine(OneLineTileEffect(start_x, start_y, start_z, start_w,dir));
+        StartCoroutine(OneLineTileEffect(start_x, start_y, start_z, start_w, dir));
     }
     // 6방향 공격
     public void BossTileEffect1(int start_x, int start_y, int start_z, int start_w)
@@ -46,4 +47,9 @@ public class EffectManager : MonoBehaviour
         }
     }
 
+    public void PlayerAttackEffect0(int start_x, int start_y, int start_z, int start_w)
+    {
+        for (int dir = 0; dir < 6; ++dir)
+            Instantiate(PlayerAttackEffectPrefab, GetHexCellPosition(around[(int)dir, 0] + start_x, around[(int)dir, 1] + start_y, around[(int)dir, 2] + start_z, start_w), Quaternion.identity);
+    }
 }
