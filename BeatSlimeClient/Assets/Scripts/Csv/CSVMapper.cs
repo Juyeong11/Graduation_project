@@ -21,12 +21,6 @@ public class CSVMapper : MonoBehaviour
             int c = int.Parse(datas[i]["color"].ToString());
             int t = int.Parse(datas[i]["type"].ToString());
 
-            GameObject tmpcell = Instantiate(MM.grid.cellType[c]);
-            tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
-            tmpcell.name = "cell" + MapMaker.cellId++;
-            tmpcell.transform.parent = gameObject.transform;
-            MM.grid.cellMaps.Add(tmpcell, x, y, z, w);
-
             Protocol.Map p_tempcell = new Protocol.Map();
             p_tempcell.type = t;
             p_tempcell.x = x;
@@ -34,6 +28,13 @@ public class CSVMapper : MonoBehaviour
             p_tempcell.z = z;
             p_tempcell.w = w;
             p_tempcell.color = c;
+            p_tempcell.id = MapMaker.cellId;
+
+            GameObject tmpcell = Instantiate(MM.grid.cellType[c]);
+            tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
+            tmpcell.name = "cell" + MapMaker.cellId++;
+            tmpcell.transform.parent = gameObject.transform;
+            MM.grid.cellMaps.Add(tmpcell, x, y, z, w);
 
             MM.Mapdata.Add(p_tempcell);
         }
@@ -51,13 +52,6 @@ public class CSVMapper : MonoBehaviour
             int c = int.Parse(landdatas[i]["color"].ToString());
             int t = int.Parse(landdatas[i]["type"].ToString());
 
-            GameObject tmpcell = Instantiate(MM.grid.LandType[c]);
-            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox,oy,oz,or);
-            tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
-            tmpcell.name = "land" + MapMaker.landId++;
-            tmpcell.transform.parent = gameObject.transform;
-            //MM.grid.cellMaps.Add(tmpcell, x, y, z, w);
-
             Protocol.LandScape p_templand = new Protocol.LandScape();
             p_templand.type = t;
             p_templand.x = x;
@@ -69,6 +63,14 @@ public class CSVMapper : MonoBehaviour
             p_templand.offZ = oz;
             p_templand.offRotate = or;
             p_templand.color = c;
+            p_templand.id = MapMaker.landId;
+
+            GameObject tmpcell = Instantiate(MM.grid.LandType[c]);
+            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox,oy,oz,or);
+            tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
+            tmpcell.name = "land" + MapMaker.landId++;
+            tmpcell.transform.parent = gameObject.transform;
+            //MM.grid.cellMaps.Add(tmpcell, x, y, z, w);
 
             MM.LandScapedata.Add(p_templand);
         }

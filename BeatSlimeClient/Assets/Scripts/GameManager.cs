@@ -48,7 +48,7 @@ public class GameManager : MonoBehaviour
     public int alreadyMoved;
 
     public DoomChi MidNote;
-
+    public DoomChi MidANote;
     //
     GameObject[] Objects = new GameObject[4];
     int[] ids;
@@ -166,7 +166,7 @@ public class GameManager : MonoBehaviour
         }
         if (FieldGameManager.Net.isOnline)
         {
-            // ³×Æ®¿öÅ© ¸Þ¼¼Áö Å¥
+            // ï¿½ï¿½Æ®ï¿½ï¿½Å© ï¿½Þ¼ï¿½ï¿½ï¿½ Å¥
             if (Network.MessQueue.Count > 0)
             {
                 byte[] data = Network.MessQueue.Dequeue();
@@ -207,10 +207,10 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
                             int pid = ServerID_To_ClientID(p.id);
-                            //Debug.Log(p.id+"ÀÌµ¿");
+                            //Debug.Log(p.id+"ï¿½Ìµï¿½");
                             Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
                             Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (pid == myPlayerID)// ÇÃ·¹ÀÌ¾î ÀÌ¸é
+                            if (pid == myPlayerID)// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ì¸ï¿½
                                 Objects[pid].GetComponent<PlayerManager>().JumpTrig();
                             else if(pid < 3)
                                 Objects[pid].GetComponent<InGameOtherPlayerManager>().JumpTrig();
@@ -220,11 +220,11 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_ATTACK:
                         {
                             Protocol.sc_packet_attack p = Protocol.sc_packet_attack.SetByteToVar(data);
-                            //Debug.Log(p.id+"°¡ " + p.target_id + "¸¦ °ø°Ý");
+                            //Debug.Log(p.id+"ï¿½ï¿½ " + p.target_id + "ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
                             //MoveObject(p.type, p.id, p.x, p.y);
                             //Debug.Log(p.x + "," + p.y + ", " + p.z);
 
-                            //Debug.Log(p.id+"ÀÌµ¿");
+                            //Debug.Log(p.id+"ï¿½Ìµï¿½");
                             //Objects[p.id].GetComponent<HexCellPosition>().setDirection(p.direction);
 
                             int target_id = ServerID_To_ClientID(p.target_id);
@@ -246,7 +246,7 @@ public class GameManager : MonoBehaviour
                             {
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
-                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "ÇÃ·¹ÀÌ¾î ³ÖÀ½");
+                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½");
                                         Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                         Objects[pid].SetActive(true);
                                         Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
@@ -274,8 +274,8 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].SetActive(false);
                             }
 
-                            //´Ù¸¥ ÇÃ·¹ÀÌ¾î¸é ´Ù¸¥ÇÃ·¹ÀÌ¾î Ç®¿¡
-                            //ÀûÀÌ¸é ÀûÇ®¿¡ ³ÖÀÚ
+                            //ï¿½Ù¸ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ ï¿½Ù¸ï¿½ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ Ç®ï¿½ï¿½
+                            //ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½Ç®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                             //ReMoveObject(p.id);
                         }
                         break;
@@ -299,8 +299,8 @@ public class GameManager : MonoBehaviour
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
                             }
 
-                            //´Ù¸¥ ÇÃ·¹ÀÌ¾î¸é ´Ù¸¥ÇÃ·¹ÀÌ¾î Ç®¿¡
-                            //ÀûÀÌ¸é ÀûÇ®¿¡ ³ÖÀÚ
+                            //ï¿½Ù¸ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿½ ï¿½Ù¸ï¿½ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ Ç®ï¿½ï¿½
+                            //ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½Ç®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                             //ReMoveObject(p.id);
                         }
                         break;
@@ -332,7 +332,7 @@ public class GameManager : MonoBehaviour
                         }
                             break;
                     default:
-                        Debug.Log("ÀÌ»óÇÑ Å¸ÀÔÀÌ³×" + type);
+                        Debug.Log("ï¿½Ì»ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½Ì³ï¿½" + type);
                         break;
                 }
             }
@@ -353,7 +353,7 @@ public class GameManager : MonoBehaviour
         {
             if (id == ids[i]) return i;
         }
-        Debug.Log("¾ÆÀÌµð°¡ ¾øÀ½");
+        Debug.Log("ï¿½ï¿½ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½");
         return -1;
     }
     public void PlaySound()
@@ -376,19 +376,22 @@ public class GameManager : MonoBehaviour
         {
             if (beatCounter <= JudgementTiming)
             {
-                //MidNote.notePerfect();
-                return 1;  //ÀÏÂï ´©¸§
+                MidNote.notePerfect();
+
+                //DEBUG : ï¿½Ð¸ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ ï¿½Úµå¸¦
+                //MidANote.notePerfect();
+                return 1;  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             }
             else if (timeByBeat - beatCounter <= JudgementTiming)
             {
                 //MidNote.notePerfect();
-                return 1;   //´Ê°Ô ´©¸§
+                return 1;   //ï¿½Ê°ï¿½ ï¿½ï¿½ï¿½ï¿½
             }
             else
             {
                 //MidNote.noteEnd();
                 Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
-                return 0;   //Àß¸ø ´©¸§
+                return 0;   //ï¿½ß¸ï¿½ ï¿½ï¿½ï¿½ï¿½
             }
         }
         else

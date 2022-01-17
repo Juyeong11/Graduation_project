@@ -14,6 +14,8 @@ public class PatternManager : MonoBehaviour
     public Pattern SettedPattern;
     public Pattern CastedPattern;
 
+    public MovementNoteFactory Factory;
+
     private void Awake()
     {
         pattern = new List<Pattern>();
@@ -33,13 +35,21 @@ public class PatternManager : MonoBehaviour
 
         for (int i = 0; i < datas.Count; ++i)
         {
+            ///PATTERN LOAD
             if (datas[i]["noteType"].ToString() == "0")
                 continue;
 
             if (int.Parse(datas[i]["bar"].ToString()) != 0)
                 preBar = int.Parse(datas[i]["bar"].ToString());
 
-            pattern.Add(new Pattern(datas[i], preBar));
+            Pattern tmpP = new Pattern(datas[i], preBar);
+            pattern.Add(tmpP);
+
+            //DEBUG : 보스의 유도 공격만!
+            if (tmpP.noteType == 1)
+            {
+                Factory.attackNotesBeats.Add(tmpP.rhythmBeat.GetBeatTime());
+            }
         }
         yield return null;
     }
