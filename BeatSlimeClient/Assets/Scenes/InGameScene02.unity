@@ -1299,7 +1299,7 @@ MonoBehaviour:
   - {fileID: 526888819}
   - {fileID: 93383264}
   - {fileID: 2056314081}
-  - {fileID: 1947702929}
+  - {fileID: 5085428334478328508}
   - {fileID: 1047969358}
   - {fileID: 768859891}
   - {fileID: 534182843}
@@ -1641,6 +1641,7 @@ MonoBehaviour:
     x: 0
     z: 0
     w: 0
+  direction: 0
   landOffsetX: 0
   landOffsetY: 0
   landOffsetZ: 0
@@ -2669,7 +2670,6 @@ Transform:
   m_Father: {fileID: 1756485884}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-
 --- !u!1 &1936533664
 GameObject:
   m_ObjectHideFlags: 0
@@ -2732,7 +2732,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 21
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-
 --- !u!1 &1966644516
 GameObject:
   m_ObjectHideFlags: 0
@@ -3270,6 +3269,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f231ab97c39217f4591707671f32053e, type: 3}
+--- !u!1 &5085428334478328508 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8763948681124740672, guid: f231ab97c39217f4591707671f32053e, type: 3}
+  m_PrefabInstance: {fileID: 5085428334478328507}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7696573391692351908
 PrefabInstance:
   m_ObjectHideFlags: 0
