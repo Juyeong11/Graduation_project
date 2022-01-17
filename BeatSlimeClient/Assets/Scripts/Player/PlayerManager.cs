@@ -15,6 +15,7 @@ public class PlayerManager : MonoBehaviour
     public UnityEvent onPlayerFly;
 
     private bool isFly = false;
+    bool isReady = false;
 
     public playerState state;
     public PlayerKeyHandler handle;     //Invalid
@@ -81,8 +82,30 @@ public class PlayerManager : MonoBehaviour
             KeyHandler();
             PlayerRotateToLookAt();
             PlayerWCheck();
+            PlayerPortalCheck();
             BallBeatCheck();
         }
+    }
+    public void PlayerPortalCheck()
+    {
+        // 클라에서 플레이어가 포탈에 있는지 위치 검사 후 맞다면 -> 서버에 패킷 전송 -> 서버에서 해당 좌표가 포탈이 맞는지 확인
+        // -> 맞다면 ready상태 이펙트 패킷 전송 -> 3명이 다 준비되면 씬 전환
+
+        // 포탈 타일인지 확인 지금은 0,0,0     1,0,-1     0,1,-1로 함 -> 씬 전환 잘되면 Cell에 type 추가해 비교하는 방법으로 바꾸자
+        if(selfCoord.coordinates.X == 3 && selfCoord.coordinates.Z == -3 ||
+            selfCoord.coordinates.X == 3 && selfCoord.coordinates.Z == -2 ||
+            selfCoord.coordinates.X == 2 && selfCoord.coordinates.Z == -2)
+        {
+            if (isReady) return;
+            //FieldGameManager.Net.SendChangeSceneReadyPacket(1);
+            isReady = true;
+            return;
+        }
+        else if (isReady)
+        {
+            //FieldGameManager.Net.SendChangeSceneReadyPacket(0);
+        }
+        isReady = false;
     }
 
     public void PlayerWCheck()
@@ -181,13 +204,13 @@ public class PlayerManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Q) && KeyCheck(KeyCode.Q))
         {
-            if (GameManager.data.Net.isOnline)
+            if (FieldGameManager.Net.isOnline)
             {
                 //Debug.Log("키 전송");
                 // 서버에 이동 전송
                 GameManager.data.setMoved();
 
-                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.LEFTUP);
+                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTUP);
             }
             else
             {
@@ -204,11 +227,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
         {
-            if (GameManager.data.Net.isOnline)
+            if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
-                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.UP);
+                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.UP);
             }
             else
             {
@@ -225,11 +248,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.E) && KeyCheck(KeyCode.E))
         {
-            if (GameManager.data.Net.isOnline)
+            if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
-                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
+                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
             }
             else
             {
@@ -247,11 +270,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.A) && KeyCheck(KeyCode.A))
         {
-            if (GameManager.data.Net.isOnline)
+            if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
-                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
+                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
             }
             else
             {
@@ -268,11 +291,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.S) && KeyCheck(KeyCode.S))
         {
-            if (GameManager.data.Net.isOnline)
+            if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
-                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.DOWN);
+                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.DOWN);
             }
             else
             {
@@ -289,11 +312,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.D) && KeyCheck(KeyCode.D))
         {
-            if (GameManager.data.Net.isOnline)
+            if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
                 // 서버에 이동 전송
-                GameManager.data.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
+                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
             }
             else
             {

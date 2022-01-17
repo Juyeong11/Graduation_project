@@ -23,6 +23,8 @@ namespace Protocol
         public const byte CS_PACKET_MOVE = 2;
         public const byte CS_PACKET_READ_MAP = 3;
         public const byte CS_PACKET_WRITE_MAP = 4;
+        public const byte CS_PACKET_CHANGE_SCENE_READY = 5;
+        public const byte CS_PACKET_GAME_START_READY = 6;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -31,10 +33,12 @@ namespace Protocol
         public const byte SC_PACKET_GAME_START = 5;
         public const byte SC_PACKET_ATTACK = 6;
         public const byte SC_PACKET_MAP_DATA = 7;
+        public const byte SC_PACKET_CHANGE_SCENE = 8;
+        public const byte SC_PACKET_EFFECT = 9;
     }
     enum DIR
     {
-        UP, DOWN, LEFTUP, RIGHTUP, LEFTDOWN, RIGHTDOWN
+        LEFTUP, UP, RIGHTUP, LEFTDOWN, DOWN, RIGHTDOWN
     };
 
     enum OBJECT_TYPE
@@ -42,7 +46,7 @@ namespace Protocol
         PLAPER, ENEMY
     };
 
-
+    enum PATTERN_TYPE { ONE_LINE, SIX_LINE, AROUND };
     public class ISerializeble<T> where T : class
     {
         public ISerializeble() { }
@@ -109,7 +113,21 @@ namespace Protocol
                 public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
     }
 
-
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_change_scene_ready : ISerializeble<cs_packet_change_scene_ready>
+    {
+        public byte size;
+        public byte type;
+        public byte is_ready;
+    }
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_game_start_ready : ISerializeble<cs_packet_game_start_ready>
+    {
+        public byte size;
+        public byte type;
+    }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -173,6 +191,18 @@ namespace Protocol
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_effect : ISerializeble<sc_packet_effect>
+    {
+        public byte size;
+        public byte type;
+        public byte effect_type;
+        public byte dir;
+        public int id;
+        public int target_id;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class sc_packet_put_object : ISerializeble<sc_packet_put_object>
     {
         public byte size;
@@ -200,8 +230,21 @@ namespace Protocol
     {
         public byte size;
         public byte type;
+        public int player_id;
+        public int id1;
+        public int id2;
+        public int id3;
+        public int boss_id;
     }
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_change_scene : ISerializeble<sc_packet_change_scene>
+    {
+        public byte size;
+        public byte type;
+        public char scene_num;
 
+    }
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class sc_packet_map_data : ISerializeble<sc_packet_map_data>

@@ -194,7 +194,7 @@ public class HexGrid : MonoBehaviour
     {
         if (cellMaps.Get(pPosition).state == cellState.Damaged)
         {
-            if(!GameManager.data.Net.isOnline)
+            if(!FieldGameManager.Net.isOnline)
             Debug.Log("Player Damaged!");
         }
         foreach(var cell in cellMaps.cellMaps)
@@ -225,7 +225,8 @@ public class HexGrid : MonoBehaviour
                         {
                             //print(cellType[0]);
                             GameObject tmpcell = Instantiate(cellType[color]); // <- 나중에 string name으로 바꿔야?
-                            int w = Random.Range(0, 3);
+                            //int w = Random.Range(0, 3);
+                            int w = 0;
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
                             if (GameManager.data)
                                 tmpcell.name = "cell" + GameManager.data.mapCellid;

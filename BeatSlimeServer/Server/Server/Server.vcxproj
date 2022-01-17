@@ -144,11 +144,13 @@
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="DataBase.cpp" />
     <ClCompile Include="Ex4_iocp.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Network.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="DataBase.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="Network.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="stdfx.h" />

@@ -1,8 +1,6 @@
 #pragma once
-
-
-enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_ENEMY_MOVE, OP_ENEMY_ATTACK };
-
+#include "protocol.h"
+void error_display(const char* err_p, int err_no);
 class EXP_OVER {
 public:
 	WSAOVERLAPPED	_wsa_over;
@@ -38,11 +36,9 @@ public:
 		memcpy(_net_buf, mess, num_bytes);
 	}
 };
-enum TYPE {
-	PLAYER, ENEMY
-};
+
 enum DIR {
-	UP, DOWN, LEFTUP, RIGHTUP, LEFTDOWN, RIGHTDOWN
+	LEFTUP, UP, RIGHTUP, LEFTDOWN, DOWN, RIGHTDOWN
 };
 enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME };
 class Gameobject {
@@ -50,8 +46,9 @@ public:
 	char name[MAX_NAME_SIZE];
 	int		id;
 	short	x, y,z;
+	int map_number;
 	int direction;
-	char		type;
+	GO_TYPE		type;
 	//volatile해줘야 한다.
 	volatile STATE state;
 	std::mutex state_lock;
@@ -69,10 +66,46 @@ public:
 	std::atomic_bool is_active;
 
 	Npc() : is_active(false) {
-		type = ENEMY;
+		
 	}
 };
 
+class SkillTrader : public Npc {
+public:
+	std::atomic_bool is_talk;
+
+	SkillTrader() : is_talk (false) {
+
+	}
+};
+
+class Curator : public Npc {
+public:
+	std::atomic_bool is_talk;
+
+	Curator() : is_talk(false) {
+
+	}
+};
+
+class Witch : public Npc {
+public:
+	std::atomic_bool is_attack;
+	//공격을 몇 초마다 한다? -> 일단 이걸로 하자
+	//파일에서 읽어와서 한다?
+
+	Witch() : is_attack(false) {
+
+	}
+};
+class Boss2 : public Npc {
+public:
+	std::atomic_bool is_attack;
+
+	Boss2() : is_attack(false) {
+
+	}
+};
 
 const int VIEW_RANGE = 5;// test를 위한 거리
 const int ATTACK_RANGE = 2;// test를 위한 거리

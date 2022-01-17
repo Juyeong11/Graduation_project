@@ -4,6 +4,7 @@ public class HexCellPosition : MonoBehaviour
 {
     public HexCoordinates coordinates;
     public HexCoordinates preCoordinates;
+    public HexDirection direction;
 
     public float landOffsetX = 0;
     public float landOffsetY = 0;
@@ -128,6 +129,8 @@ public class HexCellPosition : MonoBehaviour
                 break;
 
         }
+        direction = (HexDirection)dir;
+
     }
     public void plus(int x, int y, int z,int w=0)
     {
