@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public GameObject enemy;
     public GameObject tilemap;
     public HexGrid grid;
+    public MapLoader loader;
 
     public SoundManager soundManager;
     public SoundEffectManager soundEffectManager;
@@ -62,6 +63,9 @@ public class GameManager : MonoBehaviour
         isGameStart = false;
         alreadyMoved = 0;
 
+        loader.Match(grid);
+        loader.LoadMap();
+
         nowBeat = new Beat();
 
         bpm = SoundManager.instance.GetBGMBpm(SongName);
@@ -82,6 +86,9 @@ public class GameManager : MonoBehaviour
         else {
             FieldGameManager.Net.SendGameStartReadyPacket();
         }
+
+        loader.LoadMap();
+
         //DEBUG
         enemy.GetComponent<HexCellPosition>().setInitPosition(1, 1);
         PM = PatternManager.data;
@@ -90,15 +97,15 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (Input.GetKeyDown("1"))
-        {
-            if (Mapdata.Count != 0)
-                FieldGameManager.Net.SendWriteMapPacket(Mapdata);
-        }
-        else if (Input.GetKeyDown(KeyCode.BackQuote))
-        {
-            FieldGameManager.Net.SendreadPacket();
-        }
+        //if (Input.GetKeyDown("1"))
+        //{
+            //if (Mapdata.Count != 0)
+                //FieldGameManager.Net.SendWriteMapPacket(Mapdata);
+        //}
+        //else if (Input.GetKeyDown(KeyCode.BackQuote))
+        //{
+        //    FieldGameManager.Net.SendreadPacket();
+        //}
 
 
         if (bGameStart)
@@ -274,7 +281,7 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].SetActive(false);
                             }
 
-                            //�ٸ� �÷��̾�� �ٸ��÷��̾� Ǯ��
+                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
                             //���̸� ��Ǯ�� ����
                             //ReMoveObject(p.id);
                         }
@@ -299,7 +306,7 @@ public class GameManager : MonoBehaviour
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
                             }
 
-                            //�ٸ� �÷��̾�� �ٸ��÷��̾� Ǯ��
+                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
                             //���̸� ��Ǯ�� ����
                             //ReMoveObject(p.id);
                         }

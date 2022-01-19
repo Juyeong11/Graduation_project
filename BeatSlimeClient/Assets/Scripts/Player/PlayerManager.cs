@@ -162,22 +162,22 @@ public class PlayerManager : MonoBehaviour
     {
         switch (k)
         {
-            case KeyCode.Q:
+            case KeyCode.W:
                 selfDirection = HexDirection.LeftUp;
                 break;
-            case KeyCode.W:
+            case KeyCode.E:
                 selfDirection = HexDirection.Up;
                 break;
-            case KeyCode.E:
+            case KeyCode.R:
                 selfDirection = HexDirection.RightUp;
                 break;
-            case KeyCode.A:
+            case KeyCode.S:
                 selfDirection = HexDirection.LeftDown;
                 break;
-            case KeyCode.S:
+            case KeyCode.D:
                 selfDirection = HexDirection.Down;
                 break;
-            case KeyCode.D:
+            case KeyCode.F:
                 selfDirection = HexDirection.RightDown;
                 break;
         }
@@ -202,7 +202,7 @@ public class PlayerManager : MonoBehaviour
             playerAttacking = true;
         }
 
-        if (Input.GetKeyDown(KeyCode.Q) && KeyCheck(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -225,7 +225,7 @@ public class PlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
+        else if (Input.GetKeyDown(KeyCode.E) && KeyCheck(KeyCode.E))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -246,7 +246,7 @@ public class PlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.E) && KeyCheck(KeyCode.E))
+        else if (Input.GetKeyDown(KeyCode.R) && KeyCheck(KeyCode.R))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -268,7 +268,7 @@ public class PlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.A) && KeyCheck(KeyCode.A))
+        else if (Input.GetKeyDown(KeyCode.S) && KeyCheck(KeyCode.S))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -289,7 +289,7 @@ public class PlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.S) && KeyCheck(KeyCode.S))
+        else if (Input.GetKeyDown(KeyCode.D) && KeyCheck(KeyCode.D))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -310,7 +310,7 @@ public class PlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.D) && KeyCheck(KeyCode.D))
+        else if (Input.GetKeyDown(KeyCode.F) && KeyCheck(KeyCode.F))
         {
             if (FieldGameManager.Net.isOnline)
             {

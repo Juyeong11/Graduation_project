@@ -114,7 +114,7 @@ public class CellMap
         }
 
         Debug.LogError(">Invalid coordinate<");
-        return null;
+        return new Cell();
     }
 
     public Cell map_Get(int x, int z)
