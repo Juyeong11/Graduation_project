@@ -3,9 +3,11 @@
 
 
 class MapInfo {
-	int length;
-	int halfLength;
-	int size;
+	int offsetX;
+	int offsetZ;
+
+	int LengthX;
+	int LengthZ;
 public:
 	static constexpr int HexCellAround[6][3] = {
 	{ 1, -1, 0 }, { 1, 0, -1 }, { 0, 1, -1 },
