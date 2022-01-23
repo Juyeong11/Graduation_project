@@ -47,8 +47,8 @@ Network::Network() {
 	for (int i = 0; i < MAP_NUM; ++i) {
 		maps[i] = new MapInfo;
 	}
-	maps[FIELD_MAP]->SetMap("Map\\Field_Map");
-	maps[WITCH_MAP]->SetMap("Map\\Witch_Map");
+	maps[FIELD_MAP]->SetMap("Map\\Field_Map","Music\\BAD_SEC.csv");
+	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\BAD_SEC.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
@@ -924,17 +924,34 @@ void Network::game_start(int room_id)
 	int bpm = 124;
 	int timeByBeat = 10 * 60 / (float)bpm; // 10 박자에 한번씩 범위 공격
 	int boss_id = game_room[room_id]->boss_id;
+	int map_type = game_room[room_id]->map_type;
+
+	const std::vector<std::pair<int, int>>& pt = maps[map_type]->GetPatternTime();
+
 
 	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
 
-	for (int i = 1; i < 10; ++i) {
-		timer_event t;
-		t.ev = EVENT_BOSS_TILE_ATTACK_START;
-		t.obj_id = boss_id;
-		t.target_id = rand() % 2;
-		t.game_room_id = room_id;
-		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		t.start_time = game_room[room_id]->start_time + std::chrono::seconds(timeByBeat * i);
-		timer_queue.push(t);
+	for (const auto& t : pt) {
+		int type = t.first;
+		int time = t.second;
+		timer_event tev;
+
+		switch (type)
+		{
+		case 1:
+			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
+			tev.obj_id = boss_id;
+			tev.target_id = rand() % 2;
+			tev.game_room_id = room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(time);
+			timer_queue.push(tev);
+			break;
+		default:
+			std::cout << "잘못된 패턴 타입" << std::endl;
+			break;
+		}
+
+
 	}
 }

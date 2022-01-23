@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.IO;
+using System.Linq;
 public class CSVMapper : MonoBehaviour
 {
     public string mapName;
@@ -9,10 +10,10 @@ public class CSVMapper : MonoBehaviour
 
     void Start()
     {
-        List<Dictionary<string,object>> datas = CSVReader.Read("MapCSV/" + mapName);
+        List<Dictionary<string, object>> datas = CSVReader.Read("MapCSV/" + mapName);
         List<Dictionary<string, object>> landdatas = CSVReader.Read("LandCSV/" + mapName);
 
-        for (int i=0; i<datas.Count; i++)
+        for (int i = 0; i < datas.Count; i++)
         {
             int x = int.Parse(datas[i]["x"].ToString());
             int y = int.Parse(datas[i]["y"].ToString());
@@ -66,7 +67,7 @@ public class CSVMapper : MonoBehaviour
             p_templand.id = MapMaker.landId;
 
             GameObject tmpcell = Instantiate(MM.grid.LandType[c]);
-            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox,oy,oz,or);
+            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or);
             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
             tmpcell.name = "land" + MapMaker.landId++;
             tmpcell.transform.parent = gameObject.transform;
@@ -99,6 +100,67 @@ public class CSVMapper : MonoBehaviour
                         columns.Add(MM.Mapdata[i].type.ToString());
                         writer.WriteRow(columns);
                         columns.Clear();
+                    }
+                }
+
+                //서버
+                {
+
+                    FileStream fs = new FileStream("Assets/Resources/MapCSV/" + mapName, FileMode.Create, FileAccess.Write);
+                    BinaryWriter bw = new BinaryWriter(fs);
+
+
+                    //좌표가 인덱스가 되어야함 -> 좌표에 마이너스값이 없어야함 -> 평행이동을 하자
+                    //제일 앞에 얼마만큼 평행이동할지도 적어 두자 -> 가장 작은 값만큼 평행이동
+
+                    int minX = System.Int32.MaxValue, minZ = System.Int32.MaxValue;
+                    int maxX = System.Int32.MinValue, maxZ = System.Int32.MinValue;
+                    for (int i = 0; i < MM.Mapdata.Count; ++i)
+                    {
+                        int x = MM.Mapdata[i].x;
+                        int z = MM.Mapdata[i].z;
+
+                        if (minX > x) minX = x;
+                        if (minZ > z) minZ = z;
+
+                        if (maxX < x) maxX = x;
+                        if (maxZ < z) maxZ = z;
+                    }
+                    int LengthX = maxX - minX;
+                    int LengthZ = maxZ - minZ;
+                        Debug.Log("maxX : " + maxX + " maxZ : " + maxZ);
+                        Debug.Log("minX : " + minX + " minZ : " + minZ);
+                        Debug.Log(LengthZ* LengthX);
+
+                    int[] data = Enumerable.Repeat<int>(-1, (LengthX + 1)* LengthZ).ToArray<int>(); 
+                    
+                
+                    for (int i = 0; i < MM.Mapdata.Count; ++i)
+                    {
+                        // x+y+z = 0
+                        // x+z = -y
+                        // x-min+z-min = -y + 2min
+
+                        // 블록이 곂쳐저 있으면 덮어쓴다. 만약 블록 타입이 있는 타일이라면 덮어쓰지 말고 지나가자
+                        int x = MM.Mapdata[i].x - minX;
+                        int z = MM.Mapdata[i].z - minZ;
+                        Debug.Log("x : " + x + "z : " + z);
+                        Debug.Log("p : " + (x * LengthZ + z));
+                        
+                        if(data[x * LengthZ + z] == 0 || data[x * LengthZ + z] == -1)
+                            data[x* LengthZ + z] = MM.Mapdata[i].type;
+                    }
+                    // 평행이동 한 값, 총 개수..좌표들
+                    //Debug.Log(min);
+
+                    bw.Write(LengthX);
+                    bw.Write(LengthZ);
+                    bw.Write(minX);
+                    bw.Write(minZ);
+                    
+                    for (int i = 0; i < LengthX * LengthZ; ++i)
+                    {
+                        bw.Write(data[i]);
                     }
                 }
 
