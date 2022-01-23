@@ -51,7 +51,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 	std::stringstream ss(buf);
 	while (std::getline(ss, buf, ',')) {
 		if (!buf.empty() && buf.back() == '\r') {
-			menu.push_back(std::string(buf.begin(),buf.end()-1)); // \r을 제거한 문자 
+			menu.push_back(std::string(buf.begin(), buf.end() - 1)); // \r을 제거한 문자 
 			break;
 		}
 		menu.push_back(buf);
@@ -64,13 +64,50 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 		while (std::getline(ss, buf, ',')) {
 			if (i == 0 && buf == "0") break;// 주석은 넘어가고
 			if (!buf.empty() && buf.back() == '\r') {
-				pattern[menu[i]].push_back(std::string(buf.begin(), buf.end() - 1)); // \r을 제거한 문자 
+				std::string tmp(buf.begin(), buf.end() - 1);// \r을 제거한 문자 
+				if (tmp.empty())
+					pattern[menu[i]].push_back("0");
+				else
+					pattern[menu[i]].push_back(tmp);
 				break;
 			}
-			pattern[menu[i]].push_back(buf); // \r을 제거한 문자 
+			if (buf.empty())
+				pattern[menu[i]].push_back("0");
+			else
+				pattern[menu[i]].push_back(buf);
 
 			i++;
 		}
+	}
+
+
+	barCounts = 4;
+	bpm = 124;
+	totalSongTime = 0; //(* 1000);
+	nowSongTime = 0;
+	timeByBeat = (int)(1000 * 60 / (float)bpm);
+	timeByBar = timeByBeat * barCounts;
+	timeBy24Beat = timeByBeat / 6;
+	timeBy16Beat = timeByBeat / 4;
+
+	num_totalPattern = pattern["noteType"].size();
+	pattern_time.reserve(num_totalPattern);
+
+	for (int i = 0; i < num_totalPattern; ++i) {
+		int bar = stoi(pattern["bar"][i]);
+		int addBeat = stoi(pattern["4th"][i]);
+		int add16Beat = stoi(pattern["8th"][i]) * 2 + stoi(pattern["16th"][i]);
+		int add24Beat =
+			stoi(pattern["3rd"][i]) * 8 +
+			stoi(pattern["6th"][i]) * 4 +
+			stoi(pattern["12th"][i]) * 8 +
+			stoi(pattern["24th"][i]);
+
+		pattern_time.push_back(std::make_pair(stoi(pattern["noteType"][i]),
+			bar * timeByBar
+			+ addBeat * timeByBeat
+			+ add16Beat * timeBy16Beat
+			+ add24Beat * timeBy24Beat));
 	}
 }
 

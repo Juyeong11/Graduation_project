@@ -11,17 +11,32 @@ class MapInfo {
 
 	std::vector<std::string> menu;
 	std::map<std::string, std::vector<std::string>> pattern;
+
+	typedef int type;
+	typedef int time;
+	std::vector<std::pair<type, time>> pattern_time;
+
 public:
 	static constexpr int HexCellAround[6][3] = {
 	{ 1, -1, 0 }, { 1, 0, -1 }, { 0, 1, -1 },
 	{ -1, 1, 0 }, { -1, 0, 1 }, { 0, -1, 1 }
 	};
 	int* map;
+
+	int timeByBar;
+	int timeByBeat;
+	int timeBy16Beat;
+	int timeBy24Beat;
 	int bpm;
+	int totalSongTime;
+	int nowSongTime;
+	int barCounts;
+
+	int num_totalPattern;
 
 	void SetMap(std::string map_name, std::string music_name);
 	int GetTileType(int x, int z);
-
+	const std::vector<std::pair<int, int>>& const GetPatternTime() { return pattern_time; }
 	~MapInfo()
 	{
 		delete[] map;
