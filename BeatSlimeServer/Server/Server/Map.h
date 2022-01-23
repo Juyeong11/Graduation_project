@@ -8,6 +8,9 @@ class MapInfo {
 
 	int LengthX;
 	int LengthZ;
+
+	std::vector<std::string> menu;
+	std::map<std::string, std::vector<std::string>> pattern;
 public:
 	static constexpr int HexCellAround[6][3] = {
 	{ 1, -1, 0 }, { 1, 0, -1 }, { 0, 1, -1 },
@@ -16,7 +19,7 @@ public:
 	int* map;
 	int bpm;
 
-	void SetMap(std::string file_name);
+	void SetMap(std::string map_name, std::string music_name);
 	int GetTileType(int x, int z);
 
 	~MapInfo()

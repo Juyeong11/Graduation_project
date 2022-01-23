@@ -2,9 +2,9 @@
 #include"Network.h"
 #include"Map.h"
 
-void MapInfo::SetMap(std::string file_name)
+void MapInfo::SetMap(std::string map_name, std::string music_name)
 {
-	std::ifstream in{ file_name, std::ios::binary };
+	std::ifstream in{ map_name, std::ios::binary };
 	if (!in) return;
 
 	in.read(reinterpret_cast<char*>(&LengthX), sizeof(LengthX));
@@ -15,11 +15,11 @@ void MapInfo::SetMap(std::string file_name)
 
 
 
-	map = new int[(LengthX+1) * LengthZ];
+	map = new int[(LengthX + 1) * LengthZ];
 
 	in.read(reinterpret_cast<char*>(map), (LengthX + 1) * LengthZ * sizeof(int));
 
-	/* // 맵 확인용 
+	/* // 맵 확인용
 	std::cout << LengthX << std::endl;
 	std::cout << LengthZ << std::endl;
 	std::cout << offsetX << std::endl;
@@ -34,13 +34,51 @@ void MapInfo::SetMap(std::string file_name)
 		}
 	}
 	*/
+
+	std::ifstream in_m{ music_name, std::ios::binary };
+	if (!in_m) return;
+	char tmp;
+	// BOM 건너뛰기
+	in_m.read(&tmp, sizeof(tmp));
+	in_m.read(&tmp, sizeof(tmp));
+	in_m.read(&tmp, sizeof(tmp));
+
+
+	std::string buf;
+
+	// 메뉴 읽고
+	std::getline(in_m, buf);
+	std::stringstream ss(buf);
+	while (std::getline(ss, buf, ',')) {
+		if (!buf.empty() && buf.back() == '\r') {
+			menu.push_back(std::string(buf.begin(),buf.end()-1)); // \r을 제거한 문자 
+			break;
+		}
+		menu.push_back(buf);
+	}
+
+	// 내용 읽고
+	while (std::getline(in_m, buf)) {
+		std::stringstream ss(buf);
+		int i = 0;
+		while (std::getline(ss, buf, ',')) {
+			if (i == 0 && buf == "0") break;// 주석은 넘어가고
+			if (!buf.empty() && buf.back() == '\r') {
+				pattern[menu[i]].push_back(std::string(buf.begin(), buf.end() - 1)); // \r을 제거한 문자 
+				break;
+			}
+			pattern[menu[i]].push_back(buf); // \r을 제거한 문자 
+
+			i++;
+		}
+	}
 }
 
 int MapInfo::GetTileType(int x, int z)
 {
 	int _x = x + offsetX;
 	int _z = z + offsetZ;
-	
+
 	if (_x > LengthX || _x < 0) return -1;
 	if (_z > LengthZ || _z < 0) return -1;
 
@@ -71,9 +109,9 @@ void GameRoom::GameRoomInit(int mapType, float BPM, int Boss, int* Players)
 {
 	map_type = mapType;
 	bpm = BPM;
-	
+
 	isGaming = true;
 
 	boss_id = Boss;
-	memcpy_s(player_ids,MAX_IN_GAME_PLAYER*sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
+	memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
 }

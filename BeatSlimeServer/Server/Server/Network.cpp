@@ -47,8 +47,8 @@ Network::Network() {
 	for (int i = 0; i < MAP_NUM; ++i) {
 		maps[i] = new MapInfo;
 	}
-	maps[FIELD_MAP]->SetMap("Map\\Field_Map");
-	maps[WITCH_MAP]->SetMap("Map\\Forest1");
+	maps[FIELD_MAP]->SetMap("Map\\Field_Map","Music\\BAD_SEC.csv");
+	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\BAD_SEC.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
