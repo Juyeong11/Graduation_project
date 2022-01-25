@@ -1,7 +1,31 @@
 #pragma once
 
 
+struct PatternInfo {
+	int type;
+	int time;
+	int dir;
+	int speed;
+	int x, y, z;
+	PatternInfo(int Type, int Time, int Dir, int Speed,int px, int py ,int pz) 
+		:type(Type), time(Time), dir(Dir), speed(Speed), x(px), y(py),z(pz)
+	{}
 
+
+	static constexpr int HexPattern3[10][3] = {
+	{ 0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
+	{ 0, 1, -1 },{ -1, 1, 0 }, { -1, 0, 1 },
+		{+1,+1,-2},{-1,-1,+2},{+2,-2,0},{-2,+2,0}
+	};
+
+	static constexpr int HexPattern4[8][3] = {
+		{0,-1,+1},{0,-2,+2},
+		{-1,0,+1},{-2,0,+2},
+		{+1,0,-1},{+2,0,-2},
+		{0,+1,-1},{0,+2,-2}
+	};
+
+};
 class MapInfo {
 	int offsetX;
 	int offsetZ;
@@ -12,14 +36,13 @@ class MapInfo {
 	std::vector<std::string> menu;
 	std::map<std::string, std::vector<std::string>> pattern;
 
-	typedef int type;
-	typedef int time;
-	std::vector<std::pair<type, time>> pattern_time;
+
+	std::vector<PatternInfo> pattern_time;
 
 public:
 	static constexpr int HexCellAround[6][3] = {
-	{ 1, -1, 0 }, { 1, 0, -1 }, { 0, 1, -1 },
-	{ -1, 1, 0 }, { -1, 0, 1 }, { 0, -1, 1 }
+	{ 0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
+	{ 0, 1, -1 },{ -1, 1, 0 }, { -1, 0, 1 }
 	};
 	int* map;
 
@@ -36,7 +59,7 @@ public:
 
 	void SetMap(std::string map_name, std::string music_name);
 	int GetTileType(int x, int z);
-	const std::vector<std::pair<int, int>>& const GetPatternTime() { return pattern_time; }
+	const std::vector<PatternInfo>& const GetPatternTime() { return pattern_time; }
 	~MapInfo()
 	{
 		delete[] map;

@@ -317,19 +317,19 @@ public class GameManager : MonoBehaviour
                             int pid = ServerID_To_ClientID(p.id);
                             int tid = ServerID_To_ClientID(p.target_id);
 
-                            int start_x = Objects[pid].GetComponent<HexCellPosition>().coordinates.X;
-                            int start_y = Objects[pid].GetComponent<HexCellPosition>().coordinates.Y;
-                            int start_z = Objects[pid].GetComponent<HexCellPosition>().coordinates.Z;
-                            int start_w = Objects[pid].GetComponent<HexCellPosition>().coordinates.W;
-                            switch ((Protocol.PATTERN_TYPE)p.effect_type)
+                            int start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
+                            int start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
+                            int start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
+                            int start_w = Objects[tid].GetComponent<HexCellPosition>().coordinates.W;
+                            switch (p.effect_type)
                             {
-                                case Protocol.PATTERN_TYPE.ONE_LINE:
-                                    EffectManager.instance.BossTileEffect0(start_x, start_y, start_z, start_w, (HexDirection)p.dir);
+                                case 3:
+                                    EffectManager.instance.BossTileEffect3(start_x, start_y, start_z, start_w, p.charging_time);
                                     break;
-                                case Protocol.PATTERN_TYPE.SIX_LINE:
-                                    EffectManager.instance.BossTileEffect1(start_x, start_y, start_z, start_w);
+                                case 4:
+                                    EffectManager.instance.BossTileEffect4(start_x, start_y, start_z, start_w, p.charging_time);
                                     break;
-                                case Protocol.PATTERN_TYPE.AROUND:
+                                case 5:
                                     break;
                             }
                             //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));

@@ -19,7 +19,8 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 	in.read(reinterpret_cast<char*>(map), (LengthX + 1) * LengthZ * sizeof(int));
 
-	/* // ¸Ê È®ÀÎ¿ë
+	/*
+	// ¸Ê È®ÀÎ¿ë
 	std::cout << LengthX << std::endl;
 	std::cout << LengthZ << std::endl;
 	std::cout << offsetX << std::endl;
@@ -32,8 +33,8 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			for (int j = 0; j < i / LengthZ; ++j)
 				std::cout << " " ;
 		}
-	}
-	*/
+	}*/
+
 
 	std::ifstream in_m{ music_name, std::ios::binary };
 	if (!in_m) return;
@@ -103,11 +104,51 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			stoi(pattern["12th"][i]) * 8 +
 			stoi(pattern["24th"][i]);
 
-		pattern_time.push_back(std::make_pair(stoi(pattern["noteType"][i]),
+		int speed = 0;
+		if (pattern["speed"][i] == "0") // 0
+			speed =0;
+		else if (pattern["speed"][i] == "1") // 8beat
+			speed = 8 * timeByBeat;
+		else if (pattern["speed"][i] == "2") // 4beat
+			speed = 4 * timeByBeat;
+		else if (pattern["speed"][i] == "3") // 2beat
+			speed = 2 * timeByBeat;
+		else if (pattern["speed"][i] == "4") // 1bar
+			speed = timeByBar;
+		else
+			std::cout << "Load : wrong speed\n";
+
+		// speed¿¡ ¸ÂÃç¼­ »©°í
+		// 
+		int dir = 0;
+		if (pattern["direction"][i] == "LU")
+			dir = DIR::LEFTUP;
+		else if (pattern["direction"][i] == "U")
+			dir = DIR::UP;
+		else if (pattern["direction"][i] == "RU")
+			dir = DIR::RIGHTUP;
+		else if (pattern["direction"][i] == "LD")
+			dir = DIR::LEFTDOWN;
+		else if (pattern["direction"][i] == "D")
+			dir = DIR::DOWN;
+		else if (pattern["direction"][i] == "RD")
+			dir = DIR::RIGHTDOWN;
+		else
+			std::cout << "Load : wrong dir\n";
+
+		int px = stoi(pattern["pivotX"][i]);
+		int py = stoi(pattern["pivotY"][i]);
+		int pz = stoi(pattern["pivotZ"][i]);
+
+		pattern_time.emplace_back(
+			stoi(pattern["noteType"][i]),
 			bar * timeByBar
 			+ addBeat * timeByBeat
 			+ add16Beat * timeBy16Beat
-			+ add24Beat * timeBy24Beat));
+			+ add24Beat * timeBy24Beat,
+			dir,
+			speed,
+			px,py,pz);
 	}
 }
 
@@ -141,6 +182,7 @@ bool GameRoom::FindPlayer(int id)
 	}
 	return false;
 }
+
 
 void GameRoom::GameRoomInit(int mapType, float BPM, int Boss, int* Players)
 {

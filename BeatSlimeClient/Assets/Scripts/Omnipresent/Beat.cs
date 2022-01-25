@@ -51,7 +51,6 @@ public class Beat
                + addBeat * GameManager.data.timeByBeat
                + addedMS;
         }
-;
     }
     public void SetBeatTime(int nowTime)
     {
