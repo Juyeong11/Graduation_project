@@ -877,11 +877,12 @@ void Network::worker()
 			// 시작 위치를 중심으로 패턴 공격
 			// 공격 이펙트 보내고
 			// 서버에서 공격 처리할 이벤트 추가
+			int target_id = 0;
 			switch (pattern_type)
 			{
 			case 3:
 			{
-				int target_id = find_max_hp_player(game_room_id);
+				target_id = find_max_hp_player(game_room_id);
 				for (int i = 0; i < 10; ++i) {
 
 					timer_event t;
@@ -900,7 +901,7 @@ void Network::worker()
 			break;
 			case 4:
 			{
-				int target_id = find_max_hp_player(game_room_id);
+				target_id = find_max_hp_player(game_room_id);
 				for (int i = 0; i < 8; ++i) {
 
 					timer_event t;
@@ -926,7 +927,7 @@ void Network::worker()
 			// gamestart도 여러번 들어가는듯
 			for (int id : game_room[game_room_id]->player_ids) {
 
-				send_effect(id, client_id, client_id, pattern_type, charging_time);
+				send_effect(id, client_id, target_id, pattern_type, charging_time);
 			}
 			exp_over_pool.push(exp_over);
 		}

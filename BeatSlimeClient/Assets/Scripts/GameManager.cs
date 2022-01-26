@@ -320,7 +320,7 @@ public class GameManager : MonoBehaviour
                             int start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
                             int start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
                             int start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
-                            int start_w = Objects[tid].GetComponent<HexCellPosition>().coordinates.W;
+                            int start_w = 0;//Objects[tid].GetComponent<HexCellPosition>().coordinates.W;
                             switch (p.effect_type)
                             {
                                 case 3:
