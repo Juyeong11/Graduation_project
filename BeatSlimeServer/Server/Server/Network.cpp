@@ -120,7 +120,7 @@ void Network::send_game_start(int c_id, int ids[3], int boss_id)
 	}
 
 }
-void Network::send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time)
+void Network::send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time, int x, int y, int z)
 {
 	sc_packet_effect packet;
 	packet.type = SC_PACKET_EFFECT;
@@ -130,7 +130,9 @@ void Network::send_effect(int client_id, int actor_id, int target_id, int effect
 	packet.target_id = target_id;
 	packet.dir = clients[actor_id]->direction;
 	packet.charging_time = charging_time;
-
+	packet.x = x;
+	packet.y = y;
+	packet.z = z;
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
@@ -314,6 +316,18 @@ int Network::find_max_hp_player(int game_room_id) {
 	for (int id : game_room[game_room_id]->player_ids) {
 		if (clients[id]->hp > maxhp) {
 			maxhp = clients[id]->hp;
+			ret = id;
+		};
+	}
+	return ret;
+}
+
+int Network::find_min_hp_player(int game_room_id) {
+	int minhp = 0;
+	int ret = 0;
+	for (int id : game_room[game_room_id]->player_ids) {
+		if (clients[id]->hp > minhp) {
+			minhp = clients[id]->hp;
 			ret = id;
 		};
 	}
@@ -842,21 +856,74 @@ void Network::worker()
 			int x = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			int y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
 			int z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
-			int game_rood_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
+			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
+			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
 
-			
+			int target_id = -1;
+			int pivot_x, pivot_y, pivot_z;
+			switch (pivotType)
+			{
+			case PlayerM:
+				target_id = find_max_hp_player(game_room_id);
+				pivot_x = clients[target_id]->x;
+				pivot_z = clients[target_id]->z;
+				pivot_y = -pivot_x - pivot_z;
+				break;
+			case Playerm:
+				target_id = find_min_hp_player(game_room_id);
+				pivot_x = clients[target_id]->x;
+				pivot_z = clients[target_id]->z;
+				pivot_y = -pivot_x - pivot_z;
+				break;
+			case World:
+				pivot_x = 0;
+				pivot_y = 0;
+				pivot_z = 0;
+				break;
+			case Boss:
+				target_id = client_id;
+				pivot_x = clients[target_id]->x;
+				pivot_z = clients[target_id]->z;
+				pivot_y = -pivot_x - pivot_z;
+				break;
+			case Player1:
+				target_id = game_room[game_room_id]->player_ids[0];
+				pivot_x = clients[target_id]->x;
+				pivot_z = clients[target_id]->z;
+				pivot_y = -pivot_x - pivot_z;
+				break;
+			case Player2:
+				target_id = game_room[game_room_id]->player_ids[1];
+				pivot_x = clients[target_id]->x;
+				pivot_z = clients[target_id]->z;
+				pivot_y = -pivot_x - pivot_z;
+				break;
+			case Player3:
+				target_id = game_room[game_room_id]->player_ids[2];
+				pivot_x = clients[target_id]->x;
+				pivot_z = clients[target_id]->z;
+				pivot_y = -pivot_x - pivot_z;
+				break;
+			default:
+				std::cout << "wrong pivotType" << std::endl;
+				pivot_x = 0;
+				pivot_y = 0;
+				pivot_z = 0;
+				break;
+			}
+
 			Client& cl = *reinterpret_cast<Client*>(clients[client_id]);
-			cl.x = x;
-			cl.y = y;
-			cl.z = z;
+			cl.x = x + pivot_x;
+			cl.y = y + pivot_y;
+			cl.z = z + pivot_z;
 			cl.direction = rand() % 6;
-			for (int i : game_room[game_rood_id]->player_ids) {
+			for (int i : game_room[game_room_id]->player_ids) {
 
 				send_move_object(i, client_id);
 			}
 			exp_over_pool.push(exp_over);
 		}
-			break;
+		break;
 		case OP_BOSS_TARGETING_ATTACK:
 		{
 			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
@@ -869,20 +936,70 @@ void Network::worker()
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			int pattern_type = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
 			int charging_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
+			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
+			int pivot_x = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
+			int pivot_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
+			int pivot_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
 
-			// client_id -> boss_id
-			int pos_x = clients[client_id]->x;
-			int	pos_z = clients[client_id]->z;
-			int	pos_y = -pos_x - pos_z;
+
 			// 시작 위치를 중심으로 패턴 공격
 			// 공격 이펙트 보내고
 			// 서버에서 공격 처리할 이벤트 추가
-			int target_id = 0;
+			int target_id = -1;
+
+			int pos_x, pos_z, pos_y;
+			switch (pivotType)
+			{
+			case PlayerM:
+				target_id = find_max_hp_player(game_room_id);
+				pos_x = clients[target_id]->x;
+				pos_z = clients[target_id]->z;
+				pos_y = -pos_x - pos_z;
+				break;
+			case Playerm:
+				target_id = find_min_hp_player(game_room_id);
+				pos_x = clients[target_id]->x;
+				pos_z = clients[target_id]->z;
+				pos_y = -pos_x - pos_z;
+				break;
+			case World:
+				pos_x = pivot_x;
+				pos_y = pivot_y;
+				pos_z = pivot_z;
+				break;
+			case Boss:
+				target_id = client_id;
+				pos_x = clients[target_id]->x;
+				pos_z = clients[target_id]->z;
+				pos_y = -pos_x - pos_z;
+				break;
+			case Player1:
+				target_id = game_room[game_room_id]->player_ids[0];
+				pos_x = clients[target_id]->x;
+				pos_z = clients[target_id]->z;
+				pos_y = -pos_x - pos_z;
+				break;
+			case Player2:
+				target_id = game_room[game_room_id]->player_ids[1];
+				pos_x = clients[target_id]->x;
+				pos_z = clients[target_id]->z;
+				pos_y = -pos_x - pos_z;
+				break;
+			case Player3:
+				target_id = game_room[game_room_id]->player_ids[2];
+				pos_x = clients[target_id]->x;
+				pos_z = clients[target_id]->z;
+				pos_y = -pos_x - pos_z;
+				break;
+			}
+
+			// client_id -> boss_id
+
 			switch (pattern_type)
 			{
 			case 3:
 			{
-				target_id = find_max_hp_player(game_room_id);
+
 				for (int i = 0; i < 10; ++i) {
 
 					timer_event t;
@@ -901,7 +1018,7 @@ void Network::worker()
 			break;
 			case 4:
 			{
-				target_id = find_max_hp_player(game_room_id);
+
 				for (int i = 0; i < 8; ++i) {
 
 					timer_event t;
@@ -916,7 +1033,23 @@ void Network::worker()
 					timer_queue.push(t);
 				}
 			}
-				break;
+			break;
+			case 99:
+			{
+
+				timer_event t;
+				t.ev = EVENT_BOSS_TILE_ATTACK;
+				t.obj_id = client_id;
+				t.target_id = target_id;
+				t.game_room_id = game_room_id;
+				t.x = pos_x;
+				t.y = pos_y;
+				t.z = pos_z;
+				t.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time);
+				timer_queue.push(t);
+
+			}
+			break;
 			case AROUND:
 				break;
 			default:
@@ -927,7 +1060,7 @@ void Network::worker()
 			// gamestart도 여러번 들어가는듯
 			for (int id : game_room[game_room_id]->player_ids) {
 
-				send_effect(id, client_id, target_id, pattern_type, charging_time);
+				send_effect(id, client_id, target_id, pattern_type, charging_time, pos_x, pos_y, pos_z);
 			}
 			exp_over_pool.push(exp_over);
 		}
@@ -969,6 +1102,7 @@ void Network::game_start(int room_id)
 		switch (t.type)
 		{
 		case -1:
+
 			tev.ev = EVENT_BOSS_MOVE;
 			tev.obj_id = boss_id;
 			tev.game_room_id = room_id;
@@ -978,26 +1112,50 @@ void Network::game_start(int room_id)
 			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
+			tev.pivotType = t.pivotType;
 			timer_queue.push(tev);
 			break;
 		case 3:
 			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
 			tev.obj_id = boss_id;
 			tev.type = 3;
+			tev.x = t.x;
+			tev.y = t.y;
+			tev.z = t.z;
 			tev.game_room_id = room_id;
 			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
+			tev.pivotType = t.pivotType;
 			timer_queue.push(tev);
 			break;
 		case 4:
 			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
 			tev.obj_id = boss_id;
 			tev.type = 4;
+			tev.x = t.x;
+			tev.y = t.y;
+			tev.z = t.z;
 			tev.game_room_id = room_id;
 			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
+			tev.pivotType = t.pivotType;
+			timer_queue.push(tev);
+			break;
+
+		case 99:
+			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
+			tev.obj_id = boss_id;
+			tev.type = 99;
+			tev.x = t.x;
+			tev.y = t.y;
+			tev.z = t.z;
+			tev.game_room_id = room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
+			tev.charging_time = t.speed;
+			tev.pivotType = t.pivotType;
 			timer_queue.push(tev);
 			break;
 		default:

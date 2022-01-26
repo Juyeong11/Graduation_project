@@ -127,6 +127,7 @@ struct sc_packet_effect
 	int id;
 	int target_id;
 	int charging_time;
+	int x,y,z;
 };
 struct sc_packet_map_data
 {

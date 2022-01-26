@@ -317,10 +317,19 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_effect p = Protocol.sc_packet_effect.SetByteToVar(data);
                             int pid = ServerID_To_ClientID(p.id);
                             int tid = ServerID_To_ClientID(p.target_id);
-
-                            int start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
-                            int start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
-                            int start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
+                            int start_x, start_y, start_z;
+                            if (p.target_id == -1)
+                            {
+                                start_x = p.x;
+                                start_y = p.y;
+                                start_z = p.z;
+                            }
+                            else
+                            {
+                                start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
+                                start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
+                                start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
+                            }
                             int start_w = 0;//Objects[tid].GetComponent<HexCellPosition>().coordinates.W;
                             switch (p.effect_type)
                             {
@@ -329,6 +338,9 @@ public class GameManager : MonoBehaviour
                                     break;
                                 case 4:
                                     EffectManager.instance.BossTileEffect4(start_x, start_y, start_z, start_w, p.charging_time);
+                                    break;
+                                case 99:
+                                    EffectManager.instance.OneTileEffect(start_x, start_y, start_z, start_w, p.charging_time);
                                     break;
                                 case 5:
                                     break;

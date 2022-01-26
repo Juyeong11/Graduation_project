@@ -2,13 +2,15 @@
 
 
 struct PatternInfo {
+	
 	int type;
+	int pivotType;
 	int time;
 	int dir;
 	int speed;
 	int x, y, z;
-	PatternInfo(int Type, int Time, int Dir, int Speed,int px, int py ,int pz) 
-		:type(Type), time(Time), dir(Dir), speed(Speed), x(px), y(py),z(pz)
+	PatternInfo(int Type, int PivotType, int Time, int Dir, int Speed,int px, int py ,int pz)
+		:type(Type), pivotType(PivotType), time(Time), dir(Dir), speed(Speed), x(px), y(py),z(pz)
 	{}
 
 

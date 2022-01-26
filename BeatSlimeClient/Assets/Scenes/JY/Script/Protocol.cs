@@ -200,6 +200,7 @@ namespace Protocol
         public int id;
         public int target_id;
         public int charging_time;
+        public int x,y,z;
     }
 
     [Serializable]

@@ -18,6 +18,7 @@ struct timer_event {
 	int x, y, z;
 	int type;
 	int charging_time;
+	int pivotType;
 	std::chrono::system_clock::time_point start_time;
 	EVENT_TYPE ev;
 	//int target_id;
@@ -66,7 +67,7 @@ public:
 	void send_map_data(int client_id, char* data, int nShell);
 	void send_change_scene(int client_id, int map_type);
 	void send_game_start(int client_id, int ids[3], int boss_id);
-	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time);
+	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time, int x, int y, int z);
 	void disconnect_client(int client_id);
 
 	bool is_near(int a, int b)
@@ -134,6 +135,7 @@ public:
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.y;
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.z;
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.game_room_id;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.pivotType;// 타겟 id가 패턴 종류 구분
 
 						break;
 					case EVENT_BOSS_TARGETING_ATTACK:
@@ -145,7 +147,10 @@ public:
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.type;// 타겟 id가 패턴 종류 구분
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.charging_time;// 타겟 id가 패턴 종류 구분
-
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.pivotType;// 타겟 id가 패턴 종류 구분
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.x;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.y;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.z;
 						break;
 					case EVENT_BOSS_TILE_ATTACK:
 						ex_over->_comp_op = OP_BOSS_TILE_ATTACK;
@@ -182,6 +187,7 @@ public:
 	void game_start(int room_id);
 
 	int find_max_hp_player(int game_room_id);
+	int find_min_hp_player(int game_room_id);
 private:
 	concurrency::concurrent_priority_queue<timer_event> timer_queue;
 	concurrency::concurrent_queue<EXP_OVER*> exp_over_pool;

@@ -106,11 +106,11 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 		int speed = 0;
 		if (pattern["speed"][i] == "0") // 0
-			speed =0;
+			speed = 0;
 		else if (pattern["speed"][i] == "1") // 8beat
-			speed = 8 * timeByBeat;
+			speed = 0.5f * timeByBeat;
 		else if (pattern["speed"][i] == "2") // 4beat
-			speed = 4 * timeByBeat;
+			speed = timeByBeat;
 		else if (pattern["speed"][i] == "3") // 2beat
 			speed = 2 * timeByBeat;
 		else if (pattern["speed"][i] == "4") // 1bar
@@ -136,12 +136,31 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 		else
 			std::cout << "Load : wrong dir\n";
 
+		int pivotType = 0;
+		if (pattern["pivotType"][i] == "PlayerM")
+			pivotType = 0;
+		else if (pattern["pivotType"][i] == "Playerm")
+			pivotType = 1;
+		else if (pattern["pivotType"][i] == "World")
+			pivotType = 2;
+		else if (pattern["pivotType"][i] == "Boss")
+			pivotType = 3;
+		else if (pattern["pivotType"][i] == "Player1")
+			pivotType = 4;
+		else if (pattern["pivotType"][i] == "Player2")
+			pivotType = 5;
+		else if (pattern["pivotType"][i] == "Player3")
+			pivotType = 6;
+		else
+			std::cout << "Load : wrong pivotType\n";
+
 		int px = stoi(pattern["pivotX"][i]);
 		int py = stoi(pattern["pivotY"][i]);
 		int pz = stoi(pattern["pivotZ"][i]);
 
 		pattern_time.emplace_back(
 			stoi(pattern["noteType"][i]),
+			pivotType,
 			bar * timeByBar
 			+ addBeat * timeByBeat
 			+ add16Beat * timeBy16Beat
