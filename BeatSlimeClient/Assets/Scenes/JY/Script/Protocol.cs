@@ -199,6 +199,7 @@ namespace Protocol
         public byte dir;
         public int id;
         public int target_id;
+        public int charging_time;
     }
 
     [Serializable]

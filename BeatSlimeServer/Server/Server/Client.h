@@ -48,6 +48,7 @@ public:
 	short	x, y,z;
 	int map_number;
 	int direction;
+	int hp;
 	GO_TYPE		type;
 	//volatile«ÿ¡‡æﬂ «—¥Ÿ.
 	volatile STATE state;
@@ -59,6 +60,7 @@ public:
 		x = 0;
 		y = 0;
 		z = 0;
+		hp = 10;
 	}
 };
 class Npc: public Gameobject {

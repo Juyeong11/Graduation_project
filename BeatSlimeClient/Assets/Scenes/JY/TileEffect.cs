@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TileEffect : MonoBehaviour
 {
+    public float speed;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,7 +22,7 @@ public class TileEffect : MonoBehaviour
         float scale = 0.0f;
         while(scale <= 1.0f)
         {
-            scale += 0.25f*Time.deltaTime; 
+            scale += speed*Time.deltaTime; 
             gameObject.transform.localScale = new Vector3(scale, 0.01f, scale);
             yield return null;
         }
