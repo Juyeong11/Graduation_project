@@ -21,6 +21,7 @@ public class SceneDebugTool : MonoBehaviour
     {
         if (debug)
         {
+            //게임 시작
             if (Input.GetKeyDown(KeyCode.Return))
             {
                 FieldGameManager.Net.debugOnline = true;
@@ -50,6 +51,15 @@ public class SceneDebugTool : MonoBehaviour
                 //Debug.Log("Move Packet");
 
                 Network.MessQueue.Enqueue(tmp.GetBytes());
+            }
+
+            if (Input.GetKeyDown(KeyCode.Minus))
+            {
+                GameManager.data.enemy.GetComponent<EnemyManager>().HP.Damage(150);
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                GameManager.data.player.GetComponent<PlayerManager>().HP.Damage(40);
             }
         }
     }

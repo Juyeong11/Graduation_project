@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public enum playerState
 {
@@ -14,8 +15,6 @@ public class PlayerManager : MonoBehaviour
     public UnityEvent onPlayerStand;
     public UnityEvent onPlayerFly;
 
-    private bool isFly = false;
-    bool isReady = false;
 
     public playerState state;
     public PlayerKeyHandler handle;     //Invalid
@@ -25,19 +24,24 @@ public class PlayerManager : MonoBehaviour
     public HexGrid grid;
 
     public Transform PlayerTransform;
+    public Image PlayerHPImage;
+    public Image PlayerPrevHPImage;
+    public HPManager HP;
 
     bool playerAttacking;
     List<(Beat,float)> SettledBallBeats;
 
     public void Start()
     {
+        HP = new HPManager();
         playerAttacking = false;
         grid = GameManager.data.grid;
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
         SettledBallBeats = new List<(Beat,float)>();
+
+        HP.Initialized(false);
         //onPlayerFly.Invoke();
-        isFly = true;
     }
     public void LoginOk()
     {
@@ -45,7 +49,6 @@ public class PlayerManager : MonoBehaviour
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
-        isFly = true;
     }
 
     public void JumpTrig()
@@ -63,6 +66,7 @@ public class PlayerManager : MonoBehaviour
             PlayerRotateToLookAt();
             PlayerWCheck();
             BallBeatCheck();
+            CalcHPSlider();
         }
     }
 
@@ -378,4 +382,10 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    public void CalcHPSlider()
+    {
+        HP.hpUpdate();
+        PlayerHPImage.fillAmount = (float)HP.CurrentHP / (float)HP.MaxHp;
+        PlayerPrevHPImage.fillAmount = (float)HP.prevHP / (float)HP.MaxHp;
+    }
 }

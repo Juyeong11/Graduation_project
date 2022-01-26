@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.UI;
+
 public enum enemyState
 {
     Idle,
@@ -27,17 +28,25 @@ public class EnemyManager : MonoBehaviour
     //
     public List<BeatBall> enemyNoteList;
 
+    public Image EnemyHPImage;
+    public Image EnemyPrevHPImage;
+    public HPManager HP;
+
 
     void Start()
     {
+        HP = new HPManager();
         grid = GameManager.data.grid;
         state = enemyState.Idle;
+
+        HP.Initialized(true);
     }
 
     void Update()
     {
         reflectPosition();
         EnemyWCheck();
+        CalcHPSlider();
     }
 
     public void EnemyWCheck()
@@ -56,20 +65,6 @@ public class EnemyManager : MonoBehaviour
         grid.ePosition = selfCoord.coordinates;
     }
 
-    public void PatternSet()
-    {
-        //여기서 애니메이션 처리
-        grid.WarningCell(PatternManager.data.SettedPattern);
-
-        //노트 타입따라 다른 애니메이션 만들 때 패턴 설정도 해 줘야 함 (id 사용)
-    }
-
-    public void PatternServe()
-    {
-        //여기서 장판데미지 처리
-        grid.EnemyAttack(PatternManager.data.CastedPattern);
-    }
-
     public void BeatPatternServe(Beat NowBeat,Beat offset,GameObject destination)
     {
         selfAnim.SetTrigger("Attack");
@@ -81,5 +76,11 @@ public class EnemyManager : MonoBehaviour
     public void reflectPosition()
     {
         selfCoord.reflectPosition();
+    }
+    public void CalcHPSlider()
+    {
+        HP.hpUpdate();
+        EnemyHPImage.fillAmount = (float)HP.CurrentHP / (float)HP.MaxHp;
+        EnemyPrevHPImage.fillAmount = (float)HP.prevHP / (float)HP.MaxHp;
     }
 }
