@@ -36,7 +36,19 @@ public class EnemyManager : MonoBehaviour
 
     void Update()
     {
-        
+        reflectPosition();
+        EnemyWCheck();
+    }
+
+    public void EnemyWCheck()
+    {
+        //Debug.LogError(">Player W Coordinate Error!< [ Self W : " + selfCoord.coordinates.W + ", Cell W : " + grid.cellMaps.Get(selfCoord.coordinates).w + 1 + " ]");
+        //print("Self W : " + selfCoord.coordinates.W);
+        selfCoord.coordinates.W = grid.cellMaps.Get(selfCoord.coordinates).w + 1;
+        //PlayerTransform.position = calculatePlayerPosition();
+
+        //Debug.Log("z : " + gameObject.transform.position.z);
+
     }
 
     public void Beat()
@@ -64,5 +76,10 @@ public class EnemyManager : MonoBehaviour
 
         //오브젝트 풀 만들어서 풀링하기
         enemyNoteList[0].Init(NowBeat, offset, gameObject, destination);
+    }
+
+    public void reflectPosition()
+    {
+        selfCoord.reflectPosition();
     }
 }

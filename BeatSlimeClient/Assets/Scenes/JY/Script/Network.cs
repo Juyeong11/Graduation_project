@@ -16,8 +16,9 @@ public class Network
     Socket ClientSocket;
 
     byte[] receiveBytes = new byte[BUFSIZE];
-    byte[] tempBytes = new byte[BUFSIZE*2];
+    byte[] tempBytes = new byte[BUFSIZE * 2];
 
+    public bool debugOnline = false;
     public bool isOnline = false;
 
     int pre_buf_size = 0;
@@ -29,11 +30,11 @@ public class Network
         int index = 0;
 
         //이전에 받던 데이터가 있으면
-        if(pre_buf_size != 0)
+        if (pre_buf_size != 0)
         {
             Buffer.BlockCopy(receiveBytes, 0, tempBytes, pre_buf_size, strLength);
             //Array.Clear(receiveBytes, 0, receiveBytes.Length);
-           
+
         }
         else
         {
@@ -54,8 +55,8 @@ public class Network
             byte[] temp = new byte[size];
             Buffer.BlockCopy(tempBytes, index, temp, 0, size);
             index += size;
-           
-            if(index == strLength + pre_buf_size)
+
+            if (index == strLength + pre_buf_size)
             {
                 pre_buf_size = 0;
                 MessQueue.Enqueue(temp);
@@ -64,7 +65,7 @@ public class Network
             MessQueue.Enqueue(temp);
         }
 
-        
+
         ClientSocket.BeginReceive(receiveBytes, 0, BUFSIZE, SocketFlags.None, new System.AsyncCallback(receiveComplet), ClientSocket);
     }
     void sendComplet(System.IAsyncResult ar)
@@ -118,12 +119,14 @@ public class Network
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_login));
         pk.type = Protocol.CONSTANTS.CS_PACKET_LOGIN;
 
-        ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
 
     }
     public void CloseSocket()
     {
-        ClientSocket.Close();
+        if (isOnline)
+            ClientSocket.Close();
     }
     public void SendMovePacket(byte dir)
     {
@@ -133,8 +136,8 @@ public class Network
         pk.type = Protocol.CONSTANTS.CS_PACKET_MOVE;
 
         pk.direction = dir;
-
-        ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
 
     public void SendChangeSceneReadyPacket(byte isReady)
@@ -146,7 +149,8 @@ public class Network
 
         pk.is_ready = isReady;
 
-        ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
 
     public void SendGameStartReadyPacket()
@@ -156,7 +160,8 @@ public class Network
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_game_start_ready));
         pk.type = Protocol.CONSTANTS.CS_PACKET_GAME_START_READY;
 
-        ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
 
     public void SendreadPacket()
@@ -165,8 +170,8 @@ public class Network
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_read_map));
         pk.type = Protocol.CONSTANTS.CS_PACKET_READ_MAP;
 
-
-        ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
     public void SendWriteMapPacket(ArrayList datas)
     {
@@ -203,5 +208,10 @@ public class Network
 
         ClientSocket.BeginSend(end_pk.GetBytes(), 0, end_pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
 
+    }
+
+    public bool isServerOnline()
+    {
+        return debugOnline || isOnline;
     }
 }

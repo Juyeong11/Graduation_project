@@ -11,7 +11,7 @@ public class HexCellPosition : MonoBehaviour
     public float landOffsetZ = 0;
     public float landOffsetRotate = 0;
 
-    float preBeatedTime;
+    public float preBeatedTime;
 
     public void landOffSetter(float x, float y, float z, float r)
     {
@@ -44,65 +44,20 @@ public class HexCellPosition : MonoBehaviour
 
     public void reflectPosition()
     {
-        //gameObject.transform.position = new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W) , coordinates.X * 0.5f + coordinates.Z * 1f);
+        if (coordinates.X + coordinates.Y + coordinates.Z != 0)
+        {
+            Debug.LogError("reflectPosition checkSum error!!");
+        }
+        gameObject.transform.position = new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W) , coordinates.X * 0.5f + coordinates.Z * 1f);
     }
 
     static public float calculateWPosition(int w)
     {
         return w * 0.2f;
     }
-
-    //¿©±â¼­ Lerp
-    public Vector3 calculatePlayerPosition()
-    {
-        int beatTime = GameManager.data.timeByBeat;
-
-        float tick = LerpSquare((Time.time - preBeatedTime) * 1000f / beatTime);
-        float newX;
-        float newY;
-        float newZ;
-
-        newX = Mathf.Lerp(preCoordinates.X * 0.866f, coordinates.X * 0.866f, tick);
-        newZ = Mathf.Lerp(preCoordinates.X * 0.5f + preCoordinates.Z, coordinates.X * 0.5f + coordinates.Z, tick);
-        newY = SlimeWLerp(calculateWPosition(preCoordinates.W), calculateWPosition(coordinates.W), tick);
-
-        if (tick >= 1f)
-        {
-            preCoordinates = coordinates;
-        }
-
-        return new Vector3(newX, newY, newZ);
-    }
-
-    public float LerpSquare(float tick)
-    {
-        if (tick < 0.3f)
-            return 0f;
-        else if (tick < 0.7f)
-        {
-            return (tick - 0.3f) * 2.5f;
-        }
-        else
-            return 1f;
-    }
-    
     public void beat()
     {
 
-    }
-
-    public float SlimeWLerp(float a, float b, float t)
-    {
-        float skyHigh = (a+b)*0.5f + 2f;
-
-        if (t <0.5f)
-        {
-            return Mathf.Lerp(a, skyHigh, t);
-        }
-        else
-        {
-            return Mathf.Lerp(skyHigh, b, t);
-        }
     }
 
     public void setDirection(byte dir)

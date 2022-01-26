@@ -844,7 +844,6 @@ Transform:
   - {fileID: 132048414}
   m_Father: {fileID: 0}
   m_RootOrder: 2
-
   m_LocalEulerAnglesHint: {x: 20, y: 0.104, z: 0}
 --- !u!1001 &422432063
 PrefabInstance:
@@ -2165,19 +2164,16 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-
   - component: {fileID: 1398582649}
   - component: {fileID: 1398582651}
   - component: {fileID: 1398582650}
   m_Layer: 5
   m_Name: HP
-
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
-
 --- !u!224 &1398582649
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2198,13 +2194,11 @@ RectTransform:
   m_SizeDelta: {x: 132, y: 14}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1398582650
-
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-
   m_GameObject: {fileID: 1398582648}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -2235,7 +2229,6 @@ CanvasRenderer:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-
   m_GameObject: {fileID: 1398582648}
   m_CullTransparentMesh: 1
 --- !u!1 &1539401308
@@ -2473,6 +2466,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1639745175}
   - component: {fileID: 1639745174}
+  - component: {fileID: 1639745176}
   m_Layer: 0
   m_Name: MapMakerTool
   m_TagString: Untagged
@@ -2522,6 +2516,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1639745176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1639745173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b20744431004cfa49851959c0cf9f4f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debug: 1
+  patternDebug: 0
 --- !u!1 &1680913418 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5085428333877474993, guid: f231ab97c39217f4591707671f32053e, type: 3}
