@@ -38,7 +38,7 @@ public class MovementNoteFactory : MonoBehaviour
         timeByBeat = GameManager.data.timeByBeat;
 
         float tmp = timeByBeat;
-        while (tmp <= BeatTime.beatManager.musicTime)
+        while (tmp <= GameManager.data.totalSongTime)
         {
             moveNotesBeats.Add(tmp);
             tmp += timeByBeat;

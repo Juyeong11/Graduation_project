@@ -2102,6 +2102,7 @@ MonoBehaviour:
   landOffsetY: 0
   landOffsetZ: 0
   landOffsetRotate: 0
+  landOffsetScale: 0
   preBeatedTime: 0
 --- !u!114 &1227400883
 MonoBehaviour:
@@ -2653,6 +2654,7 @@ MonoBehaviour:
   landOffsetY: 0
   landOffsetZ: 0
   landOffsetRotate: 0
+  landOffsetScale: 0
   recipt: {fileID: 0}
   Mapdata: []
 --- !u!4 &1639745175
@@ -3500,7 +3502,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2121429942}
   - component: {fileID: 2121429943}
-  - component: {fileID: 2121429944}
   - component: {fileID: 2121429945}
   - component: {fileID: 2121429946}
   m_Layer: 0
@@ -3563,23 +3564,6 @@ MonoBehaviour:
   alreadyMoved: 0
   MidNote: {fileID: 710582776}
   MidANote: {fileID: 291758517}
---- !u!114 &2121429944
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2121429941}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1e5b90600307784c84f854e24be39ad, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  BPM: 124
-  musicTime: 145000
-  offsetTime: 156
-  warningBeat: 1
-  onMusicBeat: {fileID: 11400000, guid: e53d8608e0de84945a1b68967a261591, type: 2}
 --- !u!114 &2121429945
 MonoBehaviour:
   m_ObjectHideFlags: 0

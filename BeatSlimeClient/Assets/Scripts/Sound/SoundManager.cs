@@ -49,7 +49,7 @@ public class SoundManager : MonoBehaviour
                     bgmPlayer.clip = bgm[i].clip;
 
                     bgmPlayer.Play();
-               GameManager.data.gameObject.GetComponent<BeatManager>().MusicStart(bgmPlayer);
+               //GameManager.data.gameObject.GetComponent<BeatManager>().MusicStart(bgmPlayer);
             }
         }
     }
