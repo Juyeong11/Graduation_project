@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviour
     public BeatManager beatManager;
 
     public bool isGameStart;
-    public bool bGameStart;
 
     public string SongName;
 
@@ -78,10 +77,11 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-        if (!FieldGameManager.Net.isOnline) FieldGameManager.Net.CreateAndConnect();
-        else {
-            FieldGameManager.Net.SendGameStartReadyPacket();
-        }
+
+        if (!FieldGameManager.Net.isServerOnline()) FieldGameManager.Net.CreateAndConnect();
+
+        loader.LoadMap();
+
         //DEBUG
         enemy.GetComponent<HexCellPosition>().setInitPosition(1, 1);
         PM = PatternManager.data;
@@ -90,23 +90,23 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (Input.GetKeyDown("1"))
+
+        //if (Input.GetKeyDown("1"))
+        //{
+        //if (Mapdata.Count != 0)
+        //FieldGameManager.Net.SendWriteMapPacket(Mapdata);
+        //}
+        //else if (Input.GetKeyDown(KeyCode.BackQuote))
+        //{
+        //    FieldGameManager.Net.SendreadPacket();
+        //}
+        if (Input.GetKeyDown(KeyCode.Return))
         {
-            if (Mapdata.Count != 0)
-                FieldGameManager.Net.SendWriteMapPacket(Mapdata);
-        }
-        else if (Input.GetKeyDown(KeyCode.BackQuote))
-        {
-            FieldGameManager.Net.SendreadPacket();
+            FieldGameManager.Net.SendGameStartReadyPacket();
         }
 
 
-        if (bGameStart)
-        {
-            PlaySound();
-        }
-
-        if (isGameStart && !FieldGameManager.Net.isOnline)
+        if (isGameStart && !FieldGameManager.Net.isServerOnline())
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -135,7 +135,7 @@ public class GameManager : MonoBehaviour
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
         }
-        else if (isGameStart && FieldGameManager.Net.isOnline)
+        else if (isGameStart && FieldGameManager.Net.isServerOnline())
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -164,7 +164,7 @@ public class GameManager : MonoBehaviour
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
         }
-        if (FieldGameManager.Net.isOnline)
+        if (FieldGameManager.Net.isServerOnline())
         {
             // ��Ʈ��ũ �޼��� ť
             if (Network.MessQueue.Count > 0)
@@ -188,7 +188,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:
                         {
                             Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
-
+                            Debug.Log("GS PACKET x : " + p.boss_id);
                             ids[0] = p.id1;
                             ids[1] = p.id2;
                             ids[2] = p.id3;
@@ -198,7 +198,7 @@ public class GameManager : MonoBehaviour
                             myPlayerID = pid;
                             Objects[3] = enemy;
                             Objects[3].SetActive(true);
-                            
+
                             PlaySound();
                         }
                         break;
@@ -206,14 +206,17 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
+                            Debug.Log("MOVE PACKET x : " + p.x);
+
                             int pid = ServerID_To_ClientID(p.id);
                             //Debug.Log(p.id+"�̵�");
                             Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
                             Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                             if (pid == myPlayerID)// �÷��̾� �̸�
                                 Objects[pid].GetComponent<PlayerManager>().JumpTrig();
-                            else if(pid < 3)
+                            else if (pid < 3)
                                 Objects[pid].GetComponent<InGameOtherPlayerManager>().JumpTrig();
+
 
                         }
                         break;
@@ -237,9 +240,10 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_put_object p = Protocol.sc_packet_put_object.SetByteToVar(data);
                             int pid = ServerID_To_ClientID(p.id);
-                            if (pid == myPlayerID) {
+                            if (pid == myPlayerID)
+                            {
                                 Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                                break; 
+                                break;
                             }
                             //PutObject(p.type, p.id, p.x, p.y);
                             switch (p.obj_type)
@@ -330,7 +334,7 @@ public class GameManager : MonoBehaviour
                             //Debug.Log(start_x+ " " + start_y + " " + start_z + " " + start_w);
                             //EffectManager.instance.BossTileEffect1(0, 0, 0, 0);
                         }
-                            break;
+                        break;
                     default:
                         Debug.Log("�̻��� Ÿ���̳�" + type);
                         break;
@@ -353,7 +357,7 @@ public class GameManager : MonoBehaviour
         {
             if (id == ids[i]) return i;
         }
-        Debug.Log("���̵� ����");
+        Debug.Log("���� ID�Դϴ�");
         return -1;
     }
     public void PlaySound()
@@ -384,7 +388,7 @@ public class GameManager : MonoBehaviour
             }
             else if (timeByBeat - beatCounter <= JudgementTiming)
             {
-                //MidNote.notePerfect();
+                MidNote.notePerfect();
                 return 1;   //�ʰ� ����
             }
             else

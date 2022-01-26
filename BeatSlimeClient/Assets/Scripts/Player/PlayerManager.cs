@@ -55,26 +55,6 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
-        //DEBUG
-        //if (GameManager.data.isGameStart)
-        //    resetPosition();
-        //else
-        //   gameObject.transform.position = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y -2.f*Time.deltaTime, gameObject.transform.position.z);
-
-        /*        if (gameObject.transform.position.y < -0.1f)
-                {
-                    if (isFly)
-                    {
-                        onPlayerStand.Invoke();
-                        isFly = false;
-                    }
-                }*/
-
-        //if (GameManager.data.Net.isOnline)
-        //{
-        //    GameManager.data.PlaySound();
-        //}
-
         if (GameManager.data.isGameStart)
         {
             playerAttacking = false;
@@ -82,30 +62,8 @@ public class PlayerManager : MonoBehaviour
             KeyHandler();
             PlayerRotateToLookAt();
             PlayerWCheck();
-            PlayerPortalCheck();
             BallBeatCheck();
         }
-    }
-    public void PlayerPortalCheck()
-    {
-        // 클라에서 플레이어가 포탈에 있는지 위치 검사 후 맞다면 -> 서버에 패킷 전송 -> 서버에서 해당 좌표가 포탈이 맞는지 확인
-        // -> 맞다면 ready상태 이펙트 패킷 전송 -> 3명이 다 준비되면 씬 전환
-
-        // 포탈 타일인지 확인 지금은 0,0,0     1,0,-1     0,1,-1로 함 -> 씬 전환 잘되면 Cell에 type 추가해 비교하는 방법으로 바꾸자
-        if(selfCoord.coordinates.X == 3 && selfCoord.coordinates.Z == -3 ||
-            selfCoord.coordinates.X == 3 && selfCoord.coordinates.Z == -2 ||
-            selfCoord.coordinates.X == 2 && selfCoord.coordinates.Z == -2)
-        {
-            if (isReady) return;
-            //FieldGameManager.Net.SendChangeSceneReadyPacket(1);
-            isReady = true;
-            return;
-        }
-        else if (isReady)
-        {
-            //FieldGameManager.Net.SendChangeSceneReadyPacket(0);
-        }
-        isReady = false;
     }
 
     public void PlayerWCheck()
@@ -116,7 +74,7 @@ public class PlayerManager : MonoBehaviour
             //print("Self W : " + selfCoord.coordinates.W);
             selfCoord.coordinates.W = grid.cellMaps.Get(selfCoord.coordinates).w + 1;
         }
-        PlayerTransform.position = selfCoord.calculatePlayerPosition();
+        PlayerTransform.position = calculatePlayerPosition();
 
         //Debug.Log("z : " + gameObject.transform.position.z);
 
@@ -370,4 +328,54 @@ public class PlayerManager : MonoBehaviour
             }
         }
     }
+
+
+    //여기서 Lerp
+    public Vector3 calculatePlayerPosition()
+    {
+        int beatTime = GameManager.data.timeByBeat;
+
+        float tick = LerpSquare((Time.time - selfCoord.preBeatedTime) * 1000f / beatTime);
+        float newX;
+        float newY;
+        float newZ;
+
+        newX = Mathf.Lerp(selfCoord.preCoordinates.X * 0.866f, selfCoord.coordinates.X * 0.866f, tick);
+        newZ = Mathf.Lerp(selfCoord.preCoordinates.X * 0.5f + selfCoord.preCoordinates.Z, selfCoord.coordinates.X * 0.5f + selfCoord.coordinates.Z, tick);
+        newY = SlimeWLerp(HexCellPosition.calculateWPosition(selfCoord.preCoordinates.W), HexCellPosition.calculateWPosition(selfCoord.coordinates.W), tick);
+
+        if (tick >= 1f)
+        {
+            selfCoord.preCoordinates = selfCoord.coordinates;
+        }
+
+        return new Vector3(newX, newY, newZ);
+    }
+
+    public float LerpSquare(float tick)
+    {
+        if (tick < 0.3f)
+            return 0f;
+        else if (tick < 0.7f)
+        {
+            return (tick - 0.3f) * 2.5f;
+        }
+        else
+            return 1f;
+    }
+
+    public float SlimeWLerp(float a, float b, float t)
+    {
+        float skyHigh = (a + b) * 0.5f + 2f;
+
+        if (t < 0.5f)
+        {
+            return Mathf.Lerp(a, skyHigh, t);
+        }
+        else
+        {
+            return Mathf.Lerp(skyHigh, b, t);
+        }
+    }
+
 }
