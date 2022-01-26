@@ -55,6 +55,7 @@ public class MapLoader : MonoBehaviour
             float oy = float.Parse(landdatas[i]["offY"].ToString());
             float oz = float.Parse(landdatas[i]["offZ"].ToString());
             float or = float.Parse(landdatas[i]["offRotate"].ToString());
+            float os = float.Parse(landdatas[i]["offScale"].ToString());
             int c = int.Parse(landdatas[i]["color"].ToString());
             int t = int.Parse(landdatas[i]["type"].ToString());
 
@@ -72,7 +73,7 @@ public class MapLoader : MonoBehaviour
             p_templand.id = MapMaker.landId;
 
             GameObject tmpcell = Instantiate(GameManager.data.grid.LandType[c]);
-            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or);
+            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or, os);
             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
             tmpcell.name = "land" + MapMaker.landId++;
             tmpcell.transform.parent = GRID.transform;

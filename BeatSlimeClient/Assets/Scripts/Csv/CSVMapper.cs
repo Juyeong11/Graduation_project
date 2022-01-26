@@ -50,6 +50,7 @@ public class CSVMapper : MonoBehaviour
             float oy = float.Parse(landdatas[i]["offY"].ToString());
             float oz = float.Parse(landdatas[i]["offZ"].ToString());
             float or = float.Parse(landdatas[i]["offRotate"].ToString());
+            float os = float.Parse(landdatas[i]["offScale"].ToString());
             int c = int.Parse(landdatas[i]["color"].ToString());
             int t = int.Parse(landdatas[i]["type"].ToString());
 
@@ -63,11 +64,12 @@ public class CSVMapper : MonoBehaviour
             p_templand.offY = oy;
             p_templand.offZ = oz;
             p_templand.offRotate = or;
+            p_templand.offScale = os;
             p_templand.color = c;
             p_templand.id = MapMaker.landId;
 
             GameObject tmpcell = Instantiate(MM.grid.LandType[c]);
-            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or);
+            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or, os);
             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
             tmpcell.name = "land" + MapMaker.landId++;
             tmpcell.transform.parent = gameObject.transform;
@@ -170,7 +172,7 @@ public class CSVMapper : MonoBehaviour
             {
                 using (var writer = new CsvFileWriter("Assets/Resources/LandCSV/" + mapName + ".csv"))
                 {
-                    List<string> columns = new List<string>() { "id", "x", "y", "z", "w", "offX", "offY", "offZ", "offRotate", "color", "type" };// making Index Row
+                    List<string> columns = new List<string>() { "id", "x", "y", "z", "w", "offX", "offY", "offZ", "offRotate","offScale", "color", "type" };// making Index Row
                     writer.WriteRow(columns);
                     columns.Clear();
 
@@ -185,6 +187,7 @@ public class CSVMapper : MonoBehaviour
                         columns.Add(MM.LandScapedata[i].offY.ToString());
                         columns.Add(MM.LandScapedata[i].offZ.ToString());
                         columns.Add(MM.LandScapedata[i].offRotate.ToString());
+                        columns.Add(MM.LandScapedata[i].offScale.ToString());
                         columns.Add(MM.LandScapedata[i].color.ToString());
                         columns.Add(MM.LandScapedata[i].type.ToString());
                         writer.WriteRow(columns);

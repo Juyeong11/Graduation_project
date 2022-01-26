@@ -10,17 +10,20 @@ public class HexCellPosition : MonoBehaviour
     public float landOffsetY = 0;
     public float landOffsetZ = 0;
     public float landOffsetRotate = 0;
+    public float landOffsetScale = 0;
 
     public float preBeatedTime;
 
-    public void landOffSetter(float x, float y, float z, float r)
+    public void landOffSetter(float x, float y, float z, float r, float s)
     {
         landOffsetX = x;
         landOffsetY = y;
         landOffsetZ = z;
         landOffsetRotate = r;
+        landOffsetScale = s;
 
         gameObject.transform.rotation = Quaternion.Euler(new Vector3(0, landOffsetRotate, 0));
+        gameObject.transform.localScale = new Vector3(gameObject.transform.localScale.x + landOffsetScale, gameObject.transform.localScale.y + landOffsetScale, gameObject.transform.localScale.z + landOffsetScale);
     }
     public void setInitPosition(int x, int z,int w=0)
     {

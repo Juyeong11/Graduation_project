@@ -21,6 +21,7 @@ public class MapMaker : MonoBehaviour
     public float landOffsetY = 0;
     public float landOffsetZ = 0;
     public int landOffsetRotate = 0;
+    public float landOffsetScale = 0;
 
     static public int cellId = 0;
     static public int landId = 0;
@@ -105,11 +106,11 @@ public class MapMaker : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.PageUp))
             {
-                landOffsetY += 0.05f;
+                landOffsetY += 0.02f;
             }
             if (Input.GetKeyDown(KeyCode.PageDown))
             {
-                landOffsetY -= 0.05f;
+                landOffsetY -= 0.02f;
             }
             if (Input.GetKeyDown(KeyCode.LeftBracket))  //[
             {
@@ -122,6 +123,23 @@ public class MapMaker : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha0))  //-
             {
                 dir = 0;
+                landOffsetX = 0f;
+                landOffsetY = 0f;
+                landOffsetZ = 0f;
+                landOffsetRotate = 0;
+                tmpLand.transform.localScale = new Vector3(tmpLand.transform.localScale.x - landOffsetScale, tmpLand.transform.localScale.y - landOffsetScale, tmpLand.transform.localScale.z - landOffsetScale);
+                landOffsetScale = 0f;
+                w = 0;
+            }
+            if (Input.GetKeyDown(KeyCode.Comma))
+            {
+                landOffsetScale -= 0.1f;
+                tmpLand.transform.localScale = new Vector3(tmpLand.transform.localScale.x - 0.1f, tmpLand.transform.localScale.y - 0.1f, tmpLand.transform.localScale.z - 0.1f);
+            }
+            if (Input.GetKeyDown(KeyCode.Period))
+            {
+                landOffsetScale += 0.1f;
+                tmpLand.transform.localScale = new Vector3(tmpLand.transform.localScale.x + 0.1f, tmpLand.transform.localScale.y + 0.1f, tmpLand.transform.localScale.z + 0.1f);
             }
             if (Input.GetKeyDown(KeyCode.Minus))  //-
             {
@@ -223,7 +241,7 @@ public class MapMaker : MonoBehaviour
                         else
                         {
                             GameObject tmpland = Instantiate(grid.LandType[landType]);
-                            tmpland.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate);
+                            tmpland.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate,landOffsetScale);
                             tmpland.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1, w);
                             tmpland.name = "land";// + GameManager.data.mapCellid;
                             tmpland.transform.parent = grid.transform;
@@ -239,6 +257,7 @@ public class MapMaker : MonoBehaviour
                             p_templand.offY = landOffsetY;
                             p_templand.offZ = landOffsetZ;
                             p_templand.offRotate = landOffsetRotate;
+                            p_templand.offScale = landOffsetScale;
                             p_templand.color = landType;
                             //p_tempcell.id = GameManager.data.mapCellid++;
                             p_templand.id = landId++;
@@ -281,7 +300,7 @@ public class MapMaker : MonoBehaviour
                         else
                         {
                             GameObject tmpcell = Instantiate(grid.LandType[landType]);
-                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate);
+                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
@@ -297,6 +316,7 @@ public class MapMaker : MonoBehaviour
                             p_templand.offY = landOffsetY;
                             p_templand.offZ = landOffsetZ;
                             p_templand.offRotate = landOffsetRotate;
+                            p_templand.offScale = landOffsetScale;
                             p_templand.color = landType;
                             //p_tempcell.id = GameManager.data.mapCellid++;
                             p_templand.id = landId++;
@@ -339,7 +359,7 @@ public class MapMaker : MonoBehaviour
                         else
                         {
                             GameObject tmpcell = Instantiate(grid.LandType[landType]);
-                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate);
+                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
@@ -355,6 +375,7 @@ public class MapMaker : MonoBehaviour
                             p_templand.offY = landOffsetY;
                             p_templand.offZ = landOffsetZ;
                             p_templand.offRotate = landOffsetRotate;
+                            p_templand.offScale = landOffsetScale;
                             p_templand.color = landType;
                             //p_tempcell.id = GameManager.data.mapCellid++;
                             p_templand.id = landId++;
@@ -397,7 +418,7 @@ public class MapMaker : MonoBehaviour
                         else
                         {
                             GameObject tmpcell = Instantiate(grid.LandType[landType]);
-                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate);
+                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
@@ -413,6 +434,7 @@ public class MapMaker : MonoBehaviour
                             p_templand.offY = landOffsetY;
                             p_templand.offZ = landOffsetZ;
                             p_templand.offRotate = landOffsetRotate;
+                            p_templand.offScale = landOffsetScale;
                             p_templand.color = landType;
                             //p_tempcell.id = GameManager.data.mapCellid++;
                             p_templand.id = landId++;
@@ -455,7 +477,7 @@ public class MapMaker : MonoBehaviour
                         else
                         {
                             GameObject tmpcell = Instantiate(grid.LandType[landType]);
-                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate);
+                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z - 1, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
@@ -471,6 +493,7 @@ public class MapMaker : MonoBehaviour
                             p_templand.offY = landOffsetY;
                             p_templand.offZ = landOffsetZ;
                             p_templand.offRotate = landOffsetRotate;
+                            p_templand.offScale = landOffsetScale;
                             p_templand.color = landType;
                             //p_tempcell.id = GameManager.data.mapCellid++;
                             p_templand.id = landId++;
@@ -513,7 +536,7 @@ public class MapMaker : MonoBehaviour
                         else
                         {
                             GameObject tmpcell = Instantiate(grid.LandType[landType]);
-                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate);
+                            tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z - 1, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
                             tmpcell.transform.parent = grid.transform;
@@ -529,6 +552,7 @@ public class MapMaker : MonoBehaviour
                             p_templand.offY = landOffsetY;
                             p_templand.offZ = landOffsetZ;
                             p_templand.offRotate = landOffsetRotate;
+                            p_templand.offScale = landOffsetScale;
                             p_templand.color = landType;
                             //p_tempcell.id = GameManager.data.mapCellid++;
                             p_templand.id = landId++;
@@ -731,6 +755,7 @@ public class MapMaker : MonoBehaviour
             }
             tmpLand.transform.position = new Vector3(tmp.transform.position.x + landOffsetX, tmp.transform.position.y + landOffsetY, tmp.transform.position.z + landOffsetZ);
             tmpLand.transform.rotation = Quaternion.Euler(new Vector3(0, landOffsetRotate, 0));
+
         }
     }
 }

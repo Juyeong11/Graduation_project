@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3018296117430239388}
   - component: {fileID: 2183401147456409401}
   - component: {fileID: 4154580068372397043}
+  - component: {fileID: 8142486946510990375}
   m_Layer: 0
   m_Name: WaterTile
   m_TagString: Untagged
@@ -25,7 +26,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2497515370922809894}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.313, y: 3.102, z: 19.207}
   m_LocalScale: {x: 2.14, y: 2.14, z: 2.14}
   m_Children: []
@@ -81,3 +82,29 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8142486946510990375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2497515370922809894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6defb06d774d9a4b85bc5e60097dc2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  coordinates:
+    x: 0
+    z: 0
+    w: 0
+  preCoordinates:
+    x: 0
+    z: 0
+    w: 0
+  direction: 0
+  landOffsetX: 0
+  landOffsetY: 0
+  landOffsetZ: 0
+  landOffsetRotate: 0
+  preBeatedTime: 0

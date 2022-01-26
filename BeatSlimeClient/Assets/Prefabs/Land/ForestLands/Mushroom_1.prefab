@@ -121,7 +121,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8626966361617486887}
-  - component: {fileID: 5783058807380502202}
+  - component: {fileID: -2122650461627891362}
   m_Layer: 0
   m_Name: Mushroom_1
   m_TagString: Untagged
@@ -144,7 +144,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5783058807380502202
+--- !u!114 &-2122650461627891362
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -153,18 +153,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 8626966361617486886}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bb0d87920b3ec24eacb460dc23ca478, type: 3}
+  m_Script: {fileID: 11500000, guid: a6defb06d774d9a4b85bc5e60097dc2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MakeMapWithoutMapPacket: 0
-  TMP: 0
-  cellType: []
-  LandType: []
-  pPosition:
+  coordinates:
     x: 0
     z: 0
     w: 0
-  ePosition:
+  preCoordinates:
     x: 0
     z: 0
     w: 0
+  direction: 0
+  landOffsetX: 0
+  landOffsetY: 0
+  landOffsetZ: 0
+  landOffsetRotate: 0
+  preBeatedTime: 0

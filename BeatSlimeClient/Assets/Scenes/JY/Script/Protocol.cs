@@ -96,7 +96,7 @@ namespace Protocol
     {
         public int id;
         public int x, y, z, w;
-        public float offX, offY, offZ, offRotate;
+        public float offX, offY, offZ, offRotate, offScale;
         public int color, type;
 
     }
