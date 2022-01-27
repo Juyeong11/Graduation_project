@@ -10,6 +10,7 @@ public class CSVMapper : MonoBehaviour
 
     void Start()
     {
+
         List<Dictionary<string, object>> datas = CSVReader.Read("MapCSV/" + mapName);
         List<Dictionary<string, object>> landdatas = CSVReader.Read("LandCSV/" + mapName);
 
@@ -83,6 +84,9 @@ public class CSVMapper : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.End))
         {
+            PlayerPrefs.SetInt("MapMakerX", MM.playerPosition.coordinates.X);
+            PlayerPrefs.SetInt("MapMakerW", MM.w);
+            PlayerPrefs.SetInt("MapMakerZ", MM.playerPosition.coordinates.Z);
             if (MM.cellMode)
             {
                 using (var writer = new CsvFileWriter("Assets/Resources/MapCSV/" + mapName + ".csv"))

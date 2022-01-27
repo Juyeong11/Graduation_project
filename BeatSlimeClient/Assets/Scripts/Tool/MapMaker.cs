@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class MapMaker : MonoBehaviour
 {
@@ -26,11 +28,17 @@ public class MapMaker : MonoBehaviour
     static public int cellId = 0;
     static public int landId = 0;
 
+    public Text witch;
+
     public GameObject recipt;
 
     public List<Protocol.Map> Mapdata = new List<Protocol.Map>();
     public List<Protocol.LandScape> LandScapedata = new List<Protocol.LandScape>();
 
+    void Start()
+    {
+        w = PlayerPrefs.GetInt("MapMakerW", 0);
+    }
     // Update is called once per frame
     void Update()
     {
@@ -119,6 +127,15 @@ public class MapMaker : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.RightBracket))  //]
             {
                 w++;
+            }
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                PlayerPrefs.SetInt("MapMakerX", playerPosition.coordinates.X);
+                PlayerPrefs.SetInt("MapMakerW", w);
+                PlayerPrefs.SetInt("MapMakerZ", playerPosition.coordinates.Z);
+                int scene = SceneManager.GetActiveScene().buildIndex;
+                SceneManager.LoadScene(scene, LoadSceneMode.Single);
+                Time.timeScale = 1;
             }
             if (Input.GetKeyDown(KeyCode.Alpha0))  //-
             {
@@ -726,36 +743,48 @@ public class MapMaker : MonoBehaviour
                 }
                 dir = 0;
             }
+
+            HexCoordinates t = new HexCoordinates();
+            t = playerPosition.coordinates;
             switch (dir)
             {
                 case 0:
-                    tmp.transform.position = new Vector3(1000f, 1000f, 1000f);
+                    t.X = 1000;
+                    t.Z = 1000;
                     break;
                 case 1:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1, w);
+                    t.X -= 1;
+                    t.Z += 1;
                     break;
                 case 2:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1, w);
+                    t.Z += 1;
                     break;
                 case 3:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z, w);
+                    t.X += 1;
                     break;
                 case 4:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z, w);
+                    t.X -= 1;
                     break;
                 case 5:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z - 1, w);
+                    t.Z -= 1;
                     break;
                 case 6:
-                    tmp.transform.position = HexCellPosition.getRealPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z - 1, w);
+                    t.X += 1;
+                    t.Z -= 1;
                     break;
                 default:
-                    tmp.transform.position = new Vector3(1000f, 1000f, 1000f);
+                    t.X = 1000;
+                    t.Z = 1000;
                     break;
             }
+            tmp.transform.position = HexCellPosition.getRealPosition(t.X,t.Z,w);
+
             tmpLand.transform.position = new Vector3(tmp.transform.position.x + landOffsetX, tmp.transform.position.y + landOffsetY, tmp.transform.position.z + landOffsetZ);
             tmpLand.transform.rotation = Quaternion.Euler(new Vector3(0, landOffsetRotate, 0));
 
-        }
+            witch.text = "( " + (t.X == 1000 ? playerPosition.coordinates.X : t.X) + ", " + (t.Y == -2000 ? playerPosition.coordinates.Y : t.Y) + ", " + (t.Z == 1000 ? playerPosition.coordinates.Z : t.Z) + " ) , " + w + "\n"
+                + (cellMode ? type : landType) + ", offset-> " + landOffsetX + ", " + landOffsetY + ", " + landOffsetZ + ", rotate : " + landOffsetRotate + ", Scale : " + landOffsetScale;
+
+}
     }
 }

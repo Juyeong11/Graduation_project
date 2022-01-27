@@ -13,6 +13,9 @@ public class MapMakersController : MonoBehaviour
         var CT = CCO.GetCinemachineComponent<CinemachineTransposer>();
         CT.m_FollowOffset.y = 3f;
         CT.m_FollowOffset.z = -4f;
+
+        playerPosition.coordinates.X = PlayerPrefs.GetInt("MapMakerX", 0);
+        playerPosition.coordinates.Z = PlayerPrefs.GetInt("MapMakerZ", 0);
     }
     // Update is called once per frame
     void Update()
