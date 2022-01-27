@@ -4,7 +4,7 @@
 Members.
 - 정내훈 교수님 (zzapuno) / Academic Adviser
 - Riu / Programmer
-- SH-Broar / Programmer
+- SH-Broar / Sound
 - MINGO / Graphic
 
 Links.
@@ -16,4 +16,7 @@ https://terrorist.atlassian.net/wiki/spaces/GRADUATION/overview
 
 
 How Start.
-- build MiniEngine/ProjectTemplates/AppTemplate.sln
+- build BeatSlimeServer/Server/Server.sln
+- build BeatSlimeClient (w/ unity 2020.3.20f1)
+- start BeatSlimeServer
+- start BeatSlimeClient by 3.
