@@ -35,6 +35,7 @@ namespace Protocol
         public const byte SC_PACKET_MAP_DATA = 7;
         public const byte SC_PACKET_CHANGE_SCENE = 8;
         public const byte SC_PACKET_EFFECT = 9;
+        public const byte SC_PACKET_GAME_END = 10;
     }
     enum DIR
     {
@@ -187,6 +188,7 @@ namespace Protocol
         public int id;
         public int target_id;
         public byte direction;
+        public int hp;
     }
 
     [Serializable]
@@ -253,6 +255,16 @@ namespace Protocol
     {
         public byte size;
         public byte type;
+
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_game_end : ISerializeble<sc_packet_game_end>
+    {
+        public byte size;
+        public byte type;
+        public byte end_type;
 
     }
 }

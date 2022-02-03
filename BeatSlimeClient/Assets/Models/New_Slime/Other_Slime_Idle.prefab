@@ -184,7 +184,7 @@ GameObject:
   - component: {fileID: 7696573392222074292}
   - component: {fileID: 7696573392222074293}
   m_Layer: 0
-  m_Name: Slime_Idle
+  m_Name: Other_Slime_Idle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -304,13 +304,6 @@ MonoBehaviour:
     x: 0
     z: 0
     w: 0
-  direction: 0
-  landOffsetX: 0
-  landOffsetY: 0
-  landOffsetZ: 0
-  landOffsetRotate: 0
-  landOffsetScale: 0
-  preBeatedTime: 0
 --- !u!114 &7696573392222074293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -372,6 +365,3 @@ MonoBehaviour:
   selfDirection: 0
   grid: {fileID: 0}
   PlayerTransform: {fileID: 7873701472968955038}
-  PlayerHPImage: {fileID: 0}
-  PlayerPrevHPImage: {fileID: 0}
-  isThisCurrentPlayingPlayerObject: 1

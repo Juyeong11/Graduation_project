@@ -8,7 +8,8 @@
 
 enum EVENT_TYPE {
 	EVENT_BOSS_MOVE, EVENT_BOSS_TARGETING_ATTACK, EVENT_PLAYER_PARRYING,
-	EVENT_BOSS_TILE_ATTACK_START, EVENT_BOSS_TILE_ATTACK
+	EVENT_BOSS_TILE_ATTACK_START, EVENT_BOSS_TILE_ATTACK,
+	EVENT_GAME_END
 };
 enum PATTERN_TYPE { ONE_LINE, SIX_LINE, AROUND };
 struct timer_event {
@@ -61,12 +62,14 @@ public:
 
 	void send_login_ok(int client_id);
 	void send_move_object(int client_id, int mover_id);
-	void send_attack_player(int client_id, int target_id, int receiver);
+	void send_attack_player(int attacker, int target_id, int receiver);
 	void send_put_object(int client_id, int target_id);
 	void send_remove_object(int client_id, int victim_id);
 	void send_map_data(int client_id, char* data, int nShell);
 	void send_change_scene(int client_id, int map_type);
 	void send_game_start(int client_id, int ids[3], int boss_id);
+	void send_game_end(int client_id,char end_type);
+
 	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time, int x, int y, int z);
 	void disconnect_client(int client_id);
 
@@ -77,10 +80,17 @@ public:
 
 		return true;
 	}
-	bool can_attack(int a, int b)
+	bool is_attack(int a, int b)
 	{
 		if (ATTACK_RANGE < abs(clients[a]->x - clients[b]->x)) return false;
 		if (ATTACK_RANGE < abs(clients[a]->z - clients[b]->z)) return false;
+
+		return true;
+	}
+	bool is_attack(int a, int x, int z)
+	{
+		if (ATTACK_RANGE < abs(clients[a]->x - x)) return false;
+		if (ATTACK_RANGE < abs(clients[a]->z - z)) return false;
 
 		return true;
 	}
@@ -109,7 +119,7 @@ public:
 	}
 	void do_npc_move(int npc_id);
 	void do_npc_attack(int npc_id, int target_id, int receiver);
-	void do_npc_tile_attack();
+	void do_npc_tile_attack(int game_room_id,int x,int y, int z);
 
 	void do_timer() {
 		using namespace std;
@@ -157,10 +167,16 @@ public:
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.x;
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.y;
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.z;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.game_room_id;
+
 						break;
 					case EVENT_PLAYER_PARRYING:
 						ex_over->_comp_op = OP_PLAYER_PARRYING;
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
+						break;
+					case EVENT_GAME_END:
+						ex_over->_comp_op = OP_PLAYER_PARRYING;
+						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
 						break;
 					default:
 						break;
@@ -188,6 +204,16 @@ public:
 
 	int find_max_hp_player(int game_room_id);
 	int find_min_hp_player(int game_room_id);
+
+	void check_game_over(int game_room_id, int dead_charactor_id) {
+		// 게임 오버 패킷을 보내고
+
+	}
+
+	void check_game_clear(int hp) {
+		// 게임  패킷을 보내고
+
+	}
 private:
 	concurrency::concurrent_priority_queue<timer_event> timer_queue;
 	concurrency::concurrent_queue<EXP_OVER*> exp_over_pool;
