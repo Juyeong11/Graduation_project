@@ -227,17 +227,16 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_ATTACK:
                         {
                             Protocol.sc_packet_attack p = Protocol.sc_packet_attack.SetByteToVar(data);
-                            //Debug.Log(p.id+"ï¿½ï¿½ " + p.target_id + "ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½");
-                            //MoveObject(p.type, p.id, p.x, p.y);
-                            //Debug.Log(p.x + "," + p.y + ", " + p.z);
 
-                            //Debug.Log(p.id+"ï¿½Ìµï¿½");
-                            //Objects[p.id].GetComponent<HexCellPosition>().setDirection(p.direction);
 
                             int target_id = ServerID_To_ClientID(p.target_id);
-                            int randomTickForTest = 4;//Random.Range(1, 6);
-                            enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
-                            Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
+                            //int randomTickForTest = 4;//Random.Range(1, 6);
+                            //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
+                            //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
+                            //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
+                            
+                            HPManager hm = Objects[target_id].GetComponent<PlayerManager>().HP;
+                            hm.Damage(hm.CurrentHP - p.hp);
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
@@ -330,17 +329,17 @@ public class GameManager : MonoBehaviour
                                 start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
                                 start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
                             }
-                            int start_w = 0;//Objects[tid].GetComponent<HexCellPosition>().coordinates.W;
+                            int start_w = 1;//Objects[tid].GetComponent<HexCellPosition>().coordinates.W;
                             switch (p.effect_type)
                             {
                                 case 3:
-                                    EffectManager.instance.BossTileEffect3(start_x, start_y, start_z, start_w, p.charging_time);
+                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,3);
                                     break;
                                 case 4:
-                                    EffectManager.instance.BossTileEffect4(start_x, start_y, start_z, start_w, p.charging_time);
+                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,4);
                                     break;
                                 case 99:
-                                    EffectManager.instance.OneTileEffect(start_x, start_y, start_z, start_w, p.charging_time);
+                                    EffectManager.instance.OneTileEffect(start_x, start_y, start_z, p.charging_time);
                                     break;
                                 case 5:
                                     break;
@@ -349,6 +348,13 @@ public class GameManager : MonoBehaviour
 
                             //Debug.Log(start_x+ " " + start_y + " " + start_z + " " + start_w);
                             //EffectManager.instance.BossTileEffect1(0, 0, 0, 0);
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_GAME_END:
+                        {
+                            Protocol.sc_packet_game_end p = Protocol.sc_packet_game_end.SetByteToVar(data);
+
+                            Debug.Log("Game_Over");
                         }
                         break;
                     default:
@@ -373,7 +379,7 @@ public class GameManager : MonoBehaviour
         {
             if (id == ids[i]) return i;
         }
-        Debug.Log("ï¿½ï¿½ï¿½ï¿½ IDï¿½Ô´Ï´ï¿½");
+        Debug.Log("Àß¸øµÈ Å¬¶óÀÌ¾ðÆ® id");
         return -1;
     }
     public void PlaySound()

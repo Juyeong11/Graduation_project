@@ -156,14 +156,15 @@ void Network::send_move_object(int c_id, int mover)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
-void Network::send_attack_player(int c_id, int target, int receiver)
+void Network::send_attack_player(int attacker, int target, int receiver)
 {
 	sc_packet_attack packet;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_ATTACK;
-	packet.id = c_id;
+	packet.id = attacker;
 	packet.target_id = target;
-	packet.direction = DOWN;
+	packet.direction = clients[attacker]->direction;
+	packet.hp = clients[target]->hp;
 	//packet.move_time = clients[mover]->last_move_time;
 
 	EXP_OVER* ex_over;
@@ -220,6 +221,22 @@ void Network::send_map_data(int c_id, char* data, int nShell)
 	ex_over->set_exp(OP_SEND, packet.size, &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 
+}
+
+void Network::send_game_end(int c_id, char end_type)
+{
+	sc_packet_game_end packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_GAME_END;
+	packet.end_type = end_type;
+
+
+	//packet.move_time = clients[mover]->last_move_time;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
 
 void Network::disconnect_client(int c_id)
@@ -336,66 +353,38 @@ int Network::find_min_hp_player(int game_room_id) {
 
 void Network::do_npc_move(int npc_id) {
 
-	std::unordered_set<int> can_attacklist;
 
-	for (int i = 0; i < MAX_USER; ++i) {
-		Client* obj = reinterpret_cast<Client*>(clients[i]);
-		if (obj->state != ST_INGAME) continue;
-
-
-		if (true == can_attack(npc_id, obj->id))
-			can_attacklist.insert(obj->id);
-
-	}
-
-
-	for (auto pl : can_attacklist) {
-		if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
-			timer_event t;
-			t.ev = EVENT_BOSS_TARGETING_ATTACK;
-			t.obj_id = npc_id;
-			t.target_id = pl;
-			t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
-			timer_queue.push(t);
-			break;
-		}
-	}
-	if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
-		timer_event t;
-		t.ev = EVENT_BOSS_MOVE;
-		t.obj_id = npc_id;
-		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
-		//timer_queue.push(t);
-	}
 }
 
 void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 
-	// 피격에 대한 알고리즘
-
-	// 패킷 전송
-	Client* cl = reinterpret_cast<Client*>(clients[target_id]);
-	cl->vl.lock();
-	std::unordered_set cp_vl = cl->viewlist;
-	cl->vl.unlock();
-	for (int id : cp_vl) {
-		if (is_player(id))
-			send_attack_player(npc_id, target_id, id);
-	}
-	send_attack_player(npc_id, target_id, target_id);
-
-	if (true == reinterpret_cast<Npc*>(clients[npc_id])->is_active) {
-		timer_event t;
-		t.ev = EVENT_BOSS_TARGETING_ATTACK;
-		t.obj_id = npc_id;
-		t.target_id = target_id;
-		t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
-		timer_queue.push(t);
-	}
 }
 
-void Network::do_npc_tile_attack()
+void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
+	const int damage = 3;
+	for (int id : game_room[game_room_id]->player_ids) {
+		if (false == is_attack(id, x, z)) continue;
+		clients[id]->hp -= damage;
+		for (int i : game_room[game_room_id]->player_ids)
+			send_attack_player(game_room[game_room_id]->boss_id, id, i);
+
+		if (clients[id]->hp < 0) {
+			// 게임 끝
+			reinterpret_cast<Client*>(clients[id])->is_active = false;
+			bool is_game_end = true;
+			for (int i : game_room[game_room_id]->player_ids) {
+				if (clients[i]->hp > 0) is_game_end = false;
+			}
+
+			if (is_game_end) {
+				for (int i : game_room[game_room_id]->player_ids)
+					send_game_end(i, GAME_OVER);
+			}
+		}
+		
+	}
+
 
 }
 
@@ -465,6 +454,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 	break;
 	case CS_PACKET_MOVE:
 	{
+		if (false == cl.is_active) break;
+		std::cout << "player move\n";
+
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 		//cl.last_move_time = packet->move_time;
 		short& x = cl.x;
@@ -1070,11 +1062,26 @@ void Network::worker()
 			int pos_x = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			int pos_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
 			int pos_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
-			//do_npc_attack(client_id, target_id, target_id);
+			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
+			do_npc_tile_attack(game_room_id, pos_x, pos_y,pos_z);
 			// 맞았을 때 처리
 			exp_over_pool.push(exp_over);
 		}
 		break;
+		case OP_GAME_END:
+		{
+			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			//보스 체력 확인하고
+			int boss_id = game_room[game_room_id]->boss_id;
+			//if(clients[boss_id]->hp<10;
+			//체력에 따라 클리어 유무
+			for (int i : game_room[game_room_id]->player_ids)
+				send_game_end(i, GAME_CLEAR);
+
+			exp_over_pool.push(exp_over);
+		}
+		break;
+
 		default:
 			break;
 		}
@@ -1156,6 +1163,15 @@ void Network::game_start(int room_id)
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
 			tev.pivotType = t.pivotType;
+			timer_queue.push(tev);
+			break;
+
+		case -600:
+			tev.ev = EVENT_GAME_END;
+			tev.game_room_id = room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
+
 			timer_queue.push(tev);
 			break;
 		default:

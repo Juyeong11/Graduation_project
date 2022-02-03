@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: a408cfc7d6f6ad44f95c01194e373e40, type: 2}
   m_LightingSettings: {fileID: 0}
 --- !u!196 &4
 NavMeshSettings:
@@ -2102,6 +2102,7 @@ MonoBehaviour:
   landOffsetY: 0
   landOffsetZ: 0
   landOffsetRotate: 0
+  landOffsetScale: 0
   preBeatedTime: 0
 --- !u!114 &1227400883
 MonoBehaviour:
@@ -2652,6 +2653,8 @@ MonoBehaviour:
   landOffsetY: 0
   landOffsetZ: 0
   landOffsetRotate: 0
+  landOffsetScale: 0
+  witch: {fileID: 0}
   recipt: {fileID: 0}
   Mapdata: []
 --- !u!4 &1639745175
@@ -3578,7 +3581,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerPrefeb: {fileID: 7354045492482313764, guid: 062baae922b7b2e479b97ba3ba7406d1, type: 3}
-  OtherPlayerPrefeb: {fileID: 6558977205578625581, guid: 86fa78b2e24ba0e42addebbdb61b19eb, type: 3}
+  OtherPlayerPrefeb: {fileID: 7354045492482313764, guid: ab8fa907e81425b4d9cccf8b7cba376d, type: 3}
   EnemyPrefeb: {fileID: 1227400879}
 --- !u!114 &2121429946
 MonoBehaviour:

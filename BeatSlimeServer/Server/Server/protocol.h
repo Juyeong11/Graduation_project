@@ -20,6 +20,7 @@ const char SC_PACKET_ATTACK = 6;
 const char SC_PACKET_MAP_DATA = 7;
 const char SC_PACKET_CHANGE_SCENE = 8;
 const char SC_PACKET_EFFECT = 9;
+const char SC_PACKET_GAME_END = 10;
 
 #pragma pack (push, 1)
 //client -> server
@@ -83,6 +84,7 @@ struct sc_packet_attack {
 	int	id;
 	int	target_id;
 	char direction;
+	int hp;
 	//int		move_time;
 };
 
@@ -134,6 +136,13 @@ struct sc_packet_map_data
 	unsigned char size;
 	char type;
 	char buf[BUFSIZE/2];
+};
+
+struct sc_packet_game_end
+{
+	unsigned char size;
+	char type;
+	char end_type;
 };
 
 #pragma pack(pop)

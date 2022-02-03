@@ -48,7 +48,7 @@ public:
 	short	x, y,z;
 	int map_number;
 	int direction;
-	int hp;
+	std::atomic_int hp;
 	GO_TYPE		type;
 	//volatile해줘야 한다.
 	volatile STATE state;
@@ -60,7 +60,7 @@ public:
 		x = 0;
 		y = 0;
 		z = 0;
-		hp = 10;
+		hp = 100;
 	}
 };
 class Npc: public Gameobject {
@@ -110,7 +110,7 @@ public:
 };
 
 const int VIEW_RANGE = 5;// test를 위한 거리
-const int ATTACK_RANGE = 2;// test를 위한 거리
+const int ATTACK_RANGE = 1;// test를 위한 거리
 class Client : public Gameobject
 {
 public:
@@ -120,13 +120,14 @@ public:
 	EXP_OVER recv_over;
 	SOCKET socket; // 재사용 하기 때문에 data race -> state로 보호
 
+	bool is_active;
 	int		prev_recv_size;
 public:
 
 	Client()
 	{
 		type = PLAYER;
-
+		is_active = true;
 		prev_recv_size = 0;
 	}
 
