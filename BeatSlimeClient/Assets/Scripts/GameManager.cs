@@ -233,7 +233,7 @@ public class GameManager : MonoBehaviour
                             //int randomTickForTest = 4;//Random.Range(1, 6);
                             //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
-                            Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
+                            //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
                             
                             HPManager hm = Objects[target_id].GetComponent<PlayerManager>().HP;
                             hm.Damage(hm.CurrentHP - p.hp);
@@ -333,13 +333,13 @@ public class GameManager : MonoBehaviour
                             switch (p.effect_type)
                             {
                                 case 3:
-                                    EffectManager.instance.BossTileEffect3(start_x, start_y, start_z, start_w, p.charging_time);
+                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,3);
                                     break;
                                 case 4:
-                                    EffectManager.instance.BossTileEffect4(start_x, start_y, start_z, start_w, p.charging_time);
+                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,4);
                                     break;
                                 case 99:
-                                    EffectManager.instance.OneTileEffect(start_x, start_y, start_z, start_w, p.charging_time);
+                                    EffectManager.instance.OneTileEffect(start_x, start_y, start_z, p.charging_time);
                                     break;
                                 case 5:
                                     break;
@@ -379,7 +379,7 @@ public class GameManager : MonoBehaviour
         {
             if (id == ids[i]) return i;
         }
-        Debug.Log("ï¿½ï¿½ï¿½ï¿½ IDï¿½Ô´Ï´ï¿½");
+        Debug.Log("Àß¸øµÈ Å¬¶óÀÌ¾ðÆ® id");
         return -1;
     }
     public void PlaySound()
