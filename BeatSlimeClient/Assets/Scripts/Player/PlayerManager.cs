@@ -15,7 +15,6 @@ public class PlayerManager : MonoBehaviour
     public UnityEvent onPlayerStand;
     public UnityEvent onPlayerFly;
 
-
     public playerState state;
     public PlayerKeyHandler handle;     //Invalid
 
@@ -30,6 +29,8 @@ public class PlayerManager : MonoBehaviour
 
     bool playerAttacking;
     List<(Beat,float)> SettledBallBeats;
+
+    public bool isThisCurrentPlayingPlayerObject;
 
     public void Start()
     {
@@ -62,11 +63,14 @@ public class PlayerManager : MonoBehaviour
         {
             playerAttacking = false;
 
-            KeyHandler();
+            if (isThisCurrentPlayingPlayerObject)
+            {
+                KeyHandler();
+                BallBeatCheck();
+                CalcHPSlider();
+            }
             PlayerRotateToLookAt();
             PlayerWCheck();
-            BallBeatCheck();
-            CalcHPSlider();
         }
     }
 
