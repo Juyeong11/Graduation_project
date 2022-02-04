@@ -242,6 +242,7 @@ public class GameManager : MonoBehaviour
                             //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                             //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
+                            Debug.Log("ATTACK : " + p.id + ", HP : " + hm.CurrentHP +" to " + p.hp);
 
                             hm.Damage(hm.CurrentHP - p.hp);
                         }

@@ -1017,28 +1017,6 @@ void Network::worker()
 				break;
 			}
 
-			// client_id -> boss_id
-			// 현재 해당 위치에 있지 않는데 데미지를 받음
-			// 버그가 나는 이유
-			//	- 플레이어의 위치 업데이트가 느린경우 
-			//		-> 움직임이 클라이언트에 보인다는건 이미 서버에서 처리가 끝나고 패킷까지 전송했다는 뜻 즉 해당 경우는 발생할 수 없음
-			//	- 클라이언트에서 계산해 보여지는 이펙트와 서버에서 계산해 피격하는 시간이 맞지 않는 경우
-			//		-> 장판이 커지는 시간을 서버에서 전송해주는데 그럴 수 없지 
-			//		-> 클라이언트에서 프레임시간에 스피드 곱해서 스케일을 조정
-			//		-> 서버에서 보내주는 시간 -> millisec 그래서 클라이언트에서 계산할 때 sec로 바꿈
-			//		-> 약간의 차이로 피한경우 데미지가 들어온다
-			//		- 클라이언트와 서버간 장판 차징 시간 차이
-			//			- 서버 
-			//				-> 계산된 시간(A)만큼 뒤에 이벤트 큐에서 빼서 attack패킷만 보내면 됨
-			//				-> 이벤트 큐에서 빼는 시간만큼의 차이가 생김
-			//			- 클라
-			//				-> 장판 차징을 보여주기 위해 시작과 장판이 커지는 시간(A)을 서버로부터 받음
-			//				-> 패킷을 받는 시간 + 이펙트를 생성하는 시간만큼의 차이가 생김
-			//			* 이 두 시간다 무시해도될 거 같은데
-			//			커지면 들어오는건 맞음
-			//	* 위의 문제들은 다 아니고
-			//	
-			//	- 정확한 위치 계산이 안되고 있는거 같네요 
 			switch (pattern_type)
 			{
 			case 3:
@@ -1051,9 +1029,9 @@ void Network::worker()
 					t.obj_id = client_id;
 					t.target_id = target_id;
 					t.game_room_id = game_room_id;
-					t.x = PatternInfo::HexPattern3[i][0] * i + pos_x;
-					t.y = PatternInfo::HexPattern3[i][1] * i + pos_y;
-					t.z = PatternInfo::HexPattern3[i][2] * i + pos_z;
+					t.x = PatternInfo::HexPattern3[i][0] + pos_x;
+					t.y = PatternInfo::HexPattern3[i][1] + pos_y;
+					t.z = PatternInfo::HexPattern3[i][2] + pos_z;
 					t.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time);
 					timer_queue.push(t);
 				}
@@ -1070,9 +1048,9 @@ void Network::worker()
 					t.obj_id = client_id;
 					t.target_id = target_id;
 					t.game_room_id = game_room_id;
-					t.x = PatternInfo::HexPattern4[i][0] * i + pos_x;
-					t.y = PatternInfo::HexPattern4[i][1] * i + pos_y;
-					t.z = PatternInfo::HexPattern4[i][2] * i + pos_z;
+					t.x = PatternInfo::HexPattern4[i][0] + pos_x;
+					t.y = PatternInfo::HexPattern4[i][1] + pos_y;
+					t.z = PatternInfo::HexPattern4[i][2] + pos_z;
 					t.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time);
 					timer_queue.push(t);
 				}
@@ -1173,7 +1151,7 @@ void Network::game_start(int room_id)
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
 			tev.pivotType = t.pivotType;
-			timer_queue.push(tev);
+			timer_queue.push(std::move(tev));
 			break;
 		case 3:
 			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
@@ -1187,7 +1165,7 @@ void Network::game_start(int room_id)
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
 			tev.pivotType = t.pivotType;
-			timer_queue.push(tev);
+			timer_queue.push(std::move(tev));
 			break;
 		case 4:
 			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
@@ -1201,7 +1179,7 @@ void Network::game_start(int room_id)
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
 			tev.pivotType = t.pivotType;
-			timer_queue.push(tev);
+			timer_queue.push(std::move(tev));
 			break;
 
 		case 99:
@@ -1216,7 +1194,7 @@ void Network::game_start(int room_id)
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
 			tev.pivotType = t.pivotType;
-			timer_queue.push(tev);
+			timer_queue.push(std::move(tev));
 			break;
 
 		case -600:
@@ -1225,7 +1203,7 @@ void Network::game_start(int room_id)
 			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
 
-			timer_queue.push(tev);
+			timer_queue.push(std::move(tev));
 			break;
 		default:
 			std::cout << "잘못된 패턴 타입" << std::endl;
