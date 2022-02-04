@@ -364,7 +364,7 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 
 void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
-	const int damage = 3;
+	const int damage = 5;
 	for (int id : game_room[game_room_id]->player_ids) {
 		if (false == is_attack(id, x, z)) continue;
 		clients[id]->hp -= damage;
@@ -882,6 +882,8 @@ void Network::worker()
 
 			int target_id = -1;
 			int pivot_x, pivot_y, pivot_z;
+
+			// 보스가 무엇을 기준으로 움직이는지
 			switch (pivotType)
 			{
 			case PlayerM:
@@ -1016,7 +1018,27 @@ void Network::worker()
 			}
 
 			// client_id -> boss_id
-
+			// 현재 해당 위치에 있지 않는데 데미지를 받음
+			// 버그가 나는 이유
+			//	- 플레이어의 위치 업데이트가 느린경우 
+			//		-> 움직임이 클라이언트에 보인다는건 이미 서버에서 처리가 끝나고 패킷까지 전송했다는 뜻 즉 해당 경우는 발생할 수 없음
+			//	- 클라이언트에서 계산해 보여지는 이펙트와 서버에서 계산해 피격하는 시간이 맞지 않는 경우
+			//		-> 장판이 커지는 시간을 서버에서 전송해주는데 그럴 수 없지 
+			//		-> 클라이언트에서 프레임시간에 스피드 곱해서 스케일을 조정
+			//		-> 서버에서 보내주는 시간 -> millisec 그래서 클라이언트에서 계산할 때 sec로 바꿈
+			//		-> 약간의 차이로 피한경우 데미지가 들어온다
+			//		- 클라이언트와 서버간 장판 차징 시간 차이
+			//			- 서버 
+			//				-> 계산된 시간(A)만큼 뒤에 이벤트 큐에서 빼서 attack패킷만 보내면 됨
+			//				-> 이벤트 큐에서 빼는 시간만큼의 차이가 생김
+			//			- 클라
+			//				-> 장판 차징을 보여주기 위해 시작과 장판이 커지는 시간(A)을 서버로부터 받음
+			//				-> 패킷을 받는 시간 + 이펙트를 생성하는 시간만큼의 차이가 생김
+			//			* 이 두 시간다 무시해도될 거 같은데
+			//			커지면 들어오는건 맞음
+			//	* 위의 문제들은 다 아니고
+			//	
+			//	- 정확한 위치 계산이 안되고 있는거 같네요 
 			switch (pattern_type)
 			{
 			case 3:

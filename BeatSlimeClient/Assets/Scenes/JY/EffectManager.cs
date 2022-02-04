@@ -30,7 +30,7 @@ public class EffectManager : MonoBehaviour
 
         GameObject go = Instantiate(TileEffectPrefab, GameManager.data.grid.cellMaps.Get(start_x, start_y, start_z).getCellRealPosition(), Quaternion.identity);
         float s = speed * 1 / 1000f;
-        //Debug.Log(s);
+        Debug.Log("effect " + Time.time);
         go.GetComponent<TileEffect>().speed = s;
     }
 
