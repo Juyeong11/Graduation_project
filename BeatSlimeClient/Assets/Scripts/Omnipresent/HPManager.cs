@@ -30,7 +30,7 @@ public class HPManager
     public void Damage(int damage)
     {
         CurrentHP -= damage;
-        Debug.Log("Damaged");
+        //Debug.Log("Damaged");
         if (CurrentHP <= 0)
             isAlive = false;
     }

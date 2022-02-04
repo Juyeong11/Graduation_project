@@ -89,8 +89,8 @@ public:
 	}
 	bool is_attack(int a, int x, int z)
 	{
-		if (ATTACK_RANGE < abs(clients[a]->x - x)) return false;
-		if (ATTACK_RANGE < abs(clients[a]->z - z)) return false;
+		if (abs(clients[a]->x != x)) return false;
+		if (abs(clients[a]->z != z)) return false;
 
 		return true;
 	}
