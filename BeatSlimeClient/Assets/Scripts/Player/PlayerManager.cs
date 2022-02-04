@@ -11,6 +11,8 @@ public enum playerState
 
 public class PlayerManager : MonoBehaviour
 {
+    public bool isDebug;
+
     public Animator JumpTrigger;
     public UnityEvent onPlayerStand;
     public UnityEvent onPlayerFly;
@@ -23,8 +25,10 @@ public class PlayerManager : MonoBehaviour
     public HexGrid grid;
 
     public Transform PlayerTransform;
-    public Image PlayerHPImage;
-    public Image PlayerPrevHPImage;
+
+    Image PlayerHPImage;
+    Image PlayerPrevHPImage;
+
     public HPManager HP;
 
     bool playerAttacking;
@@ -52,6 +56,12 @@ public class PlayerManager : MonoBehaviour
         //onPlayerFly.Invoke();
     }
 
+    public void SetHPImages(Image hp, Image prev)
+    {
+        PlayerHPImage = hp;
+        PlayerPrevHPImage = prev;
+    }
+
     public void JumpTrig()
     {
         JumpTrigger.SetTrigger("Jump");
@@ -67,10 +77,11 @@ public class PlayerManager : MonoBehaviour
             {
                 KeyHandler();
                 BallBeatCheck();
-                CalcHPSlider();
+
             }
             PlayerRotateToLookAt();
             PlayerWCheck();
+            CalcHPSlider();
         }
     }
 
@@ -170,6 +181,14 @@ public class PlayerManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             playerAttacking = true;
+        }
+
+        if (isDebug)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha0))
+            {
+                HP.CurrentHP -= 45;
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
@@ -392,7 +411,7 @@ public class PlayerManager : MonoBehaviour
 
     public void CalcHPSlider()
     {
-        HP.hpUpdate();
+        HP.hpUpdate(Time.deltaTime);
         PlayerHPImage.fillAmount = (float)HP.CurrentHP / (float)HP.MaxHp;
         PlayerPrevHPImage.fillAmount = (float)HP.prevHP / (float)HP.MaxHp;
     }

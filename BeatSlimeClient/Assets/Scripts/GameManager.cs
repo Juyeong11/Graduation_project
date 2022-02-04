@@ -49,6 +49,10 @@ public class GameManager : MonoBehaviour
 
     public DoomChi MidNote;
     public DoomChi MidANote;
+
+    public HPImagesForGameManager HPGM;
+    int HPGMStaticInt = 1;
+
     //
     GameObject[] Objects = new GameObject[4];
     int[] ids;
@@ -58,6 +62,7 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         print("Start");
+        HPGM = gameObject.GetComponent<HPImagesForGameManager>();
         data = this;
         isGameStart = false;
         alreadyMoved = 0;
@@ -74,6 +79,8 @@ public class GameManager : MonoBehaviour
         timeByBar = timeByBeat * barCounts;
         timeBy24Beat = timeByBeat / 6;
         timeBy16Beat = timeByBeat / 4;
+
+        player.GetComponent<PlayerManager>().SetHPImages(HPGM.HPs[0], HPGM.prevHPs[0]);
     }
     private void OnApplicationQuit()
     {
@@ -170,7 +177,7 @@ public class GameManager : MonoBehaviour
         }
         if (FieldGameManager.Net.isServerOnline())
         {
-            // ��Ʈ��ũ �޼��� ť
+            //
             if (Network.MessQueue.Count > 0)
             {
                 byte[] data = Network.MessQueue.Dequeue();
@@ -213,9 +220,9 @@ public class GameManager : MonoBehaviour
                             //Debug.Log(p.id+" : pid");
                             Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
                             Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (pid == myPlayerID)// �ڱ� �ڽ�
+                            if (pid == myPlayerID)// �ڱ� �ڽ�
                                 Objects[pid].GetComponent<PlayerManager>().JumpTrig();
-                            else if (pid < 3)   //�̰� ���� �ʿ䰡 ������
+                            else if (pid < 3)   //�̰� ���� �ʿ䰡 ������
                                 Objects[pid].GetComponent<PlayerManager>().JumpTrig();
 
 
@@ -225,7 +232,6 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_attack p = Protocol.sc_packet_attack.SetByteToVar(data);
 
-
                             int target_id = ServerID_To_ClientID(p.target_id);
                             //int randomTickForTest = 4;//Random.Range(1, 6);
                             //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
@@ -233,7 +239,10 @@ public class GameManager : MonoBehaviour
                             //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
                       
                             HPManager hm = Objects[target_id].GetComponent<PlayerManager>().HP;
-                            Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
+                            //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
+
+                            //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
+
                             hm.Damage(hm.CurrentHP - p.hp);
                         }
                         break;
@@ -251,12 +260,18 @@ public class GameManager : MonoBehaviour
                             {
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
-                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "�÷��̾� ����");
-                                        Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
-                                        Objects[pid].SetActive(true);
-                                        Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
+                                        if (HPGMStaticInt <= 2)
+                                        {
+                                            // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "�÷��̾� ����");
+                                            Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
+                                            Objects[pid].SetActive(true);
+                                            Objects[pid].GetComponent<PlayerManager>().SetHPImages(HPGM.HPs[HPGMStaticInt], GameManager.data.HPGM.prevHPs[HPGMStaticInt]);
+                                            HPGMStaticInt++;
 
-                                        Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                            Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
+
+                                            Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        }
                                         break;
                                     }
                                 case (byte)Protocol.OBJECT_TYPE.ENEMY:
@@ -289,7 +304,7 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].SetActive(false);
                             }
 
-                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
+                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
                             //���̸� ��Ǯ�� ����
                             //ReMoveObject(p.id);
                         }
@@ -314,7 +329,7 @@ public class GameManager : MonoBehaviour
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
                             }
 
-                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
+                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
                             //���̸� ��Ǯ�� ����
                             //ReMoveObject(p.id);
                         }
@@ -366,11 +381,12 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_game_end p = Protocol.sc_packet_game_end.SetByteToVar(data);
                             isGameStart = false;
+
                             Debug.Log("Game_Over");
                         }
                         break;
                     default:
-                        Debug.Log("�̻��� Ÿ���̳�" + type);
+                        Debug.Log("�߸��� �������� ����" + type);
                         break;
                 }
             }
@@ -391,7 +407,7 @@ public class GameManager : MonoBehaviour
         {
             if (id == ids[i]) return i;
         }
-        Debug.Log("�߸��� Ŭ���̾�Ʈ id");
+        Debug.Log("�߸��� Ŭ���̾�Ʈ id");
         return -1;
     }
     public void PlaySound()

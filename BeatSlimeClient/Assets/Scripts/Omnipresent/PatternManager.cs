@@ -50,6 +50,7 @@ public class PatternManager : MonoBehaviour
             {
                 Factory.attackNotesBeats.Add(tmpP.rhythmBeat.GetBeatTime());
             }
+            //DEBUG : 장판 공격도 작은 노트 보여주고싶음 (비트 알려주기 위해)
         }
         yield return null;
     }

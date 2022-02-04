@@ -122,37 +122,4 @@ public class FieldHexGrid : MonoBehaviour
         }
     }
 
-
-
-    //DEBUG----------------------------------------이 아래로 다 고쳐야함
-    Dictionary<int, HexCoordinates> cellStoredPos = new Dictionary<int, HexCoordinates>();
-
-    public void WarningCell(Pattern p)
-    {
-        //위치 세팅하면 저장해야함
-        HexCoordinates RedZone = new HexCoordinates();
-
-        //DEBUG - 이대로 두면 안 됨
-        if (p.noteType == 1)
-        {
-            RedZone = pPosition;
-        }
-
-        //foreach(var coord in RedZone)
-        {
-            RedZone.plus(p.pivot.X, p.pivot.Z);
-            //Debug.Log(RedZone.ToString());
-            cellMaps.Get(RedZone).Warning();
-            cellStoredPos.Add(p.id,RedZone);
-        }
-    }
-
-    public void EnemyAttack(Pattern p)
-    {
-        //주의! 세팅된 위치가 아니라 다른 위치 쓰면 안됨
-
-        Debug.Log(p.rhythmBeat.ToString() + ", " + cellStoredPos[p.id]);
-
-        cellMaps.Get(cellStoredPos[p.id]).Damage(1);
-    }
 }

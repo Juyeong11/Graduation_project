@@ -7,7 +7,7 @@ public class HPManager
 {
     public int MaxHp;
     public int CurrentHP;
-    public int prevHP;
+    public float prevHP;
     public bool isAlive;
 
     public void Initialized(bool isBoss)
@@ -35,11 +35,11 @@ public class HPManager
             isAlive = false;
     }
 
-    public void hpUpdate()
+    public void hpUpdate(float deltaTime)
     {
         if (prevHP > CurrentHP)
         {
-            prevHP -= 3;
+            prevHP -= 30 * deltaTime;
         }
     }
 }

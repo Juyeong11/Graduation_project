@@ -75,7 +75,8 @@ public:
 		{
 			std::cout << maps[FIELD_MAP].GetTileType(x, z) << std::endl;
 		}
-	}*/
+	}
+	*/
 };
 
 class Gameobject;

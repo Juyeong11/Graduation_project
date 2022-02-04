@@ -80,7 +80,7 @@ public class EnemyManager : MonoBehaviour
     }
     public void CalcHPSlider()
     {
-        HP.hpUpdate();
+        HP.hpUpdate(Time.deltaTime);
         EnemyHPImage.fillAmount = (float)HP.CurrentHP / (float)HP.MaxHp;
         EnemyPrevHPImage.fillAmount = (float)HP.prevHP / (float)HP.MaxHp;
     }
