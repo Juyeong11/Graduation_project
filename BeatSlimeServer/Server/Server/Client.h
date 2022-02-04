@@ -108,7 +108,7 @@ public:
 	}
 };
 
-const int VIEW_RANGE = 5;// test를 위한 거리
+const int VIEW_RANGE = 10;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
 class Client : public Gameobject
 {

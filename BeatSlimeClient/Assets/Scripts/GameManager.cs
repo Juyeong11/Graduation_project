@@ -87,7 +87,7 @@ public class GameManager : MonoBehaviour
         loader.LoadMap();
 
         //DEBUG
-        enemy.GetComponent<HexCellPosition>().setInitPosition(1, 1);
+        enemy.GetComponent<HexCellPosition>().setInitPosition(0, 0);
         PM = PatternManager.data;
         ids = new int[4];
     }
@@ -252,6 +252,16 @@ public class GameManager : MonoBehaviour
                                     {
                                         // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "�÷��̾� ����");
                                         Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
+                                        Objects[pid].SetActive(true);
+                                        Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
+
+                                        Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        break;
+                                    }
+                                case (byte)Protocol.OBJECT_TYPE.ENEMY:
+                                    {
+                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "�÷��̾� ����");
+                                        Objects[pid] = enemy;
                                         Objects[pid].SetActive(true);
                                         Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 

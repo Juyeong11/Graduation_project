@@ -114,6 +114,7 @@ public:
 			clients[i]->id = i;
 			clients[i]->state = ST_ACCEPT;
 			clients[i]->direction = DOWN;
+			clients[i]->type = WITCH;
 
 		}
 	}

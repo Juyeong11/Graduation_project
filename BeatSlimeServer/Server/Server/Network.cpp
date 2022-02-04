@@ -47,13 +47,9 @@ Network::Network() {
 	for (int i = 0; i < MAP_NUM; ++i) {
 		maps[i] = new MapInfo;
 	}
-<<<<<<< HEAD
-	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\BAD_SEC.csv");
-	maps[WITCH_MAP]->SetMap("Map\\WitchMap", "Music\\BAD_SEC.csv");
-=======
+
 	maps[FIELD_MAP]->SetMap("Map\\Field_Map", "Music\\BAD_SEC.csv");
 	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
->>>>>>> e2efd34b8ba428c1532fb3052a9a666e0f7b0bf7
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
@@ -994,7 +990,7 @@ void Network::worker()
 				pos_z = pivot_z;
 				break;
 			case Boss:
-				target_id = client_id;
+				target_id = game_room[game_room_id]->boss_id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;

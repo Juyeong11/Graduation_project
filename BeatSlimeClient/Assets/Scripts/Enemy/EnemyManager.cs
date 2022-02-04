@@ -40,6 +40,7 @@ public class EnemyManager : MonoBehaviour
         state = enemyState.Idle;
 
         HP.Initialized(true);
+        //selfCoord.SetPosition()
     }
 
     void Update()
