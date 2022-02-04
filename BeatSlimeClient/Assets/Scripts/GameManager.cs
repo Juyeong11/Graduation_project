@@ -87,7 +87,7 @@ public class GameManager : MonoBehaviour
         loader.LoadMap();
 
         //DEBUG
-        enemy.GetComponent<HexCellPosition>().setInitPosition(1, 1);
+        enemy.GetComponent<HexCellPosition>().setInitPosition(0, 0);
         PM = PatternManager.data;
         ids = new int[4];
     }
@@ -179,14 +179,11 @@ public class GameManager : MonoBehaviour
 
                 switch (type)
                 {
-                    case Protocol.CONSTANTS.SC_PACKET_LOGIN_OK:
+                    case Protocol.CONSTANTS.SC_PACKET_CHANGE_SCENE:
                         {
-                            Protocol.sc_packet_login_ok p = Protocol.sc_packet_login_ok.SetByteToVar(data);
-
-                            myPlayerID = p.id;
-                            Objects[p.id] = player;
-                            //PutPlayerObject(p.type, p.id, p.x, p.y);
-                            PlaySound();
+                            Protocol.sc_packet_change_scene p = Protocol.sc_packet_change_scene.SetByteToVar(data);
+                            UnityEngine.SceneManagement.SceneManager.LoadScene(p.scene_num);
+                            Debug.Log("Game_Over -> Change Scene");
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:
@@ -213,13 +210,13 @@ public class GameManager : MonoBehaviour
                             Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
-                            //Debug.Log(p.id+"ï¿½Ìµï¿½");
+                            //Debug.Log(p.id+" : pid");
                             Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
                             Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (pid == myPlayerID)// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ì¸ï¿½
+                            if (pid == myPlayerID)// ÀÚ±â ÀÚ½Å
                                 Objects[pid].GetComponent<PlayerManager>().JumpTrig();
-                            else if (pid < 3)
-                                Objects[pid].GetComponent<InGameOtherPlayerManager>().JumpTrig();
+                            else if (pid < 3)   //ÀÌ°Å Áö¿ï ÇÊ¿ä°¡ ÀÖÀ»µí
+                                Objects[pid].GetComponent<PlayerManager>().JumpTrig();
 
 
                         }
@@ -255,6 +252,16 @@ public class GameManager : MonoBehaviour
                                     {
                                         // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½");
                                         Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
+                                        Objects[pid].SetActive(true);
+                                        Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
+
+                                        Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        break;
+                                    }
+                                case (byte)Protocol.OBJECT_TYPE.ENEMY:
+                                    {
+                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½");
+                                        Objects[pid] = enemy;
                                         Objects[pid].SetActive(true);
                                         Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 
@@ -317,19 +324,23 @@ public class GameManager : MonoBehaviour
                             int pid = ServerID_To_ClientID(p.id);
                             int tid = ServerID_To_ClientID(p.target_id);
                             int start_x, start_y, start_z;
-                            if (p.target_id == -1)
-                            {
-                                start_x = p.x;
-                                start_y = p.y;
-                                start_z = p.z;
-                            }
-                            else
-                            {
-                                start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
-                                start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
-                                start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
-                            }
-                            int start_w = 1;//Objects[tid].GetComponent<HexCellPosition>().coordinates.W;
+
+                            start_x = p.x;
+                            start_y = p.y;
+                            start_z = p.z;
+                            //if (p.target_id == -1)
+                            //{
+                            //    start_x = p.x;
+                            //    start_y = p.y;
+                            //    start_z = p.z;
+                            //}
+                            //else
+                            //{
+                            //    start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
+                            //    start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
+                            //    start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
+                            //}
+
                             switch (p.effect_type)
                             {
                                 case 3:
@@ -353,7 +364,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_GAME_END:
                         {
                             Protocol.sc_packet_game_end p = Protocol.sc_packet_game_end.SetByteToVar(data);
-
+                            isGameStart = false;
                             Debug.Log("Game_Over");
                         }
                         break;
