@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class Cloud_Spin : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
+    public float degree = 0.0;
+    // Start is called before the first frame update
+    
     // Update is called once per frame
     void Update()
     {
-        
+  
     }
 }
