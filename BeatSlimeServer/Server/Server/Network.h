@@ -175,7 +175,7 @@ public:
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
 						break;
 					case EVENT_GAME_END:
-						ex_over->_comp_op = OP_PLAYER_PARRYING;
+						ex_over->_comp_op = OP_GAME_END;
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
 						break;
 					default:
