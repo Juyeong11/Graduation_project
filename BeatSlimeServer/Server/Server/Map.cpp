@@ -83,7 +83,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 
 	barCounts = 4;
-	bpm = 124;
+	bpm = 90;
 	totalSongTime = 0; //(* 1000);
 	nowSongTime = 0;
 	timeByBeat = (int)(1000 * 60 / (float)bpm);

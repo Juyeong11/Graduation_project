@@ -48,7 +48,7 @@ Network::Network() {
 		maps[i] = new MapInfo;
 	}
 	maps[FIELD_MAP]->SetMap("Map\\Field_Map", "Music\\BAD_SEC.csv");
-	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\BAD_SEC.csv");
+	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
@@ -940,18 +940,19 @@ void Network::worker()
 			int target_id = -1;
 
 			int pos_x, pos_z, pos_y;
+			//printf("%d %d %d\n", pivot_x, pivot_y, pivot_z);
 			switch (pivotType)
 			{
 			case PlayerM:
 				target_id = find_max_hp_player(game_room_id);
-				pos_x = clients[target_id]->x;
-				pos_z = clients[target_id]->z;
+				pos_x = clients[target_id]->x + pivot_x;
+				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Playerm:
 				target_id = find_min_hp_player(game_room_id);
-				pos_x = clients[target_id]->x;
-				pos_z = clients[target_id]->z;
+				pos_x = clients[target_id]->x + pivot_x;
+				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case World:
@@ -961,26 +962,26 @@ void Network::worker()
 				break;
 			case Boss:
 				target_id = client_id;
-				pos_x = clients[target_id]->x;
-				pos_z = clients[target_id]->z;
+				pos_x = clients[target_id]->x + pivot_x;
+				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player1:
 				target_id = game_room[game_room_id]->player_ids[0];
-				pos_x = clients[target_id]->x;
-				pos_z = clients[target_id]->z;
+				pos_x = clients[target_id]->x + pivot_x;
+				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player2:
 				target_id = game_room[game_room_id]->player_ids[1];
-				pos_x = clients[target_id]->x;
-				pos_z = clients[target_id]->z;
+				pos_x = clients[target_id]->x + pivot_x;
+				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player3:
 				target_id = game_room[game_room_id]->player_ids[2];
-				pos_x = clients[target_id]->x;
-				pos_z = clients[target_id]->z;
+				pos_x = clients[target_id]->x + pivot_x;
+				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			}

@@ -317,19 +317,23 @@ public class GameManager : MonoBehaviour
                             int pid = ServerID_To_ClientID(p.id);
                             int tid = ServerID_To_ClientID(p.target_id);
                             int start_x, start_y, start_z;
-                            if (p.target_id == -1)
-                            {
-                                start_x = p.x;
-                                start_y = p.y;
-                                start_z = p.z;
-                            }
-                            else
-                            {
-                                start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
-                                start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
-                                start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
-                            }
-                            int start_w = 1;//Objects[tid].GetComponent<HexCellPosition>().coordinates.W;
+
+                            start_x = p.x;
+                            start_y = p.y;
+                            start_z = p.z;
+                            //if (p.target_id == -1)
+                            //{
+                            //    start_x = p.x;
+                            //    start_y = p.y;
+                            //    start_z = p.z;
+                            //}
+                            //else
+                            //{
+                            //    start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
+                            //    start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
+                            //    start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
+                            //}
+
                             switch (p.effect_type)
                             {
                                 case 3:
