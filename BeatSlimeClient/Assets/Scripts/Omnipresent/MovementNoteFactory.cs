@@ -78,53 +78,63 @@ public class MovementNoteFactory : MonoBehaviour
         if (GameManager.data.isGameStart)
         {
             float beatPercentage = GameManager.data.nowSongTime;
-            if (moveNotesBeats.Count > 0)
+
+            if (beatPercentage < GameManager.data.totalSongTime)
             {
-                if (beatPercentage >= moveNotesBeats[0] + GameManager.data.JudgementTiming * 0.5f)
+                //Debug.Log(GameManager.data.nowSongTime);
+                //Debug.Log(moveNotesBeats.Count);
+                //Debug.Log(attackNotesBeats.Count);
+                if (moveNotesBeats.Count > 0)
                 {
-                    moveNotesBeats.RemoveAt(0);
-                }
-                for (int i = 0; i < leftNote.Count; ++i)
-                {
-                    leftNote[i].anchoredPosition = -translator * (moveNotesBeats[i] - beatPercentage) + Zero;
-                    rightNote[i].anchoredPosition = translator * (moveNotesBeats[i] - beatPercentage) + Zero;
-
-                    if (leftNote[i].anchoredPosition.x >= 0)
-                        leftNote[i].anchoredPosition = Zero;
-
-                    if (rightNote[i].anchoredPosition.x <= 0)
-                        rightNote[i].anchoredPosition = Zero;
-                }
-            }
-
-            if (attackNotesBeats.Count > 0)
-            {
-                while (beatPercentage >= attackNotesBeats[0] + GameManager.data.JudgementTiming * 0.5f)
-                {
-                    attackNotesBeats.RemoveAt(0);
-                    ANoteIndex++;
-                    if (attackNotesBeats.Count <= 0)
+                    if (beatPercentage >= moveNotesBeats[0] + GameManager.data.JudgementTiming * 0.5f)
                     {
-                        break;
+                        moveNotesBeats.RemoveAt(0);
+                    }
+                    if (moveNotesBeats.Count > 0)
+                    {
+                        for (int i = 0; i < leftNote.Count; ++i)
+                        {
+                            leftNote[i].anchoredPosition = -translator * (moveNotesBeats[i] - beatPercentage) + Zero;
+                            rightNote[i].anchoredPosition = translator * (moveNotesBeats[i] - beatPercentage) + Zero;
+
+                            if (leftNote[i].anchoredPosition.x >= 0)
+                                leftNote[i].anchoredPosition = Zero;
+
+                            if (rightNote[i].anchoredPosition.x <= 0)
+                                rightNote[i].anchoredPosition = Zero;
+                        }
                     }
                 }
-                for (int i = 0; i < attackNotesBeats.Count; ++i)
+
+                if (attackNotesBeats.Count > 0)
                 {
-                    //풀링
-                    if (attackNotesBeats[i] - beatPercentage < 3000f)
+                    while (beatPercentage >= attackNotesBeats[0] + GameManager.data.JudgementTiming * 0.5f)
                     {
-                        leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition = -translator * (attackNotesBeats[i] - beatPercentage) + Zero;
-                        rightANote[(ANoteIndex + i) % rightANote.Count].anchoredPosition = translator * (attackNotesBeats[i] - beatPercentage) + Zero;
-
-                        if (leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition.x >= 0)
-                            leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition = new Vector3(-1000f, 0f);
-
-                        if (rightANote[(ANoteIndex + i) % rightANote.Count].anchoredPosition.x <= 0)
-                            rightANote[(ANoteIndex + i) % rightANote.Count].anchoredPosition = new Vector3(1000f, 0f);
+                        attackNotesBeats.RemoveAt(0);
+                        ANoteIndex++;
+                        if (attackNotesBeats.Count <= 0)
+                        {
+                            break;
+                        }
                     }
-                    else
-                        break;
+                    for (int i = 0; i < attackNotesBeats.Count; ++i)
+                    {
+                        //풀링
+                        if (attackNotesBeats[i] - beatPercentage < 3000f)
+                        {
+                            leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition = -translator * (attackNotesBeats[i] - beatPercentage) + Zero;
+                            rightANote[(ANoteIndex + i) % rightANote.Count].anchoredPosition = translator * (attackNotesBeats[i] - beatPercentage) + Zero;
 
+                            if (leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition.x >= 0)
+                                leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition = new Vector3(-1000f, 0f);
+
+                            if (rightANote[(ANoteIndex + i) % rightANote.Count].anchoredPosition.x <= 0)
+                                rightANote[(ANoteIndex + i) % rightANote.Count].anchoredPosition = new Vector3(1000f, 0f);
+                        }
+                        else
+                            break;
+
+                    }
                 }
             }
         }

@@ -36,6 +36,7 @@ public class SoundManager : MonoBehaviour
 
     private void Awake()
     {
+        bgmPlayer.time += 10;
         instance = this;
     }
     public void PlayBGM(string p_bgmName)

@@ -213,13 +213,13 @@ public class GameManager : MonoBehaviour
                             Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
-                            //Debug.Log(p.id+"ï¿½Ìµï¿½");
+                            //Debug.Log(p.id+" : pid");
                             Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
                             Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (pid == myPlayerID)// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ì¸ï¿½
+                            if (pid == myPlayerID)// ÀÚ±â ÀÚ½Å
                                 Objects[pid].GetComponent<PlayerManager>().JumpTrig();
-                            else if (pid < 3)
-                                Objects[pid].GetComponent<InGameOtherPlayerManager>().JumpTrig();
+                            else if (pid < 3)   //ÀÌ°Å Áö¿ï ÇÊ¿ä°¡ ÀÖÀ»µí
+                                Objects[pid].GetComponent<PlayerManager>().JumpTrig();
 
 
                         }
@@ -353,7 +353,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_GAME_END:
                         {
                             Protocol.sc_packet_game_end p = Protocol.sc_packet_game_end.SetByteToVar(data);
-
+                            isGameStart = false;
                             Debug.Log("Game_Over");
                         }
                         break;
