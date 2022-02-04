@@ -52,6 +52,16 @@ public class Cell
         return (x, y, z, w);
     }
 
+    public Vector3 getCellRealPosition()
+    {
+        Vector3 neu = new Vector3();
+        neu.x = obejct.transform.position.x;
+        neu.y = obejct.transform.position.y + 0.128f;   ///
+        neu.z = obejct.transform.position.z;
+
+        return neu;
+    }
+
     public void Warning()
     {
         

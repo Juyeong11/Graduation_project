@@ -210,13 +210,13 @@ public class GameManager : MonoBehaviour
                             Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
-                            //Debug.Log(p.id+"ï¿½Ìµï¿½");
+                            //Debug.Log(p.id+" : pid");
                             Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
                             Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (pid == myPlayerID)// ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½Ì¸ï¿½
+                            if (pid == myPlayerID)// ÀÚ±â ÀÚ½Å
                                 Objects[pid].GetComponent<PlayerManager>().JumpTrig();
-                            else if (pid < 3)
-                                Objects[pid].GetComponent<InGameOtherPlayerManager>().JumpTrig();
+                            else if (pid < 3)   //ÀÌ°Å Áö¿ï ÇÊ¿ä°¡ ÀÖÀ»µí
+                                Objects[pid].GetComponent<PlayerManager>().JumpTrig();
 
 
                         }
@@ -230,7 +230,7 @@ public class GameManager : MonoBehaviour
                             //int randomTickForTest = 4;//Random.Range(1, 6);
                             //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
-                            Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
+                            //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
                             
                             HPManager hm = Objects[target_id].GetComponent<PlayerManager>().HP;
                             hm.Damage(hm.CurrentHP - p.hp);
@@ -314,29 +314,33 @@ public class GameManager : MonoBehaviour
                             int pid = ServerID_To_ClientID(p.id);
                             int tid = ServerID_To_ClientID(p.target_id);
                             int start_x, start_y, start_z;
-                            if (p.target_id == -1)
-                            {
-                                start_x = p.x;
-                                start_y = p.y;
-                                start_z = p.z;
-                            }
-                            else
-                            {
-                                start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
-                                start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
-                                start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
-                            }
-                            int start_w = 1;//Objects[tid].GetComponent<HexCellPosition>().coordinates.W;
+
+                            start_x = p.x;
+                            start_y = p.y;
+                            start_z = p.z;
+                            //if (p.target_id == -1)
+                            //{
+                            //    start_x = p.x;
+                            //    start_y = p.y;
+                            //    start_z = p.z;
+                            //}
+                            //else
+                            //{
+                            //    start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
+                            //    start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
+                            //    start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
+                            //}
+
                             switch (p.effect_type)
                             {
                                 case 3:
-                                    EffectManager.instance.BossTileEffect3(start_x, start_y, start_z, start_w, p.charging_time);
+                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,3);
                                     break;
                                 case 4:
-                                    EffectManager.instance.BossTileEffect4(start_x, start_y, start_z, start_w, p.charging_time);
+                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,4);
                                     break;
                                 case 99:
-                                    EffectManager.instance.OneTileEffect(start_x, start_y, start_z, start_w, p.charging_time);
+                                    EffectManager.instance.OneTileEffect(start_x, start_y, start_z, p.charging_time);
                                     break;
                                 case 5:
                                     break;
@@ -350,7 +354,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_GAME_END:
                         {
                             Protocol.sc_packet_game_end p = Protocol.sc_packet_game_end.SetByteToVar(data);
-
+                            isGameStart = false;
                             Debug.Log("Game_Over");
                         }
                         break;
@@ -376,7 +380,7 @@ public class GameManager : MonoBehaviour
         {
             if (id == ids[i]) return i;
         }
-        Debug.Log("ï¿½ï¿½ï¿½ï¿½ IDï¿½Ô´Ï´ï¿½");
+        Debug.Log("Àß¸øµÈ Å¬¶óÀÌ¾ðÆ® id");
         return -1;
     }
     public void PlaySound()

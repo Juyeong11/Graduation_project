@@ -97,8 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: a408cfc7d6f6ad44f95c01194e373e40, type: 2}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 4562de27f413b55498725773d513063d, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -694,7 +694,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 1.05, z: -3.41}
+  m_FollowOffset: {x: 0, y: 1.8, z: -4}
   m_XDamping: 1
   m_YDamping: 4
   m_ZDamping: 1
@@ -912,14 +912,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400982002}
-  m_LocalRotation: {x: 0.17364809, y: 0.000893829, z: -0.00015760615, w: 0.9848074}
-  m_LocalPosition: {x: 0, y: 2.05, z: -3.41}
+  m_LocalRotation: {x: 0.19080885, y: 0.00089094223, z: -0.00017318156, w: 0.9816268}
+  m_LocalPosition: {x: 0, y: 4.02, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 132048414}
   m_Father: {fileID: 0}
   m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 22, y: 0.104, z: 0}
 --- !u!1001 &422432063
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1352,9 +1352,9 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 0.526
-    m_Bias: 5.26
-    m_NormalBias: 1
+    m_Strength: 0.43
+    m_Bias: 0.1
+    m_NormalBias: 0.8
     m_NearPlane: 0.1
     m_CullingMatrixOverride:
       e00: 1
@@ -1405,7 +1405,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 26.503, y: 32.417, z: 29.951}
 --- !u!114 &725164332
 MonoBehaviour:
@@ -2505,7 +2505,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3023719220529722365, guid: 0ab9e890bcb41cc4cafc092f0e5ed178, type: 3}
       propertyPath: m_RootOrder
-      value: 12
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 3023719220529722365, guid: 0ab9e890bcb41cc4cafc092f0e5ed178, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2750,9 +2750,9 @@ MonoBehaviour:
   - name: Attack
     clip: {fileID: 8300000, guid: a98292501fcda4148a4c9b23eda4ad65, type: 3}
   bgm:
-  - name: BAD_SEC
-    clip: {fileID: 8300000, guid: 77edb4e76abe3404ab00442f1aedcf22, type: 3}
-    bpm: 124
+  - name: flower_load
+    clip: {fileID: 8300000, guid: 8a76f0a3288031740a3fe1ffb8563148, type: 3}
+    bpm: 90
   bgmPlayer: {fileID: 1931281404}
   sfxPlayer:
   - {fileID: 72865752}
@@ -2966,8 +2966,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930881972}
-  m_LocalRotation: {x: 0.17364809, y: 0.000893829, z: -0.00015760615, w: 0.9848074}
-  m_LocalPosition: {x: 0, y: 2.05, z: -3.41}
+  m_LocalRotation: {x: 0.19080885, y: 0.00089094223, z: -0.00017318156, w: 0.9816268}
+  m_LocalPosition: {x: 0, y: 4.02, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3536,7 +3536,7 @@ MonoBehaviour:
   soundProgressBar: {fileID: 0}
   beatManager: {fileID: 0}
   isGameStart: 0
-  SongName: BAD_SEC
+  SongName: flower_load
   bpm: 0
   barCounts: 4
   totalSongTime: 0
@@ -3913,7 +3913,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7873701472968955038, guid: 062baae922b7b2e479b97ba3ba7406d1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 2.22
       objectReference: {fileID: 0}
     - target: {fileID: 7873701472968955038, guid: 062baae922b7b2e479b97ba3ba7406d1, type: 3}
       propertyPath: m_LocalPosition.z
