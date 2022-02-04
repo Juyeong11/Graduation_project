@@ -47,8 +47,13 @@ Network::Network() {
 	for (int i = 0; i < MAP_NUM; ++i) {
 		maps[i] = new MapInfo;
 	}
+<<<<<<< HEAD
+	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\BAD_SEC.csv");
+	maps[WITCH_MAP]->SetMap("Map\\WitchMap", "Music\\BAD_SEC.csv");
+=======
 	maps[FIELD_MAP]->SetMap("Map\\Field_Map", "Music\\BAD_SEC.csv");
 	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
+>>>>>>> e2efd34b8ba428c1532fb3052a9a666e0f7b0bf7
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
@@ -97,6 +102,7 @@ void Network::send_change_scene(int c_id, int map_type)
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->cur_map_type = map_type;
 }
 
 void Network::send_game_start(int c_id, int ids[3], int boss_id)
@@ -378,11 +384,16 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 			}
 
 			if (is_game_end) {
+				//게임룸 돌리고
+				//씬 변경도 해야됨
+				//게임이 끝난 게임룸의 이벤트는 모두 제거해야됨
+				//이미 들어간건 찾을 수 없는데 
+				//한번에 다 넣지 말고 한 패턴 끝나면 넣고 이런식으로 해야되나 -> 고려해볼만 하구만
 				for (int i : game_room[game_room_id]->player_ids)
 					send_game_end(i, GAME_OVER);
 			}
 		}
-		
+
 	}
 
 
@@ -404,6 +415,12 @@ void Network::process_packet(int client_id, unsigned char* p)
 		cl.state_lock.lock();
 		cl.state = ST_INGAME;
 		cl.state_lock.unlock();
+
+
+		//cl.x = maps[FIELD_MAP]->LengthX / 2;
+		//cl.z = maps[FIELD_MAP]->LengthZ / 2;
+		//cl.y = -cl.z - cl.x;
+
 
 		//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
 		for (int i = 0; i < MAX_USER; ++i)
@@ -463,24 +480,38 @@ void Network::process_packet(int client_id, unsigned char* p)
 		short& y = cl.y;
 		short& z = cl.z;
 		cl.direction = packet->direction;
+		int cur_map = cl.cur_map_type;
+
 		switch (packet->direction) {
 		case DIR::LEFTUP:
-			if (true) { x--; z++; }
+			if (maps[cur_map]->GetTileType(x - 1, z + 1) != 0) {
+				x--; z++;
+			}
 			break;
 		case DIR::UP:
-			if (true) { y--; z++; }
+			if (maps[cur_map]->GetTileType(x, z + 1) != 0) {
+				y--; z++;
+			}
 			break;
 		case DIR::RIGHTUP:
-			if (true) { x++; y--; }
+			if (maps[cur_map]->GetTileType(x + 1, z) != 0) {
+				x++; y--;
+			}
 			break;
 		case DIR::LEFTDOWN:
-			if (true) { x--; y++; }
+			if (maps[cur_map]->GetTileType(x - 1, z) != 0) {
+				x--; y++;
+			}
 			break;
 		case DIR::DOWN:
-			if (true) { y++; z--; }
+			if (maps[cur_map]->GetTileType(x, z - 1) != 0) {
+				y++; z--;
+			}
 			break;
 		case DIR::RIGHTDOWN:
-			if (true) { x++; z--; }
+			if (maps[cur_map]->GetTileType(x + 1, z - 1) != 0) {
+				x++; z--;
+			}
 			break;
 		default:
 			std::cout << "Invalid move in client " << client_id << std::endl;
@@ -697,6 +728,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 					int boss_id = get_npc_id(p->map_type);
 					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, boss_id, ids);
 					//std::cout << "시작" << std::endl;
+					p->player_ids.clear();
+					p->ready_player_cnt = 0;
 				}
 				p->id_lock.unlock();
 				break;
@@ -1064,7 +1097,7 @@ void Network::worker()
 			int pos_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
 			int pos_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
-			do_npc_tile_attack(game_room_id, pos_x, pos_y,pos_z);
+			do_npc_tile_attack(game_room_id, pos_x, pos_y, pos_z);
 			// 맞았을 때 처리
 			exp_over_pool.push(exp_over);
 		}
@@ -1078,6 +1111,12 @@ void Network::worker()
 			//체력에 따라 클리어 유무
 			for (int i : game_room[game_room_id]->player_ids)
 				send_game_end(i, GAME_CLEAR);
+			for (int i : game_room[game_room_id]->player_ids)
+				send_change_scene(i, FIELD_MAP);
+
+			game_room[game_room_id]->isGaming = false;
+
+
 
 			exp_over_pool.push(exp_over);
 		}
@@ -1091,11 +1130,6 @@ void Network::worker()
 
 void Network::game_start(int room_id)
 {
-	// mapinfo에서 패턴 읽어서 이벤트 등록
-	// 일단 지금은 bpm에 맞춰서 이벤트 등록
-	//int bpm = game_room[room_id]->bpm;
-	int bpm = 124;
-	int timeByBeat = 10 * 60 / (float)bpm; // 10 박자에 한번씩 범위 공격
 	int boss_id = game_room[room_id]->boss_id;
 	int map_type = game_room[room_id]->map_type;
 
@@ -1179,7 +1213,16 @@ void Network::game_start(int room_id)
 			std::cout << "잘못된 패턴 타입" << std::endl;
 			break;
 		}
-
-
 	}
+
+	/*
+	// 맵 중앙으로 옮기자
+	for (int i : game_room[room_id]->player_ids) {
+		clients[i]->x = maps[game_room[room_id]->map_type]->LengthX / 2;
+		clients[i]->z = maps[game_room[room_id]->map_type]->LengthZ / 2;
+		clients[i]->y = -clients[i]->z - clients[i]->x;
+
+		for (int j : game_room[room_id]->player_ids)
+			send_move_object(j, i);
+	}*/
 }

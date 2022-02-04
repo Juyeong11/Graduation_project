@@ -179,14 +179,11 @@ public class GameManager : MonoBehaviour
 
                 switch (type)
                 {
-                    case Protocol.CONSTANTS.SC_PACKET_LOGIN_OK:
+                    case Protocol.CONSTANTS.SC_PACKET_CHANGE_SCENE:
                         {
-                            Protocol.sc_packet_login_ok p = Protocol.sc_packet_login_ok.SetByteToVar(data);
-
-                            myPlayerID = p.id;
-                            Objects[p.id] = player;
-                            //PutPlayerObject(p.type, p.id, p.x, p.y);
-                            PlaySound();
+                            Protocol.sc_packet_change_scene p = Protocol.sc_packet_change_scene.SetByteToVar(data);
+                            UnityEngine.SceneManagement.SceneManager.LoadScene(p.scene_num);
+                            Debug.Log("Game_Over -> Change Scene");
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:

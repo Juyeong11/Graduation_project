@@ -46,7 +46,6 @@ public:
 	char name[MAX_NAME_SIZE];
 	int		id;
 	short	x, y,z;
-	int map_number;
 	int direction;
 	std::atomic_int hp;
 	GO_TYPE		type;
@@ -121,6 +120,7 @@ public:
 	SOCKET socket; // 재사용 하기 때문에 data race -> state로 보호
 
 	bool is_active;
+	int cur_map_type;
 	int		prev_recv_size;
 public:
 
@@ -129,6 +129,7 @@ public:
 		type = PLAYER;
 		is_active = true;
 		prev_recv_size = 0;
+		cur_map_type = 0;
 	}
 
 	~Client()

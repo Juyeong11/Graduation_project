@@ -29,6 +29,7 @@ struct PatternInfo {
 
 };
 class MapInfo {
+public:
 	int offsetX;
 	int offsetZ;
 
