@@ -31,7 +31,7 @@ public class HPManager
     {
         CurrentHP -= damage;
         //Debug.Log("Damaged");
-        if (CurrentHP <= 0)
+        if (prevHP <= 0)
             isAlive = false;
     }
 

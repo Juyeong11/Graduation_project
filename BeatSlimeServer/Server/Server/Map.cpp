@@ -151,6 +151,8 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			pivotType = 5;
 		else if (pattern["pivotType"][i] == "Player3")
 			pivotType = 6;
+		else if (pattern["pivotType"][i] == "END")
+			std::cout << std::endl << music_name + " - pattern csv load done.\n";
 		else
 			std::cout << "Load : wrong pivotType\n";
 

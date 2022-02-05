@@ -305,8 +305,6 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].SetActive(false);
                             }
 
-                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
-                            //���̸� ��Ǯ�� ����
                             //ReMoveObject(p.id);
                         }
                         break;
@@ -330,8 +328,6 @@ public class GameManager : MonoBehaviour
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
                             }
 
-                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
-                            //���̸� ��Ǯ�� ����
                             //ReMoveObject(p.id);
                         }
                         break;
@@ -384,10 +380,12 @@ public class GameManager : MonoBehaviour
                             isGameStart = false;
 
                             Debug.Log("Game_Over");
+                            
                         }
                         break;
                     default:
-                        Debug.Log("�߸��� �������� ����" + type);
+                        Debug.Log("wrong + type");
+
                         break;
                 }
             }
@@ -408,7 +406,7 @@ public class GameManager : MonoBehaviour
         {
             if (id == ids[i]) return i;
         }
-        Debug.Log("�߸��� Ŭ���̾�Ʈ id");
+        Debug.Log("wrong id");
         return -1;
     }
     public void PlaySound()

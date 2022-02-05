@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
 using UnityEngine.UI;
@@ -32,6 +32,7 @@ public class PlayerManager : MonoBehaviour
     public HPManager HP;
 
     bool playerAttacking;
+    bool playerDieAnimTriggered;
     List<(Beat,float)> SettledBallBeats;
 
     public bool isThisCurrentPlayingPlayerObject;
@@ -44,6 +45,7 @@ public class PlayerManager : MonoBehaviour
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
         SettledBallBeats = new List<(Beat,float)>();
+        playerDieAnimTriggered = false;
 
         HP.Initialized(false);
         //onPlayerFly.Invoke();
@@ -77,7 +79,6 @@ public class PlayerManager : MonoBehaviour
             {
                 KeyHandler();
                 BallBeatCheck();
-
             }
             PlayerRotateToLookAt();
             PlayerWCheck();
@@ -108,7 +109,6 @@ public class PlayerManager : MonoBehaviour
         switch(selfDirection)
         {
             case HexDirection.LeftUp:
-                //½Ã¾ß º¤ÅÍ¸¦ ¿ÜÀûÇØ¾ßÁö °¢µµ¸¦ ¿ÜÀûÇÏ¸é ´ç¿¬È÷ Æ²¸®Áö
                 //Vector3 c = Vector3.Cross(transform.rotation.eulerAngles, new Vector3(0, -120, 0));
                 //transform.Rotate(0, c.x * 3f, 0);
 
@@ -195,8 +195,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (FieldGameManager.Net.isOnline)
             {
-                //Debug.Log("Å° Àü¼Û");
-                // ¼­¹ö¿¡ ÀÌµ¿ Àü¼Û
+                
                 GameManager.data.setMoved();
 
                 FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTUP);
@@ -219,7 +218,7 @@ public class PlayerManager : MonoBehaviour
             if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
-                // ¼­¹ö¿¡ ÀÌµ¿ Àü¼Û
+               
                 FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.UP);
             }
             else
@@ -240,7 +239,7 @@ public class PlayerManager : MonoBehaviour
             if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
-                // ¼­¹ö¿¡ ÀÌµ¿ Àü¼Û
+                
                 FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
             }
             else
@@ -262,7 +261,7 @@ public class PlayerManager : MonoBehaviour
             if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
-                // ¼­¹ö¿¡ ÀÌµ¿ Àü¼Û
+                
                 FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
             }
             else
@@ -283,7 +282,7 @@ public class PlayerManager : MonoBehaviour
             if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
-                // ¼­¹ö¿¡ ÀÌµ¿ Àü¼Û
+                
                 FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.DOWN);
             }
             else
@@ -304,7 +303,7 @@ public class PlayerManager : MonoBehaviour
             if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
-                // ¼­¹ö¿¡ ÀÌµ¿ Àü¼Û
+                
                 FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
             }
             else
@@ -342,8 +341,6 @@ public class PlayerManager : MonoBehaviour
         {
             if (SettledBallBeats[0].Item1.GetBeatTime() + GameManager.data.JudgementTiming < GameManager.data.nowBeat.GetBeatTime())
             {
-                //³õÄ§
-                Debug.Log("¹Ý°Ý ½ÇÆÐ");
                 VFXManager.data.HitSounder(SettledBallBeats[0].Item2);
                 SettledBallBeats.RemoveAt(0);
                 GameManager.data.MidANote.noteEnd();
@@ -351,8 +348,6 @@ public class PlayerManager : MonoBehaviour
             else if (SettledBallBeats[0].Item1.GetBeatTime() - GameManager.data.JudgementTiming < GameManager.data.nowBeat.GetBeatTime()
                 && playerAttacking)
             {
-                //°ø°Ý
-                Debug.Log("¹Ý°Ý ¼º°ø!");
                 VFXManager.data.HitSounder(1);
                 SettledBallBeats.RemoveAt(0);
                 GameManager.data.MidANote.notePerfect();
@@ -361,7 +356,7 @@ public class PlayerManager : MonoBehaviour
     }
 
 
-    //¿©±â¼­ Lerp
+    //Lerp
     public Vector3 calculatePlayerPosition()
     {
         int beatTime = GameManager.data.timeByBeat;
@@ -414,5 +409,12 @@ public class PlayerManager : MonoBehaviour
         HP.hpUpdate(Time.deltaTime);
         PlayerHPImage.fillAmount = (float)HP.CurrentHP / (float)HP.MaxHp;
         PlayerPrevHPImage.fillAmount = (float)HP.prevHP / (float)HP.MaxHp;
+
+        if (!HP.isAlive && !playerDieAnimTriggered)
+        {
+            //ìŠ¬ë¼ìž„ ì£½ëŠ” ëª¨ì…˜
+            JumpTrigger.SetTrigger("Dead");
+            playerDieAnimTriggered = true;
+        }
     }
 }
