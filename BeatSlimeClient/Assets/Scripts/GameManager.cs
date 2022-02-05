@@ -164,7 +164,7 @@ public class GameManager : MonoBehaviour
 
                 if (prevBeats != nowBeat.addBeat)
                 {
-                    Objects[myPlayerID].GetComponent<PlayerManager>().Beat();
+                    Objects[myPlayerID].GetComponentInChildren<PlayerManager>().Beat();
                     enemy.GetComponent<EnemyManager>().Beat();
                     grid.Beat();
                     soundEffectManager.BeatEffect();
@@ -218,12 +218,12 @@ public class GameManager : MonoBehaviour
 
                             int pid = ServerID_To_ClientID(p.id);
                             //Debug.Log(p.id+" : pid");
-                            Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
-                            Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (pid == myPlayerID)// �ڱ� �ڽ�
-                                Objects[pid].GetComponent<PlayerManager>().JumpTrig();
-                            else if (pid < 3)   //�̰� ���� �ʿ䰡 ������
-                                Objects[pid].GetComponent<PlayerManager>().JumpTrig();
+                            Objects[pid].GetComponentInChildren<HexCellPosition>().setDirection((byte)p.dir);
+                            Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                            if (pid == myPlayerID)// 
+                                Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
+                            else if (pid < 3)   //
+                                Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
 
 
                         }
@@ -238,7 +238,7 @@ public class GameManager : MonoBehaviour
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
                             //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
                       
-                            HPManager hm = Objects[target_id].GetComponent<PlayerManager>().HP;
+                            HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
                             //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                             //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
@@ -253,7 +253,7 @@ public class GameManager : MonoBehaviour
                             int pid = ServerID_To_ClientID(p.id);
                             if (pid == myPlayerID)
                             {
-                                Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                 break;
                             }
                             //PutObject(p.type, p.id, p.x, p.y);
@@ -266,12 +266,12 @@ public class GameManager : MonoBehaviour
                                             // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "�÷��̾� ����");
                                             Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                             Objects[pid].SetActive(true);
-                                            Objects[pid].GetComponent<PlayerManager>().SetHPImages(HPGM.HPs[HPGMStaticInt], GameManager.data.HPGM.prevHPs[HPGMStaticInt]);
+                                            Objects[pid].GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.HPs[HPGMStaticInt], GameManager.data.HPGM.prevHPs[HPGMStaticInt]);
                                             HPGMStaticInt++;
 
                                             Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 
-                                            Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                            Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         }
                                         break;
                                     }
@@ -282,7 +282,7 @@ public class GameManager : MonoBehaviour
                                         Objects[pid].SetActive(true);
                                         Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 
-                                        Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         break;
                                     }
                             }
