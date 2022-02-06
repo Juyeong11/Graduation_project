@@ -122,7 +122,7 @@ void Network::send_game_start(int c_id, GameObject* ids[3], int boss_id)
 	}
 
 }
-void Network::send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z)
+void Network::send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time, int dir, int x, int y, int z)
 {
 	sc_packet_effect packet;
 	packet.type = SC_PACKET_EFFECT;
@@ -234,6 +234,19 @@ void Network::send_game_end(int c_id, char end_type)
 
 
 	//packet.move_time = clients[mover]->last_move_time;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+}
+
+void Network::send_parrying(int c_id,int actor_id)
+{
+	sc_packet_parrying packet;
+	packet.type = SC_PACKET_PARRYING;
+	packet.size = sizeof(packet);
+	packet.id = actor_id;
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -743,6 +756,48 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 	}
 	break;
+	case CS_PACKET_PARRYING:
+	{
+		cs_packet_parrying* packet = reinterpret_cast<cs_packet_parrying*>(p);
+		/*
+		*	- 서버에 전송된 패킷을 보고 서버에서
+		*		- 클라이언트가 플레이중인 게임 방을 찾음
+		*		- 해당 게임 방의 게임 플레이 시간과 패킷이 온시간을 계산
+		*		- 계산된 시간대에 패링가능한 공격이 있었는지 확인한 후 만약 있었다면
+		*			- 패링 성공 패킷 클라이언트로 전송 -> 이 때 타겟인 플레이어가 패링 패킷을 보낸경우에만 패링가능 -> 패킷에 자신의 번호가 들어있어야함
+		*			- 없으면 실패
+		*/
+
+		
+		for (auto* gr : game_room) {
+			if (false == gr->isGaming) continue;
+			// 해당 플레이어의 게임 방을 찾고
+			if (false == gr->FindPlayer(client_id)) continue;
+			int id = gr->FindPlayer(client_id); 
+			// 게임시간이 얼마나 지났는지 확인하고
+			int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
+			// 현재시간에 패링패턴이 있었는지 확인
+			const std::vector<PatternInfo>& pt = maps[gr->map_type]->GetPatternTime();
+			for (auto& pattern : pt) {
+				if (10 != pattern.type) continue;// 패링 노트인지 채크
+				if (id != (pattern.pivotType - 4)) continue; // 타겟이 된 플레이어인지 체크
+				//100ms보다 작으면
+				if (abs(running_time - pattern.time) < 100) {
+					//패링 성공
+					// 패링 성공 패킷을 클라이언트로 보냄
+					for (const auto pl : gr->player_ids) {
+						send_parrying(pl->id, client_id);
+					}
+				}
+				else {
+					//패링 실패
+				}
+				
+			}
+		}
+		std::cout << "Can not find player game room\n";
+	}
+	break;
 	default:
 		std::cout << "이상한 패킷 수신\n";
 		break;
@@ -923,10 +978,42 @@ void Network::worker()
 			exp_over_pool.push(exp_over);
 		}
 		break;
-		case OP_BOSS_TARGETING_ATTACK:
+		case OP_PLAYER_PARRYING:
 		{
 			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
-			do_npc_attack(client_id, target_id, target_id);
+			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
+			int charging_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
+			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
+
+			switch (pivotType)
+			{
+			case PlayerM:
+				target_id = game_room[game_room_id]->find_max_hp_player();
+				break;
+			case Playerm:
+				target_id = game_room[game_room_id]->find_min_hp_player();
+				break;
+
+			case Boss:
+				target_id = game_room[game_room_id]->boss_id->id;
+
+				break;
+			case Player1:
+				target_id = game_room[game_room_id]->player_ids[0]->id;
+
+				break;
+			case Player2:
+				target_id = game_room[game_room_id]->player_ids[1]->id;
+
+				break;
+			case Player3:
+				target_id = game_room[game_room_id]->player_ids[2]->id;
+
+				break;
+			}
+			for (const auto pl : game_room[game_room_id]->player_ids) {
+				send_effect(pl->id, client_id, target_id, 10, charging_time, 0, 0, 0, 0);
+			}
 			exp_over_pool.push(exp_over);
 		}
 		break;
@@ -946,7 +1033,7 @@ void Network::worker()
 			// 서버에서 공격 처리할 이벤트 추가
 			int target_id = -1;
 
-			int pos_x, pos_z, pos_y,dir = 0;
+			int pos_x, pos_z, pos_y, dir = 0;
 			//printf("%d %d %d\n", pivot_x, pivot_y, pivot_z);
 			switch (pivotType)
 			{
@@ -1187,7 +1274,43 @@ void Network::game_start(int room_id)
 			timer_queue.push(tev);
 			break;
 
-		case 7: // 유도 공격 -> 패링할 수 있음
+		case 10: // 유도 공격 -> 패링할 수 있음
+			/*
+			* 유도공격은 패링할 수 있음
+			* 서버가 알 수 있는 정보
+			*	- 패링할 수 있는 시간
+			*	- 클라이언트에서 보낸 패링 패킷의 도착 시간
+			*
+			* 그러면 클라이언트에서 패킷이 오면 해당 플레이어가 어느 방에서 플레이중인지 찾고
+			* 해당 방에서 게임이 진행된 시간을 계산한 다음
+			* 패링가능한 패턴을 찾아서(찾는건 시간으로 이진탐색을 하자)
+			* 비교해보면서 포함되는게 있으면 패링 성공으로 패킷을 보낸다.
+			*
+			* 해야할 일
+			*	- 유도 공격 이펙트 패킷을 보낼 이벤트를 추가한다.
+			*	- 추가된 이벤트에서 클라이언트에 패킷을 보내면 클라이언트에서 이펙트를 출력
+			*	- 출력된 이펙트를 보고 플레이어가 패링 패킷을 서버에 전송
+			*	- 서버에 전송된 패킷을 보고 서버에서
+			*		- 클라이언트가 플레이중인 게임 방을 찾음
+			*		- 해당 게임 방의 게임 플레이 시간과 패킷이 온시간을 계산
+			*		- 계산된 시간대에 패링가능한 공격이 있었는지 확인한 후 만약 있었다면
+			*			- 패링 성공 패킷 클라이언트로 전송 -> 이 때 타겟인 플레이어가 패링 패킷을 보낸경우에만 패링가능 -> 패킷에 자신의 번호가 들어있어야함
+			*			- 없으면 고냥 실패
+			*	- 끝 -
+			*/
+
+			tev.ev = EVENT_PLAYER_PARRYING;
+			tev.obj_id = boss_id;
+			tev.type = t.type;
+			tev.x = t.x;
+			tev.y = t.y;
+			tev.z = t.z;
+			tev.game_room_id = room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
+			tev.charging_time = t.speed;
+			tev.pivotType = t.pivotType;
+			timer_queue.push(tev);
 			break;
 		case -600:
 			tev.ev = EVENT_GAME_END;

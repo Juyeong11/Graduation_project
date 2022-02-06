@@ -354,14 +354,13 @@ public class GameManager : MonoBehaviour
                                     EffectManager.instance.OneTileEffect(p.x, p.y, p.z, p.charging_time);
                                     break;
                                 case 5:
-
                                     EffectManager.instance.BossWaterGunEffect(Objects[pid].transform.localPosition, Objects[tid].transform.localPosition, p.charging_time);
-                                    Debug.Log("pos : " + Objects[pid].transform.localPosition.x + " " + Objects[pid].transform.localPosition.y + " " + Objects[pid].transform.localPosition.z);
-                                    Debug.Log("pos : " + Objects[tid].transform.localPosition.x + " " + Objects[tid].transform.localPosition.y + " " + Objects[tid].transform.localPosition.z);
-                                    break;
+                                break;
                                 case 6:
                                     EffectManager.instance.BossQuakeEffect(p.x, p.y, p.z, p.charging_time, Objects[tid].GetComponent<HexCellPosition>().direction);
-
+                                    break;
+                                case 10:
+                                    EffectManager.instance.BossTargetingEffect(Objects[pid].transform.localPosition,ref Objects[tid], p.charging_time);
                                     break;
                             }
                             //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));
@@ -376,6 +375,14 @@ public class GameManager : MonoBehaviour
                             isGameStart = false;
 
                             Debug.Log("Game_Over");
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_PARRYING:
+                        {
+                            Protocol.sc_packet_parrying p = Protocol.sc_packet_parrying.SetByteToVar(data);
+                            isGameStart = false;
+
+                            Debug.Log("Parrying Success");
                         }
                         break;
                     default:

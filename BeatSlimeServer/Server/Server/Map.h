@@ -103,7 +103,7 @@ public:
 	GameRoom(int id);
 
 	void GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER]);
-	bool FindPlayer(int id) const;
+	int FindPlayer(int id) const;
 
 	int find_max_hp_player() const;
 	int find_min_hp_player() const;

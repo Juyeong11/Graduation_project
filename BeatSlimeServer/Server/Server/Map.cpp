@@ -194,10 +194,12 @@ GameRoom::GameRoom(int id) : game_room_id(id) {
 	ready_player_cnt = 0;
 }
 
-bool GameRoom::FindPlayer(int id) const
+int GameRoom::FindPlayer(int id) const
 {
+	int room_id=0;
 	for (const auto p : player_ids) {
-		if (p->id == id) return true;
+		if (p->id == id) return room_id;
+		room_id++;
 	}
 	return false;
 }

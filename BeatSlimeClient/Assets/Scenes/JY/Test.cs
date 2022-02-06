@@ -6,18 +6,28 @@ public class Test : MonoBehaviour
 {
     float t = 0;
     float i = 0;
+
+    GameObject Target;
+    public GameObject Prefeb;
+    public GameObject rf;
     // Start is called before the first frame update
     void Start()
     {
-        
-    }
+        Prefeb.GetComponent<WaterGunEffect>().start_pos = new Vector3(0, 0, 0);
+        Prefeb.GetComponent<WaterGunEffect>().end_pos = new Vector3(10, 10, 10);
+        Prefeb.GetComponent<WaterGunEffect>().speed = 1000;
 
+        rf = Instantiate(Prefeb);
+        SetTarget(ref rf);
+    }
+    public void SetTarget(ref GameObject target)
+    {
+        Target = target;
+    }
     // Update is called once per frame
     void Update()
     {
-        t += Time.deltaTime;
-        i = Mathf.Lerp(0, 3.14f, t);
-        Debug.Log(i);
-        Debug.Log(Mathf.Sin(i));
+        if(Target)
+            Debug.Log(Target.transform.position.x + " " + Target.transform.position.y + " " + Target.transform.position.z);
     }
 }

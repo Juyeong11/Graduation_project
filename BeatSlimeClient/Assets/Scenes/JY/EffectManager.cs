@@ -8,6 +8,9 @@ public class EffectManager : MonoBehaviour
     public GameObject TileEffectPrefab;
     public GameObject QuakeEffectPrefab;
     public GameObject WaterGunEffectPrefab;
+    public GameObject TargetingEffectPrefab;
+
+
     public GameObject PlayerAttackEffectPrefab;
 
     int[,] around = new int[6, 3] { { 1, -1, 0 }, { 1, 0, -1 }, { 0, 1, -1 }, { -1, 1, 0 }, { -1, 0, 1 }, { 0, -1, 1 } };
@@ -32,7 +35,7 @@ public class EffectManager : MonoBehaviour
 
         GameObject go = Instantiate(TileEffectPrefab, GameManager.data.grid.cellMaps.Get(start_x, start_y, start_z).getCellRealPosition(), Quaternion.identity);
         float s = speed * 1 / 1000f;
-        Debug.Log("effect t" + Time.time);
+        //Debug.Log("effect t" + Time.time);
         go.GetComponent<TileEffect>().speed = s;
     }
     public void OneQuakeEffect(int start_x, int start_y, int start_z, int speed)
@@ -40,15 +43,14 @@ public class EffectManager : MonoBehaviour
 
         GameObject go = Instantiate(QuakeEffectPrefab, GameManager.data.grid.cellMaps.Get(start_x, start_y, start_z).getCellRealPosition(), Quaternion.identity);
         float s = speed * 1 / 1000f;
-        Debug.Log("effect q" + Time.time);
+        //Debug.Log("effect q" + Time.time);
         go.GetComponent<QuakeEffect>().speed = s;
     }
     public void OneWaterGunEffect(Vector3 start_pos, Vector3 end_pos, int speed)
     {
-
         GameObject go = Instantiate(WaterGunEffectPrefab, start_pos, Quaternion.identity);
         float s = speed * 1 / 1000f;
-        Debug.Log("effect w" + Time.time);
+        //Debug.Log("effect w" + Time.time);
         go.GetComponent<WaterGunEffect>().speed = s;
         go.GetComponent<WaterGunEffect>().start_pos = start_pos;
         go.GetComponent<WaterGunEffect>().end_pos = end_pos;
@@ -70,6 +72,15 @@ public class EffectManager : MonoBehaviour
     public void BossWaterGunEffect(Vector3 start_pos,Vector3 end_pos, int speed)
     {
         OneWaterGunEffect(start_pos, end_pos, speed);
+    }
+    public void BossTargetingEffect(Vector3 start_pos,ref GameObject target, int speed)
+    {
+        GameObject go = Instantiate(TargetingEffectPrefab, start_pos, Quaternion.identity);
+        float s = speed * 1 / 1000f;
+        //Debug.Log("effect w" + Time.time);
+        go.GetComponent<TargetingEffect>().speed = s;
+        go.GetComponent<TargetingEffect>().start_pos = start_pos;
+        go.GetComponent<TargetingEffect>().target = target;
     }
     public void BossQuakeEffect(int start_x, int start_y, int start_z, int speed, HexDirection dir)
     {

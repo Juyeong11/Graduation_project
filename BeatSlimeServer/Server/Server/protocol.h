@@ -10,6 +10,7 @@ const char CS_PACKET_READ_MAP = 3;
 const char CS_PACKET_WRITE_MAP = 4;
 const char CS_PACKET_CHANGE_SCENE_READY = 5;
 const char CS_PACKET_GAME_START_READY = 6;
+const char CS_PACKET_PARRYING = 7;
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -21,6 +22,7 @@ const char SC_PACKET_MAP_DATA = 7;
 const char SC_PACKET_CHANGE_SCENE = 8;
 const char SC_PACKET_EFFECT = 9;
 const char SC_PACKET_GAME_END = 10;
+const char SC_PACKET_PARRYING = 11;
 
 #pragma pack (push, 1)
 //client -> server
@@ -57,6 +59,11 @@ struct cs_packet_change_scene_ready {
 };
 
 struct cs_packet_game_start_ready {
+	unsigned char size;
+	char	type;
+};
+
+struct cs_packet_parrying {
 	unsigned char size;
 	char	type;
 };
@@ -143,6 +150,12 @@ struct sc_packet_game_end
 	unsigned char size;
 	char type;
 	char end_type;
+};
+
+struct sc_packet_parrying {
+	unsigned char size;
+	char	type;
+	int id;
 };
 
 #pragma pack(pop)
