@@ -48,8 +48,8 @@ Network::Network() {
 		maps[i] = new MapInfo;
 	}
 
-	maps[FIELD_MAP]->SetMap("Map\\Field_Map", "Music\\BAD_SEC.csv");
-	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
+	maps[FIELD_MAP]->SetMap("Map\\Field_Map", "Music\\Test.csv");
+	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\Test.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
@@ -101,15 +101,15 @@ void Network::send_change_scene(int c_id, int map_type)
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->cur_map_type = map_type;
 }
 
-void Network::send_game_start(int c_id, int ids[3], int boss_id)
+void Network::send_game_start(int c_id, GameObject* ids[3], int boss_id)
 {
 	sc_packet_game_start packet;
 	packet.type = SC_PACKET_GAME_START;
 	packet.size = sizeof(packet);
 	packet.player_id = c_id;
-	packet.id1 = ids[0];
-	packet.id2 = ids[1];
-	packet.id3 = ids[2];
+	packet.id1 = ids[0]->id;
+	packet.id2 = ids[1]->id;
+	packet.id3 = ids[2]->id;
 	packet.boss_id = boss_id;
 
 	EXP_OVER* ex_over;
@@ -118,11 +118,11 @@ void Network::send_game_start(int c_id, int ids[3], int boss_id)
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 
 	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
-		send_put_object(c_id, ids[i]);
+		send_put_object(c_id, ids[i]->id);
 	}
 
 }
-void Network::send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time, int x, int y, int z)
+void Network::send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z)
 {
 	sc_packet_effect packet;
 	packet.type = SC_PACKET_EFFECT;
@@ -130,7 +130,7 @@ void Network::send_effect(int client_id, int actor_id, int target_id, int effect
 	packet.effect_type = effect_type;
 	packet.id = actor_id;
 	packet.target_id = target_id;
-	packet.dir = clients[actor_id]->direction;
+	packet.dir = dir;
 	packet.charging_time = charging_time;
 	packet.x = x;
 	packet.y = y;
@@ -329,30 +329,6 @@ int Network::get_game_room_id()
 	return -1;
 }
 
-int Network::find_max_hp_player(int game_room_id) {
-	int maxhp = 0;
-	int ret = 0;
-	for (int id : game_room[game_room_id]->player_ids) {
-		if (clients[id]->hp > maxhp) {
-			maxhp = clients[id]->hp;
-			ret = id;
-		};
-	}
-	return ret;
-}
-
-int Network::find_min_hp_player(int game_room_id) {
-	int minhp = 0;
-	int ret = 0;
-	for (int id : game_room[game_room_id]->player_ids) {
-		if (clients[id]->hp > minhp) {
-			minhp = clients[id]->hp;
-			ret = id;
-		};
-	}
-	return ret;
-}
-
 void Network::do_npc_move(int npc_id) {
 
 
@@ -365,18 +341,18 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
 	const int damage = 5;
-	for (int id : game_room[game_room_id]->player_ids) {
-		if (false == is_attack(id, x, z)) continue;
-		clients[id]->hp -= damage;
-		for (int i : game_room[game_room_id]->player_ids)
-			send_attack_player(game_room[game_room_id]->boss_id, id, i);
+	for (const auto& pl : game_room[game_room_id]->player_ids) {
+		if (false == is_attack(pl->id, x, z)) continue;
+		pl->hp -= damage;
+		for (const auto& p : game_room[game_room_id]->player_ids)
+			send_attack_player(game_room[game_room_id]->boss_id->id, pl->id, p->id);
 
-		if (clients[id]->hp < 0) {
+		if (pl->hp < 0) {
 			// 게임 끝
-			reinterpret_cast<Client*>(clients[id])->is_active = false;
+			reinterpret_cast<Client*>(pl)->is_active = false;
 			bool is_game_end = true;
-			for (int i : game_room[game_room_id]->player_ids) {
-				if (clients[i]->hp > 0) is_game_end = false;
+			for (const auto& p : game_room[game_room_id]->player_ids) {
+				if (p->hp > 0) is_game_end = false;
 			}
 
 			if (is_game_end) {
@@ -385,8 +361,8 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 				//게임이 끝난 게임룸의 이벤트는 모두 제거해야됨
 				//이미 들어간건 찾을 수 없는데 
 				//한번에 다 넣지 말고 한 패턴 끝나면 넣고 이런식으로 해야되나 -> 고려해볼만 하구만
-				for (int i : game_room[game_room_id]->player_ids)
-					send_game_end(i, GAME_OVER);
+				for (const auto& p : game_room[game_room_id]->player_ids)
+					send_game_end(p->id, GAME_OVER);
 			}
 		}
 
@@ -705,12 +681,12 @@ void Network::process_packet(int client_id, unsigned char* p)
 				p->player_ids.insert(cl.id);
 
 				// 준비 이펙트 전송
-				int ids[MAX_IN_GAME_PLAYER];
+				GameObject* players[MAX_IN_GAME_PLAYER];
 				if (p->player_ids.size() >= MAX_IN_GAME_PLAYER) {
 					// 씬 전환
 					int i = 0;
 					for (int id : p->player_ids) { // 이미 change 씬
-						ids[i] = id;
+						players[i] = clients[id];
 						i++;
 						if (i > MAX_IN_GAME_PLAYER) break;
 					}
@@ -722,7 +698,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					// 포탈에서 GameRoom으로 이동
 					int room_id = get_game_room_id();
 					int boss_id = get_npc_id(p->map_type);
-					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, boss_id, ids);
+					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players);
 					//std::cout << "시작" << std::endl;
 					p->player_ids.clear();
 					p->ready_player_cnt = 0;
@@ -747,21 +723,21 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		cs_packet_game_start_ready* packet = reinterpret_cast<cs_packet_game_start_ready*>(p);
 
-		for (auto* p : game_room) {
-			p->ready_lock.lock();
-			if (false == p->FindPlayer(client_id)) { p->ready_lock.unlock(); continue; }
-			p->ready_player_cnt++;
-			if (p->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
+		for (auto* gr : game_room) {
+			gr->ready_lock.lock();
+			if (false == gr->FindPlayer(client_id)) { gr->ready_lock.unlock(); continue; }
+			gr->ready_player_cnt++;
+			if (gr->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
 
-				for (int id : p->player_ids) {
-					send_game_start(id, p->player_ids, p->boss_id);
+				for (const auto pl : gr->player_ids) {
+					send_game_start(pl->id, gr->player_ids, gr->boss_id->id);
 				}
-				p->start_time = std::chrono::system_clock::now();
-				game_start(p->game_room_id);
+				gr->start_time = std::chrono::system_clock::now();
+				game_start(gr->game_room_id);
 				std::cout << "게임 시작\n";
 
 			}
-			p->ready_lock.unlock();
+			gr->ready_lock.unlock();
 			break;
 		}
 
@@ -887,13 +863,13 @@ void Network::worker()
 			switch (pivotType)
 			{
 			case PlayerM:
-				target_id = find_max_hp_player(game_room_id);
+				target_id = game_room[game_room_id]->find_max_hp_player();
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Playerm:
-				target_id = find_min_hp_player(game_room_id);
+				target_id = game_room[game_room_id]->find_min_hp_player();
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
@@ -910,19 +886,19 @@ void Network::worker()
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player1:
-				target_id = game_room[game_room_id]->player_ids[0];
+				target_id = game_room[game_room_id]->player_ids[0]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player2:
-				target_id = game_room[game_room_id]->player_ids[1];
+				target_id = game_room[game_room_id]->player_ids[1]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player3:
-				target_id = game_room[game_room_id]->player_ids[2];
+				target_id = game_room[game_room_id]->player_ids[2]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
@@ -940,9 +916,9 @@ void Network::worker()
 			cl.y = y + pivot_y;
 			cl.z = z + pivot_z;
 			cl.direction = rand() % 6;
-			for (int i : game_room[game_room_id]->player_ids) {
+			for (const auto pl : game_room[game_room_id]->player_ids) {
 
-				send_move_object(i, client_id);
+				send_move_object(pl->id, client_id);
 			}
 			exp_over_pool.push(exp_over);
 		}
@@ -970,18 +946,18 @@ void Network::worker()
 			// 서버에서 공격 처리할 이벤트 추가
 			int target_id = -1;
 
-			int pos_x, pos_z, pos_y;
+			int pos_x, pos_z, pos_y,dir = 0;
 			//printf("%d %d %d\n", pivot_x, pivot_y, pivot_z);
 			switch (pivotType)
 			{
 			case PlayerM:
-				target_id = find_max_hp_player(game_room_id);
+				target_id = game_room[game_room_id]->find_max_hp_player();
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Playerm:
-				target_id = find_min_hp_player(game_room_id);
+				target_id = game_room[game_room_id]->find_min_hp_player();
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
@@ -992,25 +968,25 @@ void Network::worker()
 				pos_z = pivot_z;
 				break;
 			case Boss:
-				target_id = game_room[game_room_id]->boss_id;
+				target_id = game_room[game_room_id]->boss_id->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player1:
-				target_id = game_room[game_room_id]->player_ids[0];
+				target_id = game_room[game_room_id]->player_ids[0]->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player2:
-				target_id = game_room[game_room_id]->player_ids[1];
+				target_id = game_room[game_room_id]->player_ids[1]->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player3:
-				target_id = game_room[game_room_id]->player_ids[2];
+				target_id = game_room[game_room_id]->player_ids[2]->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
@@ -1021,8 +997,10 @@ void Network::worker()
 			{
 			case 3:
 			{
-
 				for (int i = 0; i < 10; ++i) {
+					// 다 똑같은 시간을 가지고 있다
+					// 즉 이벤트를 나눌 필요가 굳이 있을까 싶다
+					// 이걸 합치는 방법을 생각해봐야겠다.
 
 					timer_event t;
 					t.ev = EVENT_BOSS_TILE_ATTACK;
@@ -1035,14 +1013,11 @@ void Network::worker()
 					t.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time);
 					timer_queue.push(t);
 				}
-
 			}
 			break;
 			case 4:
 			{
-
 				for (int i = 0; i < 8; ++i) {
-
 					timer_event t;
 					t.ev = EVENT_BOSS_TILE_ATTACK;
 					t.obj_id = client_id;
@@ -1058,7 +1033,6 @@ void Network::worker()
 			break;
 			case 99:
 			{
-
 				timer_event t;
 				t.ev = EVENT_BOSS_TILE_ATTACK;
 				t.obj_id = client_id;
@@ -1069,20 +1043,49 @@ void Network::worker()
 				t.z = pos_z;
 				t.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time);
 				timer_queue.push(t);
-
 			}
 			break;
-			case AROUND:
-				break;
+			case 5:
+			{
+				timer_event t;
+				t.ev = EVENT_BOSS_TILE_ATTACK;
+				t.obj_id = client_id;
+				t.target_id = game_room[game_room_id]->find_max_distance_player();
+				target_id = t.target_id;
+				t.game_room_id = game_room_id;
+				t.x = clients[t.target_id]->x;
+				t.y = clients[t.target_id]->y;
+				t.z = clients[t.target_id]->z;
+				t.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time);
+				timer_queue.push(t);
+			}
+			break;
+			case 6:// 보스가 보는 방향으로 지진
+			{
+				dir = game_room[game_room_id]->boss_id->direction;
+				for (int i = 0; i < 5; ++i) {
+					timer_event t;
+					t.ev = EVENT_BOSS_TILE_ATTACK;
+					t.obj_id = client_id;
+					t.target_id = target_id;
+					t.game_room_id = game_room_id;
+					t.x = PatternInfo::HexCellAround[dir][0] * i + pos_x;
+					t.y = PatternInfo::HexCellAround[dir][1] * i + pos_y;
+					t.z = PatternInfo::HexCellAround[dir][2] * i + pos_z;
+					t.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time);
+					timer_queue.push(t);
+				}
+			}
+			break;
 			default:
 				std::cout << "wrong pattern type\n";
 				break;
 			}
 			//해당 게임 룸에 있는 모든 오브젝트한테 보내야됨
 			// gamestart도 여러번 들어가는듯
-			for (int id : game_room[game_room_id]->player_ids) {
+			for (const auto pl : game_room[game_room_id]->player_ids) {
 
-				send_effect(id, client_id, target_id, pattern_type, charging_time, pos_x, pos_y, pos_z);
+				send_effect(pl->id, client_id, target_id, pattern_type, charging_time, dir, pos_x, pos_y, pos_z);
 			}
 			exp_over_pool.push(exp_over);
 		}
@@ -1102,13 +1105,13 @@ void Network::worker()
 		{
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			//보스 체력 확인하고
-			int boss_id = game_room[game_room_id]->boss_id;
+			int boss_id = game_room[game_room_id]->boss_id->id;
 			//if(clients[boss_id]->hp<10;
 			//체력에 따라 클리어 유무
-			for (int i : game_room[game_room_id]->player_ids)
-				send_game_end(i, GAME_CLEAR);
-			for (int i : game_room[game_room_id]->player_ids)
-				send_change_scene(i, FIELD_MAP);
+			for (const auto p : game_room[game_room_id]->player_ids)
+				send_game_end(p->id, GAME_CLEAR);
+			for (const auto p : game_room[game_room_id]->player_ids)
+				send_change_scene(p->id, FIELD_MAP);
 
 			game_room[game_room_id]->isGaming = false;
 
@@ -1126,7 +1129,7 @@ void Network::worker()
 
 void Network::game_start(int room_id)
 {
-	int boss_id = game_room[room_id]->boss_id;
+	int boss_id = game_room[room_id]->boss_id->id;
 	int map_type = game_room[room_id]->map_type;
 
 	const std::vector<PatternInfo>& pt = maps[map_type]->GetPatternTime();
@@ -1134,6 +1137,18 @@ void Network::game_start(int room_id)
 
 	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
 
+	/*
+	* 현재 필요한 것
+	* - 보스 비 유도 공격 2가지
+	* - 보스 유도 공격 1가지
+	* 이걸 구현하기 위해 필요한 것
+	* - noteType에 타입 지정 -> 비 유도부터 순서대로 5번~7번
+	* - 가장 멀리 떨어진 플레이어를 찾는 코드
+	* - 보스가 보는 방향으로 지진
+	*	- 맵의 끝까지 보내야됨 -> 현재 좌표에서 맵의 끝까지 몇 칸인지 계산하는 함수가 필요함
+	*	- 지진을 나타낼 임시 에니메이션
+	* * 일단 유도공격은 나중에
+	*/
 	for (const auto& t : pt) {
 		timer_event tev;
 
@@ -1151,12 +1166,16 @@ void Network::game_start(int room_id)
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
 			tev.pivotType = t.pivotType;
-			timer_queue.push(std::move(tev));
+			timer_queue.push(tev);// 여기 move를 사용해도 될까?
 			break;
-		case 3:
+		case 3:// 패턴 3번
+		case 4:// 패턴 4번
+		case 99:// 단일 장판 공격
+		case 5: // 가장 멀리있는 적에게 물줄기 발사
+		case 6: // 보스가 보는 방향으로 지진
 			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
 			tev.obj_id = boss_id;
-			tev.type = 3;
+			tev.type = t.type;
 			tev.x = t.x;
 			tev.y = t.y;
 			tev.z = t.z;
@@ -1165,38 +1184,11 @@ void Network::game_start(int room_id)
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
 			tev.pivotType = t.pivotType;
-			timer_queue.push(std::move(tev));
-			break;
-		case 4:
-			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
-			tev.obj_id = boss_id;
-			tev.type = 4;
-			tev.x = t.x;
-			tev.y = t.y;
-			tev.z = t.z;
-			tev.game_room_id = room_id;
-			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
-			tev.charging_time = t.speed;
-			tev.pivotType = t.pivotType;
-			timer_queue.push(std::move(tev));
+			timer_queue.push(tev);
 			break;
 
-		case 99:
-			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
-			tev.obj_id = boss_id;
-			tev.type = 99;
-			tev.x = t.x;
-			tev.y = t.y;
-			tev.z = t.z;
-			tev.game_room_id = room_id;
-			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
-			tev.charging_time = t.speed;
-			tev.pivotType = t.pivotType;
-			timer_queue.push(std::move(tev));
+		case 7: // 유도 공격 -> 패링할 수 있음
 			break;
-
 		case -600:
 			tev.ev = EVENT_GAME_END;
 			tev.game_room_id = room_id;

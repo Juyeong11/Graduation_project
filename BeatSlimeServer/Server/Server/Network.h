@@ -67,10 +67,10 @@ public:
 	void send_remove_object(int client_id, int victim_id);
 	void send_map_data(int client_id, char* data, int nShell);
 	void send_change_scene(int client_id, int map_type);
-	void send_game_start(int client_id, int ids[3], int boss_id);
+	void send_game_start(int client_id, GameObject* ids[3], int boss_id);
 	void send_game_end(int client_id,char end_type);
 
-	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time, int x, int y, int z);
+	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z);
 	void disconnect_client(int client_id);
 
 	bool is_near(int a, int b)
@@ -203,9 +203,7 @@ public:
 
 	void game_start(int room_id);
 
-	int find_max_hp_player(int game_room_id);
-	int find_min_hp_player(int game_room_id);
-
+	int cal_map_end_cur_direction(int game_room_id) const;
 	void check_game_over(int game_room_id, int dead_charactor_id) {
 		// 게임 오버 패킷을 보내고
 
@@ -218,7 +216,7 @@ public:
 private:
 	concurrency::concurrent_priority_queue<timer_event> timer_queue;
 	concurrency::concurrent_queue<EXP_OVER*> exp_over_pool;
-	std::array<Gameobject*, MAX_OBJECT> clients;// 200, 200 맵을 존으로 나누어 뷰 리스트 제작할 것
+	std::array<GameObject*, MAX_OBJECT> clients;// 200, 200 맵을 존으로 나누어 뷰 리스트 제작할 것
 	EXP_OVER accept_ex;
 
 private:

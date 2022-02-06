@@ -94,9 +94,9 @@ GameObject:
   - component: {fileID: 6679951883753254021}
   - component: {fileID: 6679951883753254020}
   - component: {fileID: 6222226676457482791}
-  - component: {fileID: -74327777758708112}
+  - component: {fileID: -5635292475181331734}
   m_Layer: 0
-  m_Name: effect 1
+  m_Name: QuakeEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -150,7 +150,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: de346ae44b9610649b0cd2c0573fbf3d, type: 2}
+  - {fileID: 2100000, guid: 1bbcc4f0f6c6d5c48ab0dcc9d54cff18, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -200,7 +200,14 @@ MonoBehaviour:
     x: 0
     z: 0
     w: 0
---- !u!114 &-74327777758708112
+  direction: 0
+  landOffsetX: 0
+  landOffsetY: 0
+  landOffsetZ: 0
+  landOffsetRotate: 0
+  landOffsetScale: 0
+  preBeatedTime: 0
+--- !u!114 &-5635292475181331734
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -209,6 +216,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8687026714411121945}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4680daf5686184c42889bad0ff3f51d3, type: 3}
+  m_Script: {fileID: 11500000, guid: fe22daa2ed7a64b4c9a89b123aa2c732, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 0

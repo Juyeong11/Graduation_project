@@ -320,7 +320,15 @@ public class PlayerManager : MonoBehaviour
                 }
             }
         }
-
+        else if (Input.GetKeyDown(KeyCode.J) && KeyCheck(KeyCode.J))
+        {
+            if (FieldGameManager.Net.isOnline)
+            {
+                GameManager.data.setMoved();
+                // 서버에 이동 전송
+                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
+            }
+        }
     }
 
     void resetPosition()

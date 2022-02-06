@@ -202,6 +202,7 @@ public class GameManager : MonoBehaviour
                             ids[2] = p.id3;
                             ids[3] = p.boss_id;
                             int pid = ServerID_To_ClientID(p.player_id);
+
                             Objects[pid] = player;
                             myPlayerID = pid;
                             Objects[3] = enemy;
@@ -242,7 +243,6 @@ public class GameManager : MonoBehaviour
                             //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                             //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
-                            Debug.Log("ATTACK : " + p.id + ", HP : " + hm.CurrentHP +" to " + p.hp);
 
                             hm.Damage(hm.CurrentHP - p.hp);
                         }
@@ -340,36 +340,28 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_effect p = Protocol.sc_packet_effect.SetByteToVar(data);
                             int pid = ServerID_To_ClientID(p.id);
                             int tid = ServerID_To_ClientID(p.target_id);
-                            int start_x, start_y, start_z;
-
-                            start_x = p.x;
-                            start_y = p.y;
-                            start_z = p.z;
-                            //if (p.target_id == -1)
-                            //{
-                            //    start_x = p.x;
-                            //    start_y = p.y;
-                            //    start_z = p.z;
-                            //}
-                            //else
-                            //{
-                            //    start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
-                            //    start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
-                            //    start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
-                            //}
+                            
 
                             switch (p.effect_type)
                             {
                                 case 3:
-                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,3);
+                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time,3);
                                     break;
                                 case 4:
-                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,4);
+                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time,4);
                                     break;
                                 case 99:
-                                    EffectManager.instance.OneTileEffect(start_x, start_y, start_z, p.charging_time);
+                                    EffectManager.instance.OneTileEffect(p.x, p.y, p.z, p.charging_time);
                                     break;
                                 case 5:
+
+                                    EffectManager.instance.BossWaterGunEffect(Objects[pid].transform.localPosition, Objects[tid].transform.localPosition, p.charging_time);
+                                    Debug.Log("pos : " + Objects[pid].transform.localPosition.x + " " + Objects[pid].transform.localPosition.y + " " + Objects[pid].transform.localPosition.z);
+                                    Debug.Log("pos : " + Objects[tid].transform.localPosition.x + " " + Objects[tid].transform.localPosition.y + " " + Objects[tid].transform.localPosition.z);
+                                    break;
+                                case 6:
+                                    EffectManager.instance.BossQuakeEffect(p.x, p.y, p.z, p.charging_time, Objects[tid].GetComponent<HexCellPosition>().direction);
+
                                     break;
                             }
                             //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));
