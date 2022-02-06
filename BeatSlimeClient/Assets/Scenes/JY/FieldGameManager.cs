@@ -76,10 +76,11 @@ public class FieldGameManager : MonoBehaviour
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
                             //Debug.Log(p.id+"¿Ãµø");
-                            Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().setDirection((byte)p.dir);
-                            Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
+                            Debug.Log((byte)p.dir);
+                            Objects[p.id].GetComponent<FieldHexCellPosition>().setDirection((byte)p.dir);
+                            Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
                             if (p.id < Protocol.CONSTANTS.MAX_USER)
-                                Objects[p.id].GetComponentInChildren<FieldPlayerManager>().JumpTrig();
+                                Objects[p.id].GetComponent<FieldPlayerManager>().JumpTrig();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:

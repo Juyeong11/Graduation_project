@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour
         HPGM = gameObject.GetComponent<HPImagesForGameManager>();
         data = this;
         isGameStart = false;
-        debugStart = true;
+        debugStart = false;
         alreadyMoved = 0;
 
         loader.Match(grid);

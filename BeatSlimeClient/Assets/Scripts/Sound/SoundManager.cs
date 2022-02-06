@@ -30,7 +30,7 @@ public class SoundManager : MonoBehaviour
 
     //40frame = 45bpm
     float pAnimUnitBPM = 45f;
-    public Animator pAnimation;
+    //public Animator pAnimation;
     public Animator eAnimation;
     // Start is called before the first frame update
 
@@ -45,12 +45,11 @@ public class SoundManager : MonoBehaviour
         {
             if (p_bgmName == bgm[i].name)
             {
+                GameManager.data.player.GetComponentInChildren<Animator>().SetFloat("Speed", bgm[i].bpm / pAnimUnitBPM);
+                bgmPlayer.clip = bgm[i].clip;
 
-                    pAnimation.SetFloat("Speed", bgm[i].bpm / pAnimUnitBPM);
-                    bgmPlayer.clip = bgm[i].clip;
-
-                    bgmPlayer.Play();
-               //GameManager.data.gameObject.GetComponent<BeatManager>().MusicStart(bgmPlayer);
+                bgmPlayer.Play();
+                //GameManager.data.gameObject.GetComponent<BeatManager>().MusicStart(bgmPlayer);
             }
         }
     }

@@ -121,22 +121,22 @@ public class FieldPlayerManager : MonoBehaviour
                 //Vector3 c = Vector3.Cross(transform.rotation.eulerAngles, new Vector3(0, -120, 0));
                 //transform.Rotate(0, c.x * 3f, 0);
 
-                transform.rotation = Quaternion.Euler(new Vector3(0, -120, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, -120 - 90, 0));
                 break;
             case HexDirection.Up:
-                transform.rotation = Quaternion.Euler(new Vector3(0, -90, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, -90 - 90, 0));
                 break;
             case HexDirection.RightUp:
-                transform.rotation = Quaternion.Euler(new Vector3(0, -30, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, -30 - 90, 0));
                 break;
             case HexDirection.Down:
-                transform.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, 90 - 90, 0));
                 break;
             case HexDirection.LeftDown:
-                transform.rotation = Quaternion.Euler(new Vector3(0, 120, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, 120 - 90, 0));
                 break;
             case HexDirection.RightDown:
-                transform.rotation = Quaternion.Euler(new Vector3(0, 30, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, 30 - 90, 0));
                 break;
         }
     }
@@ -152,22 +152,22 @@ public class FieldPlayerManager : MonoBehaviour
     {
         switch (k)
         {
-            case KeyCode.Q:
+            case KeyCode.W:
                 selfDirection = HexDirection.LeftUp;
                 break;
-            case KeyCode.W:
+            case KeyCode.E:
                 selfDirection = HexDirection.Up;
                 break;
-            case KeyCode.E:
+            case KeyCode.R:
                 selfDirection = HexDirection.RightUp;
                 break;
-            case KeyCode.A:
+            case KeyCode.S:
                 selfDirection = HexDirection.LeftDown;
                 break;
-            case KeyCode.S:
+            case KeyCode.D:
                 selfDirection = HexDirection.Down;
                 break;
-            case KeyCode.D:
+            case KeyCode.F:
                 selfDirection = HexDirection.RightDown;
                 break;
         }
@@ -183,7 +183,7 @@ public class FieldPlayerManager : MonoBehaviour
     }
     void KeyHandler()
     {
-        if (Input.GetKeyDown(KeyCode.Q) && KeyCheck(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -206,7 +206,7 @@ public class FieldPlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
+        else if (Input.GetKeyDown(KeyCode.E) && KeyCheck(KeyCode.E))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -227,7 +227,7 @@ public class FieldPlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.E) && KeyCheck(KeyCode.E))
+        else if (Input.GetKeyDown(KeyCode.R) && KeyCheck(KeyCode.R))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -249,7 +249,7 @@ public class FieldPlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.A) && KeyCheck(KeyCode.A))
+        else if (Input.GetKeyDown(KeyCode.S) && KeyCheck(KeyCode.S))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -270,7 +270,7 @@ public class FieldPlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.S) && KeyCheck(KeyCode.S))
+        else if (Input.GetKeyDown(KeyCode.D) && KeyCheck(KeyCode.D))
         {
             if (FieldGameManager.Net.isOnline)
             {
@@ -291,7 +291,7 @@ public class FieldPlayerManager : MonoBehaviour
                 }
             }
         }
-        else if (Input.GetKeyDown(KeyCode.D) && KeyCheck(KeyCode.D))
+        else if (Input.GetKeyDown(KeyCode.F) && KeyCheck(KeyCode.F))
         {
             if (FieldGameManager.Net.isOnline)
             {

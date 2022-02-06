@@ -118,22 +118,22 @@ public class FieldOtherPlayerManager : MonoBehaviour
                 //Vector3 c = Vector3.Cross(transform.rotation.eulerAngles, new Vector3(0, -120, 0));
                 //transform.Rotate(0, c.x * 3f, 0);
 
-                transform.rotation = Quaternion.Euler(new Vector3(0, -120, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, -120 - 90, 0));
                 break;
             case HexDirection.Up:
-                transform.rotation = Quaternion.Euler(new Vector3(0, -90, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, -90 - 90, 0));
                 break;
             case HexDirection.RightUp:
-                transform.rotation = Quaternion.Euler(new Vector3(0, -30, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, -30 - 90, 0));
                 break;
             case HexDirection.Down:
-                transform.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, 90 - 90, 0));
                 break;
             case HexDirection.LeftDown:
-                transform.rotation = Quaternion.Euler(new Vector3(0, 120, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, 120 - 90, 0));
                 break;
             case HexDirection.RightDown:
-                transform.rotation = Quaternion.Euler(new Vector3(0, 30, 0));
+                transform.rotation = Quaternion.Euler(new Vector3(0, 30 - 90, 0));
                 break;
         }
     }
@@ -149,22 +149,22 @@ public class FieldOtherPlayerManager : MonoBehaviour
     {
         switch (k)
         {
-            case KeyCode.Q:
+            case KeyCode.W:
                 selfDirection = HexDirection.LeftUp;
                 break;
-            case KeyCode.W:
+            case KeyCode.E:
                 selfDirection = HexDirection.Up;
                 break;
-            case KeyCode.E:
+            case KeyCode.R:
                 selfDirection = HexDirection.RightUp;
                 break;
-            case KeyCode.A:
+            case KeyCode.S:
                 selfDirection = HexDirection.LeftDown;
                 break;
-            case KeyCode.S:
+            case KeyCode.D:
                 selfDirection = HexDirection.Down;
                 break;
-            case KeyCode.D:
+            case KeyCode.F:
                 selfDirection = HexDirection.RightDown;
                 break;
         }
@@ -178,137 +178,6 @@ public class FieldOtherPlayerManager : MonoBehaviour
         selfCoord.SetPosition(x, y, z);
         //selfDirection = HexDirection.LeftUp;
     }
-    void KeyHandler()
-    {
-        if (Input.GetKeyDown(KeyCode.Q) && KeyCheck(KeyCode.Q))
-        {
-            if (FieldGameManager.Net.isOnline)
-            {
-                //Debug.Log("키 전송");
-                // 서버에 이동 전송
-                //FieldGameManager.data.setMoved();
-
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTUP);
-            }
-            else
-            {
-                //FieldGameManager.data.setMoved();
-                if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).state != cellState.None)
-                {
-                    if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).w <= selfCoord.coordinates.W)
-                    {
-                        selfCoord.plus(-1, 0, 1, grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z + 1).w - selfCoord.coordinates.W + 1);
-                        JumpTrig();
-                    }
-                }
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
-        {
-            if (FieldGameManager.Net.isOnline)
-            {
-                //GameManager.data.setMoved();
-                // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.UP);
-            }
-            else
-            {
-                //GameManager.data.setMoved();
-                if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).state != cellState.None)
-                {
-                    if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).w <= selfCoord.coordinates.W)
-                    {
-                        selfCoord.plus(0, -1, 1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y -1, selfCoord.coordinates.Z + 1).w - selfCoord.coordinates.W + 1);
-                        JumpTrig();
-                    }
-                }
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.E) && KeyCheck(KeyCode.E))
-        {
-            if (FieldGameManager.Net.isOnline)
-            {
-                //GameManager.data.setMoved();
-                // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
-            }
-            else
-            {
-                //FieldGameManager.data.setMoved();
-                if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).state != cellState.None)
-                {
-                    if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).w <= selfCoord.coordinates.W)
-                    {
-                        selfCoord.plus(1, -1, 0, grid.cellMaps.Get(selfCoord.coordinates.X+1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
-                        JumpTrig();
-                    }
-                    
-                }
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.A) && KeyCheck(KeyCode.A))
-        {
-            if (FieldGameManager.Net.isOnline)
-            {
-                //GameManager.data.setMoved();
-                // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
-            }
-            else
-            {
-                //FieldGameManager.data.setMoved();
-                if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).state != cellState.None)
-                {
-                    if (grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).w <= selfCoord.coordinates.W)
-                    {
-                        selfCoord.plus(-1, 1, 0, grid.cellMaps.Get(selfCoord.coordinates.X - 1, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
-                        JumpTrig();
-                    }
-                }
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.S) && KeyCheck(KeyCode.S))
-        {
-            if (FieldGameManager.Net.isOnline)
-            {
-                //GameManager.data.setMoved();
-                // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.DOWN);
-            }
-            else
-            {
-                //GameManager.data.setMoved();
-                if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z - 1).state != cellState.None)
-                {
-                    if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z -1).w <= selfCoord.coordinates.W)
-                    {
-                        selfCoord.plus(0, 1, -1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z-1).w - selfCoord.coordinates.W + 1);
-                        JumpTrig();
-                    }
-                }
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.D) && KeyCheck(KeyCode.D))
-        {
-            if (FieldGameManager.Net.isOnline)
-            {
-                //GameManager.data.setMoved();
-                // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
-            }
-            else
-            {
-                //GameManager.data.setMoved();
-                if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).state != cellState.None)
-                {
-                    if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w <= selfCoord.coordinates.W)
-                    {
-                        selfCoord.plus(1, 0, -1, grid.cellMaps.Get(selfCoord.coordinates.X+1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w - selfCoord.coordinates.W + 1);
-                        JumpTrig();
-                    }
-                }
-            }
-        }
-
-    }
+    
+    
 }
