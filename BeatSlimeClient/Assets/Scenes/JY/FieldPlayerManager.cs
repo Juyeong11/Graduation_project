@@ -100,12 +100,14 @@ public class FieldPlayerManager : MonoBehaviour
         if (selfCoord.coordinates.W != grid.cellMaps.Get(selfCoord.coordinates).w + 1)
         {
             Debug.LogError(">Player W Coordinate Error!<");
-            print("Self W : " + selfCoord.coordinates.W);
-            print("Self W : " + grid.cellMaps.Get(selfCoord.coordinates).w);
+            //print("Self W : " + selfCoord.coordinates.W);
+            //print("Self W : " + grid.cellMaps.Get(selfCoord.coordinates).w);
+            //Debug.Log(grid.cellMaps.Get(selfCoord.coordinates).x.ToString() + grid.cellMaps.Get(selfCoord.coordinates).y.ToString() + grid.cellMaps.Get(selfCoord.coordinates).z.ToString());
             selfCoord.coordinates.W = grid.cellMaps.Get(selfCoord.coordinates).w + 1;
         }
+        //Debug.Log("P1 : " + PlayerTransform.position.x + " " + selfCoord.coordinates.X);
         PlayerTransform.position = selfCoord.calculatePlayerPosition();
-
+        //Debug.Log("P2 :" + PlayerTransform.position.x + " " + selfCoord.coordinates.X);
         //Debug.Log("z : " + gameObject.transform.position.z);
 
     }

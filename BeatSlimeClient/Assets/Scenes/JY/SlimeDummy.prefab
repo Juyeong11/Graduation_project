@@ -1,0 +1,103 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7931333467193077254
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5866127781166014189}
+  m_Layer: 0
+  m_Name: SlimeDummy
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5866127781166014189
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7931333467193077254}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 2535456291390411101}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &8314273526241524170
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5866127781166014189}
+    m_Modifications:
+    - target: {fileID: 2146725059812677486, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: 295bf8d83a468bd4eb56f6a23ac2d3cf, type: 2}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6325097687784081826, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6558977205578625581, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+      propertyPath: m_Name
+      value: Slime_Idle
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+--- !u!4 &2535456291390411101 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5786557799086794903, guid: c6a2d4cd1b605374e966e41bb3bacabc, type: 3}
+  m_PrefabInstance: {fileID: 8314273526241524170}
+  m_PrefabAsset: {fileID: 0}

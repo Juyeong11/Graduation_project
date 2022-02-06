@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     public BeatManager beatManager;
 
     public bool isGameStart;
+    bool debugStart;
 
     public string SongName;
 
@@ -65,6 +66,7 @@ public class GameManager : MonoBehaviour
         HPGM = gameObject.GetComponent<HPImagesForGameManager>();
         data = this;
         isGameStart = false;
+        debugStart = true;
         alreadyMoved = 0;
 
         loader.Match(grid);
@@ -217,6 +219,9 @@ public class GameManager : MonoBehaviour
                             Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
+                            
+                            if (!debugStart)
+                            {
                             //Debug.Log(p.id+" : pid");
                             Objects[pid].GetComponentInChildren<HexCellPosition>().setDirection((byte)p.dir);
                             Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
@@ -224,6 +229,13 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
                             else if (pid < 3)   //
                                 Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
+                            }
+                            else    //DEBUG
+                            {
+                                player.GetComponent<HexCellPosition>().setDirection((byte)p.dir);
+                                player.GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                player.GetComponent<PlayerManager>().JumpTrig();
+                            }
 
 
                         }
@@ -418,6 +430,7 @@ public class GameManager : MonoBehaviour
             soundEffectManager.BeatEffect();
             beatCounter = timeByBeat;
             isGameStart = true;
+            debugStart = false;
         }
         //StartCoroutine(AutoPatternSetter());
 

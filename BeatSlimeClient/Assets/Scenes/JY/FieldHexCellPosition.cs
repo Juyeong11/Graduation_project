@@ -37,8 +37,6 @@ public class FieldHexCellPosition : MonoBehaviour
     //¿©±â¼­ Lerp
     public Vector3 calculatePlayerPosition()
     {
-
-
         float tick = 1f;
         float newX;
         float newY;
@@ -123,7 +121,7 @@ public class FieldHexCellPosition : MonoBehaviour
         coordinates.plus(x, z, w);
         //reflectPosition();
     }
-    public void SetPosition(int x, int y, int z, int w=0)
+    public void SetPosition(int x, int y, int z, int w=-9999)
     {
         preBeatedTime = Time.time;
 
@@ -132,6 +130,9 @@ public class FieldHexCellPosition : MonoBehaviour
             Debug.LogError("HexSetting Error (x+y+z != 0)");
         }
         preCoordinates = coordinates;
+
+        if (w == -9999)
+            w = coordinates.W;
         coordinates.setCoordinates(x, z, w);
         //reflectPosition();
     }

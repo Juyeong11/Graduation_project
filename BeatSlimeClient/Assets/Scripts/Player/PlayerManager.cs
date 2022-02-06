@@ -36,6 +36,7 @@ public class PlayerManager : MonoBehaviour
     List<(Beat,float)> SettledBallBeats;
 
     public bool isThisCurrentPlayingPlayerObject;
+    public int playerClassofSkill;
 
     public void Start()
     {
@@ -46,6 +47,9 @@ public class PlayerManager : MonoBehaviour
         selfDirection = HexDirection.Up;
         SettledBallBeats = new List<(Beat,float)>();
         playerDieAnimTriggered = false;
+
+        //DEBUG :
+        playerClassofSkill = 2;
 
         HP.Initialized(false);
         //onPlayerFly.Invoke();
@@ -67,6 +71,21 @@ public class PlayerManager : MonoBehaviour
     public void JumpTrig()
     {
         JumpTrigger.SetTrigger("Jump");
+    }
+
+    public void SkillTrig()
+    {
+        switch(playerClassofSkill)
+        {
+            case 0:
+            break;
+            case 1:
+            break;
+            case 2:
+                JumpTrigger.SetTrigger("Heal");
+            break;
+        }
+
     }
 
     void Update()
@@ -188,6 +207,10 @@ public class PlayerManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha0))
             {
                 HP.CurrentHP -= 45;
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha9))
+            {
+                SkillTrig();
             }
         }
 
