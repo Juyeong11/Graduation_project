@@ -136,6 +136,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 		else
 			std::cout << "Load : wrong dir\n";
 
+
 		int pivotType = 0;
 		if (pattern["pivotType"][i] == "PlayerM")
 			pivotType = 0;

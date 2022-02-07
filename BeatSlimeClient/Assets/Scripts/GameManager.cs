@@ -209,6 +209,8 @@ public class GameManager : MonoBehaviour
                             myPlayerID = pid;
                             Objects[3] = enemy;
                             Objects[3].SetActive(true);
+
+                            PatternManager.data.Load(myPlayerID);
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:
