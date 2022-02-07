@@ -2,17 +2,21 @@
 
 
 struct PatternInfo {
-	
+
 	int type;
 	int pivotType;
 	int time;
 	int dir;
 	int speed;
 	int x, y, z;
-	PatternInfo(int Type, int PivotType, int Time, int Dir, int Speed,int px, int py ,int pz)
-		:type(Type), pivotType(PivotType), time(Time), dir(Dir), speed(Speed), x(px), y(py),z(pz)
+	PatternInfo(int Type, int PivotType, int Time, int Dir, int Speed, int px, int py, int pz)
+		:type(Type), pivotType(PivotType), time(Time), dir(Dir), speed(Speed), x(px), y(py), z(pz)
 	{}
 
+	static constexpr int HexCellAround[6][3] = {
+	{0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
+	{ 0, 1, -1 },{ -1, 1, 0 }, { -1, 0, 1 }
+	};
 
 	static constexpr int HexPattern3[10][3] = {
 	{ 0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
@@ -43,10 +47,7 @@ public:
 	std::vector<PatternInfo> pattern_time;
 
 public:
-	static constexpr int HexCellAround[6][3] = {
-	{ 0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
-	{ 0, 1, -1 },{ -1, 1, 0 }, { -1, 0, 1 }
-	};
+
 	int* map;
 
 	int timeByBar;
@@ -79,7 +80,7 @@ public:
 	*/
 };
 
-class Gameobject;
+class GameObject;
 class GameRoom
 {
 public:
@@ -91,8 +92,8 @@ public:
 	std::mutex state_lock;
 	bool isGaming;
 
-	int player_ids[MAX_IN_GAME_PLAYER];
-	int boss_id;
+	GameObject* player_ids[MAX_IN_GAME_PLAYER];
+	GameObject* boss_id;
 
 	std::mutex ready_lock;
 	int ready_player_cnt;
@@ -101,8 +102,15 @@ public:
 	GameRoom();
 	GameRoom(int id);
 
-	void GameRoomInit(int mapType, float BPM, int Boss, int* Players);
-	bool FindPlayer(int id);
+	void GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER]);
+	int FindPlayer(int id) const;
+
+	int find_max_hp_player() const;
+	int find_min_hp_player() const;
+	int find_max_distance_player() const;
+
+
+	void game_start() const;
 };
 
 class Portal

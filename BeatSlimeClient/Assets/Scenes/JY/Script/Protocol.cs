@@ -25,6 +25,7 @@ namespace Protocol
         public const byte CS_PACKET_WRITE_MAP = 4;
         public const byte CS_PACKET_CHANGE_SCENE_READY = 5;
         public const byte CS_PACKET_GAME_START_READY = 6;
+        public const byte CS_PACKET_PARRYING = 7;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -36,6 +37,7 @@ namespace Protocol
         public const byte SC_PACKET_CHANGE_SCENE = 8;
         public const byte SC_PACKET_EFFECT = 9;
         public const byte SC_PACKET_GAME_END = 10;
+        public const byte SC_PACKET_PARRYING = 11;
     }
     enum DIR
     {
@@ -157,6 +159,15 @@ namespace Protocol
         public int x, y, z, w;
         public int color, block_type;
     }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_parrying : ISerializeble<cs_packet_parrying>
+    {
+        public byte size;
+        public byte type;
+    }
+
     //Server -> Client
 
     [Serializable]
@@ -266,5 +277,14 @@ namespace Protocol
         public byte type;
         public byte end_type;
 
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_parrying : ISerializeble<sc_packet_parrying>
+    {
+        public byte size;
+        public byte type;
+        public int id;
     }
 }

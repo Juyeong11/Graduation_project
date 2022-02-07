@@ -37,11 +37,9 @@ public:
 	}
 };
 
-enum DIR {
-	LEFTUP, UP, RIGHTUP, LEFTDOWN, DOWN, RIGHTDOWN
-};
+
 enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME };
-class Gameobject {
+class GameObject {
 public:
 	char name[MAX_NAME_SIZE];
 	int		id;
@@ -55,14 +53,14 @@ public:
 
 
 	int		last_move_time;
-	Gameobject() :state(ST_FREE) {
+	GameObject() :state(ST_FREE) {
 		x = 0;
 		y = 0;
 		z = 0;
 		hp = 100;
 	}
 };
-class Npc: public Gameobject {
+class Npc: public GameObject {
 public:
 	std::atomic_bool is_active;
 
@@ -110,7 +108,7 @@ public:
 
 const int VIEW_RANGE = 10;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
-class Client : public Gameobject
+class Client : public GameObject
 {
 public:
 	std::unordered_set<int> viewlist;

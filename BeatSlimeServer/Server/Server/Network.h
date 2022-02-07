@@ -7,7 +7,7 @@
 
 
 enum EVENT_TYPE {
-	EVENT_BOSS_MOVE, EVENT_BOSS_TARGETING_ATTACK, EVENT_PLAYER_PARRYING,
+	EVENT_BOSS_MOVE, EVENT_PLAYER_PARRYING,
 	EVENT_BOSS_TILE_ATTACK_START, EVENT_BOSS_TILE_ATTACK,
 	EVENT_GAME_END
 };
@@ -67,10 +67,11 @@ public:
 	void send_remove_object(int client_id, int victim_id);
 	void send_map_data(int client_id, char* data, int nShell);
 	void send_change_scene(int client_id, int map_type);
-	void send_game_start(int client_id, int ids[3], int boss_id);
+	void send_game_start(int client_id, GameObject* ids[3], int boss_id);
 	void send_game_end(int client_id,char end_type);
+	void send_parrying(int client_id,int actor_id);
 
-	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time, int x, int y, int z);
+	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z);
 	void disconnect_client(int client_id);
 
 	bool is_near(int a, int b)
@@ -149,16 +150,12 @@ public:
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.pivotType;// 타겟 id가 패턴 종류 구분
 
 						break;
-					case EVENT_BOSS_TARGETING_ATTACK:
-						ex_over->_comp_op = OP_BOSS_TARGETING_ATTACK;
-						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
-						break;
 					case EVENT_BOSS_TILE_ATTACK_START:
 						ex_over->_comp_op = OP_BOSS_TILE_ATTACK_START;
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.type;// 타겟 id가 패턴 종류 구분
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.charging_time;// 타겟 id가 패턴 종류 구분
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.pivotType;// 타겟 id가 패턴 종류 구분
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.type;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.charging_time;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.pivotType;
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.x;
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.y;
 						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.z;
@@ -174,6 +171,10 @@ public:
 					case EVENT_PLAYER_PARRYING:
 						ex_over->_comp_op = OP_PLAYER_PARRYING;
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.game_room_id;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)*2) = ev.charging_time;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.pivotType;
+
 						break;
 					case EVENT_GAME_END:
 						ex_over->_comp_op = OP_GAME_END;
@@ -203,9 +204,7 @@ public:
 
 	void game_start(int room_id);
 
-	int find_max_hp_player(int game_room_id);
-	int find_min_hp_player(int game_room_id);
-
+	int cal_map_end_cur_direction(int game_room_id) const;
 	void check_game_over(int game_room_id, int dead_charactor_id) {
 		// 게임 오버 패킷을 보내고
 
@@ -218,7 +217,7 @@ public:
 private:
 	concurrency::concurrent_priority_queue<timer_event> timer_queue;
 	concurrency::concurrent_queue<EXP_OVER*> exp_over_pool;
-	std::array<Gameobject*, MAX_OBJECT> clients;// 200, 200 맵을 존으로 나누어 뷰 리스트 제작할 것
+	std::array<GameObject*, MAX_OBJECT> clients;// 200, 200 맵을 존으로 나누어 뷰 리스트 제작할 것
 	EXP_OVER accept_ex;
 
 private:
