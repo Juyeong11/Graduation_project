@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour
     {
 
         if (!FieldGameManager.Net.isServerOnline()) FieldGameManager.Net.CreateAndConnect();
-
+        FieldGameManager.Net.SendChangeSceneDonePacket();
         loader.LoadMap();
 
         //DEBUG
@@ -195,10 +195,10 @@ public class GameManager : MonoBehaviour
                             Debug.Log("Game_Over -> Change Scene");
                         }
                         break;
-                    case Protocol.CONSTANTS.SC_PACKET_GAME_START:
+                    case Protocol.CONSTANTS.SC_PACKET_GAME_INIT:
                         {
-                            Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
-                            Debug.Log("GS PACKET x : " + p.boss_id);
+                            Protocol.sc_packet_game_init p = Protocol.sc_packet_game_init.SetByteToVar(data);
+                            Debug.Log("game init");
                             ids[0] = p.id1;
                             ids[1] = p.id2;
                             ids[2] = p.id3;
@@ -209,7 +209,12 @@ public class GameManager : MonoBehaviour
                             myPlayerID = pid;
                             Objects[3] = enemy;
                             Objects[3].SetActive(true);
-
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_GAME_START:
+                        {
+                            Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
+                            
                             PlaySound();
                         }
                         break;
@@ -389,7 +394,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_PARRYING:
                         {
                             Protocol.sc_packet_parrying p = Protocol.sc_packet_parrying.SetByteToVar(data);
-                            isGameStart = false;
+                            
 
                             Debug.Log("Parrying Success");
                         }

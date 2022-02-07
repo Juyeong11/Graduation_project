@@ -26,6 +26,7 @@ namespace Protocol
         public const byte CS_PACKET_CHANGE_SCENE_READY = 5;
         public const byte CS_PACKET_GAME_START_READY = 6;
         public const byte CS_PACKET_PARRYING = 7;
+        public const byte CS_PACKET_CHANGE_SCENE_DONE = 8;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -38,6 +39,8 @@ namespace Protocol
         public const byte SC_PACKET_EFFECT = 9;
         public const byte SC_PACKET_GAME_END = 10;
         public const byte SC_PACKET_PARRYING = 11;
+        public const byte SC_PACKET_GAME_INIT = 12;
+
     }
     enum DIR
     {
@@ -124,6 +127,15 @@ namespace Protocol
         public byte type;
         public byte is_ready;
     }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_change_scene_done : ISerializeble<cs_packet_change_scene_done>
+    {
+        public byte size;
+        public byte type;
+    }
+
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class cs_packet_game_start_ready : ISerializeble<cs_packet_game_start_ready>
@@ -245,12 +257,21 @@ namespace Protocol
     {
         public byte size;
         public byte type;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_game_init : ISerializeble<sc_packet_game_init>
+    {
+        public byte size;
+        public byte type;
         public int player_id;
         public int id1;
         public int id2;
         public int id3;
         public int boss_id;
     }
+
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class sc_packet_change_scene : ISerializeble<sc_packet_change_scene>
@@ -260,6 +281,7 @@ namespace Protocol
         public char scene_num;
 
     }
+
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class sc_packet_map_data : ISerializeble<sc_packet_map_data>

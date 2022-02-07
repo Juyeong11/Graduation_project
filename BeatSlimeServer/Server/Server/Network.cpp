@@ -101,10 +101,23 @@ void Network::send_change_scene(int c_id, int map_type)
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->cur_map_type = map_type;
 }
 
-void Network::send_game_start(int c_id, GameObject* ids[3], int boss_id)
+void Network::send_game_start(int c_id)
 {
 	sc_packet_game_start packet;
 	packet.type = SC_PACKET_GAME_START;
+	packet.size = sizeof(packet);
+
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+}
+
+void Network::send_game_init(int c_id, GameObject* ids[3], int boss_id)
+{
+	sc_packet_game_init packet;
+	packet.type = SC_PACKET_GAME_INIT;
 	packet.size = sizeof(packet);
 	packet.player_id = c_id;
 	packet.id1 = ids[0]->id;
@@ -122,6 +135,7 @@ void Network::send_game_start(int c_id, GameObject* ids[3], int boss_id)
 	}
 
 }
+
 void Network::send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time, int dir, int x, int y, int z)
 {
 	sc_packet_effect packet;
@@ -241,7 +255,7 @@ void Network::send_game_end(int c_id, char end_type)
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
 
-void Network::send_parrying(int c_id,int actor_id)
+void Network::send_parrying(int c_id, int actor_id)
 {
 	sc_packet_parrying packet;
 	packet.type = SC_PACKET_PARRYING;
@@ -678,6 +692,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 	}
 	break;
+	// change 씬이 되면 씬이 바뀐걸 서버에 알려주고 
+	// 그러면 서버에서 플레이어 아이디를 보내주자
 	case CS_PACKET_CHANGE_SCENE_READY:
 	{
 		// 올바른 위치에서 ready했는지 확인
@@ -706,7 +722,6 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 					for (int id : p->player_ids) {
 						send_change_scene(id, p->map_type);
-
 					}
 					// 포탈에서 GameRoom으로 이동
 					int room_id = get_game_room_id();
@@ -732,18 +747,30 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 	}
 	break;
+	case CS_PACKET_CHANGE_SCENE_DONE:
+	{
+		cs_packet_change_scene_done* packet = reinterpret_cast<cs_packet_change_scene_done*>(p);
+		for (auto* gr : game_room) {
+			if (false == gr->isGaming) continue;
+			if (false == gr->FindPlayer(client_id)) continue;
+			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
+		}
+
+	}
+	break;
 	case CS_PACKET_GAME_START_READY:
 	{
 		cs_packet_game_start_ready* packet = reinterpret_cast<cs_packet_game_start_ready*>(p);
 
 		for (auto* gr : game_room) {
+			if (false == gr->isGaming) continue;
 			gr->ready_lock.lock();
 			if (false == gr->FindPlayer(client_id)) { gr->ready_lock.unlock(); continue; }
 			gr->ready_player_cnt++;
 			if (gr->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
 
 				for (const auto pl : gr->player_ids) {
-					send_game_start(pl->id, gr->player_ids, gr->boss_id->id);
+					send_game_start(pl->id);
 				}
 				gr->start_time = std::chrono::system_clock::now();
 				game_start(gr->game_room_id);
@@ -768,12 +795,12 @@ void Network::process_packet(int client_id, unsigned char* p)
 		*			- 없으면 실패
 		*/
 
-		
+
 		for (auto* gr : game_room) {
 			if (false == gr->isGaming) continue;
 			// 해당 플레이어의 게임 방을 찾고
 			if (false == gr->FindPlayer(client_id)) continue;
-			int id = gr->FindPlayer(client_id); 
+			int id = gr->FindPlayer(client_id);
 			// 게임시간이 얼마나 지났는지 확인하고
 			int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
 			// 현재시간에 패링패턴이 있었는지 확인
@@ -792,7 +819,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				else {
 					//패링 실패
 				}
-				
+
 			}
 		}
 		std::cout << "Can not find player game room\n";

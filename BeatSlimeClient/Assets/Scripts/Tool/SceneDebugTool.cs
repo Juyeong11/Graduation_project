@@ -29,11 +29,6 @@ public class SceneDebugTool : MonoBehaviour
                 Protocol.sc_packet_game_start game_start_packet = new Protocol.sc_packet_game_start();
                 game_start_packet.type = Protocol.CONSTANTS.SC_PACKET_GAME_START;
                 game_start_packet.size = (byte)Marshal.SizeOf(typeof(Protocol.sc_packet_game_start));
-                game_start_packet.id1 = 0;
-                game_start_packet.id2 = 1;
-                game_start_packet.id3 = 2;
-                game_start_packet.boss_id = 5000;
-                game_start_packet.player_id = 0;
 
                 Network.MessQueue.Enqueue(game_start_packet.GetBytes());
             }
