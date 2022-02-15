@@ -9,7 +9,8 @@
 enum EVENT_TYPE {
 	EVENT_BOSS_MOVE, EVENT_PLAYER_PARRYING,
 	EVENT_BOSS_TILE_ATTACK_START, EVENT_BOSS_TILE_ATTACK,
-	EVENT_GAME_END
+	EVENT_GAME_END,
+	EVENT_PLAYER_SKILL
 };
 enum PATTERN_TYPE { ONE_LINE, SIX_LINE, AROUND };
 struct timer_event {
@@ -122,7 +123,7 @@ public:
 	void do_npc_move(int npc_id);
 	void do_npc_attack(int npc_id, int target_id, int receiver);
 	void do_npc_tile_attack(int game_room_id,int x,int y, int z);
-
+	void do_player_skill(GameRoom* gr, Client* cl);
 	void do_timer() {
 		using namespace std;
 		using namespace chrono;
@@ -179,6 +180,14 @@ public:
 					case EVENT_GAME_END:
 						ex_over->_comp_op = OP_GAME_END;
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
+						break;
+					case EVENT_PLAYER_SKILL:
+						ex_over->_comp_op = OP_PLAYER_SKILL;
+						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.charging_time;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.x;
+						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.y;
+
 						break;
 					default:
 						break;

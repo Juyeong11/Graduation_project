@@ -1,5 +1,6 @@
 #pragma once
 #include "protocol.h"
+#include "PlayerSkill.h"
 void error_display(const char* err_p, int err_no);
 class EXP_OVER {
 public:
@@ -106,6 +107,15 @@ public:
 	}
 };
 
+struct Skill
+{
+	int Delay;
+	int CoolTime;
+	int Speed;
+	int Damage;
+	int SkillLevel;
+	int SkillType;
+};
 const int VIEW_RANGE = 10;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
 class Client : public GameObject
@@ -117,8 +127,9 @@ public:
 	EXP_OVER recv_over;
 	SOCKET socket; // 재사용 하기 때문에 data race -> state로 보호
 
+	Skill skill;
 	bool is_active;
-	int cur_map_type;
+	int cur_room_num;
 	int		prev_recv_size;
 public:
 
@@ -127,7 +138,7 @@ public:
 		type = PLAYER;
 		is_active = true;
 		prev_recv_size = 0;
-		cur_map_type = 0;
+		cur_room_num = -1;
 	}
 
 	~Client()

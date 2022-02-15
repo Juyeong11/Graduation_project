@@ -98,7 +98,6 @@ void Network::send_change_scene(int c_id, int map_type)
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->cur_map_type = map_type;
 }
 
 void Network::send_game_start(int c_id, GameObject* ids[3], int boss_id)
@@ -241,7 +240,7 @@ void Network::send_game_end(int c_id, char end_type)
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
 
-void Network::send_parrying(int c_id,int actor_id)
+void Network::send_parrying(int c_id, int actor_id)
 {
 	sc_packet_parrying packet;
 	packet.type = SC_PACKET_PARRYING;
@@ -380,8 +379,33 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		}
 
 	}
+}
 
+void Network::do_player_skill(GameRoom* gr, Client* cl) {
+	if (gr->boss_id->hp < 0) return;
 
+	bool attack_flag = false;
+	switch (cl->skill.SkillType)
+	{
+	case WATERGUN:
+		attack_flag = true;
+		break;
+	case QUAKE:
+	case HEAL:
+		if (is_attack(gr->boss_id->id, cl->id))
+			attack_flag = true;
+		break;
+	default:
+		std::cout << "wrong skill type\n";
+		break;
+	}
+	if (false == attack_flag) return;
+
+	gr->boss_id->hp -= cl->skill.Damage;
+
+	for (const auto pl : gr->player_ids) {
+		send_attack_player(cl->id, gr->boss_id->id, pl->id);
+	}
 }
 
 void Network::process_packet(int client_id, unsigned char* p)
@@ -465,7 +489,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		short& y = cl.y;
 		short& z = cl.z;
 		cl.direction = packet->direction;
-		int cur_map = cl.cur_map_type;
+		int cur_map = game_room[cl.cur_room_num]->map_type;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -744,6 +768,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 				for (const auto pl : gr->player_ids) {
 					send_game_start(pl->id, gr->player_ids, gr->boss_id->id);
+					reinterpret_cast<Client*>(pl)->cur_room_num = gr->game_room_id;
 				}
 				gr->start_time = std::chrono::system_clock::now();
 				game_start(gr->game_room_id);
@@ -759,21 +784,12 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_PARRYING:
 	{
 		cs_packet_parrying* packet = reinterpret_cast<cs_packet_parrying*>(p);
-		/*
-		*	- 서버에 전송된 패킷을 보고 서버에서
-		*		- 클라이언트가 플레이중인 게임 방을 찾음
-		*		- 해당 게임 방의 게임 플레이 시간과 패킷이 온시간을 계산
-		*		- 계산된 시간대에 패링가능한 공격이 있었는지 확인한 후 만약 있었다면
-		*			- 패링 성공 패킷 클라이언트로 전송 -> 이 때 타겟인 플레이어가 패링 패킷을 보낸경우에만 패링가능 -> 패킷에 자신의 번호가 들어있어야함
-		*			- 없으면 실패
-		*/
 
-		
 		for (auto* gr : game_room) {
 			if (false == gr->isGaming) continue;
 			// 해당 플레이어의 게임 방을 찾고
 			if (false == gr->FindPlayer(client_id)) continue;
-			int id = gr->FindPlayer(client_id); 
+			int id = gr->FindPlayer(client_id);
 			// 게임시간이 얼마나 지났는지 확인하고
 			int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
 			// 현재시간에 패링패턴이 있었는지 확인
@@ -792,10 +808,68 @@ void Network::process_packet(int client_id, unsigned char* p)
 				else {
 					//패링 실패
 				}
-				
+
 			}
 		}
 		std::cout << "Can not find player game room\n";
+	}
+	break;
+	case CS_PACKET_USE_SKILL:
+	{
+		/*
+		* 스킬 구현에 필요한 것
+		*	- 클라이언트에서 서버로 보내는 패킷
+		*		- 패킷, 클라이언트 작업..
+		*			- 클라 패킷에는 사용한 스킬 종류를 보낼 필요는 없고 그냥 사용했다..라고만 보내면 알아서 함
+		*	- 성장 가능한 스킬
+		*		- 플레이어마다 db에 저장해두고 불러올 예정
+		*	- 스킬에 따른 알맞은 알고리즘
+		*		- class를 이용해 해결
+		*	시작
+		*/
+
+		/*
+		* 플레이어는 스킬을 가지고 사용한다.
+		* 자신의 게임방에 있는 친구들에게 자신의 스킬 사용 유무를 알려줘야 한다.
+		*/
+		cs_packet_use_skill* packet = reinterpret_cast<cs_packet_use_skill*>(p);
+		Client* cl = reinterpret_cast<Client*>(clients[client_id]);
+		GameRoom* gr = game_room[cl->cur_room_num];
+
+
+		/*
+		* 같은 방에 있는 친구들을 찾고
+		*
+		* 해당 친구들에게 스킬 이펙트를 보내고
+		*
+		* 딜레이 시간만큼 뒤에 해당 블럭에 있는 플레이어나 보스와 상호 작용
+		* -> 이렇게 하려면 이벤트를 등록해야되는데 그냥 그래 그러자
+		*
+		* 타겟팅인 경우 그냥 끝
+		*/
+
+		/*
+		* 나의 레벨에 맞는 이펙트와 스킬을 보내야함
+		*/
+		for (const auto& pl : gr->player_ids) {
+			const Skill& plskill = reinterpret_cast<Client*>(pl)->skill;
+			send_effect(pl->id, client_id, -1, 55, plskill.Delay, cl->direction, plskill.SkillLevel, plskill.SkillType, -1);
+		}
+
+		//플레이어 스킬 이벤트 등록
+		
+		//timer_event tev;
+		//tev.game_room_id = gr->game_room_id;
+		//tev.charging_time = cl->skill.Delay;
+		//tev.ev = EVENT_PLAYER_SKILL;
+		//tev.x = cl->skill.SkillLevel;
+		//tev.y = cl->skill.SkillType;
+		//tev.start_time = 
+		//timer_queue.push(tev);
+
+		// 그냥 if문으로 구분하자... -> 클라이언트의 상호작용을 효율적으로 설계할 수 없을까?
+		//플레이어가 가지고 있는 스킬을 타입과 레벨을 확인해 그에 맞는 걸 하자
+		do_player_skill(gr, cl);
 	}
 	break;
 	default:
@@ -1207,6 +1281,12 @@ void Network::worker()
 			exp_over_pool.push(exp_over);
 		}
 		break;
+		case OP_PLAYER_SKILL:
+		{
+
+
+		}
+		break;
 
 		default:
 			break;
@@ -1224,18 +1304,8 @@ void Network::game_start(int room_id)
 
 	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
 
-	/*
-	* 현재 필요한 것
-	* - 보스 비 유도 공격 2가지
-	* - 보스 유도 공격 1가지
-	* 이걸 구현하기 위해 필요한 것
-	* - noteType에 타입 지정 -> 비 유도부터 순서대로 5번~7번
-	* - 가장 멀리 떨어진 플레이어를 찾는 코드
-	* - 보스가 보는 방향으로 지진
-	*	- 맵의 끝까지 보내야됨 -> 현재 좌표에서 맵의 끝까지 몇 칸인지 계산하는 함수가 필요함
-	*	- 지진을 나타낼 임시 에니메이션
-	* * 일단 유도공격은 나중에
-	*/
+
+
 	for (const auto& t : pt) {
 		timer_event tev;
 
@@ -1275,29 +1345,7 @@ void Network::game_start(int room_id)
 			break;
 
 		case 10: // 유도 공격 -> 패링할 수 있음
-			/*
-			* 유도공격은 패링할 수 있음
-			* 서버가 알 수 있는 정보
-			*	- 패링할 수 있는 시간
-			*	- 클라이언트에서 보낸 패링 패킷의 도착 시간
-			*
-			* 그러면 클라이언트에서 패킷이 오면 해당 플레이어가 어느 방에서 플레이중인지 찾고
-			* 해당 방에서 게임이 진행된 시간을 계산한 다음
-			* 패링가능한 패턴을 찾아서(찾는건 시간으로 이진탐색을 하자)
-			* 비교해보면서 포함되는게 있으면 패링 성공으로 패킷을 보낸다.
-			*
-			* 해야할 일
-			*	- 유도 공격 이펙트 패킷을 보낼 이벤트를 추가한다.
-			*	- 추가된 이벤트에서 클라이언트에 패킷을 보내면 클라이언트에서 이펙트를 출력
-			*	- 출력된 이펙트를 보고 플레이어가 패링 패킷을 서버에 전송
-			*	- 서버에 전송된 패킷을 보고 서버에서
-			*		- 클라이언트가 플레이중인 게임 방을 찾음
-			*		- 해당 게임 방의 게임 플레이 시간과 패킷이 온시간을 계산
-			*		- 계산된 시간대에 패링가능한 공격이 있었는지 확인한 후 만약 있었다면
-			*			- 패링 성공 패킷 클라이언트로 전송 -> 이 때 타겟인 플레이어가 패링 패킷을 보낸경우에만 패링가능 -> 패킷에 자신의 번호가 들어있어야함
-			*			- 없으면 고냥 실패
-			*	- 끝 -
-			*/
+
 
 			tev.ev = EVENT_PLAYER_PARRYING;
 			tev.obj_id = boss_id;
@@ -1326,6 +1374,11 @@ void Network::game_start(int room_id)
 		}
 	}
 
+	//수정
+	boss->hp = 1000;
+	for (auto i : game_room[room_id]->player_ids) {
+		i->hp = 100;
+	}
 	/*
 	// 맵 중앙으로 옮기자
 	for (int i : game_room[room_id]->player_ids) {
