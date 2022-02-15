@@ -161,6 +161,16 @@ public class Network
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
+    public void SendChangeSceneDonePacket()
+    {
+
+        Protocol.cs_packet_change_scene_done pk = new Protocol.cs_packet_change_scene_done();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_change_scene_done));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_CHANGE_SCENE_DONE;
+
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
 
     public void SendGameStartReadyPacket()
     {

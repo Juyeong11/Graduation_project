@@ -75,8 +75,8 @@ public class FieldGameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
-
                             //Debug.Log(p.id+"¿Ãµø");
+                            Debug.Log((byte)p.dir);
                             Objects[p.id].GetComponent<FieldHexCellPosition>().setDirection((byte)p.dir);
                             Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
                             if (p.id < Protocol.CONSTANTS.MAX_USER)
@@ -97,7 +97,7 @@ public class FieldGameManager : MonoBehaviour
                                         Objects[p.id].SetActive(true);
                                         Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", 120 / 45.0f);
 
-                                        Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         break;
                                     }
                             }

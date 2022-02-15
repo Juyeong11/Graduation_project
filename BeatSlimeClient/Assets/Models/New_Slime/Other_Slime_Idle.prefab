@@ -250,7 +250,7 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 973877516759717424, guid: a52a8f56830ad9347822eaadb11edbdb, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 295bf8d83a468bd4eb56f6a23ac2d3cf, type: 2}
   m_Bones: []
   m_BlendShapeWeights:
   - 0
@@ -275,7 +275,7 @@ Animator:
   m_GameObject: {fileID: 7354045492482313764}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: adedf26fed2dd314594c277311143568, type: 2}
+  m_Controller: {fileID: 9100000, guid: 62ced8ae1b5a0ae4e852b9392c60ea53, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -304,6 +304,13 @@ MonoBehaviour:
     x: 0
     z: 0
     w: 0
+  direction: 0
+  landOffsetX: 0
+  landOffsetY: 0
+  landOffsetZ: 0
+  landOffsetRotate: 0
+  landOffsetScale: 0
+  preBeatedTime: 0
 --- !u!114 &7696573392222074293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -316,6 +323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b258ec7290784a146b631d1e0455e795, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDebug: 0
   JumpTrigger: {fileID: 7696573392222074283}
   onPlayerStand:
     m_PersistentCalls:
@@ -365,3 +373,4 @@ MonoBehaviour:
   selfDirection: 0
   grid: {fileID: 0}
   PlayerTransform: {fileID: 7873701472968955038}
+  isThisCurrentPlayingPlayerObject: 0

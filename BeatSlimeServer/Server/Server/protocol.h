@@ -26,6 +26,7 @@ const char SC_PACKET_CHANGE_SCENE = 8;
 const char SC_PACKET_EFFECT = 9;
 const char SC_PACKET_GAME_END = 10;
 const char SC_PACKET_PARRYING = 11;
+const char SC_PACKET_GAME_INIT = 12;
 
 #pragma pack (push, 1)
 //client -> server
@@ -59,6 +60,11 @@ struct cs_packet_change_scene_ready {
 	unsigned char size;
 	char	type;
 	char is_ready;
+};
+
+struct cs_packet_change_scene_done {
+	unsigned char size;
+	char	type;
 };
 
 struct cs_packet_game_start_ready {
@@ -122,17 +128,22 @@ struct sc_packet_game_start
 {
 	unsigned char size;
 	char type;
-	int player_id;
-	int id1;
-	int id2;
-	int id3;
-	int boss_id;
 };
 struct sc_packet_change_scene
 {
 	unsigned char size;
 	char type;
 	char scene_num;
+};
+struct sc_packet_game_init
+{
+	unsigned char size;
+	char type;
+	int player_id;
+	int id1;
+	int id2;
+	int id3;
+	int boss_id;
 };
 
 struct sc_packet_effect 

@@ -30,7 +30,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7873701472968955038}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 3.4408119, y: 89.99999, z: 0}
+  m_LocalEulerAnglesHint: {x: 3.5185318, y: 89.99999, z: 0}
 --- !u!137 &1773607722425878179
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0
@@ -116,7 +116,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7873701472968955038}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 11.080532, y: 89.999985, z: -0.000000434996}
+  m_LocalEulerAnglesHint: {x: 11.08052, y: 89.999985, z: -0.000000434996}
 --- !u!137 &2606263043037908576
 SkinnedMeshRenderer:
   m_ObjectHideFlags: 0
@@ -225,7 +225,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5a598fba948dff7409a0dae59a144bad, type: 2}
+  - {fileID: 2100000, guid: 98cff5c876beda8408cfe349c553715f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -250,9 +250,10 @@ SkinnedMeshRenderer:
   m_Quality: 0
   m_UpdateWhenOffscreen: 1
   m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 973877516759717424, guid: a52a8f56830ad9347822eaadb11edbdb, type: 3}
+  m_Mesh: {fileID: 4300000, guid: 295bf8d83a468bd4eb56f6a23ac2d3cf, type: 2}
   m_Bones: []
   m_BlendShapeWeights:
+  - 0
   - 0
   - 0
   - 0
@@ -323,6 +324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b258ec7290784a146b631d1e0455e795, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isDebug: 1
   JumpTrigger: {fileID: 7696573392222074283}
   onPlayerStand:
     m_PersistentCalls:
@@ -372,6 +374,4 @@ MonoBehaviour:
   selfDirection: 0
   grid: {fileID: 0}
   PlayerTransform: {fileID: 7873701472968955038}
-  PlayerHPImage: {fileID: 0}
-  PlayerPrevHPImage: {fileID: 0}
   isThisCurrentPlayingPlayerObject: 1

@@ -22,13 +22,14 @@ public class PatternManager : MonoBehaviour
         settedPattern = new List<Pattern>();
         data = this;
     }
-    void Start()
+
+    public void Load(int myType)
     {
-        StartCoroutine(PatternLoad());
+        StartCoroutine(PatternLoad(myType+1));
     }
 
 
-    IEnumerator PatternLoad()
+    IEnumerator PatternLoad(int PID)
     {
         List<Dictionary<string, object>> datas = CSVReader.Read("Pattern/" + GameManager.data.SongName);
         int preBar = 0;
@@ -45,8 +46,8 @@ public class PatternManager : MonoBehaviour
             Pattern tmpP = new Pattern(datas[i], preBar);
             pattern.Add(tmpP);
 
-            //DEBUG : 보스의 유도 공격만!
-            if (tmpP.noteType == 1)
+            //자신에게 날아오는 보스의 유도 공격만!
+            if (tmpP.noteType == 10 && tmpP.pivotType == ("Player" + PID))
             {
                 Factory.attackNotesBeats.Add(tmpP.rhythmBeat.GetBeatTime());
             }

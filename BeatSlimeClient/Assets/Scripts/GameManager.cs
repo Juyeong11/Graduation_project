@@ -23,6 +23,7 @@ public class GameManager : MonoBehaviour
     public BeatManager beatManager;
 
     public bool isGameStart;
+    bool debugStart;
 
     public string SongName;
 
@@ -65,6 +66,7 @@ public class GameManager : MonoBehaviour
         HPGM = gameObject.GetComponent<HPImagesForGameManager>();
         data = this;
         isGameStart = false;
+        debugStart = false;
         alreadyMoved = 0;
 
         loader.Match(grid);
@@ -90,7 +92,7 @@ public class GameManager : MonoBehaviour
     {
 
         if (!FieldGameManager.Net.isServerOnline()) FieldGameManager.Net.CreateAndConnect();
-
+        FieldGameManager.Net.SendChangeSceneDonePacket();
         loader.LoadMap();
 
         //DEBUG
@@ -164,7 +166,7 @@ public class GameManager : MonoBehaviour
 
                 if (prevBeats != nowBeat.addBeat)
                 {
-                    Objects[myPlayerID].GetComponent<PlayerManager>().Beat();
+                    Objects[myPlayerID].GetComponentInChildren<PlayerManager>().Beat();
                     enemy.GetComponent<EnemyManager>().Beat();
                     grid.Beat();
                     soundEffectManager.BeatEffect();
@@ -193,10 +195,10 @@ public class GameManager : MonoBehaviour
                             Debug.Log("Game_Over -> Change Scene");
                         }
                         break;
-                    case Protocol.CONSTANTS.SC_PACKET_GAME_START:
+                    case Protocol.CONSTANTS.SC_PACKET_GAME_INIT:
                         {
-                            Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
-                            Debug.Log("GS PACKET x : " + p.boss_id);
+                            Protocol.sc_packet_game_init p = Protocol.sc_packet_game_init.SetByteToVar(data);
+                            Debug.Log("game init");
                             ids[0] = p.id1;
                             ids[1] = p.id2;
                             ids[2] = p.id3;
@@ -208,6 +210,13 @@ public class GameManager : MonoBehaviour
                             Objects[3] = enemy;
                             Objects[3].SetActive(true);
 
+                            PatternManager.data.Load(myPlayerID);
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_GAME_START:
+                        {
+                            Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
+                            
                             PlaySound();
                         }
                         break;
@@ -218,13 +227,23 @@ public class GameManager : MonoBehaviour
                             Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
+                            
+                            if (!debugStart)
+                            {
                             //Debug.Log(p.id+" : pid");
-                            Objects[pid].GetComponent<HexCellPosition>().setDirection((byte)p.dir);
-                            Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (pid == myPlayerID)// �ڱ� �ڽ�
-                                Objects[pid].GetComponent<PlayerManager>().JumpTrig();
-                            else if (pid < 3)   //�̰� ���� �ʿ䰡 ������
-                                Objects[pid].GetComponent<PlayerManager>().JumpTrig();
+                            Objects[pid].GetComponentInChildren<HexCellPosition>().setDirection((byte)p.dir);
+                            Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                            if (pid == myPlayerID)// 
+                                Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
+                            else if (pid < 3)   //
+                                Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
+                            }
+                            else    //DEBUG
+                            {
+                                player.GetComponent<HexCellPosition>().setDirection((byte)p.dir);
+                                player.GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                player.GetComponent<PlayerManager>().JumpTrig();
+                            }
 
 
                         }
@@ -239,7 +258,7 @@ public class GameManager : MonoBehaviour
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
                             //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
                       
-                            HPManager hm = Objects[target_id].GetComponent<PlayerManager>().HP;
+                            HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
                             //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                             //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
@@ -253,7 +272,7 @@ public class GameManager : MonoBehaviour
                             int pid = ServerID_To_ClientID(p.id);
                             if (pid == myPlayerID)
                             {
-                                Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                 break;
                             }
                             //PutObject(p.type, p.id, p.x, p.y);
@@ -266,12 +285,12 @@ public class GameManager : MonoBehaviour
                                             // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "�÷��̾� ����");
                                             Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                             Objects[pid].SetActive(true);
-                                            Objects[pid].GetComponent<PlayerManager>().SetHPImages(HPGM.HPs[HPGMStaticInt], GameManager.data.HPGM.prevHPs[HPGMStaticInt]);
+                                            Objects[pid].GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.HPs[HPGMStaticInt], GameManager.data.HPGM.prevHPs[HPGMStaticInt]);
                                             HPGMStaticInt++;
 
                                             Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 
-                                            Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                            Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         }
                                         break;
                                     }
@@ -282,7 +301,7 @@ public class GameManager : MonoBehaviour
                                         Objects[pid].SetActive(true);
                                         Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 
-                                        Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         break;
                                     }
                             }
@@ -305,8 +324,6 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].SetActive(false);
                             }
 
-                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
-                            //���̸� ��Ǯ�� ����
                             //ReMoveObject(p.id);
                         }
                         break;
@@ -330,8 +347,6 @@ public class GameManager : MonoBehaviour
                                 Debug.Log(s.x + ", " + s.y + ", " + s.z + ", " + s.color + ", " + s.type);
                             }
 
-                            //�ٸ� �÷��̾��?�ٸ��÷��̾� Ǯ��
-                            //���̸� ��Ǯ�� ����
                             //ReMoveObject(p.id);
                         }
                         break;
@@ -375,18 +390,20 @@ public class GameManager : MonoBehaviour
                             isGameStart = false;
 
                             Debug.Log("Game_Over");
+                            
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PARRYING:
                         {
                             Protocol.sc_packet_parrying p = Protocol.sc_packet_parrying.SetByteToVar(data);
-                            isGameStart = false;
+                            
 
                             Debug.Log("Parrying Success");
                         }
                         break;
                     default:
-                        Debug.Log("�߸��� �������� ����" + type);
+                        Debug.Log("wrong + type");
+
                         break;
                 }
             }
@@ -407,7 +424,7 @@ public class GameManager : MonoBehaviour
         {
             if (id == ids[i]) return i;
         }
-        Debug.Log("�߸��� Ŭ���̾�Ʈ id");
+        Debug.Log("wrong id");
         return -1;
     }
     public void PlaySound()
@@ -419,6 +436,7 @@ public class GameManager : MonoBehaviour
             soundEffectManager.BeatEffect();
             beatCounter = timeByBeat;
             isGameStart = true;
+            debugStart = false;
         }
         //StartCoroutine(AutoPatternSetter());
 

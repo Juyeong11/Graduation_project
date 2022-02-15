@@ -86,7 +86,7 @@ public class MovementNoteFactory : MonoBehaviour
                 //Debug.Log(attackNotesBeats.Count);
                 if (moveNotesBeats.Count > 0)
                 {
-                    if (beatPercentage >= moveNotesBeats[0] + GameManager.data.JudgementTiming * 0.5f)
+                    if (beatPercentage >= moveNotesBeats[0] + GameManager.data.JudgementTiming)
                     {
                         moveNotesBeats.RemoveAt(0);
                     }
@@ -98,17 +98,17 @@ public class MovementNoteFactory : MonoBehaviour
                             rightNote[i].anchoredPosition = translator * (moveNotesBeats[i] - beatPercentage) + Zero;
 
                             if (leftNote[i].anchoredPosition.x >= 0)
-                                leftNote[i].anchoredPosition = Zero;
+                                leftNote[i].anchoredPosition = new Vector3(-1000f, 0f);
 
                             if (rightNote[i].anchoredPosition.x <= 0)
-                                rightNote[i].anchoredPosition = Zero;
+                                rightNote[i].anchoredPosition = new Vector3(-1000f, 0f);
                         }
                     }
                 }
 
                 if (attackNotesBeats.Count > 0)
                 {
-                    while (beatPercentage >= attackNotesBeats[0] + GameManager.data.JudgementTiming * 0.5f)
+                    while (beatPercentage >= attackNotesBeats[0] + GameManager.data.JudgementTiming)
                     {
                         attackNotesBeats.RemoveAt(0);
                         ANoteIndex++;
