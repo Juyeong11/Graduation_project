@@ -13,7 +13,7 @@ Network* Network::GetInstance()
 
 
 Network::Network() {
-	//ÀÎ½ºÅÏ½º´Â ÇÑ °³¸¸!!
+	//ì¸ìŠ¤í„´ìŠ¤ëŠ” í•œ ê°œë§Œ!!
 	assert(instance == nullptr);
 	instance = this;
 
@@ -51,14 +51,14 @@ Network::Network() {
 	maps[FIELD_MAP]->SetMap("Map\\Field_Map", "Music\\Test.csv");
 	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\Test.csv");
 
-	// Æ÷Å»ÀÇ À§Ä¡¸¦ ³ªÅ¸³»´Â ÀÚ·áÇÊ¿ä
+	// í¬íƒˆì˜ ìœ„ì¹˜ë¥¼ ë‚˜íƒ€ë‚´ëŠ” ìë£Œí•„ìš”
 	for (int i = 0; i < PORTAL_NUM; ++i) {
 		portals[i] = new Portal(2, -2);
 	}
 }
 Network::~Network() {
-	//½º·¹µå°¡ Á¾·áµÈ ÈÄ ÀÌ±â ¶§¹®¿¡ ¶ôÀ» ÇÒ ÇÊ¿ä°¡ ¾ø´Ù
-//accpet»óÅÂÀÏ ¶§ ¹®Á¦°¡ »ı±ä´Ù
+	//ìŠ¤ë ˆë“œê°€ ì¢…ë£Œëœ í›„ ì´ê¸° ë•Œë¬¸ì— ë½ì„ í•  í•„ìš”ê°€ ì—†ë‹¤
+//accpetìƒíƒœì¼ ë•Œ ë¬¸ì œê°€ ìƒê¸´ë‹¤
 	for (int i = 0; i < MAX_USER; ++i)
 		if (ST_INGAME == clients[i]->state)
 			disconnect_client(clients[i]->id);
@@ -98,7 +98,6 @@ void Network::send_change_scene(int c_id, int map_type)
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->cur_map_type = map_type;
 }
 
 void Network::send_game_start(int c_id)
@@ -375,7 +374,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 			send_attack_player(game_room[game_room_id]->boss_id->id, pl->id, p->id);
 
 		if (pl->hp < 0) {
-			// °ÔÀÓ ³¡
+			// ê²Œì„ ë
 			reinterpret_cast<Client*>(pl)->is_active = false;
 			bool is_game_end = true;
 			for (const auto& p : game_room[game_room_id]->player_ids) {
@@ -383,19 +382,44 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 			}
 
 			if (is_game_end) {
-				//°ÔÀÓ·ë µ¹¸®°í
-				//¾À º¯°æµµ ÇØ¾ßµÊ
-				//°ÔÀÓÀÌ ³¡³­ °ÔÀÓ·ëÀÇ ÀÌº¥Æ®´Â ¸ğµÎ Á¦°ÅÇØ¾ßµÊ
-				//ÀÌ¹Ì µé¾î°£°Ç Ã£À» ¼ö ¾ø´Âµ¥ 
-				//ÇÑ¹ø¿¡ ´Ù ³ÖÁö ¸»°í ÇÑ ÆĞÅÏ ³¡³ª¸é ³Ö°í ÀÌ·±½ÄÀ¸·Î ÇØ¾ßµÇ³ª -> °í·ÁÇØº¼¸¸ ÇÏ±¸¸¸
+				//ê²Œì„ë£¸ ëŒë¦¬ê³ 
+				//ì”¬ ë³€ê²½ë„ í•´ì•¼ë¨
+				//ê²Œì„ì´ ëë‚œ ê²Œì„ë£¸ì˜ ì´ë²¤íŠ¸ëŠ” ëª¨ë‘ ì œê±°í•´ì•¼ë¨
+				//ì´ë¯¸ ë“¤ì–´ê°„ê±´ ì°¾ì„ ìˆ˜ ì—†ëŠ”ë° 
+				//í•œë²ˆì— ë‹¤ ë„£ì§€ ë§ê³  í•œ íŒ¨í„´ ëë‚˜ë©´ ë„£ê³  ì´ëŸ°ì‹ìœ¼ë¡œ í•´ì•¼ë˜ë‚˜ -> ê³ ë ¤í•´ë³¼ë§Œ í•˜êµ¬ë§Œ
 				for (const auto& p : game_room[game_room_id]->player_ids)
 					send_game_end(p->id, GAME_OVER);
 			}
 		}
 
 	}
+}
 
+void Network::do_player_skill(GameRoom* gr, Client* cl) {
+	if (gr->boss_id->hp < 0) return;
 
+	bool attack_flag = false;
+	switch (cl->skill.SkillType)
+	{
+	case WATERGUN:
+		attack_flag = true;
+		break;
+	case QUAKE:
+	case HEAL:
+		if (is_attack(gr->boss_id->id, cl->id))
+			attack_flag = true;
+		break;
+	default:
+		std::cout << "wrong skill type\n";
+		break;
+	}
+	if (false == attack_flag) return;
+
+	gr->boss_id->hp -= cl->skill.Damage;
+
+	for (const auto pl : gr->player_ids) {
+		send_attack_player(cl->id, gr->boss_id->id, pl->id);
+	}
 }
 
 void Network::process_packet(int client_id, unsigned char* p)
@@ -421,7 +445,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//cl.y = -cl.z - cl.x;
 
 
-		//´Ù¸¥ Å¬¶óÀÌ¾ğÆ®¿¡°Ô »õ·Î¿î Å¬¶óÀÌ¾ğÆ®°¡ µé¾î¿ÈÀ» ¾Ë¸²
+		//ë‹¤ë¥¸ í´ë¼ì´ì–¸íŠ¸ì—ê²Œ ìƒˆë¡œìš´ í´ë¼ì´ì–¸íŠ¸ê°€ ë“¤ì–´ì˜´ì„ ì•Œë¦¼
 		for (int i = 0; i < MAX_USER; ++i)
 		{
 			Client* other = reinterpret_cast<Client*>(clients[i]);
@@ -436,7 +460,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			if (false == is_near(other->id, client_id))
 				continue;
 
-			// »õ·Î µé¾î¿Â Å¬¶óÀÌ¾ğÆ®°¡ °¡±îÀÌ ÀÖ´Ù¸é ºä ¸®½ºÆ®¿¡ ³Ö°í put packetÀ» º¸³½´Ù.
+			// ìƒˆë¡œ ë“¤ì–´ì˜¨ í´ë¼ì´ì–¸íŠ¸ê°€ ê°€ê¹Œì´ ìˆë‹¤ë©´ ë·° ë¦¬ìŠ¤íŠ¸ì— ë„£ê³  put packetì„ ë³´ë‚¸ë‹¤.
 			other->vl.lock();
 			other->viewlist.insert(client_id);
 			other->vl.unlock();
@@ -444,9 +468,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 			send_put_object(other->id, client_id);
 		}
 
-		//»õ·Î Á¢¼ÓÇÑ Å¬¶óÀÌ¾ğÆ®¿¡°Ô ÇöÀç °´Ã¼µéÀÇ ÇöÈ²À» ¾Ë·ÁÁÜ
+		//ìƒˆë¡œ ì ‘ì†í•œ í´ë¼ì´ì–¸íŠ¸ì—ê²Œ í˜„ì¬ ê°ì²´ë“¤ì˜ í˜„í™©ì„ ì•Œë ¤ì¤Œ
 		for (auto* other : clients) {
-			//¿©±â¼­ NPCµµ ¾Ë·ÁÁà¾ßÁö
+			//ì—¬ê¸°ì„œ NPCë„ ì•Œë ¤ì¤˜ì•¼ì§€
 
 			if (other->id == client_id) continue;
 			other->state_lock.lock();
@@ -459,7 +483,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			if (false == is_near(other->id, client_id))
 				continue;
 
-			// ±âÁ¸¿¡ ÀÖ´ø Å¬¶óÀÌ¾ğÆ®°¡ °¡±îÀÌ ÀÖ´Ù¸é ºä ¸®½ºÆ®¿¡ ³Ö°í put packetÀ» º¸³½´Ù.
+			// ê¸°ì¡´ì— ìˆë˜ í´ë¼ì´ì–¸íŠ¸ê°€ ê°€ê¹Œì´ ìˆë‹¤ë©´ ë·° ë¦¬ìŠ¤íŠ¸ì— ë„£ê³  put packetì„ ë³´ë‚¸ë‹¤.
 			cl.vl.lock();
 			cl.viewlist.insert(other->id);
 			cl.vl.unlock();
@@ -479,7 +503,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		short& y = cl.y;
 		short& z = cl.z;
 		cl.direction = packet->direction;
-		int cur_map = cl.cur_map_type;
+		int cur_map = game_room[cl.cur_room_num]->map_type;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -517,10 +541,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 			exit(-1);
 		}
 
-		// ÀÌµ¿ÇÑ Å¬¶óÀÌ¾ğÆ®¿¡ ´ëÇÑ nearlist »ı¼º
-		// ²À unordered_setÀÌ¿©¾ß ÇÒ±î?
-		// ¾ó¸¶³ª Ãß°¡µÉÁö ¸ğ¸£°í, µ¥ÀÌÅÍ´Â idÀÌ±â ¶§¹®¿¡ Áßº¹¾øÀ½ÀÌ º¸ÀåµÇÀÖ´Ù. id·Î ±¸ºĞ¾ÈÇÏ´Â °æ¿ì°¡ ÀÖ³ª?
-		// ¼½ÅÍ¸¦ ³ª´©¾î ±ÙÃ³¿¡ ÀÖ´ÂÁö °Ë»öÇØ ¼Óµµ¸¦ ³ôÀÌÀÚ
+		// ì´ë™í•œ í´ë¼ì´ì–¸íŠ¸ì— ëŒ€í•œ nearlist ìƒì„±
+		// ê¼­ unordered_setì´ì—¬ì•¼ í• ê¹Œ?
+		// ì–¼ë§ˆë‚˜ ì¶”ê°€ë ì§€ ëª¨ë¥´ê³ , ë°ì´í„°ëŠ” idì´ê¸° ë•Œë¬¸ì— ì¤‘ë³µì—†ìŒì´ ë³´ì¥ë˜ìˆë‹¤. idë¡œ êµ¬ë¶„ì•ˆí•˜ëŠ” ê²½ìš°ê°€ ìˆë‚˜?
+		// ì„¹í„°ë¥¼ ë‚˜ëˆ„ì–´ ê·¼ì²˜ì— ìˆëŠ”ì§€ ê²€ìƒ‰í•´ ì†ë„ë¥¼ ë†’ì´ì
 		std::unordered_set<int> nearlist;
 		for (auto* other : clients) {
 			if (other->id == client_id)
@@ -535,28 +559,28 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		send_move_object(cl.id, cl.id);
 
-		//lock½Ã°£À» ÁÙÀÌ±â À§ÇØ ÀÚ·á¸¦ º¹»çÇØ¼­ »ç¿ë
+		//lockì‹œê°„ì„ ì¤„ì´ê¸° ìœ„í•´ ìë£Œë¥¼ ë³µì‚¬í•´ì„œ ì‚¬ìš©
 		cl.vl.lock();
 		std::unordered_set<int> my_vl{ cl.viewlist };
 		cl.vl.unlock();
 
 
-		// ¿òÁ÷ÀÓÀ¸·Î½á ½Ã¾ß¿¡ µé¾î¿Â ÇÃ·¹ÀÌ¾î È®ÀÎ ¹× Ãß°¡
+		// ì›€ì§ì„ìœ¼ë¡œì¨ ì‹œì•¼ì— ë“¤ì–´ì˜¨ í”Œë ˆì´ì–´ í™•ì¸ ë° ì¶”ê°€
 		for (int other : nearlist) {
-			// clÀÇ ºä¸®½ºÆ®¿¡ ¾øÀ¸¸é
+			// clì˜ ë·°ë¦¬ìŠ¤íŠ¸ì— ì—†ìœ¼ë©´
 			if (0 == my_vl.count(other)) {
-				// clÀÇ ºä¸®½ºÆ®¿¡ Ãß°¡ÇÏ°í
+				// clì˜ ë·°ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€í•˜ê³ 
 				cl.vl.lock();
 				cl.viewlist.insert(other);
 				cl.vl.unlock();
-				// º¸¿´À¸´Ï ±×¸®¶ó°í ÆĞÅ¶À» º¸³½´Ù.
+				// ë³´ì˜€ìœ¼ë‹ˆ ê·¸ë¦¬ë¼ê³  íŒ¨í‚·ì„ ë³´ë‚¸ë‹¤.
 				send_put_object(cl.id, other);
 
-				//npc´Â send¸¦ ¾ÈÇÑ´Ù.
-				//npc´Â ºä¸®½ºÆ®°¡ ¾ø°í ÀÚ½ÅÀ» º¼ ¼ö ÀÖ´Â ÇÃ·¹ÀÌ¾î°¡ ÀÖ´Ù¸é isActiveº¯¼ö¸¦ ÅëÇØ ¿òÁ÷ÀÎ´Ù.
-				//ÇÃ·¹ÀÌ¾î¿¡°Ô º¸ÀÎ NPCÀÇ ¿òÁ÷ÀÓ ÀÌº¥Æ®¸¦ ½ÃÀÛÇÑ´Ù.
+				//npcëŠ” sendë¥¼ ì•ˆí•œë‹¤.
+				//npcëŠ” ë·°ë¦¬ìŠ¤íŠ¸ê°€ ì—†ê³  ìì‹ ì„ ë³¼ ìˆ˜ ìˆëŠ” í”Œë ˆì´ì–´ê°€ ìˆë‹¤ë©´ isActiveë³€ìˆ˜ë¥¼ í†µí•´ ì›€ì§ì¸ë‹¤.
+				//í”Œë ˆì´ì–´ì—ê²Œ ë³´ì¸ NPCì˜ ì›€ì§ì„ ì´ë²¤íŠ¸ë¥¼ ì‹œì‘í•œë‹¤.
 				if (true == is_npc(other)) {
-					//lockÀÌ ÀÖ¾î¾ß ÇÏ³ª? atomicÀ¸·ÎÇÏÀÚ
+					//lockì´ ìˆì–´ì•¼ í•˜ë‚˜? atomicìœ¼ë¡œí•˜ì
 					//reinterpret_cast<Npc*>(clients[other])->is_active = true;
 					//timer_event t;
 					//t.ev = EVENT_NPC_MOVE;
@@ -567,31 +591,31 @@ void Network::process_packet(int client_id, unsigned char* p)
 				}
 
 				Client* otherPlayer = reinterpret_cast<Client*>(clients[other]);
-				// ³ªÇÑÅ× º¸ÀÌ¸é »ó´ë¿¡°Ôµµ º¸ÀÎ´Ù´Â ¶æÀÌ´Ï
-				// »ó´ë ºä¸®½ºÆ®µµ È®ÀÎÇÑ´Ù.
+				// ë‚˜í•œí…Œ ë³´ì´ë©´ ìƒëŒ€ì—ê²Œë„ ë³´ì¸ë‹¤ëŠ” ëœ»ì´ë‹ˆ
+				// ìƒëŒ€ ë·°ë¦¬ìŠ¤íŠ¸ë„ í™•ì¸í•œë‹¤.
 				otherPlayer->vl.lock();
 
-				// »ó´ë ºä¸®½ºÆ®¿¡ ¾øÀ¸¸é
+				// ìƒëŒ€ ë·°ë¦¬ìŠ¤íŠ¸ì— ì—†ìœ¼ë©´
 				if (0 == otherPlayer->viewlist.count(cl.id)) {
-					// ºä¸®½ºÆ®¿¡ Ãß°¡ÇÏ°í clÀ» ±×¸®¶ó°í Àü¼Û
+					// ë·°ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€í•˜ê³  clì„ ê·¸ë¦¬ë¼ê³  ì „ì†¡
 					otherPlayer->viewlist.insert(cl.id);
 					otherPlayer->vl.unlock();
 					send_put_object(other, cl.id);
 				}
-				// »ó´ë ºä¸®½ºÆ®¿¡ ÀÖÀ¸¸é ÀÌµ¿ ÆĞÅ¶ Àü¼Û
+				// ìƒëŒ€ ë·°ë¦¬ìŠ¤íŠ¸ì— ìˆìœ¼ë©´ ì´ë™ íŒ¨í‚· ì „ì†¡
 				else {
 					otherPlayer->vl.unlock();
 					send_move_object(other, cl.id);
 				}
 
 			}
-			//°è¼Ó ½Ã¾ß¿¡ Á¸ÀçÇÏ´Â ÇÃ·¹ÀÌ¾î Ã³¸®
+			//ê³„ì† ì‹œì•¼ì— ì¡´ì¬í•˜ëŠ” í”Œë ˆì´ì–´ ì²˜ë¦¬
 			else {
 
 				if (true == is_npc(other)) continue;
 				Client* otherPlayer = reinterpret_cast<Client*>(clients[other]);
 				otherPlayer->vl.lock();
-				//»ó´ë¹æ¿¡ ºä¸®½ºÆ®¿¡ ³»°¡ ÀÖ´ÂÁö È®ÀÎ
+				//ìƒëŒ€ë°©ì— ë·°ë¦¬ìŠ¤íŠ¸ì— ë‚´ê°€ ìˆëŠ”ì§€ í™•ì¸
 				if (0 != otherPlayer->viewlist.count(cl.id))
 				{
 					otherPlayer->vl.unlock();
@@ -608,26 +632,26 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 
 
-		// ¿òÁ÷ÀÓÀ¸·Î½á ½Ã¾ß¿¡¼­ ºüÁø ÇÃ·¹ÀÌ¾î È®ÀÎ ¹× Á¦°Å
+		// ì›€ì§ì„ìœ¼ë¡œì¨ ì‹œì•¼ì—ì„œ ë¹ ì§„ í”Œë ˆì´ì–´ í™•ì¸ ë° ì œê±°
 		for (int other : my_vl) {
-			// nearlist¿¡ ¾øÀ¸¸é
+			// nearlistì— ì—†ìœ¼ë©´
 			if (0 == nearlist.count(other)) {
-				// ³ªÇÑÅ×¼­ Áö¿ì°í
+				// ë‚˜í•œí…Œì„œ ì§€ìš°ê³ 
 				cl.vl.lock();
 				cl.viewlist.erase(other);
 				cl.vl.unlock();
 				send_remove_object(cl.id, other);
 
-				//npc´Â view¸®½ºÆ®¸¦ °¡Áö°í ÀÖÁö ¾Ê´Ù.
+				//npcëŠ” viewë¦¬ìŠ¤íŠ¸ë¥¼ ê°€ì§€ê³  ìˆì§€ ì•Šë‹¤.
 				if (true == is_npc(other)) {
 					//reinterpret_cast<Npc*>(clients[other])->is_active = false;
 					continue;
 				}
 				Client* otherPlayer = reinterpret_cast<Client*>(clients[other]);
 
-				// »ó´ë¹æµµ ³ª¸¦ Áö¿î´Ù.
+				// ìƒëŒ€ë°©ë„ ë‚˜ë¥¼ ì§€ìš´ë‹¤.
 				otherPlayer->vl.lock();
-				//ÀÖ´Ù¸é Áö¿ò
+				//ìˆë‹¤ë©´ ì§€ì›€
 				if (0 != otherPlayer->viewlist.count(cl.id)) {
 
 					otherPlayer->viewlist.erase(cl.id);
@@ -661,60 +685,60 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (pk->id != -1)
 			DB->client_map_data[pk->id] = Map{ pk->id, pk->x, pk->y,pk->z,pk->w,pk->color,pk->block_type };
 		else {
-			std::cout << "¸Ê ¼ö½Å ¿Ï·á update ¹× insert ½ÃÀÛ\n";
+			std::cout << "ë§µ ìˆ˜ì‹  ì™„ë£Œ update ë° insert ì‹œì‘\n";
 			DB->read_map_data();
 
-			//DB->db_map_data; -> ¿©±â¼­ Ã£¾Ò´Âµ¥ ÇØ´ç idÀÇ °ªÀÌ ¾øÀ¸¸é »ğÀÔ
+			//DB->db_map_data; -> ì—¬ê¸°ì„œ ì°¾ì•˜ëŠ”ë° í•´ë‹¹ idì˜ ê°’ì´ ì—†ìœ¼ë©´ ì‚½ì…
 
 			for (const std::pair<int, Map>& m : DB->client_map_data) {
 				auto re = std::find_if(DB->db_map_data.cbegin(), DB->db_map_data.cend(), [&](const Map& a) {
 					return a.id == m.first;
 					});
 				if (re == DB->db_map_data.cend()) {
-					//»ğÀÔÇØ¾ßÇÒ µ¥ÀÌÅÍ
+					//ì‚½ì…í•´ì•¼í•  ë°ì´í„°
 					DB->insert_map_data(m.second);
 				}
 				else {
 					if (*re == m.second) {
-						//À¯ÁöµÈ µ¥ÀÌÅÍ
+						//ìœ ì§€ëœ ë°ì´í„°
 					}
 					else {
-						//¾÷µ¥ÀÌÆ®ÇØ¾ßÇÒ µ¥ÀÌÅÍ
+						//ì—…ë°ì´íŠ¸í•´ì•¼í•  ë°ì´í„°
 						DB->update_map_data(m.second);
 
 					}
 				}
 			}
 
-			// »ğÀÔÇØ¾ßÇÒ °Í
+			// ì‚½ì…í•´ì•¼í•  ê²ƒ
 
-			// ¼öÁ¤ÇØ¾ßÇÒ °Í
+			// ìˆ˜ì •í•´ì•¼í•  ê²ƒ
 		}
 	}
 	break;
-	// change ¾ÀÀÌ µÇ¸é ¾ÀÀÌ ¹Ù²ï°É ¼­¹ö¿¡ ¾Ë·ÁÁÖ°í 
-	// ±×·¯¸é ¼­¹ö¿¡¼­ ÇÃ·¹ÀÌ¾î ¾ÆÀÌµğ¸¦ º¸³»ÁÖÀÚ
+	// change ì”¬ì´ ë˜ë©´ ì”¬ì´ ë°”ë€ê±¸ ì„œë²„ì— ì•Œë ¤ì£¼ê³  
+	// ê·¸ëŸ¬ë©´ ì„œë²„ì—ì„œ í”Œë ˆì´ì–´ ì•„ì´ë””ë¥¼ ë³´ë‚´ì£¼ì
 	case CS_PACKET_CHANGE_SCENE_READY:
 	{
-		// ¿Ã¹Ù¸¥ À§Ä¡¿¡¼­ readyÇß´ÂÁö È®ÀÎ
+		// ì˜¬ë°”ë¥¸ ìœ„ì¹˜ì—ì„œ readyí–ˆëŠ”ì§€ í™•ì¸
 		cs_packet_change_scene_ready* packet = reinterpret_cast<cs_packet_change_scene_ready*>(p);
 
 
 		if (packet->is_ready) {
 			for (auto* p : portals) {
 				if (false == p->isPortal(cl.x, cl.z)) continue;
-				// Æ÷Å»¿¡ µé¾î¿À°Å³ª ³ª°¡¼­ plaer_ids¸¦ ¼öÁ¤ÇØ¾ßÇÏ´Â °æ¿ì´Â ÇØ´ç ÆĞÅ¶ÀÌ ¿ÔÀ» ¶§ µü ÇÑ¹ø ¹ß»ıÇÑ´Ù. -> lockÀ» ÇÑ ¹ø¸¸ ÇÏ¸éµÊ
-				//±×·¡¼­ player_ids¸¦ º¹»çÇØ ¼öÁ¤ÇÑ ÈÄ º¹»çÇÏ´Â ¹æ¹ıÀ» lockÈ½¼ö°¡ °°±â ¶§¹®¿¡ ±×³É lockÀ» °Ç´Ù.
+				// í¬íƒˆì— ë“¤ì–´ì˜¤ê±°ë‚˜ ë‚˜ê°€ì„œ plaer_idsë¥¼ ìˆ˜ì •í•´ì•¼í•˜ëŠ” ê²½ìš°ëŠ” í•´ë‹¹ íŒ¨í‚·ì´ ì™”ì„ ë•Œ ë”± í•œë²ˆ ë°œìƒí•œë‹¤. -> lockì„ í•œ ë²ˆë§Œ í•˜ë©´ë¨
+				//ê·¸ë˜ì„œ player_idsë¥¼ ë³µì‚¬í•´ ìˆ˜ì •í•œ í›„ ë³µì‚¬í•˜ëŠ” ë°©ë²•ì„ lockíšŸìˆ˜ê°€ ê°™ê¸° ë•Œë¬¸ì— ê·¸ëƒ¥ lockì„ ê±´ë‹¤.
 
 				p->id_lock.lock();
 				p->player_ids.insert(cl.id);
 
-				// ÁØºñ ÀÌÆåÆ® Àü¼Û
+				// ì¤€ë¹„ ì´í™íŠ¸ ì „ì†¡
 				GameObject* players[MAX_IN_GAME_PLAYER];
 				if (p->player_ids.size() >= MAX_IN_GAME_PLAYER) {
-					// ¾À ÀüÈ¯
+					// ì”¬ ì „í™˜
 					int i = 0;
-					for (int id : p->player_ids) { // ÀÌ¹Ì change ¾À
+					for (int id : p->player_ids) { // ì´ë¯¸ change ì”¬
 						players[i] = clients[id];
 						i++;
 						if (i > MAX_IN_GAME_PLAYER) break;
@@ -723,11 +747,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 					for (int id : p->player_ids) {
 						send_change_scene(id, p->map_type);
 					}
-					// Æ÷Å»¿¡¼­ GameRoomÀ¸·Î ÀÌµ¿
+					// í¬íƒˆì—ì„œ GameRoomìœ¼ë¡œ ì´ë™
 					int room_id = get_game_room_id();
 					int boss_id = get_npc_id(p->map_type);
 					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players);
-					//std::cout << "½ÃÀÛ" << std::endl;
+					//std::cout << "ì‹œì‘" << std::endl;
 					p->player_ids.clear();
 					p->ready_player_cnt = 0;
 				}
@@ -770,11 +794,13 @@ void Network::process_packet(int client_id, unsigned char* p)
 			if (gr->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
 
 				for (const auto pl : gr->player_ids) {
-					send_game_start(pl->id);
+					send_game_start(pl->id, gr->player_ids, gr->boss_id->id);
+					reinterpret_cast<Client*>(pl)->cur_room_num = gr->game_room_id;
+
 				}
 				gr->start_time = std::chrono::system_clock::now();
 				game_start(gr->game_room_id);
-				std::cout << "°ÔÀÓ ½ÃÀÛ\n";
+				std::cout << "ê²Œì„ ì‹œì‘\n";
 
 			}
 			gr->ready_lock.unlock();
@@ -786,38 +812,29 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_PARRYING:
 	{
 		cs_packet_parrying* packet = reinterpret_cast<cs_packet_parrying*>(p);
-		/*
-		*	- ¼­¹ö¿¡ Àü¼ÛµÈ ÆĞÅ¶À» º¸°í ¼­¹ö¿¡¼­
-		*		- Å¬¶óÀÌ¾ğÆ®°¡ ÇÃ·¹ÀÌÁßÀÎ °ÔÀÓ ¹æÀ» Ã£À½
-		*		- ÇØ´ç °ÔÀÓ ¹æÀÇ °ÔÀÓ ÇÃ·¹ÀÌ ½Ã°£°ú ÆĞÅ¶ÀÌ ¿Â½Ã°£À» °è»ê
-		*		- °è»êµÈ ½Ã°£´ë¿¡ ÆĞ¸µ°¡´ÉÇÑ °ø°İÀÌ ÀÖ¾ú´ÂÁö È®ÀÎÇÑ ÈÄ ¸¸¾à ÀÖ¾ú´Ù¸é
-		*			- ÆĞ¸µ ¼º°ø ÆĞÅ¶ Å¬¶óÀÌ¾ğÆ®·Î Àü¼Û -> ÀÌ ¶§ Å¸°ÙÀÎ ÇÃ·¹ÀÌ¾î°¡ ÆĞ¸µ ÆĞÅ¶À» º¸³½°æ¿ì¿¡¸¸ ÆĞ¸µ°¡´É -> ÆĞÅ¶¿¡ ÀÚ½ÅÀÇ ¹øÈ£°¡ µé¾îÀÖ¾î¾ßÇÔ
-		*			- ¾øÀ¸¸é ½ÇÆĞ
-		*/
-
 
 		for (auto* gr : game_room) {
 			if (false == gr->isGaming) continue;
-			// ÇØ´ç ÇÃ·¹ÀÌ¾îÀÇ °ÔÀÓ ¹æÀ» Ã£°í
+			// í•´ë‹¹ í”Œë ˆì´ì–´ì˜ ê²Œì„ ë°©ì„ ì°¾ê³ 
 			if (false == gr->FindPlayer(client_id)) continue;
 			int id = gr->FindPlayer(client_id);
-			// °ÔÀÓ½Ã°£ÀÌ ¾ó¸¶³ª Áö³µ´ÂÁö È®ÀÎÇÏ°í
+			// ê²Œì„ì‹œê°„ì´ ì–¼ë§ˆë‚˜ ì§€ë‚¬ëŠ”ì§€ í™•ì¸í•˜ê³ 
 			int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
-			// ÇöÀç½Ã°£¿¡ ÆĞ¸µÆĞÅÏÀÌ ÀÖ¾ú´ÂÁö È®ÀÎ
+			// í˜„ì¬ì‹œê°„ì— íŒ¨ë§íŒ¨í„´ì´ ìˆì—ˆëŠ”ì§€ í™•ì¸
 			const std::vector<PatternInfo>& pt = maps[gr->map_type]->GetPatternTime();
 			for (auto& pattern : pt) {
-				if (10 != pattern.type) continue;// ÆĞ¸µ ³ëÆ®ÀÎÁö Ã¤Å©
-				if (id != (pattern.pivotType - 4)) continue; // Å¸°ÙÀÌ µÈ ÇÃ·¹ÀÌ¾îÀÎÁö Ã¼Å©
-				//100msº¸´Ù ÀÛÀ¸¸é
+				if (10 != pattern.type) continue;// íŒ¨ë§ ë…¸íŠ¸ì¸ì§€ ì±„í¬
+				if (id != (pattern.pivotType - 4)) continue; // íƒ€ê²Ÿì´ ëœ í”Œë ˆì´ì–´ì¸ì§€ ì²´í¬
+				//100msë³´ë‹¤ ì‘ìœ¼ë©´
 				if (abs(running_time - pattern.time) < 100) {
-					//ÆĞ¸µ ¼º°ø
-					// ÆĞ¸µ ¼º°ø ÆĞÅ¶À» Å¬¶óÀÌ¾ğÆ®·Î º¸³¿
+					//íŒ¨ë§ ì„±ê³µ
+					// íŒ¨ë§ ì„±ê³µ íŒ¨í‚·ì„ í´ë¼ì´ì–¸íŠ¸ë¡œ ë³´ëƒ„
 					for (const auto pl : gr->player_ids) {
 						send_parrying(pl->id, client_id);
 					}
 				}
 				else {
-					//ÆĞ¸µ ½ÇÆĞ
+					//íŒ¨ë§ ì‹¤íŒ¨
 				}
 
 			}
@@ -825,8 +842,66 @@ void Network::process_packet(int client_id, unsigned char* p)
 		std::cout << "Can not find player game room\n";
 	}
 	break;
+	case CS_PACKET_USE_SKILL:
+	{
+		/*
+		* ìŠ¤í‚¬ êµ¬í˜„ì— í•„ìš”í•œ ê²ƒ
+		*	- í´ë¼ì´ì–¸íŠ¸ì—ì„œ ì„œë²„ë¡œ ë³´ë‚´ëŠ” íŒ¨í‚·
+		*		- íŒ¨í‚·, í´ë¼ì´ì–¸íŠ¸ ì‘ì—…..
+		*			- í´ë¼ íŒ¨í‚·ì—ëŠ” ì‚¬ìš©í•œ ìŠ¤í‚¬ ì¢…ë¥˜ë¥¼ ë³´ë‚¼ í•„ìš”ëŠ” ì—†ê³  ê·¸ëƒ¥ ì‚¬ìš©í–ˆë‹¤..ë¼ê³ ë§Œ ë³´ë‚´ë©´ ì•Œì•„ì„œ í•¨
+		*	- ì„±ì¥ ê°€ëŠ¥í•œ ìŠ¤í‚¬
+		*		- í”Œë ˆì´ì–´ë§ˆë‹¤ dbì— ì €ì¥í•´ë‘ê³  ë¶ˆëŸ¬ì˜¬ ì˜ˆì •
+		*	- ìŠ¤í‚¬ì— ë”°ë¥¸ ì•Œë§ì€ ì•Œê³ ë¦¬ì¦˜
+		*		- classë¥¼ ì´ìš©í•´ í•´ê²°
+		*	ì‹œì‘
+		*/
+
+		/*
+		* í”Œë ˆì´ì–´ëŠ” ìŠ¤í‚¬ì„ ê°€ì§€ê³  ì‚¬ìš©í•œë‹¤.
+		* ìì‹ ì˜ ê²Œì„ë°©ì— ìˆëŠ” ì¹œêµ¬ë“¤ì—ê²Œ ìì‹ ì˜ ìŠ¤í‚¬ ì‚¬ìš© ìœ ë¬´ë¥¼ ì•Œë ¤ì¤˜ì•¼ í•œë‹¤.
+		*/
+		cs_packet_use_skill* packet = reinterpret_cast<cs_packet_use_skill*>(p);
+		Client* cl = reinterpret_cast<Client*>(clients[client_id]);
+		GameRoom* gr = game_room[cl->cur_room_num];
+
+
+		/*
+		* ê°™ì€ ë°©ì— ìˆëŠ” ì¹œêµ¬ë“¤ì„ ì°¾ê³ 
+		*
+		* í•´ë‹¹ ì¹œêµ¬ë“¤ì—ê²Œ ìŠ¤í‚¬ ì´í™íŠ¸ë¥¼ ë³´ë‚´ê³ 
+		*
+		* ë”œë ˆì´ ì‹œê°„ë§Œí¼ ë’¤ì— í•´ë‹¹ ë¸”ëŸ­ì— ìˆëŠ” í”Œë ˆì´ì–´ë‚˜ ë³´ìŠ¤ì™€ ìƒí˜¸ ì‘ìš©
+		* -> ì´ë ‡ê²Œ í•˜ë ¤ë©´ ì´ë²¤íŠ¸ë¥¼ ë“±ë¡í•´ì•¼ë˜ëŠ”ë° ê·¸ëƒ¥ ê·¸ë˜ ê·¸ëŸ¬ì
+		*
+		* íƒ€ê²ŸíŒ…ì¸ ê²½ìš° ê·¸ëƒ¥ ë
+		*/
+
+		/*
+		* ë‚˜ì˜ ë ˆë²¨ì— ë§ëŠ” ì´í™íŠ¸ì™€ ìŠ¤í‚¬ì„ ë³´ë‚´ì•¼í•¨
+		*/
+		for (const auto& pl : gr->player_ids) {
+			const Skill& plskill = reinterpret_cast<Client*>(pl)->skill;
+			send_effect(pl->id, client_id, -1, 55, plskill.Delay, cl->direction, plskill.SkillLevel, plskill.SkillType, -1);
+		}
+
+		//í”Œë ˆì´ì–´ ìŠ¤í‚¬ ì´ë²¤íŠ¸ ë“±ë¡
+		
+		//timer_event tev;
+		//tev.game_room_id = gr->game_room_id;
+		//tev.charging_time = cl->skill.Delay;
+		//tev.ev = EVENT_PLAYER_SKILL;
+		//tev.x = cl->skill.SkillLevel;
+		//tev.y = cl->skill.SkillType;
+		//tev.start_time = 
+		//timer_queue.push(tev);
+
+		// ê·¸ëƒ¥ ifë¬¸ìœ¼ë¡œ êµ¬ë¶„í•˜ì... -> í´ë¼ì´ì–¸íŠ¸ì˜ ìƒí˜¸ì‘ìš©ì„ íš¨ìœ¨ì ìœ¼ë¡œ ì„¤ê³„í•  ìˆ˜ ì—†ì„ê¹Œ?
+		//í”Œë ˆì´ì–´ê°€ ê°€ì§€ê³  ìˆëŠ” ìŠ¤í‚¬ì„ íƒ€ì…ê³¼ ë ˆë²¨ì„ í™•ì¸í•´ ê·¸ì— ë§ëŠ” ê±¸ í•˜ì
+		do_player_skill(gr, cl);
+	}
+	break;
 	default:
-		std::cout << "ÀÌ»óÇÑ ÆĞÅ¶ ¼ö½Å\n";
+		std::cout << "ì´ìƒí•œ íŒ¨í‚· ìˆ˜ì‹ \n";
 		break;
 	}
 }
@@ -860,9 +935,9 @@ void Network::worker()
 				disconnect_client(client_id);
 				continue;
 			}
-			//ÇÏ³ªÀÇ ¼ÒÄÏ¿¡ ´ëÇØ RecvÈ£ÃâÀº ¾ğÁ¦³ª ÇÏ³ª -> EXP_OVER(¹öÆÛ, WSAOVERLAPPED) Àç»ç¿ë °¡´É
-			//ÆĞÅ¶ÀÌ Áß°£¿¡ Àß·ÁÁø Ã¤·Î µµÂøÇÒ ¼ö ÀÖ´Ù. -> ¹öÆÛ¿¡ ³öµÎ¾ú´Ù°¡ ´ÙÀ½¿¡ ¿Â µ¥ÀÌÅÍ¿Í °áÇÕ -> ÀÌÀü¿¡ ¹ŞÀº Å©±â¸¦ ±â¾ïÇØ ±× À§Ä¡ºÎÅÍ ¹Ş±â ½ÃÀÛÇÏÀÚ
-			//ÆĞÅ¶ÀÌ ¿©·¯ °³ ÇÑ¹ø¿¡ µµÂøÇÒ ¼ö ÀÖ´Ù.	 -> Ã¹ ¹øÂ°°¡ »çÀÌÁîÀÌ´Ï Àß¶ó¼­ Ã³¸®ÇÏÀÚ
+			//í•˜ë‚˜ì˜ ì†Œì¼“ì— ëŒ€í•´ Recví˜¸ì¶œì€ ì–¸ì œë‚˜ í•˜ë‚˜ -> EXP_OVER(ë²„í¼, WSAOVERLAPPED) ì¬ì‚¬ìš© ê°€ëŠ¥
+			//íŒ¨í‚·ì´ ì¤‘ê°„ì— ì˜ë ¤ì§„ ì±„ë¡œ ë„ì°©í•  ìˆ˜ ìˆë‹¤. -> ë²„í¼ì— ë†”ë‘ì—ˆë‹¤ê°€ ë‹¤ìŒì— ì˜¨ ë°ì´í„°ì™€ ê²°í•© -> ì´ì „ì— ë°›ì€ í¬ê¸°ë¥¼ ê¸°ì–µí•´ ê·¸ ìœ„ì¹˜ë¶€í„° ë°›ê¸° ì‹œì‘í•˜ì
+			//íŒ¨í‚·ì´ ì—¬ëŸ¬ ê°œ í•œë²ˆì— ë„ì°©í•  ìˆ˜ ìˆë‹¤.	 -> ì²« ë²ˆì§¸ê°€ ì‚¬ì´ì¦ˆì´ë‹ˆ ì˜ë¼ì„œ ì²˜ë¦¬í•˜ì
 			Client& cl = *reinterpret_cast<Client*>(clients[client_id]);
 
 			int remain_data = cl.prev_recv_size + num_byte;
@@ -889,8 +964,8 @@ void Network::worker()
 		case OP_SEND:
 		{
 			if (num_byte != exp_over->_wsa_buf.len) {
-				std::cout << num_byte << " ¼Û½Å¹öÆÛ °¡µæ Âü\n";
-				std::cout << "Å¬¶óÀÌ¾ğÆ® ¿¬°á ²÷À½\n";
+				std::cout << num_byte << " ì†¡ì‹ ë²„í¼ ê°€ë“ ì°¸\n";
+				std::cout << "í´ë¼ì´ì–¸íŠ¸ ì—°ê²° ëŠìŒ\n";
 				disconnect_client(client_id);
 			}
 			exp_over_pool.push(exp_over);
@@ -899,7 +974,7 @@ void Network::worker()
 		case OP_ACCEPT:
 		{
 			std::cout << "Accept Completed.\n";
-			SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->_net_buf)); // È®Àå overlapped±¸Á¶Ã¼¿¡ ³Ö¾î µÎ¾ú´ø ¼ÒÄ¹À» ²¨³½´Ù
+			SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->_net_buf)); // í™•ì¥ overlappedêµ¬ì¡°ì²´ì— ë„£ì–´ ë‘ì—ˆë˜ ì†Œìº£ì„ êº¼ë‚¸ë‹¤
 			int new_id = get_new_id();
 			if (-1 == new_id) continue;
 
@@ -920,10 +995,10 @@ void Network::worker()
 
 			cl.do_recv();
 
-			// exp_over ÀçÈ°¿ë
+			// exp_over ì¬í™œìš©
 			ZeroMemory(&exp_over->_wsa_over, sizeof(exp_over->_wsa_over));
 			c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-			//char* ¹öÆÛ¸¦ socket*·Î ¹Ù²ã ¼ÒÄÏÀ» °¡¸£Å³ ¼ö ÀÖµµ·Ï ÇÑ´Ù. ¼ÒÄÏµµ Æ÷ÀÎÅÍÀÎµğ?
+			//char* ë²„í¼ë¥¼ socket*ë¡œ ë°”ê¿” ì†Œì¼“ì„ ê°€ë¥´í‚¬ ìˆ˜ ìˆë„ë¡ í•œë‹¤. ì†Œì¼“ë„ í¬ì¸í„°ì¸ë””?
 			*(reinterpret_cast<SOCKET*>(exp_over->_net_buf)) = c_socket;
 
 			AcceptEx(g_s_socket, c_socket, exp_over->_net_buf + sizeof(SOCKET), 0, sizeof(SOCKADDR_IN) + 16,
@@ -941,7 +1016,7 @@ void Network::worker()
 			int target_id = -1;
 			int pivot_x, pivot_y, pivot_z;
 
-			// º¸½º°¡ ¹«¾ùÀ» ±âÁØÀ¸·Î ¿òÁ÷ÀÌ´ÂÁö
+			// ë³´ìŠ¤ê°€ ë¬´ì—‡ì„ ê¸°ì¤€ìœ¼ë¡œ ì›€ì§ì´ëŠ”ì§€
 			switch (pivotType)
 			{
 			case PlayerM:
@@ -1055,9 +1130,9 @@ void Network::worker()
 			int pivot_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
 
 
-			// ½ÃÀÛ À§Ä¡¸¦ Áß½ÉÀ¸·Î ÆĞÅÏ °ø°İ
-			// °ø°İ ÀÌÆåÆ® º¸³»°í
-			// ¼­¹ö¿¡¼­ °ø°İ Ã³¸®ÇÒ ÀÌº¥Æ® Ãß°¡
+			// ì‹œì‘ ìœ„ì¹˜ë¥¼ ì¤‘ì‹¬ìœ¼ë¡œ íŒ¨í„´ ê³µê²©
+			// ê³µê²© ì´í™íŠ¸ ë³´ë‚´ê³ 
+			// ì„œë²„ì—ì„œ ê³µê²© ì²˜ë¦¬í•  ì´ë²¤íŠ¸ ì¶”ê°€
 			int target_id = -1;
 
 			int pos_x, pos_z, pos_y, dir = 0;
@@ -1112,9 +1187,9 @@ void Network::worker()
 			case 3:
 			{
 				for (int i = 0; i < 10; ++i) {
-					// ´Ù ¶È°°Àº ½Ã°£À» °¡Áö°í ÀÖ´Ù
-					// Áï ÀÌº¥Æ®¸¦ ³ª´­ ÇÊ¿ä°¡ ±»ÀÌ ÀÖÀ»±î ½Í´Ù
-					// ÀÌ°É ÇÕÄ¡´Â ¹æ¹ıÀ» »ı°¢ÇØºÁ¾ß°Ú´Ù.
+					// ë‹¤ ë˜‘ê°™ì€ ì‹œê°„ì„ ê°€ì§€ê³  ìˆë‹¤
+					// ì¦‰ ì´ë²¤íŠ¸ë¥¼ ë‚˜ëˆŒ í•„ìš”ê°€ êµ³ì´ ìˆì„ê¹Œ ì‹¶ë‹¤
+					// ì´ê±¸ í•©ì¹˜ëŠ” ë°©ë²•ì„ ìƒê°í•´ë´ì•¼ê² ë‹¤.
 
 					timer_event t;
 					t.ev = EVENT_BOSS_TILE_ATTACK;
@@ -1174,7 +1249,7 @@ void Network::worker()
 				timer_queue.push(t);
 			}
 			break;
-			case 6:// º¸½º°¡ º¸´Â ¹æÇâÀ¸·Î ÁöÁø
+			case 6:// ë³´ìŠ¤ê°€ ë³´ëŠ” ë°©í–¥ìœ¼ë¡œ ì§€ì§„
 			{
 				dir = game_room[game_room_id]->boss_id->direction;
 				for (int i = 0; i < 5; ++i) {
@@ -1195,8 +1270,8 @@ void Network::worker()
 				std::cout << "wrong pattern type\n";
 				break;
 			}
-			//ÇØ´ç °ÔÀÓ ·ë¿¡ ÀÖ´Â ¸ğµç ¿ÀºêÁ§Æ®ÇÑÅ× º¸³»¾ßµÊ
-			// gamestartµµ ¿©·¯¹ø µé¾î°¡´Âµí
+			//í•´ë‹¹ ê²Œì„ ë£¸ì— ìˆëŠ” ëª¨ë“  ì˜¤ë¸Œì íŠ¸í•œí…Œ ë³´ë‚´ì•¼ë¨
+			// gamestartë„ ì—¬ëŸ¬ë²ˆ ë“¤ì–´ê°€ëŠ”ë“¯
 			for (const auto pl : game_room[game_room_id]->player_ids) {
 
 				send_effect(pl->id, client_id, target_id, pattern_type, charging_time, dir, pos_x, pos_y, pos_z);
@@ -1211,17 +1286,17 @@ void Network::worker()
 			int pos_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
 			do_npc_tile_attack(game_room_id, pos_x, pos_y, pos_z);
-			// ¸Â¾ÒÀ» ¶§ Ã³¸®
+			// ë§ì•˜ì„ ë•Œ ì²˜ë¦¬
 			exp_over_pool.push(exp_over);
 		}
 		break;
 		case OP_GAME_END:
 		{
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
-			//º¸½º Ã¼·Â È®ÀÎÇÏ°í
+			//ë³´ìŠ¤ ì²´ë ¥ í™•ì¸í•˜ê³ 
 			int boss_id = game_room[game_room_id]->boss_id->id;
 			//if(clients[boss_id]->hp<10;
-			//Ã¼·Â¿¡ µû¶ó Å¬¸®¾î À¯¹«
+			//ì²´ë ¥ì— ë”°ë¼ í´ë¦¬ì–´ ìœ ë¬´
 			for (const auto p : game_room[game_room_id]->player_ids)
 				send_game_end(p->id, GAME_CLEAR);
 			for (const auto p : game_room[game_room_id]->player_ids)
@@ -1232,6 +1307,12 @@ void Network::worker()
 
 
 			exp_over_pool.push(exp_over);
+		}
+		break;
+		case OP_PLAYER_SKILL:
+		{
+
+
 		}
 		break;
 
@@ -1251,18 +1332,8 @@ void Network::game_start(int room_id)
 
 	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
 
-	/*
-	* ÇöÀç ÇÊ¿äÇÑ °Í
-	* - º¸½º ºñ À¯µµ °ø°İ 2°¡Áö
-	* - º¸½º À¯µµ °ø°İ 1°¡Áö
-	* ÀÌ°É ±¸ÇöÇÏ±â À§ÇØ ÇÊ¿äÇÑ °Í
-	* - noteType¿¡ Å¸ÀÔ ÁöÁ¤ -> ºñ À¯µµºÎÅÍ ¼ø¼­´ë·Î 5¹ø~7¹ø
-	* - °¡Àå ¸Ö¸® ¶³¾îÁø ÇÃ·¹ÀÌ¾î¸¦ Ã£´Â ÄÚµå
-	* - º¸½º°¡ º¸´Â ¹æÇâÀ¸·Î ÁöÁø
-	*	- ¸ÊÀÇ ³¡±îÁö º¸³»¾ßµÊ -> ÇöÀç ÁÂÇ¥¿¡¼­ ¸ÊÀÇ ³¡±îÁö ¸î Ä­ÀÎÁö °è»êÇÏ´Â ÇÔ¼ö°¡ ÇÊ¿äÇÔ
-	*	- ÁöÁøÀ» ³ªÅ¸³¾ ÀÓ½Ã ¿¡´Ï¸ŞÀÌ¼Ç
-	* * ÀÏ´Ü À¯µµ°ø°İÀº ³ªÁß¿¡
-	*/
+
+
 	for (const auto& t : pt) {
 		timer_event tev;
 
@@ -1280,13 +1351,13 @@ void Network::game_start(int room_id)
 			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 			tev.charging_time = t.speed;
 			tev.pivotType = t.pivotType;
-			timer_queue.push(tev);// ¿©±â move¸¦ »ç¿ëÇØµµ µÉ±î?
+			timer_queue.push(tev);// ì—¬ê¸° moveë¥¼ ì‚¬ìš©í•´ë„ ë ê¹Œ?
 			break;
-		case 3:// ÆĞÅÏ 3¹ø
-		case 4:// ÆĞÅÏ 4¹ø
-		case 99:// ´ÜÀÏ ÀåÆÇ °ø°İ
-		case 5: // °¡Àå ¸Ö¸®ÀÖ´Â Àû¿¡°Ô ¹°ÁÙ±â ¹ß»ç
-		case 6: // º¸½º°¡ º¸´Â ¹æÇâÀ¸·Î ÁöÁø
+		case 3:// íŒ¨í„´ 3ë²ˆ
+		case 4:// íŒ¨í„´ 4ë²ˆ
+		case 99:// ë‹¨ì¼ ì¥íŒ ê³µê²©
+		case 5: // ê°€ì¥ ë©€ë¦¬ìˆëŠ” ì ì—ê²Œ ë¬¼ì¤„ê¸° ë°œì‚¬
+		case 6: // ë³´ìŠ¤ê°€ ë³´ëŠ” ë°©í–¥ìœ¼ë¡œ ì§€ì§„
 			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
 			tev.obj_id = boss_id;
 			tev.type = t.type;
@@ -1301,30 +1372,8 @@ void Network::game_start(int room_id)
 			timer_queue.push(tev);
 			break;
 
-		case 10: // À¯µµ °ø°İ -> ÆĞ¸µÇÒ ¼ö ÀÖÀ½
-			/*
-			* À¯µµ°ø°İÀº ÆĞ¸µÇÒ ¼ö ÀÖÀ½
-			* ¼­¹ö°¡ ¾Ë ¼ö ÀÖ´Â Á¤º¸
-			*	- ÆĞ¸µÇÒ ¼ö ÀÖ´Â ½Ã°£
-			*	- Å¬¶óÀÌ¾ğÆ®¿¡¼­ º¸³½ ÆĞ¸µ ÆĞÅ¶ÀÇ µµÂø ½Ã°£
-			*
-			* ±×·¯¸é Å¬¶óÀÌ¾ğÆ®¿¡¼­ ÆĞÅ¶ÀÌ ¿À¸é ÇØ´ç ÇÃ·¹ÀÌ¾î°¡ ¾î´À ¹æ¿¡¼­ ÇÃ·¹ÀÌÁßÀÎÁö Ã£°í
-			* ÇØ´ç ¹æ¿¡¼­ °ÔÀÓÀÌ ÁøÇàµÈ ½Ã°£À» °è»êÇÑ ´ÙÀ½
-			* ÆĞ¸µ°¡´ÉÇÑ ÆĞÅÏÀ» Ã£¾Æ¼­(Ã£´Â°Ç ½Ã°£À¸·Î ÀÌÁøÅ½»öÀ» ÇÏÀÚ)
-			* ºñ±³ÇØº¸¸é¼­ Æ÷ÇÔµÇ´Â°Ô ÀÖÀ¸¸é ÆĞ¸µ ¼º°øÀ¸·Î ÆĞÅ¶À» º¸³½´Ù.
-			*
-			* ÇØ¾ßÇÒ ÀÏ
-			*	- À¯µµ °ø°İ ÀÌÆåÆ® ÆĞÅ¶À» º¸³¾ ÀÌº¥Æ®¸¦ Ãß°¡ÇÑ´Ù.
-			*	- Ãß°¡µÈ ÀÌº¥Æ®¿¡¼­ Å¬¶óÀÌ¾ğÆ®¿¡ ÆĞÅ¶À» º¸³»¸é Å¬¶óÀÌ¾ğÆ®¿¡¼­ ÀÌÆåÆ®¸¦ Ãâ·Â
-			*	- Ãâ·ÂµÈ ÀÌÆåÆ®¸¦ º¸°í ÇÃ·¹ÀÌ¾î°¡ ÆĞ¸µ ÆĞÅ¶À» ¼­¹ö¿¡ Àü¼Û
-			*	- ¼­¹ö¿¡ Àü¼ÛµÈ ÆĞÅ¶À» º¸°í ¼­¹ö¿¡¼­
-			*		- Å¬¶óÀÌ¾ğÆ®°¡ ÇÃ·¹ÀÌÁßÀÎ °ÔÀÓ ¹æÀ» Ã£À½
-			*		- ÇØ´ç °ÔÀÓ ¹æÀÇ °ÔÀÓ ÇÃ·¹ÀÌ ½Ã°£°ú ÆĞÅ¶ÀÌ ¿Â½Ã°£À» °è»ê
-			*		- °è»êµÈ ½Ã°£´ë¿¡ ÆĞ¸µ°¡´ÉÇÑ °ø°İÀÌ ÀÖ¾ú´ÂÁö È®ÀÎÇÑ ÈÄ ¸¸¾à ÀÖ¾ú´Ù¸é
-			*			- ÆĞ¸µ ¼º°ø ÆĞÅ¶ Å¬¶óÀÌ¾ğÆ®·Î Àü¼Û -> ÀÌ ¶§ Å¸°ÙÀÎ ÇÃ·¹ÀÌ¾î°¡ ÆĞ¸µ ÆĞÅ¶À» º¸³½°æ¿ì¿¡¸¸ ÆĞ¸µ°¡´É -> ÆĞÅ¶¿¡ ÀÚ½ÅÀÇ ¹øÈ£°¡ µé¾îÀÖ¾î¾ßÇÔ
-			*			- ¾øÀ¸¸é °í³É ½ÇÆĞ
-			*	- ³¡ -
-			*/
+		case 10: // ìœ ë„ ê³µê²© -> íŒ¨ë§í•  ìˆ˜ ìˆìŒ
+
 
 			tev.ev = EVENT_PLAYER_PARRYING;
 			tev.obj_id = boss_id;
@@ -1348,13 +1397,18 @@ void Network::game_start(int room_id)
 			timer_queue.push(std::move(tev));
 			break;
 		default:
-			std::cout << "Àß¸øµÈ ÆĞÅÏ Å¸ÀÔ" << std::endl;
+			std::cout << "ì˜ëª»ëœ íŒ¨í„´ íƒ€ì…" << std::endl;
 			break;
 		}
 	}
 
+	//ìˆ˜ì •
+	boss->hp = 1000;
+	for (auto i : game_room[room_id]->player_ids) {
+		i->hp = 100;
+	}
 	/*
-	// ¸Ê Áß¾ÓÀ¸·Î ¿Å±âÀÚ
+	// ë§µ ì¤‘ì•™ìœ¼ë¡œ ì˜®ê¸°ì
 	for (int i : game_room[room_id]->player_ids) {
 		clients[i]->x = maps[game_room[room_id]->map_type]->LengthX / 2;
 		clients[i]->z = maps[game_room[room_id]->map_type]->LengthZ / 2;

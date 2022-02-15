@@ -12,6 +12,8 @@ const char CS_PACKET_CHANGE_SCENE_READY = 5;
 const char CS_PACKET_GAME_START_READY = 6;
 const char CS_PACKET_PARRYING = 7;
 const char CS_PACKET_CHANGE_SCENE_DONE = 8;
+const char CS_PACKET_USE_SKILL = 9;
+
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -71,6 +73,11 @@ struct cs_packet_game_start_ready {
 };
 
 struct cs_packet_parrying {
+	unsigned char size;
+	char	type;
+};
+
+struct cs_packet_use_skill {
 	unsigned char size;
 	char	type;
 };
