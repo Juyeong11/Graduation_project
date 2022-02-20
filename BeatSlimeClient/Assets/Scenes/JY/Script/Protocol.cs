@@ -27,6 +27,8 @@ namespace Protocol
         public const byte CS_PACKET_GAME_START_READY = 6;
         public const byte CS_PACKET_PARRYING = 7;
         public const byte CS_PACKET_CHANGE_SCENE_DONE = 8;
+        public const byte CS_PACKET_USE_SKILL = 9;
+        public const byte CS_PACKET_CHANGE_SKILL = 10;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -40,6 +42,7 @@ namespace Protocol
         public const byte SC_PACKET_GAME_END = 10;
         public const byte SC_PACKET_PARRYING = 11;
         public const byte SC_PACKET_GAME_INIT = 12;
+        public const byte SC_PACKET_CHANGE_SKILL = 13;
 
     }
     enum DIR
@@ -52,7 +55,6 @@ namespace Protocol
         PLAPER, ENEMY
     };
 
-    enum PATTERN_TYPE { ONE_LINE, SIX_LINE, AROUND };
     public class ISerializeble<T> where T : class
     {
         public ISerializeble() { }
@@ -179,7 +181,23 @@ namespace Protocol
         public byte size;
         public byte type;
     }
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_use_skill : ISerializeble<cs_packet_use_skill>
+    {
+        public byte size;
+        public byte type;
+    }
 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_change_skill : ISerializeble<cs_packet_change_skill>
+    {
+        public byte size;
+        public byte type;
+        public byte skill_type;
+        public byte skill_level;
+    }
     //Server -> Client
 
     [Serializable]
@@ -308,5 +326,15 @@ namespace Protocol
         public byte size;
         public byte type;
         public int id;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_change_skill : ISerializeble<sc_packet_change_skill>
+    {
+        public byte size;
+        public byte type;
+        public int id;
+        public byte skill_type;
     }
 }

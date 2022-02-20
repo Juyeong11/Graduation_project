@@ -312,6 +312,23 @@ public class FieldPlayerManager : MonoBehaviour
                 }
             }
         }
+        else if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            Debug.Log("skill change 1");
+            FieldGameManager.Net.SendChangeSkillPacket(1);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            FieldGameManager.Net.SendChangeSkillPacket(2);
+            Debug.Log("skill change 2");
+
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            FieldGameManager.Net.SendChangeSkillPacket(3);
+            Debug.Log("skill change 3");
+
+        }
 
     }
 }

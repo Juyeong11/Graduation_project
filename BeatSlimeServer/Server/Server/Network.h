@@ -72,6 +72,7 @@ public:
 	void send_game_init(int client_id, GameObject* ids[3], int boss_id);
 	void send_game_end(int client_id,char end_type);
 	void send_parrying(int client_id,int actor_id);
+	void send_change_skill(int client_id,int actor_id);
 
 	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z);
 	void disconnect_client(int client_id);
@@ -234,5 +235,7 @@ private:
 	std::array<GameRoom*, MAX_GAME_ROOM_NUM> game_room;
 	std::array<MapInfo*, MAP_NUM> maps;
 	std::array<Portal*, PORTAL_NUM> portals;
+
+	std::array<Skill*, SKILL_CNT> skills;
 };
 

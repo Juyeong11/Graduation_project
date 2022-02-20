@@ -149,6 +149,29 @@ public class Network
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
+
+    public void SendUseSkillPacket()
+    {
+        Protocol.cs_packet_use_skill pk = new Protocol.cs_packet_use_skill();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_use_skill));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_USE_SKILL;
+
+
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+    public void SendChangeSkillPacket(byte skill_type)
+    {
+        Protocol.cs_packet_change_skill pk = new Protocol.cs_packet_change_skill();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_change_skill));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_CHANGE_SKILL;
+        pk.skill_type = skill_type;
+
+
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
     public void SendChangeSceneReadyPacket(byte isReady)
     {
 

@@ -347,15 +347,15 @@ public class PlayerManager : MonoBehaviour
             if (FieldGameManager.Net.isOnline)
             {
                 GameManager.data.setMoved();
-                // ¼­¹ö¿¡ °ø°Ý Àü¼Û
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
+
+                FieldGameManager.Net.SendUseSkillPacket();
             }
         }
         else if (Input.GetKeyDown(KeyCode.Space))
         {
             if (FieldGameManager.Net.isOnline)
             {
-                // ¼­¹ö¿¡ ÆÐ¸µ Àü¼Û
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¸ï¿½ ï¿½ï¿½ï¿½ï¿½
                 FieldGameManager.Net.SendParryingPacket();
             }
         }

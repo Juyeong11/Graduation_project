@@ -123,6 +123,12 @@ public class FieldGameManager : MonoBehaviour
                             //ReMoveObject(p.id);
                         }
                         break;
+                    case Protocol.CONSTANTS.SC_PACKET_CHANGE_SKILL:
+                        {
+                            Protocol.sc_packet_change_skill p = Protocol.sc_packet_change_skill.SetByteToVar(data);
+                            Debug.Log(p.id + "가 " + p.skill_type + "으로 스킬을 바꿈");
+                        }
+                        break;
                     default:
                         Debug.Log("이상한 타입이네");
                         break;

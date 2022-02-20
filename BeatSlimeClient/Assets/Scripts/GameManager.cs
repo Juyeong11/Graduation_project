@@ -257,13 +257,20 @@ public class GameManager : MonoBehaviour
                             //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
                             //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
-                      
-                            HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
-                            //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
+                            if(target_id == myPlayerID)
+                            {
+                                HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
+                                //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
-                            //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
+                                //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
 
-                            hm.Damage(hm.CurrentHP - p.hp);
+                                hm.Damage(hm.CurrentHP - p.hp);
+                            }
+                            else
+                            {
+                                Debug.Log("player hit boss");
+                            }
+
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
@@ -354,7 +361,9 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_effect p = Protocol.sc_packet_effect.SetByteToVar(data);
                             int pid = ServerID_To_ClientID(p.id);
-                            int tid = ServerID_To_ClientID(p.target_id);
+                            int tid = -1;
+                            if (p.target_id != -1)
+                                tid = ServerID_To_ClientID(p.target_id);
                             
 
                             switch (p.effect_type)
@@ -376,6 +385,35 @@ public class GameManager : MonoBehaviour
                                     break;
                                 case 10:
                                     EffectManager.instance.BossTargetingEffect(Objects[pid].transform.localPosition,ref Objects[tid], p.charging_time);
+                                    break;
+
+                                case 55:// skill
+                                    // p->x  == skill Level
+                                    // p->y  == skill type
+                                    switch (p.y)
+                                    {
+                                        case 1:
+                                            EffectManager.instance.PlayerWaterGunEffect(Objects[pid].transform.localPosition, ref Objects[tid], p.charging_time);
+
+                                            break;
+                                        case 2:
+                                            {
+                                                HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
+                                                EffectManager.instance.PlayerQuakeEffect(cell.X,cell.Y,cell.Z, p.charging_time);
+                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " 스킬 사용");
+
+                                            }
+                                            break;
+                                        case 3:
+                                            {
+                                                HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
+                                                EffectManager.instance.PlayerHealEffect(cell.X, cell.Y, cell.Z, p.charging_time);
+                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " 스킬 사용");
+
+                                            }
+                                            break;
+                                    }
+                                    Debug.Log(p.y + " 스킬 사용");
                                     break;
                             }
                             //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));
