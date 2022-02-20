@@ -72,6 +72,7 @@ constexpr int BOSS2_ID_START = WITCH_ID_END;
 constexpr int BOSS2_ID_END = BOSS2_ID_START + MAX_BOSS2;
 
 const int MAP_NUM = 2;
+const int SKILL_CNT = 3*3;
 const int PORTAL_NUM = 1;
 const int MAX_GAME_ROOM_NUM = 5;
 

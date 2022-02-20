@@ -17,8 +17,14 @@ Network::Network() {
 	assert(instance == nullptr);
 	instance = this;
 
+	for (int i = 0; i < SKILL_CNT; ++i) {
+		skills[i] = new Skill(i % 3 + 1 , i / 3 + 1);
+	}
+
+	//수정
+	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
 	for (int i = 0; i < MAX_USER; ++i) {
-		clients[i] = new Client;
+		clients[i] = new Client(skills[0]);
 	}
 	for (int i = SKILL_TRADER_ID_START; i < SKILL_TRADER_ID_END; ++i) {
 		clients[i] = new SkillTrader();
@@ -48,13 +54,15 @@ Network::Network() {
 		maps[i] = new MapInfo;
 	}
 
-	maps[FIELD_MAP]->SetMap("Map\\Field_Map", "Music\\Test.csv");
-	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\Test.csv");
+	maps[FIELD_MAP]->SetMap("Map\\Field_Map", "Music\\flower_load.csv");
+	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
 		portals[i] = new Portal(2, -2);
 	}
+
+
 }
 Network::~Network() {
 	//스레드가 종료된 후 이기 때문에 락을 할 필요가 없다
@@ -70,6 +78,18 @@ Network::~Network() {
 		EXP_OVER* ex;
 		exp_over_pool.try_pop(ex);
 		delete ex;
+	}
+
+	delete DB;
+	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
+		delete game_room[i];
+	}
+	for (int i = 0; i < MAP_NUM; ++i) {
+		delete maps[i];
+	}
+
+	for (int i = 1; i <= SKILL_CNT; ++i) {
+		delete skills[i];
 	}
 }
 void Network::send_login_ok(int c_id)
@@ -186,6 +206,21 @@ void Network::send_attack_player(int attacker, int target, int receiver)
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[receiver])->do_send(ex_over);
+}
+void Network::send_change_skill(int c_id, int target) {
+	sc_packet_change_skill packet;
+
+	//strcpy_s(packet.name, clients[target]->name);
+	packet.id = target;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_CHANGE_SKILL;
+	packet.skill_type = reinterpret_cast<Client*>(clients[target])->skill->SkillType;
+	packet.skill_level = reinterpret_cast<Client*>(clients[target])->skill->SkillLevel;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
 
 void Network::send_put_object(int c_id, int target) {
@@ -399,15 +434,18 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 	if (gr->boss_id->hp < 0) return;
 
 	bool attack_flag = false;
-	switch (cl->skill.SkillType)
+	switch (cl->skill->SkillType)
 	{
 	case WATERGUN:
 		attack_flag = true;
+		gr->boss_id->hp -= cl->skill->Damage;
+
 		break;
 	case QUAKE:
 	case HEAL:
 		if (is_attack(gr->boss_id->id, cl->id))
 			attack_flag = true;
+		 gr->boss_id->hp = std::clamp(gr->boss_id->hp + cl->skill->Damage, 0, 100);
 		break;
 	default:
 		std::cout << "wrong skill type\n";
@@ -415,7 +453,6 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 	}
 	if (false == attack_flag) return;
 
-	gr->boss_id->hp -= cl->skill.Damage;
 
 	for (const auto pl : gr->player_ids) {
 		send_attack_player(cl->id, gr->boss_id->id, pl->id);
@@ -503,7 +540,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 		short& y = cl.y;
 		short& z = cl.z;
 		cl.direction = packet->direction;
-		int cur_map = game_room[cl.cur_room_num]->map_type;
+		int cur_map = 0;
+		if(cl.cur_room_num != -1)
+			cur_map = game_room[cl.cur_room_num]->map_type;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -777,7 +816,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 		for (auto* gr : game_room) {
 			if (false == gr->isGaming) continue;
 			if (false == gr->FindPlayer(client_id)) continue;
-			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
+
+			for (const auto pl : gr->player_ids) {
+				send_game_init(pl->id, gr->player_ids, gr->boss_id->id);
+			}
 		}
 
 	}
@@ -794,7 +836,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			if (gr->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
 
 				for (const auto pl : gr->player_ids) {
-					send_game_start(pl->id, gr->player_ids, gr->boss_id->id);
+					send_game_start(pl->id);
 					reinterpret_cast<Client*>(pl)->cur_room_num = gr->game_room_id;
 
 				}
@@ -832,12 +874,15 @@ void Network::process_packet(int client_id, unsigned char* p)
 					for (const auto pl : gr->player_ids) {
 						send_parrying(pl->id, client_id);
 					}
+					break;
 				}
 				else {
 					//패링 실패
+					break;
 				}
 
 			}
+			break;
 		}
 		std::cout << "Can not find player game room\n";
 	}
@@ -878,10 +923,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		/*
 		* 나의 레벨에 맞는 이펙트와 스킬을 보내야함
+		* 이펙트 딜레이를 계산해야 되는데 그러면 내가 플레이 중인 맵에 노래에 맞춰서 딜레이를 보여야 함
 		*/
 		for (const auto& pl : gr->player_ids) {
-			const Skill& plskill = reinterpret_cast<Client*>(pl)->skill;
-			send_effect(pl->id, client_id, -1, 55, plskill.Delay, cl->direction, plskill.SkillLevel, plskill.SkillType, -1);
+			const Skill* plskill = reinterpret_cast<Client*>(pl)->skill;
+			send_effect(pl->id, client_id, gr->boss_id->id, 55, 1000, cl->direction, plskill->SkillLevel, plskill->SkillType, -1);
 		}
 
 		//플레이어 스킬 이벤트 등록
@@ -900,6 +946,28 @@ void Network::process_packet(int client_id, unsigned char* p)
 		do_player_skill(gr, cl);
 	}
 	break;
+	case CS_PACKET_CHANGE_SKILL:
+	{
+		cs_packet_change_skill* packet = reinterpret_cast<cs_packet_change_skill*>(p);
+
+		/*
+		* 스킬이 풀려있는지 보고 바꿔준다. -> db연결하면 하자
+		* 스킬특성이 있는 파일이 있어야 함 -> 파일 입출력을 해서 서버 시작할 때 읽어 오도록 -> 달라지는게 쿨타임, 데미지 뿐인데 그냥 level에 비례하게 하면 될거 같음
+		*
+		* 일단 패킷이 오면 해당 타입의 스킬 1레벨로 바꾸는 걸로 하자
+		* 나중에는 db에 접근해 스킬이 풀려있는지 확인하고 해당 레벨의 능력치로 맞춰서 알려주자
+		*/
+		Client* c = reinterpret_cast<Client*>(clients[client_id]);
+		c->skill = skills[packet->skill_type * 3 - 1];
+		
+		for (int i : c->viewlist) {
+			if (false == is_player(i)) continue;
+			send_change_skill(i, client_id);
+		}
+		send_change_skill(client_id, client_id);
+
+	}
+		break;
 	default:
 		std::cout << "이상한 패킷 수신\n";
 		break;
@@ -1397,7 +1465,7 @@ void Network::game_start(int room_id)
 			timer_queue.push(std::move(tev));
 			break;
 		default:
-			std::cout << "잘못된 패턴 타입" << std::endl;
+			std::cout << "잘못된 패턴 타입\n";
 			break;
 		}
 	}

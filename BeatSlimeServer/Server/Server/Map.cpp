@@ -19,7 +19,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 	in.read(reinterpret_cast<char*>(map), (LengthX + 1) * LengthZ * sizeof(int));
 
-	
+	/*
 	// ¸Ê È®ÀÎ¿ë
 	std::cout << LengthX << std::endl;
 	std::cout << LengthZ << std::endl;
@@ -34,7 +34,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 				std::cout << " " ;
 		}
 	}
-
+	*/
 
 	std::ifstream in_m{ music_name, std::ios::binary };
 	if (!in_m) return;

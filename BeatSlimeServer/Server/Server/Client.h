@@ -60,6 +60,7 @@ public:
 		z = 0;
 		hp = 100;
 	}
+
 };
 class Npc: public GameObject {
 public:
@@ -107,6 +108,7 @@ public:
 	}
 };
 
+enum SKILL_TYPE{WATERGUN,QUAKE,HEAL};
 struct Skill
 {
 	int Delay;
@@ -115,6 +117,10 @@ struct Skill
 	int Damage;
 	int SkillLevel;
 	int SkillType;
+	Skill(int sl, int st) :SkillLevel(sl), SkillType(st) {
+		Damage = SkillLevel * SkillLevel;
+		CoolTime = 10/SkillLevel;
+	}
 };
 const int VIEW_RANGE = 10;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
@@ -127,13 +133,13 @@ public:
 	EXP_OVER recv_over;
 	SOCKET socket; // 재사용 하기 때문에 data race -> state로 보호
 
-	Skill skill;
+	Skill* skill;
 	bool is_active;
 	int cur_room_num;
 	int		prev_recv_size;
 public:
 
-	Client()
+	Client(Skill* sk) : skill(sk)
 	{
 		type = PLAYER;
 		is_active = true;
