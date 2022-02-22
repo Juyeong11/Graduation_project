@@ -113,10 +113,10 @@ public class GameManager : MonoBehaviour
         //{
         //    FieldGameManager.Net.SendreadPacket();
         //}
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            FieldGameManager.Net.SendGameStartReadyPacket();
-        }
+        //if (Input.GetKeyDown(KeyCode.Return))
+        //{
+        //    FieldGameManager.Net.SendGameStartReadyPacket();
+        //}
 
 
         if (isGameStart && !FieldGameManager.Net.isServerOnline())
@@ -211,12 +211,15 @@ public class GameManager : MonoBehaviour
                             Objects[3].SetActive(true);
 
                             PatternManager.data.Load(myPlayerID);
+
+                            FieldGameManager.Net.SendGameStartReadyPacket();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:
                         {
                             Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
                             
+
                             PlaySound();
                         }
                         break;
