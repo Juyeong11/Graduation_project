@@ -13,10 +13,6 @@ public class TileEffect : MonoBehaviour
 
 
     // Update is called once per frame
-    void Update()
-    {
-        //Objects[pid].GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-    }
     IEnumerator Animation()
     {
         float scale = 0.0f;

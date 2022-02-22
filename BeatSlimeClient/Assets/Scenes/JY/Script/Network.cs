@@ -139,6 +139,38 @@ public class Network
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
+    public void SendParryingPacket()
+    {
+        Protocol.cs_packet_parrying pk = new Protocol.cs_packet_parrying();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_parrying));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_PARRYING;
+
+       
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
+    public void SendUseSkillPacket()
+    {
+        Protocol.cs_packet_use_skill pk = new Protocol.cs_packet_use_skill();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_use_skill));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_USE_SKILL;
+
+
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+    public void SendChangeSkillPacket(byte skill_type)
+    {
+        Protocol.cs_packet_change_skill pk = new Protocol.cs_packet_change_skill();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_change_skill));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_CHANGE_SKILL;
+        pk.skill_type = skill_type;
+
+
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
 
     public void SendChangeSceneReadyPacket(byte isReady)
     {
@@ -148,6 +180,16 @@ public class Network
         pk.type = Protocol.CONSTANTS.CS_PACKET_CHANGE_SCENE_READY;
 
         pk.is_ready = isReady;
+
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+    public void SendChangeSceneDonePacket()
+    {
+
+        Protocol.cs_packet_change_scene_done pk = new Protocol.cs_packet_change_scene_done();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_change_scene_done));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_CHANGE_SCENE_DONE;
 
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);

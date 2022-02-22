@@ -22,13 +22,14 @@ public class PatternManager : MonoBehaviour
         settedPattern = new List<Pattern>();
         data = this;
     }
-    void Start()
+
+    public void Load(int myType)
     {
-        StartCoroutine(PatternLoad());
+        StartCoroutine(PatternLoad(myType+1));
     }
 
 
-    IEnumerator PatternLoad()
+    IEnumerator PatternLoad(int PID)
     {
         List<Dictionary<string, object>> datas = CSVReader.Read("Pattern/" + GameManager.data.SongName);
         int preBar = 0;

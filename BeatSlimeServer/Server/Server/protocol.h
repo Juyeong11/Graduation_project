@@ -10,6 +10,11 @@ const char CS_PACKET_READ_MAP = 3;
 const char CS_PACKET_WRITE_MAP = 4;
 const char CS_PACKET_CHANGE_SCENE_READY = 5;
 const char CS_PACKET_GAME_START_READY = 6;
+const char CS_PACKET_PARRYING = 7;
+const char CS_PACKET_CHANGE_SCENE_DONE = 8;
+const char CS_PACKET_USE_SKILL = 9;
+const char CS_PACKET_CHANGE_SKILL = 10;
+
 
 const char SC_PACKET_LOGIN_OK = 1;
 const char SC_PACKET_MOVE = 2;
@@ -21,6 +26,9 @@ const char SC_PACKET_MAP_DATA = 7;
 const char SC_PACKET_CHANGE_SCENE = 8;
 const char SC_PACKET_EFFECT = 9;
 const char SC_PACKET_GAME_END = 10;
+const char SC_PACKET_PARRYING = 11;
+const char SC_PACKET_GAME_INIT = 12;
+const char SC_PACKET_CHANGE_SKILL = 13;
 
 #pragma pack (push, 1)
 //client -> server
@@ -56,9 +64,30 @@ struct cs_packet_change_scene_ready {
 	char is_ready;
 };
 
+struct cs_packet_change_scene_done {
+	unsigned char size;
+	char	type;
+};
+
 struct cs_packet_game_start_ready {
 	unsigned char size;
 	char	type;
+};
+
+struct cs_packet_parrying {
+	unsigned char size;
+	char	type;
+};
+
+struct cs_packet_use_skill {
+	unsigned char size;
+	char	type;
+};
+
+struct cs_packet_change_skill {
+	unsigned char size;
+	char	type;
+	char	skill_type;
 };
 
 //server->client
@@ -107,17 +136,22 @@ struct sc_packet_game_start
 {
 	unsigned char size;
 	char type;
-	int player_id;
-	int id1;
-	int id2;
-	int id3;
-	int boss_id;
 };
 struct sc_packet_change_scene
 {
 	unsigned char size;
 	char type;
 	char scene_num;
+};
+struct sc_packet_game_init
+{
+	unsigned char size;
+	char type;
+	int player_id;
+	int id1;
+	int id2;
+	int id3;
+	int boss_id;
 };
 
 struct sc_packet_effect 
@@ -145,4 +179,17 @@ struct sc_packet_game_end
 	char end_type;
 };
 
+struct sc_packet_parrying {
+	unsigned char size;
+	char	type;
+	int id;
+};
+
+struct sc_packet_change_skill {
+	unsigned char size;
+	char	type;
+	int		id;
+	char	skill_type;
+	char	skill_level;
+};
 #pragma pack(pop)

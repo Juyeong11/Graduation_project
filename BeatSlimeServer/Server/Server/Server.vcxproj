@@ -146,12 +146,14 @@
     <ClCompile Include="Ex4_iocp.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Network.cpp" />
+    <ClCompile Include="PlayerSkill.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h" />
     <ClInclude Include="DataBase.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Network.h" />
+    <ClInclude Include="PlayerSkill.h" />
     <ClInclude Include="protocol.h" />
     <ClInclude Include="stdfx.h" />
   </ItemGroup>

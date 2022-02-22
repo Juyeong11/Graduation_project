@@ -342,7 +342,23 @@ public class PlayerManager : MonoBehaviour
                 }
             }
         }
+        else if (Input.GetKeyDown(KeyCode.J) && KeyCheck(KeyCode.J))
+        {
+            if (FieldGameManager.Net.isOnline)
+            {
+                GameManager.data.setMoved();
 
+                FieldGameManager.Net.SendUseSkillPacket();
+            }
+        }
+        else if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (FieldGameManager.Net.isOnline)
+            {
+                // ������ �и� ����
+                FieldGameManager.Net.SendParryingPacket();
+            }
+        }
     }
 
     void resetPosition()

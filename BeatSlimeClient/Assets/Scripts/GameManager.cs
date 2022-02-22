@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour
     {
 
         if (!FieldGameManager.Net.isServerOnline()) FieldGameManager.Net.CreateAndConnect();
-
+        FieldGameManager.Net.SendChangeSceneDonePacket();
         loader.LoadMap();
 
         //DEBUG
@@ -113,10 +113,10 @@ public class GameManager : MonoBehaviour
         //{
         //    FieldGameManager.Net.SendreadPacket();
         //}
-        if (Input.GetKeyDown(KeyCode.Return))
-        {
-            FieldGameManager.Net.SendGameStartReadyPacket();
-        }
+        //if (Input.GetKeyDown(KeyCode.Return))
+        //{
+        //    FieldGameManager.Net.SendGameStartReadyPacket();
+        //}
 
 
         if (isGameStart && !FieldGameManager.Net.isServerOnline())
@@ -195,19 +195,30 @@ public class GameManager : MonoBehaviour
                             Debug.Log("Game_Over -> Change Scene");
                         }
                         break;
-                    case Protocol.CONSTANTS.SC_PACKET_GAME_START:
+                    case Protocol.CONSTANTS.SC_PACKET_GAME_INIT:
                         {
-                            Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
-                            Debug.Log("GS PACKET x : " + p.boss_id);
+                            Protocol.sc_packet_game_init p = Protocol.sc_packet_game_init.SetByteToVar(data);
+                            Debug.Log("game init");
                             ids[0] = p.id1;
                             ids[1] = p.id2;
                             ids[2] = p.id3;
                             ids[3] = p.boss_id;
                             int pid = ServerID_To_ClientID(p.player_id);
+
                             Objects[pid] = player;
                             myPlayerID = pid;
                             Objects[3] = enemy;
                             Objects[3].SetActive(true);
+
+                            PatternManager.data.Load(myPlayerID);
+
+                            FieldGameManager.Net.SendGameStartReadyPacket();
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_GAME_START:
+                        {
+                            Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
+                            
 
                             PlaySound();
                         }
@@ -249,14 +260,20 @@ public class GameManager : MonoBehaviour
                             //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
                             //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
-                      
-                            HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
-                            //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
+                            if(target_id == myPlayerID)
+                            {
+                                HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
+                                //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
-                            //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
-                            Debug.Log("ATTACK : " + p.id + ", HP : " + hm.CurrentHP +" to " + p.hp);
+                                //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
 
-                            hm.Damage(hm.CurrentHP - p.hp);
+                                hm.Damage(hm.CurrentHP - p.hp);
+                            }
+                            else
+                            {
+                                Debug.Log("player hit boss");
+                            }
+
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
@@ -347,37 +364,59 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_effect p = Protocol.sc_packet_effect.SetByteToVar(data);
                             int pid = ServerID_To_ClientID(p.id);
-                            int tid = ServerID_To_ClientID(p.target_id);
-                            int start_x, start_y, start_z;
-
-                            start_x = p.x;
-                            start_y = p.y;
-                            start_z = p.z;
-                            //if (p.target_id == -1)
-                            //{
-                            //    start_x = p.x;
-                            //    start_y = p.y;
-                            //    start_z = p.z;
-                            //}
-                            //else
-                            //{
-                            //    start_x = Objects[tid].GetComponent<HexCellPosition>().coordinates.X;
-                            //    start_y = Objects[tid].GetComponent<HexCellPosition>().coordinates.Y;
-                            //    start_z = Objects[tid].GetComponent<HexCellPosition>().coordinates.Z;
-                            //}
+                            int tid = -1;
+                            if (p.target_id != -1)
+                                tid = ServerID_To_ClientID(p.target_id);
+                            
 
                             switch (p.effect_type)
                             {
                                 case 3:
-                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,3);
+                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time,3);
                                     break;
                                 case 4:
-                                    EffectManager.instance.BossTileEffect(start_x, start_y, start_z, p.charging_time,4);
+                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time,4);
                                     break;
                                 case 99:
-                                    EffectManager.instance.OneTileEffect(start_x, start_y, start_z, p.charging_time);
+                                    EffectManager.instance.OneTileEffect(p.x, p.y, p.z, p.charging_time);
                                     break;
                                 case 5:
+                                    EffectManager.instance.BossWaterGunEffect(Objects[pid].transform.localPosition, Objects[tid].transform.localPosition, p.charging_time);
+                                break;
+                                case 6:
+                                    EffectManager.instance.BossQuakeEffect(p.x, p.y, p.z, p.charging_time, Objects[tid].GetComponent<HexCellPosition>().direction);
+                                    break;
+                                case 10:
+                                    EffectManager.instance.BossTargetingEffect(Objects[pid].transform.localPosition,ref Objects[tid], p.charging_time);
+                                    break;
+
+                                case 55:// skill
+                                    // p->x  == skill Level
+                                    // p->y  == skill type
+                                    switch (p.y)
+                                    {
+                                        case 1:
+                                            EffectManager.instance.PlayerWaterGunEffect(Objects[pid].transform.localPosition, ref Objects[tid], p.charging_time);
+
+                                            break;
+                                        case 2:
+                                            {
+                                                HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
+                                                EffectManager.instance.PlayerQuakeEffect(cell.X,cell.Y,cell.Z, p.charging_time);
+                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " 스킬 사용");
+
+                                            }
+                                            break;
+                                        case 3:
+                                            {
+                                                HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
+                                                EffectManager.instance.PlayerHealEffect(cell.X, cell.Y, cell.Z, p.charging_time);
+                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " 스킬 사용");
+
+                                            }
+                                            break;
+                                    }
+                                    Debug.Log(p.y + " 스킬 사용");
                                     break;
                             }
                             //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));
@@ -393,6 +432,14 @@ public class GameManager : MonoBehaviour
 
                             Debug.Log("Game_Over");
                             
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_PARRYING:
+                        {
+                            Protocol.sc_packet_parrying p = Protocol.sc_packet_parrying.SetByteToVar(data);
+                            
+
+                            Debug.Log("Parrying Success");
                         }
                         break;
                     default:

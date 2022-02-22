@@ -19,7 +19,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 	in.read(reinterpret_cast<char*>(map), (LengthX + 1) * LengthZ * sizeof(int));
 
-	
+	/*
 	// ¸Ê È®ÀÎ¿ë
 	std::cout << LengthX << std::endl;
 	std::cout << LengthZ << std::endl;
@@ -34,7 +34,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 				std::cout << " " ;
 		}
 	}
-
+	*/
 
 	std::ifstream in_m{ music_name, std::ios::binary };
 	if (!in_m) return;
@@ -136,6 +136,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 		else
 			std::cout << "Load : wrong dir\n";
 
+
 		int pivotType = 0;
 		if (pattern["pivotType"][i] == "PlayerM")
 			pivotType = 0;
@@ -196,16 +197,18 @@ GameRoom::GameRoom(int id) : game_room_id(id) {
 	ready_player_cnt = 0;
 }
 
-bool GameRoom::FindPlayer(int id)
+int GameRoom::FindPlayer(int id) const
 {
-	for (int p : player_ids) {
-		if (p == id) return true;
+	int room_id=0;
+	for (const auto p : player_ids) {
+		if (p->id == id) return room_id;
+		room_id++;
 	}
 	return false;
 }
 
 
-void GameRoom::GameRoomInit(int mapType, float BPM, int Boss, int* Players)
+void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER])
 {
 	map_type = mapType;
 	bpm = BPM;
@@ -213,5 +216,47 @@ void GameRoom::GameRoomInit(int mapType, float BPM, int Boss, int* Players)
 	isGaming = true;
 
 	boss_id = Boss;
-	memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
+	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
+	player_ids[0] = Players[0];
+	player_ids[1] = Players[1];
+	player_ids[2] = Players[2];
+}
+
+int GameRoom::find_max_hp_player() const
+{
+	int maxhp = 0;
+	int ret = 0;
+	for (const auto pl : player_ids) {
+		if (pl->hp > maxhp) {
+			maxhp = pl->hp;
+			ret = pl->id;
+		};
+	}
+	return ret;
+}
+
+int GameRoom::find_min_hp_player() const {
+	int minhp = 0xfffff;
+	int ret = 0;
+	for (const auto pl : player_ids) {
+		if (pl->hp < minhp) {
+			minhp = pl->hp;
+			ret = pl->id;
+		};
+	}
+	return ret;
+}
+int GameRoom::find_max_distance_player() const {
+	int max_distance = 0;
+	int distance = 0;
+	int ret_id;
+	
+	for (const auto pl : player_ids) {
+		distance = abs(boss_id->x - pl->x) + abs(boss_id->z - pl->z);
+		if (distance > max_distance) {
+			max_distance = distance;
+			ret_id = pl->id;
+		};
+	}
+	return ret_id;
 }

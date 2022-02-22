@@ -1,5 +1,6 @@
 #pragma once
 #include "protocol.h"
+#include "PlayerSkill.h"
 void error_display(const char* err_p, int err_no);
 class EXP_OVER {
 public:
@@ -37,11 +38,9 @@ public:
 	}
 };
 
-enum DIR {
-	LEFTUP, UP, RIGHTUP, LEFTDOWN, DOWN, RIGHTDOWN
-};
+
 enum STATE { ST_FREE, ST_ACCEPT, ST_INGAME };
-class Gameobject {
+class GameObject {
 public:
 	char name[MAX_NAME_SIZE];
 	int		id;
@@ -55,14 +54,15 @@ public:
 
 
 	int		last_move_time;
-	Gameobject() :state(ST_FREE) {
+	GameObject() :state(ST_FREE) {
 		x = 0;
 		y = 0;
 		z = 0;
 		hp = 100;
 	}
+
 };
-class Npc: public Gameobject {
+class Npc: public GameObject {
 public:
 	std::atomic_bool is_active;
 
@@ -108,9 +108,23 @@ public:
 	}
 };
 
+enum SKILL_TYPE{WATERGUN,QUAKE,HEAL};
+struct Skill
+{
+	int Delay;
+	int CoolTime;
+	int Speed;
+	int Damage;
+	int SkillLevel;
+	int SkillType;
+	Skill(int sl, int st) :SkillLevel(sl), SkillType(st) {
+		Damage = SkillLevel * SkillLevel;
+		CoolTime = 10/SkillLevel;
+	}
+};
 const int VIEW_RANGE = 10;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
-class Client : public Gameobject
+class Client : public GameObject
 {
 public:
 	std::unordered_set<int> viewlist;
@@ -119,17 +133,18 @@ public:
 	EXP_OVER recv_over;
 	SOCKET socket; // 재사용 하기 때문에 data race -> state로 보호
 
+	Skill* skill;
 	bool is_active;
-	int cur_map_type;
+	int cur_room_num;
 	int		prev_recv_size;
 public:
 
-	Client()
+	Client(Skill* sk) : skill(sk)
 	{
 		type = PLAYER;
 		is_active = true;
 		prev_recv_size = 0;
-		cur_map_type = 0;
+		cur_room_num = -1;
 	}
 
 	~Client()
