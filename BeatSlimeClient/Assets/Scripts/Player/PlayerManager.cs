@@ -21,7 +21,7 @@ public class PlayerManager : MonoBehaviour
     public PlayerKeyHandler handle;     //Invalid
 
     public HexCellPosition selfCoord;
-    public HexDirection selfDirection;
+    //public HexDirection selfDirection;
     public HexGrid grid;
 
     public Transform PlayerTransform;
@@ -44,7 +44,7 @@ public class PlayerManager : MonoBehaviour
         playerAttacking = false;
         grid = GameManager.data.grid;
         state = playerState.Idle;
-        selfDirection = HexDirection.Up;
+        selfCoord.direction = HexDirection.Up;
         SettledBallBeats = new List<(Beat,float)>();
         playerDieAnimTriggered = false;
 
@@ -58,7 +58,7 @@ public class PlayerManager : MonoBehaviour
     {
         grid = GameManager.data.grid;
         state = playerState.Idle;
-        selfDirection = HexDirection.Up;
+        selfCoord.direction = HexDirection.Up;
         //onPlayerFly.Invoke();
     }
 
@@ -125,7 +125,7 @@ public class PlayerManager : MonoBehaviour
 
     public void PlayerRotateToLookAt()
     {
-        switch(selfDirection)
+        switch(selfCoord.direction)
         {
             case HexDirection.LeftUp:
                 //Vector3 c = Vector3.Cross(transform.rotation.eulerAngles, new Vector3(0, -120, 0));
@@ -163,22 +163,22 @@ public class PlayerManager : MonoBehaviour
         switch (k)
         {
             case KeyCode.W:
-                selfDirection = HexDirection.LeftUp;
+                selfCoord.direction = HexDirection.LeftUp;
                 break;
             case KeyCode.E:
-                selfDirection = HexDirection.Up;
+                selfCoord.direction = HexDirection.Up;
                 break;
             case KeyCode.R:
-                selfDirection = HexDirection.RightUp;
+                selfCoord.direction = HexDirection.RightUp;
                 break;
             case KeyCode.S:
-                selfDirection = HexDirection.LeftDown;
+                selfCoord.direction = HexDirection.LeftDown;
                 break;
             case KeyCode.D:
-                selfDirection = HexDirection.Down;
+                selfCoord.direction = HexDirection.Down;
                 break;
             case KeyCode.F:
-                selfDirection = HexDirection.RightDown;
+                selfCoord.direction = HexDirection.RightDown;
                 break;
         }
 
