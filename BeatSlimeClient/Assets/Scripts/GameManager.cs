@@ -233,13 +233,14 @@ public class GameManager : MonoBehaviour
                             
                             if (!debugStart)
                             {
-                            //Debug.Log(p.id+" : pid");
-                            Objects[pid].GetComponentInChildren<HexCellPosition>().setDirection((byte)p.dir);
-                            Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                            if (pid == myPlayerID)// 
-                                Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
-                            else if (pid < 3)   //
-                                Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
+                                
+                                //Debug.Log(p.id+" : pid");
+                                Objects[pid].GetComponentInChildren<HexCellPosition>().setDirection((byte)p.dir);
+                                Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                if (pid == myPlayerID)// 
+                                    Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
+                                else if (pid < 3)   //
+                                    Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
                             }
                             else    //DEBUG
                             {
@@ -403,7 +404,7 @@ public class GameManager : MonoBehaviour
                                             {
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerQuakeEffect(cell.X,cell.Y,cell.Z, p.charging_time);
-                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " ìŠ¤í‚¬ ì‚¬ìš©");
+                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " ?Š¤?‚¬ ?‚¬?š©");
 
                                             }
                                             break;
@@ -411,12 +412,12 @@ public class GameManager : MonoBehaviour
                                             {
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerHealEffect(cell.X, cell.Y, cell.Z, p.charging_time);
-                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " ìŠ¤í‚¬ ì‚¬ìš©");
+                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " ?Š¤?‚¬ ?‚¬?š©");
 
                                             }
                                             break;
                                     }
-                                    Debug.Log(p.y + " ìŠ¤í‚¬ ì‚¬ìš©");
+                                    Debug.Log(p.y + " ?Š¤?‚¬ ?‚¬?š©");
                                     break;
                             }
                             //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));

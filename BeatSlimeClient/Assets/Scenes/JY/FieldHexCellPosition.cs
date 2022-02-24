@@ -5,6 +5,8 @@ public class FieldHexCellPosition : MonoBehaviour
     public HexCoordinates coordinates;
     public HexCoordinates preCoordinates;
 
+    public HexDirection direction;
+
     float preBeatedTime;
 
     public void setInitPosition(int x, int z,int w=0)
@@ -107,8 +109,8 @@ public class FieldHexCellPosition : MonoBehaviour
             case (byte)Protocol.DIR.LEFTDOWN:
                 gameObject.transform.localRotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
                 break;
-
         }
+        direction = (HexDirection)dir;
     }
     public void plus(int x, int y, int z,int w=0)
     {
