@@ -264,6 +264,8 @@ public class GameManager : MonoBehaviour
                             if(target_id == myPlayerID)
                             {
                                 HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
+                                
+                                Objects[target_id].GetComponentInChildren<PlayerManager>().StunTrig();
                                 //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                                 //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
@@ -272,6 +274,7 @@ public class GameManager : MonoBehaviour
                             }
                             else
                             {
+                                //Objects[ServerID_To_ClientID(p.id)].GetComponentInChildren<PlayerManager>().AttackTrig();
                                 Debug.Log("player hit boss");
                             }
 
@@ -439,7 +442,8 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_parrying p = Protocol.sc_packet_parrying.SetByteToVar(data);
                             
-
+                            int pid = ServerID_To_ClientID(p.id);
+                            Objects[pid].GetComponentInChildren<PlayerManager>().ParryTrig();
                             Debug.Log("Parrying Success");
                         }
                         break;
