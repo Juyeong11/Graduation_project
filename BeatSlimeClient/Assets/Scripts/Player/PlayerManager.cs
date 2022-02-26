@@ -72,6 +72,18 @@ public class PlayerManager : MonoBehaviour
     {
         JumpTrigger.SetTrigger("Jump");
     }
+    public void StunTrig()
+    {
+        JumpTrigger.SetTrigger("Stun");
+    }
+    public void ParryTrig()
+    {
+        JumpTrigger.SetTrigger("Parry");
+    }
+    public void AttackTrig()
+    {
+        JumpTrigger.SetTrigger("Attack");
+    }
 
     public void SkillTrig()
     {
@@ -197,10 +209,10 @@ public class PlayerManager : MonoBehaviour
     }
     void KeyHandler()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            playerAttacking = true;
-        }
+        // if (Input.GetKeyDown(KeyCode.Space))
+        // {
+        //     playerAttacking = true;
+        // }
 
         if (isDebug)
         {
@@ -337,8 +349,8 @@ public class PlayerManager : MonoBehaviour
                     if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w <= selfCoord.coordinates.W)
                     {
                         selfCoord.plus(1, 0, -1, grid.cellMaps.Get(selfCoord.coordinates.X+1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w - selfCoord.coordinates.W + 1);
-                        JumpTrig();
                     }
+                        JumpTrig();
                 }
             }
         }
@@ -349,6 +361,7 @@ public class PlayerManager : MonoBehaviour
                 GameManager.data.setMoved();
 
                 FieldGameManager.Net.SendUseSkillPacket();
+
             }
         }
         else if (Input.GetKeyDown(KeyCode.Space))
