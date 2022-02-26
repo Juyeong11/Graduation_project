@@ -108,15 +108,17 @@ public class EffectManager : MonoBehaviour
     {
         for (int i = 0; i < 6; ++i)
         {
-            PlayerOneQuakeEffect(around[i, 0]+ start_x, around[i, 1] + start_y, around[i, 2] + start_z, speed);
+            PlayerOneQuakeEffect(around[i, 0]+ start_x, around[i, 1] + start_y, around[i, 2] + start_z, speed,i);
+           
         }
     }
-    public void PlayerOneQuakeEffect(int start_x, int start_y, int start_z, int speed)
+    public void PlayerOneQuakeEffect(int start_x, int start_y, int start_z, int speed,int dir)
     {
 
         GameObject go = Instantiate(PlayerQuakeEffectPrefab, GameManager.data.grid.cellMaps.Get(start_x, start_y, start_z).getCellRealPosition(), Quaternion.identity);
         float s = speed * 1 / 1000f;
         //Debug.Log("effect q" + Time.time);
+        go.GetComponent<HexCellPosition>().setDirection((byte)dir);
         go.GetComponent<PlayerQuake>().speed = s;
     }
 

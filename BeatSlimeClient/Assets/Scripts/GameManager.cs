@@ -407,7 +407,7 @@ public class GameManager : MonoBehaviour
                                             {
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerQuakeEffect(cell.X,cell.Y,cell.Z, p.charging_time);
-                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " ?Š¤?‚¬ ?‚¬?š©");
+                                                //Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " skill attack");
 
                                             }
                                             break;
@@ -415,7 +415,7 @@ public class GameManager : MonoBehaviour
                                             {
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerHealEffect(cell.X, cell.Y, cell.Z, p.charging_time);
-                                                Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " ?Š¤?‚¬ ?‚¬?š©");
+                                                //Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " skill attack");
 
                                             }
                                             break;

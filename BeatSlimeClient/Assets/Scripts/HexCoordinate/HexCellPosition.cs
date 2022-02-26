@@ -88,8 +88,8 @@ public class HexCellPosition : MonoBehaviour
 
         }
         direction = (HexDirection)dir;
-
     }
+   
     public void plus(int x, int y, int z,int w=0)
     {
         preBeatedTime = Time.time;
