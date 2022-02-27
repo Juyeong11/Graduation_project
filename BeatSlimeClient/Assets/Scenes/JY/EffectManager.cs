@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class EffectManager : MonoBehaviour
 {
@@ -124,10 +125,11 @@ public class EffectManager : MonoBehaviour
 
     public void PlayerHealEffect(int start_x, int start_y, int start_z, int speed)
     {
-        for (int i = 0; i < 6; ++i)
-        {
-            PlayerOneHealEffect(around[i, 0] + start_x, around[i, 1] + start_y, around[i, 2] + start_z, speed);
-        }
+        //for (int i = 0; i < 6; ++i)
+        //{
+        //    PlayerOneHealEffect(around[i, 0] + start_x, around[i, 1] + start_y, around[i, 2] + start_z, speed);
+        //}
+        PlayerOneHealEffect(start_x,start_y, start_z, speed);
     }
     public void PlayerOneHealEffect(int start_x, int start_y, int start_z, int speed)
     {
@@ -136,5 +138,7 @@ public class EffectManager : MonoBehaviour
         float s = speed * 1 / 1000f;
         //Debug.Log("effect q" + Time.time);
         go.GetComponent<PlayerHeal>().speed = s;
+        //에니메이션 재생속도 조절
+        //go.GetComponent<VisualEffect>().SetFloat = s;
     }
 }
