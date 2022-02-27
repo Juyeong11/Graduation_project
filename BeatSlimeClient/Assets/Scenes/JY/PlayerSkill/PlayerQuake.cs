@@ -17,7 +17,7 @@ public class PlayerQuake : MonoBehaviour
         while (scale <= 1.0f)
         {
             scale += Time.deltaTime * 1 / speed;
-            gameObject.transform.localScale = new Vector3(scale, 0.01f, scale);
+            //gameObject.transform.localScale = new Vector3(scale, 0.01f, scale);
             yield return null;
         }
         Destroy(gameObject);
