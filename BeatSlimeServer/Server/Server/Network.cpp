@@ -18,7 +18,7 @@ Network::Network() {
 	instance = this;
 
 	for (int i = 0; i < SKILL_CNT; ++i) {
-		skills[i] = new Skill(i % 3 + 1 , i / 3 + 1);
+		skills[i] = new Skill(i % 3 + 1, i / 3 + 1);
 	}
 
 	//수정
@@ -431,21 +431,23 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 }
 
 void Network::do_player_skill(GameRoom* gr, Client* cl) {
-	if (gr->boss_id->hp < 0) return;
+	
 
 	bool attack_flag = false;
-	switch (cl->skill->SkillType)
+	switch (cl->skill->SkillType-1)
 	{
 	case WATERGUN:
 		attack_flag = true;
-		gr->boss_id->hp -= cl->skill->Damage;
+		gr->boss_id->hp -= 10;//cl->skill->Damage;
 
 		break;
 	case QUAKE:
-	case HEAL:
 		if (is_attack(gr->boss_id->id, cl->id))
 			attack_flag = true;
-		 gr->boss_id->hp = std::clamp(gr->boss_id->hp + cl->skill->Damage, 0, 100);
+		gr->boss_id->hp -= 10; // cl->skill->Damage;
+		break;
+	case HEAL:
+		
 		break;
 	default:
 		std::cout << "wrong skill type\n";
@@ -453,7 +455,15 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 	}
 	if (false == attack_flag) return;
 
+	if (gr->boss_id->hp < 0) {
+		timer_event tev;
+		tev.ev = EVENT_GAME_END;
+		tev.game_room_id = gr->game_room_id;
+		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
 
+		timer_queue.push(std::move(tev));
+	}
 	for (const auto pl : gr->player_ids) {
 		send_attack_player(cl->id, gr->boss_id->id, pl->id);
 	}
@@ -541,7 +551,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		short& z = cl.z;
 		cl.direction = packet->direction;
 		int cur_map = 0;
-		if(cl.cur_room_num != -1)
+		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
 
 		switch (packet->direction) {
@@ -815,11 +825,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 		cs_packet_change_scene_done* packet = reinterpret_cast<cs_packet_change_scene_done*>(p);
 		for (auto* gr : game_room) {
 			if (false == gr->isGaming) continue;
-			if (false == gr->FindPlayer(client_id)) continue;
+			if (-1 == gr->FindPlayer(client_id)) continue;
 
-			for (const auto pl : gr->player_ids) {
-				send_game_init(pl->id, gr->player_ids, gr->boss_id->id);
-			}
+
+			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
+			break;
 		}
 
 	}
@@ -831,7 +841,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		for (auto* gr : game_room) {
 			if (false == gr->isGaming) continue;
 			gr->ready_lock.lock();
-			if (false == gr->FindPlayer(client_id)) { gr->ready_lock.unlock(); continue; }
+			if (-1 == gr->FindPlayer(client_id)) { gr->ready_lock.unlock(); continue; }
 			gr->ready_player_cnt++;
 			if (gr->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
 
@@ -858,7 +868,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		for (auto* gr : game_room) {
 			if (false == gr->isGaming) continue;
 			// 해당 플레이어의 게임 방을 찾고
-			if (false == gr->FindPlayer(client_id)) continue;
+			if (-1 == gr->FindPlayer(client_id)) continue;
 			int id = gr->FindPlayer(client_id);
 			// 게임시간이 얼마나 지났는지 확인하고
 			int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
@@ -871,6 +881,18 @@ void Network::process_packet(int client_id, unsigned char* p)
 				if (abs(running_time - pattern.time) < 100) {
 					//패링 성공
 					// 패링 성공 패킷을 클라이언트로 보냄
+
+					//수정
+					gr->boss_id->hp -= 10;
+					if (gr->boss_id->hp < 0) {
+						timer_event tev;
+						tev.ev = EVENT_GAME_END;
+						tev.game_room_id = gr->game_room_id;
+						//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+						tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+						timer_queue.push(std::move(tev));
+					}
 					for (const auto pl : gr->player_ids) {
 						send_parrying(pl->id, client_id);
 					}
@@ -927,11 +949,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 		*/
 		for (const auto& pl : gr->player_ids) {
 			const Skill* plskill = reinterpret_cast<Client*>(pl)->skill;
-			send_effect(pl->id, client_id, gr->boss_id->id, 55, 1000, cl->direction, plskill->SkillLevel, plskill->SkillType, -1);
+			send_effect(pl->id, client_id, gr->boss_id->id, 55, 1000, cl->direction, cl->skill->SkillLevel, cl->skill->SkillType, -1);
 		}
 
 		//플레이어 스킬 이벤트 등록
-		
+
 		//timer_event tev;
 		//tev.game_room_id = gr->game_room_id;
 		//tev.charging_time = cl->skill.Delay;
@@ -959,7 +981,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		*/
 		Client* c = reinterpret_cast<Client*>(clients[client_id]);
 		c->skill = skills[packet->skill_type * 3 - 1];
-		
+
 		for (int i : c->viewlist) {
 			if (false == is_player(i)) continue;
 			send_change_skill(i, client_id);
@@ -967,7 +989,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		send_change_skill(client_id, client_id);
 
 	}
-		break;
+	break;
 	default:
 		std::cout << "이상한 패킷 수신\n";
 		break;

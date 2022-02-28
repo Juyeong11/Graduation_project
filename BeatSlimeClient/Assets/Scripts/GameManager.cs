@@ -420,7 +420,7 @@ public class GameManager : MonoBehaviour
                                             }
                                             break;
                                     }
-                                    Debug.Log(p.y + " ?Š¤?‚¬ ?‚¬?š©");
+                                    Debug.Log(p.y + " skill type");
                                     break;
                             }
                             //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));

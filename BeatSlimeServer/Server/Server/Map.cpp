@@ -202,9 +202,9 @@ int GameRoom::FindPlayer(int id) const
 	int room_id=0;
 	for (const auto p : player_ids) {
 		if (p->id == id) return room_id;
-		room_id++;
+
 	}
-	return false;
+	return -1;
 }
 
 
