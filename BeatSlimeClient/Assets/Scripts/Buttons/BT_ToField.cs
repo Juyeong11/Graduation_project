@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BT_ToField : MonoBehaviour
 {
@@ -8,6 +9,7 @@ public class BT_ToField : MonoBehaviour
     {
         //DEBUG
         
-        // 나가는 패킷 보내기
+        SceneManager.LoadScene("FieldScene");
+        
     }
 }

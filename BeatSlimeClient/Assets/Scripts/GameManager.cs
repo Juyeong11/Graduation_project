@@ -436,6 +436,14 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_game_end p = Protocol.sc_packet_game_end.SetByteToVar(data);
                             isGameStart = false;
 
+                            if (p.end_type == 0)
+                            {
+                                gameOverImage.SetGameEnd(GameEndTraits.Lose);
+                            }
+                            else if (p.end_type == 1)
+                            {
+                                gameOverImage.SetGameEnd(GameEndTraits.Win);
+                            }
                             Debug.Log("Game_Over");
                             
                         }
