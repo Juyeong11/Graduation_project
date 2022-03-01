@@ -1389,8 +1389,8 @@ void Network::worker()
 			//체력에 따라 클리어 유무
 			for (const auto p : game_room[game_room_id]->player_ids)
 				send_game_end(p->id, GAME_CLEAR);
-			for (const auto p : game_room[game_room_id]->player_ids)
-				send_change_scene(p->id, FIELD_MAP);
+			//for (const auto p : game_room[game_room_id]->player_ids)
+			//	send_change_scene(p->id, FIELD_MAP);
 
 			game_room[game_room_id]->isGaming = false;
 
