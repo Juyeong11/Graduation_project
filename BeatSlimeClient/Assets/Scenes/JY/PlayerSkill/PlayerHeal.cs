@@ -13,9 +13,9 @@ public class PlayerHeal : MonoBehaviour
     IEnumerator Animation()
     {
         float scale = 0.0f;
-        while (scale <= 1.0f)
+        while (scale <= 5.0f)
         {
-            scale += Time.deltaTime * 1 / speed;
+            scale += Time.deltaTime;// * 1 / speed;
             //gameObject.transform.localScale = new Vector3(scale, 0.01f, scale);
             yield return null;
         }
