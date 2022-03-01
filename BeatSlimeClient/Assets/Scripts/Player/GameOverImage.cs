@@ -1,24 +1,44 @@
-ï»¿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum GameEndTraits {
+    None,
+    Win,
+    Lose
+}
+
 public class GameOverImage : MonoBehaviour
 {
-    public PlayerManager player;
-    public GameObject t;
+    public GameEndTraits gameEnder;
+    public Text t;
+    public GameObject Center;
+
+
     void Start()
     {
-        t.SetActive(false);
+        gameEnder = GameEndTraits.None;
+        Center.SetActive(false);
     }
 
     void Update()
     {
-        // ë”°ë¡œ í´ë˜ìŠ¤ê°€ ë¹ ì ¸ìˆëŠ” ì´ìœ  : PlayerManagerì—ì„œ í•˜ë©´ í•œ í”Œë ˆì´ì–´ë¼ë„ ì£½ìœ¼ë©´ í™”ë©´ì— ê²Œì„ ì˜¤ë²„ê°€ ëœ¨ê¸° ë•Œë¬¸.
-        if (!player.HP.isAlive)
+        // µû·Î Å¬·¡½º°¡ ºüÁ®ÀÖ´Â ÀÌÀ¯ : PlayerManager¿¡¼­ ÇÏ¸é ÇÑ ÇÃ·¹ÀÌ¾î¶óµµ Á×À¸¸é È­¸é¿¡ °ÔÀÓ ¿À¹ö°¡ ¶ß±â ¶§¹®.
+        if (gameEnder == GameEndTraits.Lose)
         {
-            gameObject.GetComponent<Image>().color = new Color(0.5f, 0.5f, 0.5f, 0.4f);
-            t.SetActive(true);
+            t.text = "Game Over";
+            Center.SetActive(true);
         }
+        else if (gameEnder == GameEndTraits.Win)
+        {
+            t.text = "Game Clear!";
+            Center.SetActive(true);
+        }
+    }
+
+    public void SetGameEnd(GameEndTraits end)
+    {
+        gameEnder = end;
     }
 }

@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
     public HPImagesForGameManager HPGM;
     int HPGMStaticInt = 1;
 
+    public GameOverImage gameOverImage;
+
     //
     GameObject[] Objects = new GameObject[4];
     int[] ids;
