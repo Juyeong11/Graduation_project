@@ -263,7 +263,7 @@ public class GameManager : MonoBehaviour
                             //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
                             //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
-                            if(target_id == myPlayerID)
+                            if(target_id != 3) // is not boss
                             {
                                 HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
                                 
@@ -277,7 +277,9 @@ public class GameManager : MonoBehaviour
                             else
                             {
                                 //Objects[ServerID_To_ClientID(p.id)].GetComponentInChildren<PlayerManager>().AttackTrig();
-                                Debug.Log("player hit boss");
+                                HPManager hm = Objects[target_id].GetComponentInChildren<EnemyManager>().HP;
+                                hm.Damage(hm.CurrentHP - p.hp);
+                                //Objects[target_id].GetComponentInChildren<EnemyManager>().StunTrig();
                             }
 
                         }
