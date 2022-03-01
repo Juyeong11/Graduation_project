@@ -182,7 +182,7 @@ public class GameManager : MonoBehaviour
         if (FieldGameManager.Net.isServerOnline())
         {
             //
-            if (Network.MessQueue.Count > 0)
+            while (Network.MessQueue.Count > 0)
             {
                 byte[] data = Network.MessQueue.Dequeue();
 

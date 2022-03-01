@@ -184,7 +184,7 @@ void Network::send_move_object(int c_id, int mover)
 	packet.z = clients[mover]->z;
 	packet.dir = clients[mover]->direction;
 
-	//packet.move_time = clients[mover]->last_move_time;
+	packet.move_time = clients[mover]->last_move_time;
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -545,7 +545,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		std::cout << "player move\n";
 
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
-		//cl.last_move_time = packet->move_time;
+		cl.last_move_time = packet->move_time;
 		short& x = cl.x;
 		short& y = cl.y;
 		short& z = cl.z;

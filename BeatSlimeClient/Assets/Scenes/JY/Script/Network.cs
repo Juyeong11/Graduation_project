@@ -1,4 +1,4 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Net.Sockets;
@@ -27,46 +27,30 @@ public class Network
         Socket c_Socket = (Socket)ar.AsyncState;
         int strLength = c_Socket.EndReceive(ar);
 
-        int index = 0;
+        int data_size = pre_buf_size + strLength;
+        int packet_start_index = 0;
+        int packet_size = receiveBytes[packet_start_index];
 
-        //¿Ã¿¸ø° πﬁ¥¯ µ•¿Ã≈Õ∞° ¿÷¿∏∏È
-        if (pre_buf_size != 0)
+        while (packet_size <= data_size)
         {
-            Buffer.BlockCopy(receiveBytes, 0, tempBytes, pre_buf_size, strLength);
-            //Array.Clear(receiveBytes, 0, receiveBytes.Length);
+            //
+            byte[] packet = new byte[packet_size];
+            Buffer.BlockCopy(receiveBytes, packet_start_index, packet, 0, packet_size);
+            MessQueue.Enqueue(packet);
 
+            //
+            data_size -= packet_size;
+            packet_start_index += packet_size;
+            if (data_size > 0) packet_size = receiveBytes[packet_start_index];
         }
-        else
-        {
-            Buffer.BlockCopy(receiveBytes, 0, tempBytes, 0, strLength);
-        }
-        //.ºˆ¡§« ø‰
-        while (true)
-        {
-            int size = tempBytes[index];
-            if (index + size > strLength + pre_buf_size)
-            {
-                //∆–≈∂¿Ã ¥˙ ø»
-                Buffer.BlockCopy(tempBytes, 0, tempBytes, index, strLength - index);
-                pre_buf_size = strLength - index;
-                break;
-            }
-            //Debug.Log(size);
-            byte[] temp = new byte[size];
-            Buffer.BlockCopy(tempBytes, index, temp, 0, size);
-            index += size;
+        pre_buf_size = data_size;
 
-            if (index == strLength + pre_buf_size)
-            {
-                pre_buf_size = 0;
-                MessQueue.Enqueue(temp);
-                break;
-            }
-            MessQueue.Enqueue(temp);
-        }
+        // 
+        if (data_size > 0) Buffer.BlockCopy(receiveBytes, data_size, receiveBytes, 0, data_size);
 
+        ClientSocket.BeginReceive(receiveBytes, pre_buf_size, BUFSIZE, SocketFlags.None, new System.AsyncCallback(receiveComplet), ClientSocket);
 
-        ClientSocket.BeginReceive(receiveBytes, 0, BUFSIZE, SocketFlags.None, new System.AsyncCallback(receiveComplet), ClientSocket);
+       
     }
     void sendComplet(System.IAsyncResult ar)
     {
@@ -81,11 +65,11 @@ public class Network
         IPEndPoint severEP = (IPEndPoint)tempSocket.RemoteEndPoint;
         if (severEP == null && tempSocket != null)
         {
-            Debug.Log("¿Áø¨∞· Ω√µµ");
+            Debug.Log("Ïû¨Ïó∞Í≤∞ ÏãúÎèÑ");
             StartConnect();
             return;
         }
-        Debug.Log("º≠πˆ ø¨∞· º∫∞¯");
+        Debug.Log("ÏÑúÎ≤Ñ Ïó∞Í≤∞ ÏÑ±Í≥µ");
         isOnline = true;
         tempSocket.EndConnect(ar);
         ClientSocket.BeginReceive(receiveBytes, 0, BUFSIZE, SocketFlags.None, new System.AsyncCallback(receiveComplet), ClientSocket);
