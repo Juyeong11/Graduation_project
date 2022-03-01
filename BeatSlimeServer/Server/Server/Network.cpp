@@ -431,10 +431,10 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 }
 
 void Network::do_player_skill(GameRoom* gr, Client* cl) {
-	
+
 
 	bool attack_flag = false;
-	switch (cl->skill->SkillType-1)
+	switch (cl->skill->SkillType - 1)
 	{
 	case WATERGUN:
 		attack_flag = true;
@@ -447,7 +447,7 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 		gr->boss_id->hp -= 10; // cl->skill->Damage;
 		break;
 	case HEAL:
-		
+
 		break;
 	default:
 		std::cout << "wrong skill type\n";
@@ -542,7 +542,6 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_MOVE:
 	{
 		if (false == cl.is_active) break;
-		std::cout << "player move\n";
 
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 		cl.last_move_time = packet->move_time;
@@ -553,6 +552,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		int cur_map = 0;
 		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
+		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
