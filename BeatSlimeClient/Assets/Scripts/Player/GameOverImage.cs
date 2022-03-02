@@ -15,6 +15,10 @@ public class GameOverImage : MonoBehaviour
     public Text t;
     public GameObject Center;
 
+    public Text bt;
+    public Text M;
+    public Text ts;
+
 
     void Start()
     {
@@ -28,11 +32,13 @@ public class GameOverImage : MonoBehaviour
         if (gameEnder == GameEndTraits.Lose)
         {
             t.text = "Game Over";
+            M.text = "F";
             Center.SetActive(true);
         }
         else if (gameEnder == GameEndTraits.Win)
         {
             t.text = "Game Clear!";
+            M.text = "A";
             Center.SetActive(true);
         }
     }
@@ -40,5 +46,12 @@ public class GameOverImage : MonoBehaviour
     public void SetGameEnd(GameEndTraits end)
     {
         gameEnder = end;
+
+    }
+    public void SetResultData(int perfect, int great, int miss, int attack, int damaged, int score)
+    {
+        bt.text = perfect + "\n" + great + "\n" + miss + "\n\n" + attack + "\n" + damaged;
+        ts.text = score.ToString();
+
     }
 }
