@@ -557,33 +557,35 @@ void Network::process_packet(int client_id, unsigned char* p)
 		switch (packet->direction) {
 		case DIR::LEFTUP:
 			if (maps[cur_map]->GetTileType(x - 1, z + 1) != 0) {
-				x--; z++;
+				//break;
 			}
+			x--; z++;
 			break;
 		case DIR::UP:
 			if (maps[cur_map]->GetTileType(x, z + 1) != 0) {
-				y--; z++;
+				//break;
 			}
+				y--; z++;
 			break;
 		case DIR::RIGHTUP:
 			if (maps[cur_map]->GetTileType(x + 1, z) != 0) {
-				x++; y--;
 			}
+				x++; y--;
 			break;
 		case DIR::LEFTDOWN:
 			if (maps[cur_map]->GetTileType(x - 1, z) != 0) {
-				x--; y++;
 			}
+				x--; y++;
 			break;
 		case DIR::DOWN:
 			if (maps[cur_map]->GetTileType(x, z - 1) != 0) {
-				y++; z--;
 			}
+				y++; z--;
 			break;
 		case DIR::RIGHTDOWN:
 			if (maps[cur_map]->GetTileType(x + 1, z - 1) != 0) {
-				x++; z--;
 			}
+				x++; z--;
 			break;
 		default:
 			std::cout << "Invalid move in client " << client_id << std::endl;
