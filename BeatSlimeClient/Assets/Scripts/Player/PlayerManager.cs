@@ -113,8 +113,9 @@ public class PlayerManager : MonoBehaviour
             }
             PlayerRotateToLookAt();
             PlayerWCheck();
-            CalcHPSlider();
+
         }
+        CalcHPSlider();
     }
 
     public void PlayerWCheck()
