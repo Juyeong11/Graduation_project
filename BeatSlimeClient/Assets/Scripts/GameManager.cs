@@ -55,6 +55,7 @@ public class GameManager : MonoBehaviour
     int HPGMStaticInt = 1;
 
     public GameOverImage gameOverImage;
+    public ResultsData resultsData;
 
     //
     GameObject[] Objects = new GameObject[4];
@@ -74,6 +75,7 @@ public class GameManager : MonoBehaviour
         loader.Match(grid);
         loader.LoadMap();
 
+        resultsData = new ResultsData();
         nowBeat = new Beat();
 
         bpm = SoundManager.instance.GetBGMBpm(SongName);
@@ -271,14 +273,22 @@ public class GameManager : MonoBehaviour
                                 //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                                 //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
+                                if (target_id == myPlayerID)
+                                    resultsData.damaged += (hm.CurrentHP - p.hp);
 
                                 hm.Damage(hm.CurrentHP - p.hp);
+
+                                
                             }
                             else
                             {
                                 //Objects[ServerID_To_ClientID(p.id)].GetComponentInChildren<PlayerManager>().AttackTrig();
                                 HPManager hm = Objects[target_id].GetComponentInChildren<EnemyManager>().HP;
+                                resultsData.attack += (hm.CurrentHP - p.hp);
+                                
                                 hm.Damage(hm.CurrentHP - p.hp);
+
+                                
                                 //Objects[target_id].GetComponentInChildren<EnemyManager>().StunTrig();
                             }
 
@@ -441,12 +451,21 @@ public class GameManager : MonoBehaviour
                             if (p.end_type == 0)
                             {
                                 gameOverImage.SetGameEnd(GameEndTraits.Lose);
+                                gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack,resultsData.damaged,0);
+                                Debug.Log("Game_Over");
                             }
                             else if (p.end_type == 1)
                             {
                                 gameOverImage.SetGameEnd(GameEndTraits.Win);
+                                gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack,resultsData.damaged,
+                                                            resultsData.perfect*1000 + resultsData.great*500 - resultsData.miss*50 + resultsData.attack*100 - resultsData.damaged*20);
+                                Debug.Log("Game_Clear");
                             }
-                            Debug.Log("Game_Over");
+                            else
+                            {
+                                Debug.Log("Game_Error");
+                            }
+                            
                             
                         }
                         break;
@@ -507,6 +526,10 @@ public class GameManager : MonoBehaviour
             if (beatCounter <= JudgementTiming)
             {
                 MidNote.notePerfect();
+                if (beatCounter <= JudgementTiming/2f)
+                    resultsData.perfect++;
+                else
+                    resultsData.great++;
 
                 //DEBUG : �и� ��Ʈ���� �Ʒ� �ڵ带
                 //MidANote.notePerfect();
@@ -515,12 +538,19 @@ public class GameManager : MonoBehaviour
             else if (timeByBeat - beatCounter <= JudgementTiming)
             {
                 MidNote.notePerfect();
+
+                if (beatCounter <= JudgementTiming/2f)
+                    resultsData.perfect++;
+                else
+                    resultsData.great++;
+
                 return 1;   //�ʰ� ����
             }
             else
             {
                 //MidNote.noteEnd();
                 Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
+                resultsData.miss++;
                 return 0;   //�߸� ����
             }
         }
