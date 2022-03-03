@@ -54,7 +54,7 @@ Network::Network() {
 		maps[i] = new MapInfo;
 	}
 
-	maps[FIELD_MAP]->SetMap("Map\\Field_Map", "Music\\flower_load.csv");
+	maps[FIELD_MAP]->SetMap("Map\\Field", "Music\\flower_load.csv");
 	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
@@ -557,35 +557,39 @@ void Network::process_packet(int client_id, unsigned char* p)
 		switch (packet->direction) {
 		case DIR::LEFTUP:
 			if (maps[cur_map]->GetTileType(x - 1, z + 1) != 0) {
-				//break;
+				break;
 			}
 			x--; z++;
 			break;
 		case DIR::UP:
 			if (maps[cur_map]->GetTileType(x, z + 1) != 0) {
-				//break;
+				break;
 			}
-				y--; z++;
+			y--; z++;
 			break;
 		case DIR::RIGHTUP:
 			if (maps[cur_map]->GetTileType(x + 1, z) != 0) {
+				break;
 			}
-				x++; y--;
+			x++; y--;
 			break;
 		case DIR::LEFTDOWN:
 			if (maps[cur_map]->GetTileType(x - 1, z) != 0) {
+				break;
 			}
-				x--; y++;
+			x--; y++;
 			break;
 		case DIR::DOWN:
 			if (maps[cur_map]->GetTileType(x, z - 1) != 0) {
+				break;
 			}
-				y++; z--;
+			y++; z--;
 			break;
 		case DIR::RIGHTDOWN:
 			if (maps[cur_map]->GetTileType(x + 1, z - 1) != 0) {
+				break;
 			}
-				x++; z--;
+			x++; z--;
 			break;
 		default:
 			std::cout << "Invalid move in client " << client_id << std::endl;

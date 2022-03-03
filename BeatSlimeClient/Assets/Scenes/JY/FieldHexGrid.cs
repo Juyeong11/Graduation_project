@@ -29,12 +29,12 @@ public class FieldHexGrid : MonoBehaviour
         // LintJson 넣고 Json에서 읽어올 예정
 
         cellMaps = new CellMap();
-        xMaxLength = 3;
-        yMaxLength = 3;
-        zMaxLength = 3;
-        xMinLength = -3;
-        yMinLength = -3;
-        zMinLength = -3;
+        xMaxLength = 10;
+        yMaxLength = 10;
+        zMaxLength = 10;
+        xMinLength = -10;
+        yMinLength = -10;
+        zMinLength = -10;
     }
 
     public void Beat()
