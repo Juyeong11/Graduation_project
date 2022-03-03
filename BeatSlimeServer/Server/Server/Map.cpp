@@ -15,26 +15,27 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 
 
-	map = new int[(LengthX + 1) * LengthZ];
+	map = new int[(LengthX ) * LengthZ];
 
-	in.read(reinterpret_cast<char*>(map), (LengthX + 1) * LengthZ * sizeof(int));
+	in.read(reinterpret_cast<char*>(map), (LengthX ) * LengthZ * sizeof(int));
 
-	/*
+	
 	// ¸Ê È®ÀÎ¿ë
 	std::cout << LengthX << std::endl;
 	std::cout << LengthZ << std::endl;
 	std::cout << offsetX << std::endl;
 	std::cout << offsetZ << std::endl;
-	for (int i = 0; i < LengthX* LengthZ; ++i) {
+	std::cout << " ";
+	for (int i = 1; i <= LengthX* LengthZ ; ++i) {
 
-		std::cout<<std::setw(2) << map[i];
-		if (i % LengthZ == 0) {
+		std::cout<<std::setw(2) << map[i-1];
+		if (i % (LengthX) == 0) {
 			std::cout << std::endl ;
-			for (int j = 0; j < i / LengthZ; ++j)
+			for (int j = 0; j <= i / (LengthX); ++j)
 				std::cout << " " ;
 		}
 	}
-	*/
+	
 
 	std::ifstream in_m{ music_name, std::ios::binary };
 	if (!in_m) return;
@@ -176,13 +177,14 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 int MapInfo::GetTileType(int x, int z)
 {
-	int _x = x + offsetX;
-	int _z = z + offsetZ;
+	int _x = x - offsetX;
+	int _z = z - offsetZ;
 
+	std::cout << "x : " << _x << " z : " << _z << std::endl;
 	if (_x > LengthX || _x < 0) return -1;
 	if (_z > LengthZ || _z < 0) return -1;
 
-	return map[_x * LengthX + _z];
+	return map[_z * LengthX + _x];
 }
 
 GameRoom::GameRoom() :bpm(0) {

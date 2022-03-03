@@ -132,13 +132,13 @@ public class CSVMapper : MonoBehaviour
                         if (maxX < x) maxX = x;
                         if (maxZ < z) maxZ = z;
                     }
-                    int LengthX = maxX - minX;
-                    int LengthZ = maxZ - minZ;
+                    int LengthX = maxX - minX +4;
+                    int LengthZ = maxZ - minZ +4;
                         Debug.Log("maxX : " + maxX + " maxZ : " + maxZ);
                         Debug.Log("minX : " + minX + " minZ : " + minZ);
                         Debug.Log(LengthZ* LengthX);
 
-                    int[] data = Enumerable.Repeat<int>(-1, (LengthX + 1)* LengthZ).ToArray<int>(); 
+                    int[] data = Enumerable.Repeat<int>(-1, (LengthX)* LengthZ).ToArray<int>(); 
                     
                 
                     for (int i = 0; i < MM.Mapdata.Count; ++i)
@@ -153,8 +153,8 @@ public class CSVMapper : MonoBehaviour
                         Debug.Log("x : " + x + "z : " + z);
                         Debug.Log("p : " + (x * LengthZ + z));
                         
-                        if(data[x * LengthZ + z] == 0 || data[x * LengthZ + z] == -1)
-                            data[x* LengthZ + z] = MM.Mapdata[i].type;
+                        if(data[z * LengthX + x] == 0 || data[z * LengthX + x] == -1)
+                            data[z* LengthX + x] = MM.Mapdata[i].type;
                     }
                     // 평행이동 한 값, 총 개수..좌표들
                     //Debug.Log(min);
