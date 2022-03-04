@@ -173,6 +173,9 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			speed,
 			px,py,pz);
 	}
+
+	std::sort(pattern_time.begin(), pattern_time.end());
+
 }
 
 int MapInfo::GetTileType(int x, int z)
@@ -218,6 +221,7 @@ void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject
 	isGaming = true;
 
 	boss_id = Boss;
+	pattern_progress = 0;
 	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
 	player_ids[0] = Players[0];
 	player_ids[1] = Players[1];
@@ -229,6 +233,7 @@ int GameRoom::find_max_hp_player() const
 	int maxhp = 0;
 	int ret = 0;
 	for (const auto pl : player_ids) {
+		if (pl == nullptr) continue;
 		if (pl->hp > maxhp) {
 			maxhp = pl->hp;
 			ret = pl->id;
@@ -236,11 +241,21 @@ int GameRoom::find_max_hp_player() const
 	}
 	return ret;
 }
+int GameRoom::find_online_player() const
+{
+	for (const auto pl : player_ids) {
+		if (pl == nullptr) continue;
+		return pl->id;
+	}
+	return -1;
+}
 
 int GameRoom::find_min_hp_player() const {
 	int minhp = 0xfffff;
 	int ret = 0;
 	for (const auto pl : player_ids) {
+		if (pl == nullptr) continue;
+
 		if (pl->hp < minhp) {
 			minhp = pl->hp;
 			ret = pl->id;
@@ -254,6 +269,8 @@ int GameRoom::find_max_distance_player() const {
 	int ret_id;
 	
 	for (const auto pl : player_ids) {
+		if (pl == nullptr) continue;
+
 		distance = abs(boss_id->x - pl->x) + abs(boss_id->z - pl->z);
 		if (distance > max_distance) {
 			max_distance = distance;
