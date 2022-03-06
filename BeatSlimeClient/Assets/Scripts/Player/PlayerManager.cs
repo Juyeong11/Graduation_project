@@ -219,7 +219,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha0))
             {
-                HP.CurrentHP -= 45;
+                CineCameraShake.instance.ShakeCamera(25);
             }
             if (Input.GetKeyDown(KeyCode.Alpha9))
             {

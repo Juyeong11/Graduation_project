@@ -274,7 +274,11 @@ public class GameManager : MonoBehaviour
 
                                 //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
                                 if (target_id == myPlayerID)
+                                {
                                     resultsData.damaged += (hm.CurrentHP - p.hp);
+                                    
+                                    CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
+                                }
 
                                 hm.Damage(hm.CurrentHP - p.hp);
 
