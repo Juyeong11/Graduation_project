@@ -28,6 +28,7 @@ public class FieldPlayerManager : MonoBehaviour
         selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
         isFly = true;
+
     }
     public void LoginOk()
     {

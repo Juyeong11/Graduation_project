@@ -173,6 +173,9 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			speed,
 			px,py,pz);
 	}
+
+	std::sort(pattern_time.begin(), pattern_time.end());
+
 }
 
 int MapInfo::GetTileType(int x, int z)
@@ -210,7 +213,7 @@ int GameRoom::FindPlayer(int id) const
 }
 
 
-void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER])
+void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER],Portal* p)
 {
 	map_type = mapType;
 	bpm = BPM;
@@ -218,10 +221,13 @@ void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject
 	isGaming = true;
 
 	boss_id = Boss;
+	pattern_progress = 0;
 	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
 	player_ids[0] = Players[0];
 	player_ids[1] = Players[1];
 	player_ids[2] = Players[2];
+
+	portal = p;
 }
 
 int GameRoom::find_max_hp_player() const
@@ -229,6 +235,7 @@ int GameRoom::find_max_hp_player() const
 	int maxhp = 0;
 	int ret = 0;
 	for (const auto pl : player_ids) {
+		if (pl == nullptr) continue;
 		if (pl->hp > maxhp) {
 			maxhp = pl->hp;
 			ret = pl->id;
@@ -236,11 +243,21 @@ int GameRoom::find_max_hp_player() const
 	}
 	return ret;
 }
+int GameRoom::find_online_player() const
+{
+	for (const auto pl : player_ids) {
+		if (pl == nullptr) continue;
+		return pl->id;
+	}
+	return -1;
+}
 
 int GameRoom::find_min_hp_player() const {
 	int minhp = 0xfffff;
 	int ret = 0;
 	for (const auto pl : player_ids) {
+		if (pl == nullptr) continue;
+
 		if (pl->hp < minhp) {
 			minhp = pl->hp;
 			ret = pl->id;
@@ -254,6 +271,8 @@ int GameRoom::find_max_distance_player() const {
 	int ret_id;
 	
 	for (const auto pl : player_ids) {
+		if (pl == nullptr) continue;
+
 		distance = abs(boss_id->x - pl->x) + abs(boss_id->z - pl->z);
 		if (distance > max_distance) {
 			max_distance = distance;
@@ -261,4 +280,27 @@ int GameRoom::find_max_distance_player() const {
 		};
 	}
 	return ret_id;
+}
+
+void GameRoom::game_end()
+{
+	isGaming = false;
+	map_type = -1;
+	ready_player_cnt = 0;
+	game_room_id = -1;
+
+	boss_id = nullptr;
+	pattern_progress = -1;
+	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
+
+	for (auto p : player_ids) {
+		p->x = portal->x;
+		p->y = portal->y;
+		p->z = portal->z;
+		reinterpret_cast<Client*>(p)->cur_room_num = -1;
+	}
+	portal = nullptr;
+	player_ids[0] = nullptr;
+	player_ids[1] = nullptr;
+	player_ids[2] = nullptr;
 }

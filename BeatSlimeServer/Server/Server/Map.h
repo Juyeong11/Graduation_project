@@ -13,6 +13,9 @@ struct PatternInfo {
 		:type(Type), pivotType(PivotType), time(Time), dir(Dir), speed(Speed), x(px), y(py), z(pz)
 	{}
 
+	bool operator <(const PatternInfo& rhs) const {
+		return time < rhs.time;
+	}
 	static constexpr int HexCellAround[6][3] = {
 	{0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
 	{ 0, 1, -1 },{ -1, 1, 0 }, { -1, 0, 1 }
@@ -81,37 +84,7 @@ public:
 };
 
 class GameObject;
-class GameRoom
-{
-public:
-	int game_room_id;
-	int map_type;
-	float bpm;
-	std::chrono::system_clock::time_point start_time{};
-	// atomic으로는 동시에 게임 시작하는걸 막을 수가 없을 듯
-	std::mutex state_lock;
-	bool isGaming;
 
-	GameObject* player_ids[MAX_IN_GAME_PLAYER];
-	GameObject* boss_id;
-
-	std::mutex ready_lock;
-	int ready_player_cnt;
-	//std::mutex id_insert_lock;
-
-	GameRoom();
-	GameRoom(int id);
-
-	void GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER]);
-	int FindPlayer(int id) const;
-
-	int find_max_hp_player() const;
-	int find_min_hp_player() const;
-	int find_max_distance_player() const;
-
-
-	void game_start() const;
-};
 
 class Portal
 {
@@ -144,4 +117,40 @@ public:
 		id_lock.unlock();
 		return false;
 	}
+};
+
+class GameRoom
+{
+public:
+	int game_room_id;
+	int map_type;
+	float bpm;
+	std::chrono::system_clock::time_point start_time{};
+	// atomic으로는 동시에 MAX_IN_GAME_PLAYER명이서 같은 게임 룸에서 게임 시작하는걸 막을 수가 없을 듯
+	std::mutex state_lock;
+	bool isGaming;
+	std::atomic_int pattern_progress;
+
+	GameObject* player_ids[MAX_IN_GAME_PLAYER];
+	GameObject* boss_id;
+	Portal*		portal;// 게임이 끝났을 경우 원래 포탈 위치로 돌아오기 위해
+
+	std::mutex ready_lock;
+	int ready_player_cnt;
+	//std::mutex id_insert_lock;
+
+	GameRoom();
+	GameRoom(int id);
+
+	void GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER],Portal* p);
+	int FindPlayer(int id) const;
+
+	int find_online_player() const;
+
+	int find_max_hp_player() const;
+	int find_min_hp_player() const;
+	int find_max_distance_player() const;
+
+
+	void game_end();
 };

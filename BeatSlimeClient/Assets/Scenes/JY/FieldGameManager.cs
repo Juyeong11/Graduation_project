@@ -22,7 +22,7 @@ public class FieldGameManager : MonoBehaviour
     public static Network Net = new Network();
     static GameObject[] Objects = new GameObject[Protocol.CONSTANTS.MAX_OBJECT];
 
-    int myPlayerID = -1;
+    static int myPlayerID = -1;
     public ArrayList Mapdata = new ArrayList();
 
     void Awake()
@@ -30,6 +30,12 @@ public class FieldGameManager : MonoBehaviour
         print("Start");
         data = this;
         isGameStart = false;
+
+        Net.SendChangeSceneDonePacket(0);
+        if(myPlayerID != -1)
+        {
+            Objects[myPlayerID] = player;
+        }
     }
     private void OnApplicationQuit()
     {
