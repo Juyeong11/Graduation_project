@@ -213,7 +213,7 @@ int GameRoom::FindPlayer(int id) const
 }
 
 
-void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER])
+void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER],Portal* p)
 {
 	map_type = mapType;
 	bpm = BPM;
@@ -226,6 +226,8 @@ void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject
 	player_ids[0] = Players[0];
 	player_ids[1] = Players[1];
 	player_ids[2] = Players[2];
+
+	portal = p;
 }
 
 int GameRoom::find_max_hp_player() const
@@ -278,4 +280,27 @@ int GameRoom::find_max_distance_player() const {
 		};
 	}
 	return ret_id;
+}
+
+void GameRoom::game_end()
+{
+	isGaming = false;
+	map_type = -1;
+	ready_player_cnt = 0;
+	game_room_id = -1;
+
+	boss_id = nullptr;
+	pattern_progress = -1;
+	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
+
+	for (auto p : player_ids) {
+		p->x = portal->x;
+		p->y = portal->y;
+		p->z = portal->z;
+		reinterpret_cast<Client*>(p)->cur_room_num = -1;
+	}
+	portal = nullptr;
+	player_ids[0] = nullptr;
+	player_ids[1] = nullptr;
+	player_ids[2] = nullptr;
 }

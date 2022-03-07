@@ -136,6 +136,7 @@ namespace Protocol
     {
         public byte size;
         public byte type;
+        public byte scene_num;
     }
 
     [Serializable]

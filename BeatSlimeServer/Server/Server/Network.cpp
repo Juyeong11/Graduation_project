@@ -442,8 +442,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 					send_game_end(p->id, GAME_OVER);
 					reinterpret_cast<Client*>(p)->is_active = true;
 				}
-				game_room[game_room_id]->pattern_progress = -1;
-				game_room[game_room_id]->isGaming = false;
+				game_room[game_room_id]->game_end();
 			}
 		}
 
@@ -516,51 +515,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//cl.y = -cl.z - cl.x;
 
 
-		//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
-		for (int i = 0; i < MAX_USER; ++i)
-		{
-			Client* other = reinterpret_cast<Client*>(clients[i]);
-			if (i == client_id) continue;
-			other->state_lock.lock();
-			if (ST_INGAME != other->state) {
-				other->state_lock.unlock();
-				continue;
-			}
-			other->state_lock.unlock();
-
-			if (false == is_near(other->id, client_id))
-				continue;
-
-			// 새로 들어온 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
-			other->vl.lock();
-			other->viewlist.insert(client_id);
-			other->vl.unlock();
-
-			send_put_object(other->id, client_id);
-		}
-
-		//새로 접속한 클라이언트에게 현재 객체들의 현황을 알려줌
-		for (auto* other : clients) {
-			//여기서 NPC도 알려줘야지
-
-			if (other->id == client_id) continue;
-			other->state_lock.lock();
-			if (ST_INGAME != other->state) {
-				other->state_lock.unlock();
-				continue;
-			}
-			other->state_lock.unlock();
-
-			if (false == is_near(other->id, client_id))
-				continue;
-
-			// 기존에 있던 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
-			cl.vl.lock();
-			cl.viewlist.insert(other->id);
-			cl.vl.unlock();
-
-			send_put_object(client_id, other->id);
-		}
+		
 	}
 	break;
 	case CS_PACKET_MOVE:
@@ -829,7 +784,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					// 포탈에서 GameRoom으로 이동
 					int room_id = get_game_room_id();
 					int boss_id = get_npc_id(p->map_type);
-					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players);
+					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players,p);
 					//std::cout << "시작" << std::endl;
 					p->player_ids.clear();
 					p->ready_player_cnt = 0;
@@ -853,13 +808,74 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_CHANGE_SCENE_DONE:
 	{
 		cs_packet_change_scene_done* packet = reinterpret_cast<cs_packet_change_scene_done*>(p);
-		for (auto* gr : game_room) {
-			if (false == gr->isGaming) continue;
-			if (-1 == gr->FindPlayer(client_id)) continue;
+		switch (packet->scene_num)// 1 == in game map num
+		{
+		case FIELD_MAP:
+		{
+			// login OK 에서 했던 로직을 가져오자
+			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
+			for (int i = 0; i < MAX_USER; ++i)
+			{
+				Client* other = reinterpret_cast<Client*>(clients[i]);
+				if (i == client_id) continue;
+				other->state_lock.lock();
+				if (ST_INGAME != other->state) {
+					other->state_lock.unlock();
+					continue;
+				}
+				other->state_lock.unlock();
 
-			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
+				if (false == is_near(other->id, client_id))
+					continue;
+
+				// 새로 들어온 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
+				other->vl.lock();
+				other->viewlist.insert(client_id);
+				other->vl.unlock();
+
+				send_put_object(other->id, client_id);
+			}
+
+			//새로 접속한 클라이언트에게 현재 객체들의 현황을 알려줌
+			for (auto* other : clients) {
+				//여기서 NPC도 알려줘야지
+
+				if (other->id == client_id) continue;
+				other->state_lock.lock();
+				if (ST_INGAME != other->state) {
+					other->state_lock.unlock();
+					continue;
+				}
+				other->state_lock.unlock();
+
+				if (false == is_near(other->id, client_id))
+					continue;
+
+				// 기존에 있던 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
+				cl.vl.lock();
+				cl.viewlist.insert(other->id);
+				cl.vl.unlock();
+
+				send_put_object(client_id, other->id);
+			}
+			send_move_object(client_id, client_id);
+		}
+		break;
+		case WITCH_MAP:
+		{
+			for (auto* gr : game_room) {
+				if (false == gr->isGaming) continue;
+				if (-1 == gr->FindPlayer(client_id)) continue;
+
+				send_game_init(client_id, gr->player_ids, gr->boss_id->id);
+				break;
+			}
+		}
+			break;
+		default:
 			break;
 		}
+
 
 	}
 	break;
@@ -1305,7 +1321,7 @@ void Network::worker()
 				pos_x = pivot_x;
 				pos_y = pivot_y;
 				pos_z = pivot_z;
-				break; 
+				break;
 			case Boss:
 				target_id = game_room[game_room_id]->boss_id->id;
 				pos_x = clients[target_id]->x + pivot_x;
@@ -1469,7 +1485,7 @@ void Network::worker()
 			//for (const auto p : game_room[game_room_id]->player_ids)
 			//	send_change_scene(p->id, FIELD_MAP);
 
-			game_room[game_room_id]->isGaming = false;
+			game_room[game_room_id]->game_end();
 
 
 

@@ -67,6 +67,7 @@ struct cs_packet_change_scene_ready {
 struct cs_packet_change_scene_done {
 	unsigned char size;
 	char	type;
+	char	scene_num;
 };
 
 struct cs_packet_game_start_ready {
