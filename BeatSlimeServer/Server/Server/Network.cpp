@@ -281,8 +281,6 @@ void Network::send_game_end(int c_id, char end_type)
 	packet.end_type = end_type;
 
 
-	//packet.move_time = clients[mover]->last_move_time;
-
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
@@ -442,8 +440,10 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 				for (const auto& p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 					send_game_end(p->id, GAME_OVER);
+					reinterpret_cast<Client*>(p)->is_active = true;
 				}
 				game_room[game_room_id]->pattern_progress = -1;
+				game_room[game_room_id]->isGaming = false;
 			}
 		}
 
@@ -856,7 +856,6 @@ void Network::process_packet(int client_id, unsigned char* p)
 		for (auto* gr : game_room) {
 			if (false == gr->isGaming) continue;
 			if (-1 == gr->FindPlayer(client_id)) continue;
-
 
 			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
 			break;
@@ -1450,7 +1449,7 @@ void Network::worker()
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
 			do_npc_tile_attack(game_room_id, pos_x, pos_y, pos_z);
 			// 맞았을 때 처리
-			set_next_pattern(game_room_id);
+
 			exp_over_pool.push(exp_over);
 		}
 		break;
@@ -1464,6 +1463,8 @@ void Network::worker()
 			for (const auto p : game_room[game_room_id]->player_ids) {
 				if (p == nullptr) continue;
 				send_game_end(p->id, GAME_CLEAR);
+				reinterpret_cast<Client*>(p)->is_active = true;
+
 			}
 			//for (const auto p : game_room[game_room_id]->player_ids)
 			//	send_change_scene(p->id, FIELD_MAP);
