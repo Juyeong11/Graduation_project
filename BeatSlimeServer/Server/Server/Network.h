@@ -143,7 +143,6 @@ public:
 					while (!exp_over_pool.try_pop(ex_over));
 					switch (ev.ev)
 					{
-
 					case EVENT_BOSS_MOVE:
 						ex_over->_comp_op = OP_BOSS_MOVE;
 						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.x;
@@ -215,7 +214,8 @@ public:
 
 	void game_start(int room_id);
 
-	int cal_map_end_cur_direction(int game_room_id) const;
+	void set_next_pattern(int room_id);
+
 	void check_game_over(int game_room_id, int dead_charactor_id) {
 		// 게임 오버 패킷을 보내고
 

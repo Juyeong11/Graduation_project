@@ -281,8 +281,6 @@ void Network::send_game_end(int c_id, char end_type)
 	packet.end_type = end_type;
 
 
-	//packet.move_time = clients[mover]->last_move_time;
-
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
@@ -325,6 +323,19 @@ void Network::disconnect_client(int c_id)
 		}
 		else target.vl.unlock();
 	}
+	if (client.cur_room_num != -1) {
+		for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
+			if (clients[c_id] == game_room[client.cur_room_num]->player_ids[i]) {
+				game_room[client.cur_room_num]->player_ids[i] = nullptr;
+			}
+		}
+		bool isDone = true;
+		for (auto p : game_room[client.cur_room_num]->player_ids) {
+			if (p != nullptr) isDone = false;
+		}
+		if (isDone)game_room[client.cur_room_num]->pattern_progress = -1;
+	}
+
 	clients[c_id]->state_lock.lock();
 	closesocket(reinterpret_cast<Client*>(clients[c_id])->socket);
 	clients[c_id]->state = ST_FREE;
@@ -403,16 +414,20 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
 	const int damage = 5;
 	for (const auto& pl : game_room[game_room_id]->player_ids) {
+		if (pl == nullptr) continue;
 		if (false == is_attack(pl->id, x, z)) continue;
 		pl->hp -= damage;
-		for (const auto& p : game_room[game_room_id]->player_ids)
+		for (const auto& p : game_room[game_room_id]->player_ids) {
+			if (p == nullptr) continue;
 			send_attack_player(game_room[game_room_id]->boss_id->id, pl->id, p->id);
+		}
 
 		if (pl->hp < 0) {
 			// 게임 끝
 			reinterpret_cast<Client*>(pl)->is_active = false;
 			bool is_game_end = true;
 			for (const auto& p : game_room[game_room_id]->player_ids) {
+				if (p == nullptr) continue;
 				if (p->hp > 0) is_game_end = false;
 			}
 
@@ -422,12 +437,20 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 				//게임이 끝난 게임룸의 이벤트는 모두 제거해야됨
 				//이미 들어간건 찾을 수 없는데 
 				//한번에 다 넣지 말고 한 패턴 끝나면 넣고 이런식으로 해야되나 -> 고려해볼만 하구만
-				for (const auto& p : game_room[game_room_id]->player_ids)
+				for (const auto& p : game_room[game_room_id]->player_ids) {
+					if (p == nullptr) continue;
 					send_game_end(p->id, GAME_OVER);
+					reinterpret_cast<Client*>(p)->is_active = true;
+				}
+				game_room[game_room_id]->pattern_progress = -1;
+				game_room[game_room_id]->isGaming = false;
 			}
 		}
 
 	}
+
+
+
 }
 
 void Network::do_player_skill(GameRoom* gr, Client* cl) {
@@ -465,6 +488,7 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 		timer_queue.push(std::move(tev));
 	}
 	for (const auto pl : gr->player_ids) {
+		if (pl == nullptr) continue;
 		send_attack_player(cl->id, gr->boss_id->id, pl->id);
 	}
 }
@@ -833,7 +857,6 @@ void Network::process_packet(int client_id, unsigned char* p)
 			if (false == gr->isGaming) continue;
 			if (-1 == gr->FindPlayer(client_id)) continue;
 
-
 			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
 			break;
 		}
@@ -858,7 +881,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				}
 				gr->start_time = std::chrono::system_clock::now();
 				game_start(gr->game_room_id);
-				std::cout << "게임 시작\n";
+				std::cout << "Game Start\n";
 
 			}
 			gr->ready_lock.unlock();
@@ -900,12 +923,14 @@ void Network::process_packet(int client_id, unsigned char* p)
 						timer_queue.push(std::move(tev));
 					}
 					for (const auto pl : gr->player_ids) {
+						if (pl == nullptr) continue;
 						send_parrying(pl->id, client_id);
 					}
 					break;
 				}
 				else {
 					//패링 실패
+					//플레이어 어택 패킷 보내고 다 죽었는지 확인하고
 					break;
 				}
 
@@ -954,6 +979,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		* 이펙트 딜레이를 계산해야 되는데 그러면 내가 플레이 중인 맵에 노래에 맞춰서 딜레이를 보여야 함
 		*/
 		for (const auto& pl : gr->player_ids) {
+			if (pl == nullptr) continue;
 			const Skill* plskill = reinterpret_cast<Client*>(pl)->skill;
 			send_effect(pl->id, client_id, gr->boss_id->id, 55, 1000, cl->direction, cl->skill->SkillLevel, cl->skill->SkillType, -1);
 		}
@@ -1094,7 +1120,7 @@ void Network::worker()
 			// exp_over 재활용
 			ZeroMemory(&exp_over->_wsa_over, sizeof(exp_over->_wsa_over));
 			c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-			//char* 버퍼를 socket*로 바꿔 소켓을 가르킬 수 있도록 한다. 소켓도 포인터인디?
+
 			*(reinterpret_cast<SOCKET*>(exp_over->_net_buf)) = c_socket;
 
 			AcceptEx(g_s_socket, c_socket, exp_over->_net_buf + sizeof(SOCKET), 0, sizeof(SOCKADDR_IN) + 16,
@@ -1139,19 +1165,30 @@ void Network::worker()
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player1:
-				target_id = game_room[game_room_id]->player_ids[0]->id;
+				if (game_room[game_room_id]->player_ids[0] == nullptr)
+					target_id = game_room[game_room_id]->find_online_player();
+				else
+					target_id = game_room[game_room_id]->player_ids[0]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player2:
-				target_id = game_room[game_room_id]->player_ids[1]->id;
+				if (game_room[game_room_id]->player_ids[1] == nullptr)
+					target_id = game_room[game_room_id]->find_online_player();
+
+				else
+					target_id = game_room[game_room_id]->player_ids[1]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player3:
-				target_id = game_room[game_room_id]->player_ids[2]->id;
+				if (game_room[game_room_id]->player_ids[2] == nullptr)
+					target_id = game_room[game_room_id]->find_online_player();
+
+				else
+					target_id = game_room[game_room_id]->player_ids[2]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
@@ -1170,9 +1207,10 @@ void Network::worker()
 			cl.z = z + pivot_z;
 			cl.direction = rand() % 6;
 			for (const auto pl : game_room[game_room_id]->player_ids) {
-
+				if (pl == nullptr) continue;
 				send_move_object(pl->id, client_id);
 			}
+			set_next_pattern(game_room_id);
 			exp_over_pool.push(exp_over);
 		}
 		break;
@@ -1197,21 +1235,37 @@ void Network::worker()
 
 				break;
 			case Player1:
-				target_id = game_room[game_room_id]->player_ids[0]->id;
+				if (game_room[game_room_id]->player_ids[0] == nullptr)
+					target_id = game_room[game_room_id]->find_online_player();
+
+				else
+					target_id = game_room[game_room_id]->player_ids[0]->id;
+
 
 				break;
 			case Player2:
-				target_id = game_room[game_room_id]->player_ids[1]->id;
+				if (game_room[game_room_id]->player_ids[1] == nullptr)
+					target_id = game_room[game_room_id]->find_online_player();
+
+				else
+					target_id = game_room[game_room_id]->player_ids[1]->id;
 
 				break;
 			case Player3:
-				target_id = game_room[game_room_id]->player_ids[2]->id;
+				if (game_room[game_room_id]->player_ids[2] == nullptr)
+					target_id = game_room[game_room_id]->find_online_player();
+
+				else
+					target_id = game_room[game_room_id]->player_ids[2]->id;
 
 				break;
 			}
 			for (const auto pl : game_room[game_room_id]->player_ids) {
+				if (pl == nullptr) continue;
 				send_effect(pl->id, client_id, target_id, 10, charging_time, 0, 0, 0, 0);
 			}
+			set_next_pattern(game_room_id);
+
 			exp_over_pool.push(exp_over);
 		}
 		break;
@@ -1251,7 +1305,7 @@ void Network::worker()
 				pos_x = pivot_x;
 				pos_y = pivot_y;
 				pos_z = pivot_z;
-				break;
+				break; 
 			case Boss:
 				target_id = game_room[game_room_id]->boss_id->id;
 				pos_x = clients[target_id]->x + pivot_x;
@@ -1259,19 +1313,29 @@ void Network::worker()
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player1:
-				target_id = game_room[game_room_id]->player_ids[0]->id;
+				if (game_room[game_room_id]->player_ids[0] == nullptr)
+					target_id = game_room[game_room_id]->find_online_player();
+				else
+					target_id = game_room[game_room_id]->player_ids[0]->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player2:
-				target_id = game_room[game_room_id]->player_ids[1]->id;
+				if (game_room[game_room_id]->player_ids[1] == nullptr)
+					target_id = game_room[game_room_id]->find_online_player();
+
+				else
+					target_id = game_room[game_room_id]->player_ids[1]->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player3:
-				target_id = game_room[game_room_id]->player_ids[2]->id;
+				if (game_room[game_room_id]->player_ids[2] == nullptr)
+					target_id = game_room[game_room_id]->find_online_player();
+				else
+					target_id = game_room[game_room_id]->player_ids[2]->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
@@ -1369,9 +1433,11 @@ void Network::worker()
 			//해당 게임 룸에 있는 모든 오브젝트한테 보내야됨
 			// gamestart도 여러번 들어가는듯
 			for (const auto pl : game_room[game_room_id]->player_ids) {
-
+				if (pl == nullptr) continue;
 				send_effect(pl->id, client_id, target_id, pattern_type, charging_time, dir, pos_x, pos_y, pos_z);
 			}
+			set_next_pattern(game_room_id);
+
 			exp_over_pool.push(exp_over);
 		}
 		break;
@@ -1383,6 +1449,7 @@ void Network::worker()
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
 			do_npc_tile_attack(game_room_id, pos_x, pos_y, pos_z);
 			// 맞았을 때 처리
+
 			exp_over_pool.push(exp_over);
 		}
 		break;
@@ -1393,8 +1460,12 @@ void Network::worker()
 			int boss_id = game_room[game_room_id]->boss_id->id;
 			//if(clients[boss_id]->hp<10;
 			//체력에 따라 클리어 유무
-			for (const auto p : game_room[game_room_id]->player_ids)
+			for (const auto p : game_room[game_room_id]->player_ids) {
+				if (p == nullptr) continue;
 				send_game_end(p->id, GAME_CLEAR);
+				reinterpret_cast<Client*>(p)->is_active = true;
+
+			}
 			//for (const auto p : game_room[game_room_id]->player_ids)
 			//	send_change_scene(p->id, FIELD_MAP);
 
@@ -1417,6 +1488,80 @@ void Network::worker()
 		}
 	}
 }
+void Network::set_next_pattern(int room_id)
+{
+	if (game_room[room_id]->pattern_progress == -1) return;
+	const std::vector<PatternInfo>& pt = maps[game_room[room_id]->map_type]->GetPatternTime();
+	const PatternInfo& t = pt[game_room[room_id]->pattern_progress++];
+
+	int boss_id = game_room[room_id]->boss_id->id;
+
+	timer_event tev;
+
+	switch (t.type)
+	{
+	case -1:
+
+		tev.ev = EVENT_BOSS_MOVE;
+		tev.obj_id = boss_id;
+		tev.game_room_id = room_id;
+		tev.x = t.x;
+		tev.y = t.y;
+		tev.z = t.z;
+		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
+		tev.charging_time = t.speed;
+		tev.pivotType = t.pivotType;
+		timer_queue.push(tev);// 여기 move를 사용해도 될까?
+		break;
+	case 3:// 패턴 3번
+	case 4:// 패턴 4번
+	case 99:// 단일 장판 공격
+	case 5: // 가장 멀리있는 적에게 물줄기 발사
+	case 6: // 보스가 보는 방향으로 지진
+		tev.ev = EVENT_BOSS_TILE_ATTACK_START;
+		tev.obj_id = boss_id;
+		tev.type = t.type;
+		tev.x = t.x;
+		tev.y = t.y;
+		tev.z = t.z;
+		tev.game_room_id = room_id;
+		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
+		tev.charging_time = t.speed;
+		tev.pivotType = t.pivotType;
+		timer_queue.push(tev);
+		break;
+
+	case 10: // 유도 공격 -> 패링할 수 있음
+
+
+		tev.ev = EVENT_PLAYER_PARRYING;
+		tev.obj_id = boss_id;
+		tev.type = t.type;
+		tev.x = t.x;
+		tev.y = t.y;
+		tev.z = t.z;
+		tev.game_room_id = room_id;
+		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
+		tev.charging_time = t.speed;
+		tev.pivotType = t.pivotType;
+		timer_queue.push(tev);
+		break;
+	case -600:
+		tev.ev = EVENT_GAME_END;
+		tev.game_room_id = room_id;
+		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
+
+		timer_queue.push(std::move(tev));
+		break;
+	default:
+		std::cout << "잘못된 패턴 타입\n";
+		break;
+	}
+}
 
 void Network::game_start(int room_id)
 {
@@ -1427,90 +1572,80 @@ void Network::game_start(int room_id)
 
 
 	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
-
-
-
-	for (const auto& t : pt) {
-		timer_event tev;
-
-		switch (t.type)
-		{
-		case -1:
-
-			tev.ev = EVENT_BOSS_MOVE;
-			tev.obj_id = boss_id;
-			tev.game_room_id = room_id;
-			tev.x = t.x;
-			tev.y = t.y;
-			tev.z = t.z;
-			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
-			tev.charging_time = t.speed;
-			tev.pivotType = t.pivotType;
-			timer_queue.push(tev);// 여기 move를 사용해도 될까?
-			break;
-		case 3:// 패턴 3번
-		case 4:// 패턴 4번
-		case 99:// 단일 장판 공격
-		case 5: // 가장 멀리있는 적에게 물줄기 발사
-		case 6: // 보스가 보는 방향으로 지진
-			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
-			tev.obj_id = boss_id;
-			tev.type = t.type;
-			tev.x = t.x;
-			tev.y = t.y;
-			tev.z = t.z;
-			tev.game_room_id = room_id;
-			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
-			tev.charging_time = t.speed;
-			tev.pivotType = t.pivotType;
-			timer_queue.push(tev);
-			break;
-
-		case 10: // 유도 공격 -> 패링할 수 있음
-
-
-			tev.ev = EVENT_PLAYER_PARRYING;
-			tev.obj_id = boss_id;
-			tev.type = t.type;
-			tev.x = t.x;
-			tev.y = t.y;
-			tev.z = t.z;
-			tev.game_room_id = room_id;
-			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
-			tev.charging_time = t.speed;
-			tev.pivotType = t.pivotType;
-			timer_queue.push(tev);
-			break;
-		case -600:
-			tev.ev = EVENT_GAME_END;
-			tev.game_room_id = room_id;
-			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
-
-			timer_queue.push(std::move(tev));
-			break;
-		default:
-			std::cout << "잘못된 패턴 타입\n";
-			break;
-		}
-	}
-
 	//수정
 	boss->hp = 1000;
 	for (auto i : game_room[room_id]->player_ids) {
 		i->hp = 100;
 	}
-	/*
-	// 맵 중앙으로 옮기자
-	for (int i : game_room[room_id]->player_ids) {
-		clients[i]->x = maps[game_room[room_id]->map_type]->LengthX / 2;
-		clients[i]->z = maps[game_room[room_id]->map_type]->LengthZ / 2;
-		clients[i]->y = -clients[i]->z - clients[i]->x;
+	set_next_pattern(room_id);
+	{
 
-		for (int j : game_room[room_id]->player_ids)
-			send_move_object(j, i);
-	}*/
+		//for (const auto& t : pt) {
+		//	timer_event tev;
+
+		//	switch (t.type)
+		//	{
+		//	case -1:
+
+		//		tev.ev = EVENT_BOSS_MOVE;
+		//		tev.obj_id = boss_id;
+		//		tev.game_room_id = room_id;
+		//		tev.x = t.x;
+		//		tev.y = t.y;
+		//		tev.z = t.z;
+		//		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		//		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
+		//		tev.charging_time = t.speed;
+		//		tev.pivotType = t.pivotType;
+		//		timer_queue.push(tev);// 여기 move를 사용해도 될까?
+		//		break;
+		//	case 3:// 패턴 3번
+		//	case 4:// 패턴 4번
+		//	case 99:// 단일 장판 공격
+		//	case 5: // 가장 멀리있는 적에게 물줄기 발사
+		//	case 6: // 보스가 보는 방향으로 지진
+		//		tev.ev = EVENT_BOSS_TILE_ATTACK_START;
+		//		tev.obj_id = boss_id;
+		//		tev.type = t.type;
+		//		tev.x = t.x;
+		//		tev.y = t.y;
+		//		tev.z = t.z;
+		//		tev.game_room_id = room_id;
+		//		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		//		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
+		//		tev.charging_time = t.speed;
+		//		tev.pivotType = t.pivotType;
+		//		timer_queue.push(tev);
+		//		break;
+
+		//	case 10: // 유도 공격 -> 패링할 수 있음
+
+
+		//		tev.ev = EVENT_PLAYER_PARRYING;
+		//		tev.obj_id = boss_id;
+		//		tev.type = t.type;
+		//		tev.x = t.x;
+		//		tev.y = t.y;
+		//		tev.z = t.z;
+		//		tev.game_room_id = room_id;
+		//		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		//		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
+		//		tev.charging_time = t.speed;
+		//		tev.pivotType = t.pivotType;
+		//		timer_queue.push(tev);
+		//		break;
+		//	case -600:
+		//		tev.ev = EVENT_GAME_END;
+		//		tev.game_room_id = room_id;
+		//		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		//		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
+
+		//		timer_queue.push(std::move(tev));
+		//		break;
+		//	default:
+		//		std::cout << "잘못된 패턴 타입\n";
+		//		break;
+		//	}
+		//}
+	}
 }
