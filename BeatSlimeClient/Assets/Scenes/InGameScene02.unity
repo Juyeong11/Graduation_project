@@ -1415,6 +1415,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7866717380901440722, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0.000007629394
+      objectReference: {fileID: 0}
+    - target: {fileID: 7866717380901440722, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 89.99991
+      objectReference: {fileID: 0}
+    - target: {fileID: 7866717380901440722, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -1.9878466e-16
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
 --- !u!1 &438602109 stripped
@@ -4527,6 +4539,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6c23766e0d32aa4f864f8ef59fe36db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LoadByGameManagersSongName: 1
+  MapName: 
   GRID: {fileID: 422432064}
 --- !u!114 &2121429947
 MonoBehaviour:

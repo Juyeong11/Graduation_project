@@ -5,6 +5,9 @@ using UnityEngine;
 public class MapLoader : MonoBehaviour
 {
     HexGrid grid;
+    FieldHexGrid fGrid;
+    public bool LoadByGameManagersSongName;
+    public string MapName;
     public GameObject GRID;
 
     public void Match(HexGrid hg)
@@ -12,11 +15,26 @@ public class MapLoader : MonoBehaviour
         grid = hg;
     }
 
+    public void Match(FieldHexGrid fhg)
+    {
+        fGrid = fhg;
+    }
+
     public void LoadMap()
     {
+        List<Dictionary<string, object>> datas;
+        List<Dictionary<string, object>> landdatas;
 
-        List<Dictionary<string, object>> datas = CSVReader.Read("MapCSV/" + GameManager.data.SongName);
-        List<Dictionary<string, object>> landdatas = CSVReader.Read("LandCSV/" + GameManager.data.SongName);
+        if (LoadByGameManagersSongName)
+        {
+            datas = CSVReader.Read("MapCSV/" + GameManager.data.SongName);
+            landdatas = CSVReader.Read("LandCSV/" + GameManager.data.SongName);
+        }
+        else
+        {
+            datas = CSVReader.Read("MapCSV/" + MapName);
+            landdatas = CSVReader.Read("LandCSV/" + MapName);
+        }
 
         for (int i = 0; i < datas.Count; i++)
         {
@@ -36,13 +54,27 @@ public class MapLoader : MonoBehaviour
             p_tempcell.color = c;
             p_tempcell.id = MapMaker.cellId;
 
-            GameObject tmpcell = Instantiate(grid.cellType[c]);
-            tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
-            tmpcell.name = "cell" + MapMaker.cellId++;
-            tmpcell.transform.parent = GRID.transform;
-            grid.cellMaps.Add(tmpcell, x, y, z, w);
+            if (LoadByGameManagersSongName)
+            {
+                GameObject tmpcell = Instantiate(grid.cellType[c]);
+                tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
+                tmpcell.name = "cell" + MapMaker.cellId++;
+                tmpcell.transform.parent = GRID.transform;
+                grid.cellMaps.Add(tmpcell, x, y, z, w);
+            }
+            else
+            {
+                GameObject tmpcell = Instantiate(fGrid.cellType[c]);
+                tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
+                tmpcell.name = "cell" + MapMaker.cellId++;
+                tmpcell.transform.parent = GRID.transform;
+                fGrid.cellMaps.Add(tmpcell, x, y, z, w);
+            }
 
-            GameManager.data.Mapdata.Add(p_tempcell);
+            if(LoadByGameManagersSongName)
+                GameManager.data.Mapdata.Add(p_tempcell);
+            else
+                FieldGameManager.data.Mapdata.Add(p_tempcell);
         }
 
         for (int i = 0; i < landdatas.Count; i++)
@@ -72,7 +104,7 @@ public class MapLoader : MonoBehaviour
             p_templand.color = c;
             p_templand.id = MapMaker.landId;
 
-            GameObject tmpcell = Instantiate(GameManager.data.grid.LandType[c]);
+            GameObject tmpcell = Instantiate(LoadByGameManagersSongName?GameManager.data.grid.LandType[c]:FieldGameManager.data.grid.LandType[c]);
             tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or, os);
             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
             tmpcell.name = "land" + MapMaker.landId++;

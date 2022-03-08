@@ -6,6 +6,7 @@ using UnityEngine;
 public class FieldHexGrid : MonoBehaviour
 {
     public bool MakeMapWithoutMapPacket;
+    public bool TMP;
 
     private int xMaxLength;
     private int yMaxLength;
@@ -16,6 +17,7 @@ public class FieldHexGrid : MonoBehaviour
 
     //Cell 종류
     public List<GameObject> cellType;
+    public List<GameObject> LandType;
     public CellMap cellMaps;
 
     //위치
@@ -59,7 +61,7 @@ public class FieldHexGrid : MonoBehaviour
         int color = 0;
         RedZones = new List<List<HexCoordinates>>();
 
-        if (MakeMapWithoutMapPacket)
+        if (MakeMapWithoutMapPacket && !TMP)
         {
             //맵 생성
             for (int x = xMinLength; x <= xMaxLength; ++x)

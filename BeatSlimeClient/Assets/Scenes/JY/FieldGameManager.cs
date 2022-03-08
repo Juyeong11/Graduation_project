@@ -13,6 +13,8 @@ public class FieldGameManager : MonoBehaviour
     public GameObject tilemap;
     public FieldHexGrid grid;
 
+    public MapLoader loader;
+
     public SoundManager soundManager;
     public SoundEffectManager soundEffectManager;
 
@@ -31,6 +33,12 @@ public class FieldGameManager : MonoBehaviour
         data = this;
         isGameStart = false;
 
+        if (grid.TMP)
+        {
+            loader.Match(grid);
+            loader.LoadMap();
+        }
+        
         Net.SendChangeSceneDonePacket(0);
         if(myPlayerID != -1)
         {
@@ -45,6 +53,7 @@ public class FieldGameManager : MonoBehaviour
     {
         if (false == Net.isOnline)
             Net.CreateAndConnect();
+
     }
 
     void FixedUpdate()

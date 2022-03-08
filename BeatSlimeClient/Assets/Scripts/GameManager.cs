@@ -72,8 +72,11 @@ public class GameManager : MonoBehaviour
         debugStart = false;
         alreadyMoved = 0;
 
-        loader.Match(grid);
-        loader.LoadMap();
+        if(grid.TMP)
+        {
+            loader.Match(grid);
+            loader.LoadMap();
+        }
 
         resultsData = new ResultsData();
         nowBeat = new Beat();
@@ -106,7 +109,10 @@ public class GameManager : MonoBehaviour
 
     void FixedUpdate()
     {
-
+        if (Input.GetKeyDown("9"))
+        {
+            player.GetComponentInChildren<PlayerManager>().ParryTrig();
+        }
         //if (Input.GetKeyDown("1"))
         //{
         //if (Mapdata.Count != 0)
@@ -478,6 +484,8 @@ public class GameManager : MonoBehaviour
                             
                             int pid = ServerID_To_ClientID(p.id);
                             Objects[pid].GetComponentInChildren<PlayerManager>().ParryTrig();
+
+                            MidANote.notePerfect();
                             Debug.Log("Parrying Success");
                         }
                         break;
@@ -529,6 +537,8 @@ public class GameManager : MonoBehaviour
             if (beatCounter <= JudgementTiming)
             {
                 MidNote.notePerfect();
+                //DEBUG 퍼펙트 파티클 추가
+
                 if (beatCounter <= JudgementTiming/2f)
                     resultsData.perfect++;
                 else
