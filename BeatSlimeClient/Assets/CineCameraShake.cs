@@ -12,6 +12,9 @@ public class CineCameraShake : MonoBehaviour
     private float shakeTimerTotal;
     private float startingInstensity;
 
+    public float intensityFactor;
+    public float timeFactor;
+
     private void Awake() {
         instance = this;
         cam = GetComponent<CinemachineVirtualCamera>();
@@ -32,8 +35,13 @@ public class CineCameraShake : MonoBehaviour
 
     public void ShakeCamera(float damage)
     {
-        float intensity = damage * 0.1f;
-        float time = intensity * 0.05f;
+        float intensity = damage * intensityFactor;
+        float time = intensity * timeFactor;
+
+        if (intensity > 5f)
+            intensity = 5f;
+        if (time > 1f)
+            time = 1f;
 
         noise.m_AmplitudeGain = intensity;
         
