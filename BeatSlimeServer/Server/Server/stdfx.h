@@ -41,6 +41,7 @@ enum PIVOTTYPE { PlayerM, Playerm, World, Boss, Player1, Player2, Player3 };
 enum DIR {
 	LEFTUP, UP, RIGHTUP, LEFTDOWN, DOWN, RIGHTDOWN
 };
+#define DEBUG;
 const int BUFSIZE = 256;
 
 const int MAX_IN_GAME_PLAYER = 3;
