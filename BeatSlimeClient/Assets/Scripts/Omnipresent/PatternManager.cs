@@ -34,6 +34,7 @@ public class PatternManager : MonoBehaviour
         List<Dictionary<string, object>> datas = CSVReader.Read("Pattern/" + GameManager.data.SongName);
         int preBar = 0;
 
+        
         for (int i = 0; i < datas.Count; ++i)
         {
             ///PATTERN LOAD
@@ -45,12 +46,13 @@ public class PatternManager : MonoBehaviour
 
             Pattern tmpP = new Pattern(datas[i], preBar);
             pattern.Add(tmpP);
-
+            //print("patternLoad : " + tmpP.id);
             //DEBUG : 이펙트 패킷은 서버에서 보내줄 필요 없이 여기서 바로 읽어서 저장해놓고 사용하기 (동접자 올릴 때)
 
             //자신에게 날아오는 보스의 유도 공격만!
-            if (tmpP.noteType == 10 && tmpP.pivotType == ("Player" + PID))
+            if (tmpP.noteType.ToString() == "10" && tmpP.pivotType == ("Player" + PID))
             {
+                Debug.Log(tmpP.id + " " + tmpP.noteType + " " + tmpP.pivotType);
                 Factory.attackNotesBeats.Add(tmpP.rhythmBeat.GetBeatTime());
             }
             //DEBUG : 장판 공격도 작은 노트 보여주고싶음 (비트 알려주기 위해)

@@ -1,4 +1,4 @@
-#include "stdfx.h"
+﻿#include "stdfx.h"
 
 #include"Map.h"
 #include "DataBase.h"
@@ -911,22 +911,22 @@ void Network::process_packet(int client_id, unsigned char* p)
 		cs_packet_parrying* packet = reinterpret_cast<cs_packet_parrying*>(p);
 
 		for (auto* gr : game_room) {
-			if (false == gr->isGaming) continue;
+			if (false == gr->isGaming) { printf("He is not in Game!"); continue;}
 			// 해당 플레이어의 게임 방을 찾고
-			if (-1 == gr->FindPlayer(client_id)) continue;
+			if (-1 == gr->FindPlayer(client_id)) { std::cout << "Can not find player game room\n"; continue; }
 			int id = gr->FindPlayer(client_id);
 			// 게임시간이 얼마나 지났는지 확인하고
 			int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
 			// 현재시간에 패링패턴이 있었는지 확인
 			const std::vector<PatternInfo>& pt = maps[gr->map_type]->GetPatternTime();
 			for (auto& pattern : pt) {
-				if (10 != pattern.type) continue;// 패링 노트인지 채크
-				if (id != (pattern.pivotType - 4)) continue; // 타겟이 된 플레이어인지 체크
+				if (10 != pattern.type) { printf("cutParry by type %d",pattern.type); continue; }// 패링 노트인지 채크
+				if (id != (pattern.pivotType - 4)) { printf("cutParry by pivot %d while %d",id , pattern.pivotType -4); continue; } // 타겟이 된 플레이어인지 체크
 				//100ms보다 작으면
 				if (abs(running_time - pattern.time) < 100) {
 					//패링 성공
 					// 패링 성공 패킷을 클라이언트로 보냄
-
+					printf("%d parry successed : %d in %d\n", id, running_time, pattern.time);
 					//수정
 					gr->boss_id->hp -= 10;
 					if (gr->boss_id->hp < 0) {
@@ -945,6 +945,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					break;
 				}
 				else {
+					printf("%d parry failed : %d in %d\n", id, running_time, pattern.time);
 					//패링 실패
 					//플레이어 어택 패킷 보내고 다 죽었는지 확인하고
 					break;
@@ -953,7 +954,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			}
 			break;
 		}
-		std::cout << "Can not find player game room\n";
+
 	}
 	break;
 	case CS_PACKET_USE_SKILL:

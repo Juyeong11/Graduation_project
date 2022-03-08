@@ -94,7 +94,6 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-
         if (!FieldGameManager.Net.isServerOnline()) FieldGameManager.Net.CreateAndConnect();
         FieldGameManager.Net.SendChangeSceneDonePacket(1);
         loader.LoadMap();
