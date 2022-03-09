@@ -1391,6 +1391,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 922465704640310587, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a598fba948dff7409a0dae59a144bad, type: 2}
     - target: {fileID: 4101853915968575908, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -2362,6 +2366,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1396884868}
     m_Modifications:
+    - target: {fileID: 2137446211280993640, guid: 98fd3e4da0f93ad448233bbb545858a5, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5390535302158200297, guid: 98fd3e4da0f93ad448233bbb545858a5, type: 3}
       propertyPath: m_Name
       value: Cloud4
