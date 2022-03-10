@@ -323,7 +323,7 @@ public class InGameOtherPlayerManager : MonoBehaviour
 
         newX = Mathf.Lerp(selfCoord.preCoordinates.X * 0.866f, selfCoord.coordinates.X * 0.866f, tick);
         newZ = Mathf.Lerp(selfCoord.preCoordinates.X * 0.5f + selfCoord.preCoordinates.Z, selfCoord.coordinates.X * 0.5f + selfCoord.coordinates.Z, tick);
-        newY = SlimeWLerp(HexCellPosition.calculateWPosition(selfCoord.preCoordinates.W,true), HexCellPosition.calculateWPosition(selfCoord.coordinates.W,true), tick);
+        newY = SlimeWLerp(HexCellPosition.calculateWPosition(selfCoord.preCoordinates.W), HexCellPosition.calculateWPosition(selfCoord.coordinates.W), tick);
 
         if (tick >= 1f)
         {
