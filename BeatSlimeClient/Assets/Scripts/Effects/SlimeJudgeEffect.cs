@@ -4,15 +4,25 @@ using UnityEngine;
 
 public class SlimeJudgeEffect : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public ParticleSystem judgeParticle;
+    
+    public void ParticleApply(JudgeCases c)
     {
-        
-    }
+        switch(c)
+        {
+            case JudgeCases.PERFECT:
+                judgeParticle.Emit(12);
+                //judgeParticle.Play();
+                //judgeParticle.Play();
+                break;
+            case JudgeCases.GOOD:
+                judgeParticle.Emit(6);
+                //judgeParticle.Play();
+                break;
+            case JudgeCases.BAD:
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+                judgeParticle.Play();
+                break;
+        }
     }
 }

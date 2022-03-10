@@ -54,6 +54,9 @@ public class GameManager : MonoBehaviour
     public HPImagesForGameManager HPGM;
 
     public GameObject JudgeEffect;
+    public UIJudgeEffect ComboEffect;
+    public SlimeJudgeEffect ParticleEffect;
+    int nowCombo;
     int HPGMStaticInt = 1;
 
     public GameOverImage gameOverImage;
@@ -68,6 +71,7 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         print("Start");
+        nowCombo = 0;
         //HPGM = gameObject.GetComponent<HPImagesForGameManager>();
         data = this;
         isGameStart = false;
@@ -114,6 +118,8 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown("9"))
         {
             JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
+            ParticleEffect.ParticleApply(JudgeCases.PERFECT);
+            ComboEffect.CountApply(ref nowCombo);
         }
         //if (Input.GetKeyDown("1"))
         //{
@@ -492,6 +498,8 @@ public class GameManager : MonoBehaviour
 
                             MidANote.notePerfect();
                             JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
+                            ParticleEffect.ParticleApply(JudgeCases.PERFECT);
+                            nowCombo++;
                             Debug.Log("Parrying Success");
                         }
                         break;
@@ -549,11 +557,15 @@ public class GameManager : MonoBehaviour
                 {
                     resultsData.perfect++;
                     JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
+                    ParticleEffect.ParticleApply(JudgeCases.PERFECT);
+                    ComboEffect.CountApply(ref nowCombo);
                 }
                 else
                 {
                     resultsData.great++;
                     JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.GOOD);
+                    ParticleEffect.ParticleApply(JudgeCases.GOOD);
+                    ComboEffect.CountApply(ref nowCombo);
                 }
 
                 //DEBUG : �и� ��Ʈ���� �Ʒ� �ڵ带
@@ -568,11 +580,15 @@ public class GameManager : MonoBehaviour
                 {
                     resultsData.perfect++;
                     JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
+                    ParticleEffect.ParticleApply(JudgeCases.PERFECT);
+                    ComboEffect.CountApply(ref nowCombo);
                 }
                 else
                 {
                     resultsData.great++;
                     JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.GOOD);
+                    ParticleEffect.ParticleApply(JudgeCases.GOOD);
+                    ComboEffect.CountApply(ref nowCombo);
                 }
 
                 return 1;   //�ʰ� ����
@@ -583,11 +599,14 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
                 resultsData.miss++;
                 JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.BAD);
+                //ParticleEffect.ParticleApply(JudgeCases.BAD);
+                ComboEffect.CountApply(ref nowCombo,true);
                 return 0;   //�߸� ����
             }
         }
         else
         {
+            ComboEffect.CountApply(ref nowCombo,true);
             //MidNote.noteEnd();
             //Debug.Log("Cutting");
         }

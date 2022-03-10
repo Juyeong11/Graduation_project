@@ -959,6 +959,17 @@ MonoBehaviour:
   m_AmplitudeGain: 0
   m_FrequencyGain: 4
   mNoiseOffsets: {x: 0, y: 0, z: 0}
+--- !u!114 &132402395 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5219734505481944901, guid: f231ab97c39217f4591707671f32053e, type: 3}
+  m_PrefabInstance: {fileID: 5085428334478328507}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &133581933 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5279449981091976174, guid: f231ab97c39217f4591707671f32053e, type: 3}
@@ -1339,6 +1350,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 23
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &426464895 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3749183512732183419, guid: f231ab97c39217f4591707671f32053e, type: 3}
+  m_PrefabInstance: {fileID: 5085428334478328507}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &432205465
 GameObject:
   m_ObjectHideFlags: 0
@@ -1494,14 +1516,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainPlayerSlime
       objectReference: {fileID: 0}
-    - target: {fileID: 922465704640310587, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 922465704640310587, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 5a598fba948dff7409a0dae59a144bad, type: 2}
     - target: {fileID: 4101853915968575908, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -1568,6 +1582,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b258ec7290784a146b631d1e0455e795, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!198 &438602111 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 3139570922822669985, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
+  m_PrefabInstance: {fileID: 438602108}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &438602112 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 200464357357826149, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
@@ -1736,6 +1755,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &663726357 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8772132732325776100, guid: f231ab97c39217f4591707671f32053e, type: 3}
+  m_PrefabInstance: {fileID: 5085428334478328507}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &697994748 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5085428334873218887, guid: f231ab97c39217f4591707671f32053e, type: 3}
@@ -3681,6 +3711,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1719363823}
   - component: {fileID: 1719363824}
+  - component: {fileID: 1719363825}
+  - component: {fileID: 1719363826}
   m_Layer: 5
   m_Name: JudgeEffects
   m_TagString: Untagged
@@ -3727,6 +3759,75 @@ MonoBehaviour:
   - {fileID: -1048012794035350591, guid: ba697ae24c7d0ff4f963534ae5d7dcb4, type: 3}
   - {fileID: 2767182027815592236, guid: ba697ae24c7d0ff4f963534ae5d7dcb4, type: 3}
   - {fileID: -5030750000581477215, guid: ba697ae24c7d0ff4f963534ae5d7dcb4, type: 3}
+--- !u!114 &1719363825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719363822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 823e0d1cb7f70474782c416b8b170217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  H: {fileID: 132402395}
+  T: {fileID: 426464895}
+  O: {fileID: 663726357}
+  comboSprites:
+  - {fileID: 6601591887075733081, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -3112814339835767726, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 3749701065139093505, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 1683864847840004652, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -1469976724503277084, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -8372053851321398644, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 2988029567216294073, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -6663843337865108, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 3356372160459571023, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 4774885822605981829, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -598761528052667689, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 938959801153195254, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 8772665498285137694, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 8158632064950436837, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 2623124343404139702, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -7690058131818206110, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 7815256221587243647, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -3408563292084078973, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 1619160523663479491, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 6823004068758541885, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 2801379655978475773, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 8075096515997801059, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 5644756577335843295, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -2170647047378289664, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 8899126868627623867, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -6422244918176057550, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -8997621571901782182, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -2872424772770085442, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -3625024160635467816, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -7510747924548872704, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -1544470882305600476, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -2115016039438212638, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -8017709365186771574, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -5090095829228628501, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -4146388636694005167, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 8293480958627249303, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 1538039976311613522, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 6077687562850375450, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: 7354659424031170260, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+  - {fileID: -8043767846950393687, guid: 0cd62c920a2820e4e86e3b8bdf2286c7, type: 3}
+--- !u!114 &1719363826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1719363822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de43d6ab9fdfff146b14fb118bedc047, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  judgeParticle: {fileID: 438602111}
 --- !u!1 &1756485882
 GameObject:
   m_ObjectHideFlags: 0
@@ -4678,6 +4779,8 @@ MonoBehaviour:
   MidANote: {fileID: 291758517}
   HPGM: {fileID: 2121429947}
   JudgeEffect: {fileID: 1719363822}
+  ComboEffect: {fileID: 1719363825}
+  ParticleEffect: {fileID: 1719363826}
   gameOverImage: {fileID: 2224594054131023562}
 --- !u!114 &2121429944
 MonoBehaviour:
