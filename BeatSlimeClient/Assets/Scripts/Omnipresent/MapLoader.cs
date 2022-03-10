@@ -105,7 +105,7 @@ public class MapLoader : MonoBehaviour
             p_templand.id = MapMaker.landId;
 
             GameObject tmpcell = Instantiate(LoadByGameManagersSongName?GameManager.data.grid.LandType[c]:FieldGameManager.data.grid.LandType[c]);
-            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or, os);
+            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or, os,t);
             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
             tmpcell.name = "land" + MapMaker.landId++;
             tmpcell.transform.parent = GRID.transform;

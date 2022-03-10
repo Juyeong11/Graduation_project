@@ -70,7 +70,7 @@ public class CSVMapper : MonoBehaviour
             p_templand.id = MapMaker.landId;
 
             GameObject tmpcell = Instantiate(MM.grid.LandType[c]);
-            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or, os);
+            tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or, os, t);
             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
             tmpcell.name = "land" + MapMaker.landId++;
             tmpcell.transform.parent = gameObject.transform;
