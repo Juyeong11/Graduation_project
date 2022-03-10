@@ -52,6 +52,8 @@ public class GameManager : MonoBehaviour
     public DoomChi MidANote;
 
     public HPImagesForGameManager HPGM;
+
+    public GameObject JudgeEffect;
     int HPGMStaticInt = 1;
 
     public GameOverImage gameOverImage;
@@ -66,7 +68,7 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         print("Start");
-        HPGM = gameObject.GetComponent<HPImagesForGameManager>();
+        //HPGM = gameObject.GetComponent<HPImagesForGameManager>();
         data = this;
         isGameStart = false;
         debugStart = false;
@@ -111,7 +113,7 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown("9"))
         {
-            player.GetComponentInChildren<PlayerManager>().ParryTrig();
+            JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
         }
         //if (Input.GetKeyDown("1"))
         //{
@@ -247,11 +249,14 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].GetComponentInChildren<HexCellPosition>().setDirection((byte)p.dir);
                                 Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                 if (pid == myPlayerID)// 
+                                {
                                     Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
+
+                                }
                                 else if (pid < 3)   //
                                     Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
                             }
-                            else    //DEBUG
+                            else    //debug time
                             {
                                 player.GetComponent<HexCellPosition>().setDirection((byte)p.dir);
                                 player.GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
@@ -486,6 +491,7 @@ public class GameManager : MonoBehaviour
                             Objects[pid].GetComponentInChildren<PlayerManager>().ParryTrig();
 
                             MidANote.notePerfect();
+                            JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
                             Debug.Log("Parrying Success");
                         }
                         break;
@@ -540,9 +546,15 @@ public class GameManager : MonoBehaviour
                 //DEBUG ÆÛÆåÆ® ÆÄÆ¼Å¬ Ãß°¡
 
                 if (beatCounter <= JudgementTiming/2f)
+                {
                     resultsData.perfect++;
+                    JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
+                }
                 else
+                {
                     resultsData.great++;
+                    JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.GOOD);
+                }
 
                 //DEBUG : ï¿½Ð¸ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ ï¿½Úµå¸¦
                 //MidANote.notePerfect();
@@ -552,10 +564,16 @@ public class GameManager : MonoBehaviour
             {
                 MidNote.notePerfect();
 
-                if (beatCounter <= JudgementTiming/2f)
+                if ((timeByBeat - beatCounter) <= JudgementTiming/2f)
+                {
                     resultsData.perfect++;
+                    JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
+                }
                 else
+                {
                     resultsData.great++;
+                    JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.GOOD);
+                }
 
                 return 1;   //ï¿½Ê°ï¿½ ï¿½ï¿½ï¿½ï¿½
             }
@@ -564,6 +582,7 @@ public class GameManager : MonoBehaviour
                 //MidNote.noteEnd();
                 Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
                 resultsData.miss++;
+                JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.BAD);
                 return 0;   //ï¿½ß¸ï¿½ ï¿½ï¿½ï¿½ï¿½
             }
         }
