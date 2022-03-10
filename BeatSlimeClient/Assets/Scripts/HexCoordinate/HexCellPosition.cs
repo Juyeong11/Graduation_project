@@ -43,12 +43,12 @@ public class HexCellPosition : MonoBehaviour
 
     static public Vector3 getRealPosition(float x, float z, int w)
     {
-        return new Vector3(x * 0.866f, calculateWPosition(w), x * 0.5f + z * 1f);
+        return new Vector3(x * 0.866f, calculateWPosition(w,false), x * 0.5f + z * 1f);
     }
     public Vector3 getRealPosition()
     {
         return new Vector3(coordinates.X * 0.866f + landOffsetX,
-            calculateWPosition(coordinates.W) + landOffsetY,
+            calculateWPosition(coordinates.W,false) + landOffsetY,
             coordinates.X * 0.5f + coordinates.Z * 1f + landOffsetZ);
     }
 
@@ -58,12 +58,12 @@ public class HexCellPosition : MonoBehaviour
         {
             Debug.LogError("reflectPosition checkSum error!!");
         }
-        gameObject.transform.position = new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W) , coordinates.X * 0.5f + coordinates.Z * 1f);
+        gameObject.transform.position = new Vector3(coordinates.X * 0.866f, calculateWPosition(coordinates.W,true) , coordinates.X * 0.5f + coordinates.Z * 1f);
     }
 
-    static public float calculateWPosition(int w)
+    static public float calculateWPosition(int w, bool isPlayer)
     {
-        return w * 0.2f;
+        return w * 0.2f + (isPlayer ? 0.12f : 0);
     }
     public void beat()
     {
