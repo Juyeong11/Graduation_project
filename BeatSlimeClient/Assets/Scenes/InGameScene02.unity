@@ -223,13 +223,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 26566894}
-  m_LocalRotation: {x: 0.7082647, y: -0.018464271, z: 0.2657553, w: 0.653754}
+  m_LocalRotation: {x: 0.3559357, y: -0.06839409, z: 0.19292815, w: 0.9118173}
   m_LocalPosition: {x: 3.55, y: 2.89, z: -0.58}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 69.37, y: 90.644, z: 114.218}
+  m_LocalEulerAnglesHint: {x: 42.492, y: 0.98, z: 24.275}
 --- !u!1001 &32677714
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1925,7 +1925,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 0.70151705, b: 0, a: 1}
+  m_Color: {r: 0.5377358, g: 0.5377358, b: 0.5377358, a: 1}
   m_Intensity: 0.6
   m_Range: 10
   m_SpotAngle: 30
@@ -4961,6 +4961,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1201253741232371265, guid: ea611a13a1d01114b938abe69053ec7f, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 7ffd629d8b3760f4c99c21516a8ea9c6, type: 2}
     - target: {fileID: 2772194770610161140, guid: ea611a13a1d01114b938abe69053ec7f, type: 3}
       propertyPath: grid
       value: 
