@@ -31,13 +31,13 @@ public class HPManager
     {
         CurrentHP -= damage;
         //Debug.Log("Damaged");
-        if (prevHP <= 0)
+        if (CurrentHP <= 0)
             isAlive = false;
     }
 
     public void hpUpdate(float deltaTime)
     {
-        if (prevHP > CurrentHP)
+        if (prevHP >= CurrentHP)
         {
             prevHP -= 30 * deltaTime;
         }

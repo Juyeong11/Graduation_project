@@ -121,6 +121,10 @@ public class GameManager : MonoBehaviour
             ParticleEffect.ParticleApply(JudgeCases.PERFECT);
             ComboEffect.CountApply(ref nowCombo);
         }
+        if (Input.GetKeyDown("8"))
+        {
+            player.GetComponent<PlayerManager>().JumpTrigger.SetTrigger("Dead");
+        }
         //if (Input.GetKeyDown("1"))
         //{
         //if (Mapdata.Count != 0)
@@ -499,7 +503,7 @@ public class GameManager : MonoBehaviour
                             MidANote.notePerfect();
                             JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
                             ParticleEffect.ParticleApply(JudgeCases.PERFECT);
-                            nowCombo++;
+                            ComboEffect.CountApply(ref nowCombo);
                             Debug.Log("Parrying Success");
                         }
                         break;

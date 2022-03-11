@@ -225,6 +225,7 @@ MonoBehaviour:
     x: 0
     z: 0
     w: 0
+  direction: 0
 --- !u!114 &7383083645639068150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -247,7 +248,6 @@ MonoBehaviour:
   state: 0
   handle: {fileID: 0}
   selfCoord: {fileID: 4886932897758848649}
-  selfDirection: 0
   grid: {fileID: 0}
   PlayerTransform: {fileID: 4911084585068379427}
 --- !u!1 &9080147774469510370
@@ -277,7 +277,7 @@ Transform:
   m_GameObject: {fileID: 9080147774469510370}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1500001, y: 0.1500001, z: 0.1500001}
+  m_LocalScale: {x: 0.22, y: 0.22, z: 0.22}
   m_Children:
   - {fileID: 2802367669409426306}
   - {fileID: 4908572494929607801}
@@ -303,7 +303,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 98cff5c876beda8408cfe349c553715f, type: 2}
+  - {fileID: 2100000, guid: 5a598fba948dff7409a0dae59a144bad, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
