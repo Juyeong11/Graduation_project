@@ -48,6 +48,8 @@ public:
 
 
 	std::vector<PatternInfo> pattern_time;
+	//typedef int Time;
+	//std::unordered_map<Time,int> parrying_pattern;
 
 public:
 
@@ -144,6 +146,7 @@ public:
 
 	void GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER],Portal* p);
 	int FindPlayer(int id) const;
+	int FindPlayerID_by_GameRoom(int id) const;
 
 	int find_online_player() const;
 
