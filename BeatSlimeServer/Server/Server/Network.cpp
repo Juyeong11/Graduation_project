@@ -960,6 +960,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					for (const auto pl : gr->player_ids) {
 						if (pl == nullptr) continue;
 						send_parrying(pl->id, client_id);
+						send_attack_player(client_id, gr->boss_id->id, pl->id);
 					}
 					break;
 				}
