@@ -7,7 +7,7 @@
 
 
 enum EVENT_TYPE {
-	EVENT_BOSS_MOVE, EVENT_PLAYER_PARRYING,
+	EVENT_BOSS_MOVE, EVENT_PLAYER_PARRYING_START, EVENT_PLAYER_PARRYING,
 	EVENT_BOSS_TILE_ATTACK_START, EVENT_BOSS_TILE_ATTACK,
 	EVENT_GAME_END,
 	EVENT_PLAYER_SKILL
@@ -126,88 +126,7 @@ public:
 	void do_npc_attack(int npc_id, int target_id, int receiver);
 	void do_npc_tile_attack(int game_room_id,int x,int y, int z);
 	void do_player_skill(GameRoom* gr, Client* cl);
-	void do_timer() {
-		using namespace std;
-		using namespace chrono;
-		while (true) {
-
-			timer_event ev;
-			while (!timer_queue.empty()) {
-
-				timer_queue.try_pop(ev);
-
-				if (ev.start_time <= system_clock::now()) {
-					//이벤트 시작
-					EXP_OVER* ex_over;// = new EXP_OVER;
-					//ex_over->_comp_op = OP_NPC_MOVE;
-					while (!exp_over_pool.try_pop(ex_over));
-					switch (ev.ev)
-					{
-					case EVENT_BOSS_MOVE:
-						ex_over->_comp_op = OP_BOSS_MOVE;
-						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.x;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.y;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.z;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.game_room_id;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.pivotType;// 타겟 id가 패턴 종류 구분
-
-						break;
-					case EVENT_BOSS_TILE_ATTACK_START:
-						ex_over->_comp_op = OP_BOSS_TILE_ATTACK_START;
-						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.type;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.charging_time;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.pivotType;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.x;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.y;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.z;
-						break;
-					case EVENT_BOSS_TILE_ATTACK:
-						ex_over->_comp_op = OP_BOSS_TILE_ATTACK;
-						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.x;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.y;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.z;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.game_room_id;
-
-						break;
-					case EVENT_PLAYER_PARRYING:
-						ex_over->_comp_op = OP_PLAYER_PARRYING;
-						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.game_room_id;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)*2) = ev.charging_time;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.pivotType;
-
-						break;
-					case EVENT_GAME_END:
-						ex_over->_comp_op = OP_GAME_END;
-						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
-						break;
-					case EVENT_PLAYER_SKILL:
-						ex_over->_comp_op = OP_PLAYER_SKILL;
-						*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.charging_time;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.x;
-						*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.y;
-
-						break;
-					default:
-						break;
-					}
-
-					PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);// 두번째 인자가 0이 되면 소캣 종료로 취급이 된다. 1로해주자
-				}
-				else {
-					//기껏 뺐는데 다시 넣는거 좀 비효율 적이다.
-					//다시 넣지 않는 방법으로 최적화 필요
-					timer_queue.push(ev);
-					break;
-				}
-			}
-
-			//큐가 비었거나
-			this_thread::sleep_for(10ms);
-		}
-	}
+	void do_timer();
 	void process_packet(int client_id, unsigned char* p);
 
 	void worker();

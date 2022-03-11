@@ -14,6 +14,7 @@
 #include<mutex>
 #include<chrono>
 #include<unordered_set>
+#include<unordered_map>
 #include<concurrent_unordered_set.h>
 #include<atomic>
 #include<concurrent_priority_queue.h> 
@@ -29,7 +30,7 @@
 #pragma comment (lib, "MSWSock.LIB")
 
 enum MAP_TYPE { FIELD_MAP, WITCH_MAP };
-enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_BOSS_MOVE, OP_PLAYER_PARRYING, 
+enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_BOSS_MOVE, OP_PLAYER_PARRYING_START, OP_PLAYER_PARRYING,
 	OP_BOSS_TILE_ATTACK_START, OP_BOSS_TILE_ATTACK,
 	OP_GAME_END,
 	OP_PLAYER_SKILL

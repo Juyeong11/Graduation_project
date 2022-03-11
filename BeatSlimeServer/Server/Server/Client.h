@@ -137,6 +137,8 @@ public:
 	bool is_active;
 	int cur_room_num;
 	int		prev_recv_size;
+
+	int pre_parrying_pattern;
 public:
 
 	Client(Skill* sk) : skill(sk)

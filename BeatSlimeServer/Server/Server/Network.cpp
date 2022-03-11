@@ -515,7 +515,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//cl.y = -cl.z - cl.x;
 
 
-		
+
 	}
 	break;
 	case CS_PACKET_MOVE:
@@ -784,7 +784,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					// 포탈에서 GameRoom으로 이동
 					int room_id = get_game_room_id();
 					int boss_id = get_npc_id(p->map_type);
-					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players,p);
+					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players, p);
 					//std::cout << "시작" << std::endl;
 					p->player_ids.clear();
 					p->ready_player_cnt = 0;
@@ -871,7 +871,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				break;
 			}
 		}
-			break;
+		break;
 		default:
 			break;
 		}
@@ -909,34 +909,33 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_PARRYING:
 	{
 		cs_packet_parrying* packet = reinterpret_cast<cs_packet_parrying*>(p);
-
+#ifdef DEBUG
+		printf("%d : I want parrying!!\n", client_id);
+#endif
 		for (auto* gr : game_room) {
 			if (false == gr->isGaming) {
-#ifdef DEBUG
-				printf("He is not in Game!");
-#endif // DEBUG
 				continue;
 			}
 			// 해당 플레이어의 게임 방을 찾고
 			if (-1 == gr->FindPlayer(client_id)) { std::cout << "Can not find player game room\n"; continue; }
-			int id = gr->FindPlayer(client_id);
+			int id = gr->FindPlayerID_by_GameRoom(client_id);
 			// 게임시간이 얼마나 지났는지 확인하고
 			int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
 			// 현재시간에 패링패턴이 있었는지 확인
 			const std::vector<PatternInfo>& pt = maps[gr->map_type]->GetPatternTime();
+			//이 맵의 모든 패턴 중에서 running_time주변 시간에 패링 공격이 있는지 확인하고
+			//있다면 패링 성공 패킷을 보낸다.
+
 			for (auto& pattern : pt) {
-				if (10 != pattern.type) { 
-#ifdef DEBUG
-					printf("cutParry by type %d",pattern.type);
-#endif 
-					continue; 
-				}// 패링 노트인지 채크
+				// 패링 노트인지 채크
+				if (10 != pattern.type) {
+					continue;
+				}
+				// 타겟이 된 플레이어인지 체크
 				if (id != (pattern.pivotType - 4)) {
-#ifdef DEBUG
-					printf("cutParry by pivot %d while %d",id , pattern.pivotType -4); 
-#endif
-					continue; 
-				} // 타겟이 된 플레이어인지 체크
+					continue;
+				}
+
 				//100ms보다 작으면
 				if (abs(running_time - pattern.time) < 100) {
 					//패링 성공
@@ -944,6 +943,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 #ifdef DEBUG
 					printf("%d parry successed : %d in %d\n", id, running_time, pattern.time);
 #endif
+					reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
+						= static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count());
+						
 					//수정
 					gr->boss_id->hp -= 10;
 					if (gr->boss_id->hp < 0) {
@@ -961,14 +963,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					}
 					break;
 				}
-				else {
-#ifdef DEBUG
-					printf("%d parry failed : %d in %d\n", id, running_time, pattern.time);
-#endif
-					//패링 실패
-					//플레이어 어택 패킷 보내고 다 죽었는지 확인하고
-					break;
-				}
+
 
 			}
 			break;
@@ -1250,7 +1245,7 @@ void Network::worker()
 			exp_over_pool.push(exp_over);
 		}
 		break;
-		case OP_PLAYER_PARRYING:
+		case OP_PLAYER_PARRYING_START:
 		{
 			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
@@ -1296,6 +1291,17 @@ void Network::worker()
 
 				break;
 			}
+
+			timer_event t;
+			t.ev = EVENT_PLAYER_PARRYING;
+			t.obj_id = client_id;
+			t.target_id = target_id;
+			t.game_room_id = game_room_id;
+			//딜레이 시간과 판정시간을 더한 뒤 이벤트에 등록한다.
+			//이렇게 하면 이벤트를 시작할 때 패링 공격을 패링했는지 유무를 확인 할 수 있다.
+			t.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time + 100);
+			timer_queue.push(t);
+
 			for (const auto pl : game_room[game_room_id]->player_ids) {
 				if (pl == nullptr) continue;
 				send_effect(pl->id, client_id, target_id, 10, charging_time, 0, 0, 0, 0);
@@ -1303,6 +1309,50 @@ void Network::worker()
 			set_next_pattern(game_room_id);
 
 			exp_over_pool.push(exp_over);
+		}
+		break;
+		case OP_PLAYER_PARRYING:
+		{
+			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
+			int parrying_end_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));//std::chrono::system_clock::now();//
+			//패링을 했는지 안했는지 확인
+
+			auto player_parring_time = reinterpret_cast<Client*>(clients[target_id])->pre_parrying_pattern;
+
+			if ((parrying_end_time - player_parring_time) < 200) {
+				//std::cout << parrying_end_time <<" " << player_parring_time << " player already parrying\n";
+				//패링 했으니 넘어가자
+				//패링 한 뒤 동작은 이미 worker thread에서 수행된 상태이다
+			}
+			else {
+				//std::cout << parrying_end_time << " " << player_parring_time << " player parrying failed\n";
+				//패링 못했으니 플레이어를 때리자
+				clients[target_id]->hp -= 10;
+				if (clients[target_id]->hp < 0) {
+					// 게임 끝
+					reinterpret_cast<Client*>(clients[target_id])->is_active = false;
+					bool is_game_end = true;
+					for (const auto& p : game_room[game_room_id]->player_ids) {
+						if (p == nullptr) continue;
+						if (p->hp > 0) is_game_end = false;
+					}
+
+					if (is_game_end) {
+						for (const auto& p : game_room[game_room_id]->player_ids) {
+							if (p == nullptr) continue;
+							send_game_end(p->id, GAME_OVER);
+							reinterpret_cast<Client*>(p)->is_active = true;
+						}
+						game_room[game_room_id]->game_end();
+					}
+				}
+
+				for (const auto& p : game_room[game_room_id]->player_ids) {
+					if (p == nullptr) continue;
+					send_attack_player(game_room[game_room_id]->boss_id->id, target_id, p->id);
+				}
+			}
 		}
 		break;
 		case OP_BOSS_TILE_ATTACK_START:
@@ -1524,6 +1574,97 @@ void Network::worker()
 		}
 	}
 }
+
+void Network::do_timer() {
+	using namespace std;
+	using namespace chrono;
+	while (true) {
+
+		timer_event ev;
+		while (!timer_queue.empty()) {
+
+			timer_queue.try_pop(ev);
+
+			if (ev.start_time <= system_clock::now()) {
+				//이벤트 시작
+				EXP_OVER* ex_over;// = new EXP_OVER;
+				//ex_over->_comp_op = OP_NPC_MOVE;
+				while (!exp_over_pool.try_pop(ex_over));
+				switch (ev.ev)
+				{
+				case EVENT_BOSS_MOVE:
+					ex_over->_comp_op = OP_BOSS_MOVE;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.x;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.y;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.z;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.game_room_id;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.pivotType;// 타겟 id가 패턴 종류 구분
+
+					break;
+				case EVENT_BOSS_TILE_ATTACK_START:
+					ex_over->_comp_op = OP_BOSS_TILE_ATTACK_START;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.type;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.charging_time;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.pivotType;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.x;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.y;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.z;
+					break;
+				case EVENT_BOSS_TILE_ATTACK:
+					ex_over->_comp_op = OP_BOSS_TILE_ATTACK;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.x;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.y;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.z;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.game_room_id;
+
+					break;
+				case EVENT_PLAYER_PARRYING_START:
+					ex_over->_comp_op = OP_PLAYER_PARRYING_START;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.game_room_id;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.charging_time;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.pivotType;
+
+					break;
+				case EVENT_PLAYER_PARRYING:
+					ex_over->_comp_op = OP_PLAYER_PARRYING;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.game_room_id;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = static_cast<int>(time_point_cast<milliseconds>(ev.start_time).time_since_epoch().count());
+					//static_cast<int>(time_point_cast<milliseconds>(ev.start_time).time_since_epoch().count());
+					break;
+
+				case EVENT_GAME_END:
+					ex_over->_comp_op = OP_GAME_END;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
+					break;
+				case EVENT_PLAYER_SKILL:
+					ex_over->_comp_op = OP_PLAYER_SKILL;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.charging_time;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.x;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.y;
+
+					break;
+				default:
+					break;
+				}
+
+				PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);// 두번째 인자가 0이 되면 소캣 종료로 취급이 된다. 1로해주자
+			}
+			else {
+				//기껏 뺐는데 다시 넣는거 좀 비효율 적이다.
+				//다시 넣지 않는 방법으로 최적화 필요
+				timer_queue.push(ev);
+				break;
+			}
+		}
+
+		//큐가 비었거나
+		this_thread::sleep_for(10ms);
+	}
+}
 void Network::set_next_pattern(int room_id)
 {
 	if (game_room[room_id]->pattern_progress == -1) return;
@@ -1572,7 +1713,7 @@ void Network::set_next_pattern(int room_id)
 	case 10: // 유도 공격 -> 패링할 수 있음
 
 
-		tev.ev = EVENT_PLAYER_PARRYING;
+		tev.ev = EVENT_PLAYER_PARRYING_START;
 		tev.obj_id = boss_id;
 		tev.type = t.type;
 		tev.x = t.x;
@@ -1612,6 +1753,7 @@ void Network::game_start(int room_id)
 	boss->hp = 1000;
 	for (auto i : game_room[room_id]->player_ids) {
 		i->hp = 100;
+		reinterpret_cast<Client*>(i)->pre_parrying_pattern = -1;
 	}
 	set_next_pattern(room_id);
 	{

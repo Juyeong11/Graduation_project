@@ -94,7 +94,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 	num_totalPattern = pattern["noteType"].size();
 	pattern_time.reserve(num_totalPattern);
-
+	int num_parrying=0;
 	for (int i = 0; i < num_totalPattern; ++i) {
 		int bar = stoi(pattern["bar"][i]);
 		int addBeat = stoi(pattern["4th"][i]);
@@ -172,6 +172,15 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			dir,
 			speed,
 			px,py,pz);
+
+		
+			////패링공격이면 저장
+			//if (stoi(pattern["noteType"][i]) == 10)
+			//{
+			//	int starttime = pattern_time.back().time;
+			//	//int delay = pattern_time.back().speed;
+			//	parrying_pattern.emplace(starttime, num_parrying++);
+			//}
 	}
 
 	std::sort(pattern_time.begin(), pattern_time.end());
@@ -211,7 +220,15 @@ int GameRoom::FindPlayer(int id) const
 	}
 	return -1;
 }
+int GameRoom::FindPlayerID_by_GameRoom(int id) const
+{
+	int room_id = 0;
+	for (int i = 0; i < MAX_IN_GAME_PLAYER;++i) {
+		if (player_ids[i]->id == id) return i;
 
+	}
+	return -1;
+}
 
 void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject* Players[MAX_IN_GAME_PLAYER],Portal* p)
 {
