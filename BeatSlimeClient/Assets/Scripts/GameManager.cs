@@ -411,7 +411,7 @@ public class GameManager : MonoBehaviour
                             if (p.target_id != -1)
                                 tid = ServerID_To_ClientID(p.target_id);
                             
-
+                            // 플레이어 스킬 이펙트만 여기서 출력 번호는 55번
                             switch (p.effect_type)
                             {
                                 case 3:
@@ -510,7 +510,9 @@ public class GameManager : MonoBehaviour
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_ELAPSED_TIME:
                         {
+                            Protocol.sc_packet_elapsed_time p = Protocol.sc_packet_elapsed_time.SetByteToVar(data);
 
+                            GameElapsedTime = p.elapsed_time;
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PING_TEST:

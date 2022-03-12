@@ -7,8 +7,8 @@
 
 
 enum EVENT_TYPE {
-	EVENT_BOSS_MOVE, EVENT_PLAYER_PARRYING_START, EVENT_PLAYER_PARRYING,
-	EVENT_BOSS_TILE_ATTACK_START, EVENT_BOSS_TILE_ATTACK,
+	EVENT_BOSS_MOVE, EVENT_PLAYER_PARRYING,
+	EVENT_BOSS_TILE_ATTACK,
 	EVENT_GAME_END,
 	EVENT_PLAYER_SKILL
 };
@@ -19,7 +19,7 @@ struct timer_event {
 	int game_room_id;
 	int x, y, z;
 	int type;
-	int charging_time;
+	//int charging_time;
 	int pivotType;
 	std::chrono::system_clock::time_point start_time;
 	EVENT_TYPE ev;
