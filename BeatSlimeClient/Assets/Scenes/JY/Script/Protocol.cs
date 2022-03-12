@@ -29,6 +29,7 @@ namespace Protocol
         public const byte CS_PACKET_CHANGE_SCENE_DONE = 8;
         public const byte CS_PACKET_USE_SKILL = 9;
         public const byte CS_PACKET_CHANGE_SKILL = 10;
+        public const byte CS_PACKET_PING_TEST = 11;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -43,6 +44,8 @@ namespace Protocol
         public const byte SC_PACKET_PARRYING = 11;
         public const byte SC_PACKET_GAME_INIT = 12;
         public const byte SC_PACKET_CHANGE_SKILL = 13;
+        public const byte SC_PACKET_ELAPSED_TIME = 14;
+        public const byte SC_PACKET_PING_TEST = 15;
 
     }
     enum DIR
@@ -199,6 +202,15 @@ namespace Protocol
         public byte skill_type;
         public byte skill_level;
     }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_ping_test : ISerializeble<cs_packet_ping_test>
+    {
+        public byte size;
+        public byte type;
+        public int ping_time; //
+    }
     //Server -> Client
 
     [Serializable]
@@ -276,6 +288,7 @@ namespace Protocol
     {
         public byte size;
         public byte type;
+        public int game_start_time;
     }
 
     [Serializable]
@@ -337,5 +350,23 @@ namespace Protocol
         public byte type;
         public int id;
         public byte skill_type;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_elapsed_time : ISerializeble<sc_packet_elapsed_time>
+    {
+        public byte size;
+        public byte type;
+        public int elapsed_time;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_ping_test : ISerializeble<sc_packet_ping_test>
+    {
+        public byte size;
+        public byte type;
+        public int ping_time;
     }
 }

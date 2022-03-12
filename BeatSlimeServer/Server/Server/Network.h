@@ -68,11 +68,12 @@ public:
 	void send_remove_object(int client_id, int victim_id);
 	void send_map_data(int client_id, char* data, int nShell);
 	void send_change_scene(int client_id, int map_type);
-	void send_game_start(int client_id);
+	void send_game_start(int client_id,int start_time);
 	void send_game_init(int client_id, GameObject* ids[3], int boss_id);
 	void send_game_end(int client_id,char end_type);
 	void send_parrying(int client_id,int actor_id);
 	void send_change_skill(int client_id,int actor_id);
+	void send_ping(int client_id,int time);
 
 	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z);
 	void disconnect_client(int client_id);

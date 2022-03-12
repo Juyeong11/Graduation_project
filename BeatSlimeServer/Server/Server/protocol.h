@@ -14,6 +14,7 @@ const char CS_PACKET_PARRYING = 7;
 const char CS_PACKET_CHANGE_SCENE_DONE = 8;
 const char CS_PACKET_USE_SKILL = 9;
 const char CS_PACKET_CHANGE_SKILL = 10;
+const char CS_PACKET_PING_TEST = 11;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -29,6 +30,8 @@ const char SC_PACKET_GAME_END = 10;
 const char SC_PACKET_PARRYING = 11;
 const char SC_PACKET_GAME_INIT = 12;
 const char SC_PACKET_CHANGE_SKILL = 13;
+const char SC_PACKET_ELAPSED_TIME = 14;
+const char SC_PACKET_PING_TEST = 15;
 
 #pragma pack (push, 1)
 //client -> server
@@ -91,6 +94,12 @@ struct cs_packet_change_skill {
 	char	skill_type;
 };
 
+struct cs_packet_ping_test {
+	unsigned char size;
+	char	type;
+	int		ping_time; //
+};
+
 //server->client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -137,6 +146,8 @@ struct sc_packet_game_start
 {
 	unsigned char size;
 	char type;
+	int game_start_time;
+
 };
 struct sc_packet_change_scene
 {
@@ -192,5 +203,17 @@ struct sc_packet_change_skill {
 	int		id;
 	char	skill_type;
 	char	skill_level;
+};
+
+struct sc_packet_game_elapsed_time {
+	unsigned char size;
+	char	type;
+	int		elapsed_time; // milliseconds
+};
+
+struct sc_packet_ping_test {
+	unsigned char size;
+	char	type;
+	int		ping_time; //
 };
 #pragma pack(pop)

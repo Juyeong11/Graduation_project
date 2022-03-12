@@ -200,6 +200,17 @@ public class Network
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
+
+    public void SendPingTestPacket()
+    {
+        Protocol.cs_packet_ping_test pk = new Protocol.cs_packet_ping_test();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_ping_test));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_PING_TEST;
+        pk.ping_time = System.DateTime.Now.Millisecond;
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
     public void SendWriteMapPacket(ArrayList datas)
     {
         foreach (Protocol.Map m in datas)

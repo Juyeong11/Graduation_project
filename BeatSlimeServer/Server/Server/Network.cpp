@@ -120,12 +120,12 @@ void Network::send_change_scene(int c_id, int map_type)
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
 
-void Network::send_game_start(int c_id)
+void Network::send_game_start(int c_id,int start_time)
 {
 	sc_packet_game_start packet;
 	packet.type = SC_PACKET_GAME_START;
 	packet.size = sizeof(packet);
-
+	packet.game_start_time = start_time;
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -293,6 +293,19 @@ void Network::send_parrying(int c_id, int actor_id)
 	packet.type = SC_PACKET_PARRYING;
 	packet.size = sizeof(packet);
 	packet.id = actor_id;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+}
+
+void Network::send_ping(int c_id,int time)
+{
+	sc_packet_ping_test packet;
+	packet.type = SC_PACKET_PING_TEST;
+	packet.size = sizeof(packet);
+	packet.ping_time = time;
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -889,14 +902,17 @@ void Network::process_packet(int client_id, unsigned char* p)
 			if (-1 == gr->FindPlayer(client_id)) { gr->ready_lock.unlock(); continue; }
 			gr->ready_player_cnt++;
 			if (gr->ready_player_cnt >= MAX_IN_GAME_PLAYER) {
+				//static_cast<int>(time_point_cast<milliseconds>(ev.start_time).time_since_epoch().count());
+				gr->start_time = std::chrono::system_clock::now();
+				int game_start_time = static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(gr->start_time).time_since_epoch().count());
+				game_start(gr->game_room_id);
 
 				for (const auto pl : gr->player_ids) {
-					send_game_start(pl->id);
+					send_game_start(pl->id, game_start_time);
 					reinterpret_cast<Client*>(pl)->cur_room_num = gr->game_room_id;
 
 				}
-				gr->start_time = std::chrono::system_clock::now();
-				game_start(gr->game_room_id);
+
 				std::cout << "Game Start\n";
 
 			}
@@ -908,6 +924,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 	break;
 	case CS_PACKET_PARRYING:
 	{
+		//이 맵의 모든 패턴 중에서 running_time주변 시간에 패링 공격이 있는지 확인하고
+		//있다면 패링 성공 패킷을 보낸다.
 		cs_packet_parrying* packet = reinterpret_cast<cs_packet_parrying*>(p);
 #ifdef DEBUG
 		printf("%d : I want parrying!!\n", client_id);
@@ -923,8 +941,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
 			// 현재시간에 패링패턴이 있었는지 확인
 			const std::vector<PatternInfo>& pt = maps[gr->map_type]->GetPatternTime();
-			//이 맵의 모든 패턴 중에서 running_time주변 시간에 패링 공격이 있는지 확인하고
-			//있다면 패링 성공 패킷을 보낸다.
+
 
 			for (auto& pattern : pt) {
 				// 패링 노트인지 채크
@@ -1054,6 +1071,13 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 	}
 	break;
+	case CS_PACKET_PING_TEST:
+	{
+		cs_packet_ping_test* packet = reinterpret_cast<cs_packet_ping_test*>(p);
+		
+		send_ping(client_id, packet->ping_time);
+	}
+		break;
 	default:
 		std::cout << "이상한 패킷 수신\n";
 		break;
@@ -1330,6 +1354,10 @@ void Network::worker()
 				//std::cout << parrying_end_time << " " << player_parring_time << " player parrying failed\n";
 				//패링 못했으니 플레이어를 때리자
 				clients[target_id]->hp -= 10;
+				for (const auto& p : game_room[game_room_id]->player_ids) {
+					if (p == nullptr) continue;
+					send_attack_player(game_room[game_room_id]->boss_id->id, target_id, p->id);
+				}
 				if (clients[target_id]->hp < 0) {
 					// 게임 끝
 					reinterpret_cast<Client*>(clients[target_id])->is_active = false;
@@ -1349,10 +1377,7 @@ void Network::worker()
 					}
 				}
 
-				for (const auto& p : game_room[game_room_id]->player_ids) {
-					if (p == nullptr) continue;
-					send_attack_player(game_room[game_room_id]->boss_id->id, target_id, p->id);
-				}
+
 			}
 		}
 		break;

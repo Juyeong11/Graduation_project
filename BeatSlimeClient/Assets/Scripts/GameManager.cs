@@ -68,6 +68,11 @@ public class GameManager : MonoBehaviour
     int myPlayerID = -1;
     public ArrayList Mapdata = new ArrayList();
 
+    //server time
+    int GameStartTime;
+    int GameElapsedTime;
+    int[] ping_data = {-1,-1,-1,-1,-1, -1,-1,-1,-1,-1};
+    int ping_index;
     void Awake()
     {
         print("Start");
@@ -235,8 +240,8 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:
                         {
                             Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
-                            
 
+                            GameStartTime = p.game_start_time;
                             PlaySound();
                         }
                         break;
@@ -501,6 +506,21 @@ public class GameManager : MonoBehaviour
                             ParticleEffect.ParticleApply(JudgeCases.PERFECT);
                             nowCombo++;
                             Debug.Log("Parrying Success");
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_ELAPSED_TIME:
+                        {
+
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_PING_TEST:
+                        {
+                            Protocol.sc_packet_ping_test p = Protocol.sc_packet_ping_test.SetByteToVar(data);
+                            
+                            int ping = System.DateTime.Now.Millisecond - p.ping_time;
+                            ping_data[ping_index++] = ping;
+                            ping_index = ping_index % ping_data.Length;
+                            Debug.Log(ping);
                         }
                         break;
                     default:
