@@ -959,7 +959,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				printf("%d parry successed : %d in %d\n", id, running_time, pattern.time);
 #endif
 				reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
-					= static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count());
+					= std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
 
 				//수정
 				gr->boss_id->hp -= 10;
@@ -1261,8 +1261,8 @@ void Network::worker()
 		{
 			int target_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
-			int parrying_end_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));//std::chrono::system_clock::now();//
-			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
+			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
+			long long parrying_end_time = *(reinterpret_cast<long long*>(exp_over->_net_buf + sizeof(int) * 3));//std::chrono::system_clock::now();//
 
 			target_id = game_room[game_room_id]->find_online_player();
 			if (target_id == -1) break;
@@ -1301,7 +1301,7 @@ void Network::worker()
 			auto player_parring_time = reinterpret_cast<Client*>(clients[target_id])->pre_parrying_pattern;
 
 			if (parrying_end_time - player_parring_time < 200) {
-				//std::cout << parrying_end_time <<" " << player_parring_time << " player already parrying\n";
+				std::cout << parrying_end_time <<" " << player_parring_time << " player already parrying\n";
 				//패링 했으니 넘어가자
 				//패링 한 뒤 동작은 이미 worker thread에서 수행된 상태이다
 			}
@@ -1342,11 +1342,10 @@ void Network::worker()
 		{
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			int pattern_type = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
-			int charging_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
-			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
-			int pivot_x = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
-			int pivot_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
-			int pivot_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
+			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
+			int pivot_x = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) *3));
+			int pivot_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
+			int pivot_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
 
 
 			// 시작 위치를 중심으로 패턴 공격
@@ -1534,9 +1533,10 @@ void Network::do_timer() {
 					ex_over->_comp_op = OP_PLAYER_PARRYING;
 					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.game_room_id;
-					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = static_cast<int>(time_point_cast<milliseconds>(ev.start_time).time_since_epoch().count());
 
-					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.pivotType;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.pivotType;
+					*reinterpret_cast<long long*>(ex_over->_net_buf + sizeof(int) * 3) =
+						time_point_cast<milliseconds>(ev.start_time).time_since_epoch().count();
 					break;
 				case EVENT_GAME_END:
 					ex_over->_comp_op = OP_GAME_END;
@@ -1616,7 +1616,7 @@ void Network::set_next_pattern(int room_id)
 		tev.z = t.z;
 		tev.game_room_id = room_id;
 		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time + 200);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time + 100);
 		//tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
 		timer_queue.push(tev);

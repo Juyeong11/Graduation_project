@@ -138,7 +138,7 @@ public:
 	int cur_room_num;
 	int		prev_recv_size;
 
-	int pre_parrying_pattern;
+	long long pre_parrying_pattern;
 public:
 
 	Client(Skill* sk) : skill(sk)
