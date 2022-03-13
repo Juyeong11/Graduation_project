@@ -61,7 +61,10 @@ public struct HexCoordinates
 	{
 		return new HexCoordinates(x, z, w);
 	}
-
+	public Vector3 getRealPosition()
+	{
+		return new Vector3(this.x * 0.866f, this.w * 0.2f, this.x * 0.5f + this.z * 1f);
+	}
 	public void setCoordinates(int x, int z, int w=0)
     {
 		this.x = x;

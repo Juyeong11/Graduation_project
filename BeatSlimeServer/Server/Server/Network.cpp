@@ -930,61 +930,54 @@ void Network::process_packet(int client_id, unsigned char* p)
 #ifdef DEBUG
 		printf("%d : I want parrying!!\n", client_id);
 #endif
-		for (auto* gr : game_room) {
-			if (false == gr->isGaming) {
+		GameRoom* gr = game_room[reinterpret_cast<Client*>(clients[client_id])->cur_room_num];
+
+		// 해당 플레이어의 게임 방을 찾고
+		if (-1 == gr->FindPlayer(client_id)) { std::cout << "Can not find player game room\n"; }
+		int id = gr->FindPlayerID_by_GameRoom(client_id);
+		// 게임시간이 얼마나 지났는지 확인하고
+		int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
+		// 현재시간에 패링패턴이 있었는지 확인
+		const std::vector<PatternInfo>& pt = maps[gr->map_type]->GetPatternTime();
+
+
+		for (auto& pattern : pt) {
+			// 패링 노트인지 채크
+			if (10 != pattern.type) {
 				continue;
 			}
-			// 해당 플레이어의 게임 방을 찾고
-			if (-1 == gr->FindPlayer(client_id)) { std::cout << "Can not find player game room\n"; continue; }
-			int id = gr->FindPlayerID_by_GameRoom(client_id);
-			// 게임시간이 얼마나 지났는지 확인하고
-			int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
-			// 현재시간에 패링패턴이 있었는지 확인
-			const std::vector<PatternInfo>& pt = maps[gr->map_type]->GetPatternTime();
-
-
-			for (auto& pattern : pt) {
-				// 패링 노트인지 채크
-				if (10 != pattern.type) {
-					continue;
-				}
-				// 타겟이 된 플레이어인지 체크
-				if (id != (pattern.pivotType - 4)) {
-					continue;
-				}
-
-				//100ms보다 작으면
-				if (abs(running_time - pattern.time) < 100) {
-					//패링 성공
-					// 패링 성공 패킷을 클라이언트로 보냄
-#ifdef DEBUG
-					printf("%d parry successed : %d in %d\n", id, running_time, pattern.time);
-#endif
-					reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
-						= static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count());
-
-					//수정
-					gr->boss_id->hp -= 10;
-					if (gr->boss_id->hp < 0) {
-						timer_event tev;
-						tev.ev = EVENT_GAME_END;
-						tev.game_room_id = gr->game_room_id;
-						//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-						tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
-
-						timer_queue.push(std::move(tev));
-					}
-					for (const auto pl : gr->player_ids) {
-						if (pl == nullptr) continue;
-						send_parrying(pl->id, client_id);
-						send_attack_player(client_id, gr->boss_id->id, pl->id);
-					}
-					break;
-				}
-
-
+			// 타겟이 된 플레이어인지 체크
+			if (id != (pattern.pivotType - 4)) {
+				continue;
 			}
-			break;
+
+			//100ms보다 작으면
+			if (abs(running_time - pattern.time) < 100) {
+				//패링 성공
+				// 패링 성공 패킷을 클라이언트로 보냄
+#ifdef DEBUG
+				printf("%d parry successed : %d in %d\n", id, running_time, pattern.time);
+#endif
+				reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
+					= static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count());
+
+				//수정
+				gr->boss_id->hp -= 10;
+				if (gr->boss_id->hp < 0) {
+					timer_event tev;
+					tev.ev = EVENT_GAME_END;
+					tev.game_room_id = gr->game_room_id;
+					//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+					tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+					timer_queue.push(tev);
+				}
+				for (const auto pl : gr->player_ids) {
+					if (pl == nullptr) continue;
+					send_parrying(pl->id, client_id);
+					send_attack_player(client_id, gr->boss_id->id, pl->id);
+				}
+			}
 		}
 
 	}
@@ -1191,9 +1184,11 @@ void Network::worker()
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
 			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
 
-			int target_id = -1;
+			int target_id = game_room[game_room_id]->find_online_player();
+
 			int pivot_x, pivot_y, pivot_z;
 
+			if (target_id == -1) break;
 			// 보스가 무엇을 기준으로 움직이는지
 			switch (pivotType)
 			{
@@ -1221,29 +1216,21 @@ void Network::worker()
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player1:
-				if (game_room[game_room_id]->player_ids[0] == nullptr)
-					target_id = game_room[game_room_id]->find_online_player();
-				else
+				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player2:
-				if (game_room[game_room_id]->player_ids[1] == nullptr)
-					target_id = game_room[game_room_id]->find_online_player();
-
-				else
+				if (game_room[game_room_id]->player_ids[1] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[1]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player3:
-				if (game_room[game_room_id]->player_ids[2] == nullptr)
-					target_id = game_room[game_room_id]->find_online_player();
-
-				else
+				if (game_room[game_room_id]->player_ids[2] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[2]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
@@ -1277,7 +1264,9 @@ void Network::worker()
 			int parrying_end_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));//std::chrono::system_clock::now();//
 			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
 
-			target_id = -1;
+			target_id = game_room[game_room_id]->find_online_player();
+			if (target_id == -1) break;
+
 			switch (pivotType)
 			{
 			case PlayerM:
@@ -1288,31 +1277,21 @@ void Network::worker()
 				break;
 
 			case Boss:
-				target_id = game_room[game_room_id]->boss_id->id;
-
+				//target_id = game_room[game_room_id]->boss_id->id;
+				std::cout << "Boss can not Parrying self\n";
 				break;
 			case Player1:
-				if (game_room[game_room_id]->player_ids[0] == nullptr)
-					target_id = game_room[game_room_id]->find_online_player();
-
-				else
+				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
-
 
 				break;
 			case Player2:
-				if (game_room[game_room_id]->player_ids[1] == nullptr)
-					target_id = game_room[game_room_id]->find_online_player();
-
-				else
+				if (game_room[game_room_id]->player_ids[1] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[1]->id;
 
 				break;
 			case Player3:
-				if (game_room[game_room_id]->player_ids[2] == nullptr)
-					target_id = game_room[game_room_id]->find_online_player();
-
-				else
+				if (game_room[game_room_id]->player_ids[2] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[2]->id;
 
 				break;
@@ -1321,7 +1300,7 @@ void Network::worker()
 			//패링을 했는지 안했는지 확인
 			auto player_parring_time = reinterpret_cast<Client*>(clients[target_id])->pre_parrying_pattern;
 
-			if ((parrying_end_time - player_parring_time) < 200) {
+			if (parrying_end_time - player_parring_time < 200) {
 				//std::cout << parrying_end_time <<" " << player_parring_time << " player already parrying\n";
 				//패링 했으니 넘어가자
 				//패링 한 뒤 동작은 이미 worker thread에서 수행된 상태이다
@@ -1373,8 +1352,9 @@ void Network::worker()
 			// 시작 위치를 중심으로 패턴 공격
 			// 공격 이펙트 보내고
 			// 서버에서 공격 처리할 이벤트 추가
-			int target_id = -1;
+			int target_id = game_room[game_room_id]->find_online_player();
 
+			if (target_id == -1) break;
 			int pos_x, pos_z, pos_y, dir = 0;
 			//printf("%d %d %d\n", pivot_x, pivot_y, pivot_z);
 			switch (pivotType)
@@ -1403,28 +1383,21 @@ void Network::worker()
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player1:
-				if (game_room[game_room_id]->player_ids[0] == nullptr)
-					target_id = game_room[game_room_id]->find_online_player();
-				else
+				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player2:
-				if (game_room[game_room_id]->player_ids[1] == nullptr)
-					target_id = game_room[game_room_id]->find_online_player();
-
-				else
+				if (game_room[game_room_id]->player_ids[1] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[1]->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 				pos_y = -pos_x - pos_z;
 				break;
 			case Player3:
-				if (game_room[game_room_id]->player_ids[2] == nullptr)
-					target_id = game_room[game_room_id]->find_online_player();
-				else
+				if (game_room[game_room_id]->player_ids[2] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[2]->id;
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
@@ -1558,7 +1531,7 @@ void Network::do_timer() {
 					break;
 
 				case EVENT_PLAYER_PARRYING:
-					ex_over->_comp_op = OP_PLAYER_PARRYING_START;
+					ex_over->_comp_op = OP_PLAYER_PARRYING;
 					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.target_id;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.game_room_id;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = static_cast<int>(time_point_cast<milliseconds>(ev.start_time).time_since_epoch().count());
@@ -1643,7 +1616,7 @@ void Network::set_next_pattern(int room_id)
 		tev.z = t.z;
 		tev.game_room_id = room_id;
 		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time + 100);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time + 200);
 		//tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
 		timer_queue.push(tev);

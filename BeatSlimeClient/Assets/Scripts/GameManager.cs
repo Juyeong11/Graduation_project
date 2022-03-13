@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
     public ResultsData resultsData;
 
     //
-    GameObject[] Objects = new GameObject[4];
+    public GameObject[] Objects = new GameObject[4];
     int[] ids;
     int myPlayerID = -1;
     public ArrayList Mapdata = new ArrayList();
@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
     //server time
     int GameStartTime;
     int GameElapsedTime;
-    int[] ping_data = {-1,-1,-1,-1,-1, -1,-1,-1,-1,-1};
+    int[] ping_data = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
     int ping_index;
     void Awake()
     {
@@ -83,7 +83,7 @@ public class GameManager : MonoBehaviour
         debugStart = false;
         alreadyMoved = 0;
 
-        if(grid.TMP)
+        if (grid.TMP)
         {
             loader.Match(grid);
             loader.LoadMap();
@@ -117,7 +117,179 @@ public class GameManager : MonoBehaviour
         PM = PatternManager.data;
         ids = new int[4];
     }
+    public HexDirection GetBossDir()
+    {
+        return Objects[3].GetComponent<HexCellPosition>().direction;
+    }
+    int FindMinHpID()
+    {
+        int min = 0xfffff;
+        int ret = -1;
+        for (int i = 0; i < 3; ++i)
+        {
+            if (false == Objects[i].activeSelf) continue;
+            int hp = Objects[i].GetComponentInChildren<PlayerManager>().HP.CurrentHP;
+            if (min > hp)
+            {
+                min = hp;
+                ret = i;
+            }
+        }
+        return ret;
+    }
+    int FindMaxHpID()
+    {
+        int max = 0;
+        int ret = -1;
+        for (int i = 0; i < 3; ++i)
+        {
+            if (false == Objects[i].activeSelf) continue;
 
+            int hp = Objects[i].GetComponentInChildren<PlayerManager>().HP.CurrentHP;
+            if (max < hp)
+            {
+                max = hp;
+                ret = i;
+            }
+        }
+        return ret;
+    }
+    int FindOnlineID()
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            if (false == Objects[i].activeSelf) continue;
+            return i;
+        }
+        return -1;
+    }
+    public HexCoordinates GetBossPos()
+    {
+        return Objects[3].GetComponent<HexCellPosition>().coordinates;
+    }
+    
+    public HexCoordinates GetTargetPos(string pivotType)
+    {
+        HexCoordinates target_pos = new HexCoordinates();
+        int OnlinePlayerID = FindOnlineID();
+        // All die
+        if (OnlinePlayerID == -1)
+        {
+            return new HexCoordinates(0, 0, 0);
+        }
+        if (pivotType == "PlayerM")
+        {
+            target_pos = Objects[FindMaxHpID()].GetComponent<HexCellPosition>().coordinates;
+        }
+        else if (pivotType == "Playerm")
+        {
+            target_pos = Objects[FindMinHpID()].GetComponent<HexCellPosition>().coordinates;
+        }
+        else if (pivotType == "World")
+        {
+            target_pos = PatternManager.data.pattern[0].pivot;
+        }
+        else if (pivotType == "Boss")
+        {
+            target_pos = Objects[3].GetComponent<HexCellPosition>().coordinates;
+        }
+        else if (pivotType == "Player1")
+        {
+            if (Objects[0].activeSelf)
+            {
+                target_pos = Objects[0].GetComponent<HexCellPosition>().coordinates;
+            }
+            else
+            {
+                target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
+            }
+        }
+        else if (pivotType == "Player2")
+        {
+            if (Objects[1].activeSelf)
+            {
+                target_pos = Objects[1].GetComponent<HexCellPosition>().coordinates;
+            }
+            else
+            {
+                target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
+            }
+        }
+        else if (pivotType == "Player3")
+        {
+            if (Objects[2].activeSelf)
+            {
+                target_pos = Objects[2].GetComponent<HexCellPosition>().coordinates;
+            }
+            else
+            {
+                target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
+            }
+        }
+        else if (pivotType == "END")
+            Debug.Log("Pattern End");
+        else
+            Debug.Log("Load : wrong pivotType\n");
+
+        return target_pos;
+    }
+    public ref GameObject GetPlayerREF(string pivotType)
+    {
+        ref GameObject target = ref Objects[0];
+        int OnlinePlayerID = FindOnlineID();
+        if(OnlinePlayerID == -1)
+        {
+            Debug.Log("All die");
+            return ref target;
+        }
+        if (pivotType == "PlayerM")
+        {
+            target = ref Objects[FindMaxHpID()];
+        }
+        else if (pivotType == "Playerm")
+        {
+            target = ref Objects[FindMinHpID()];
+        }
+
+        else if (pivotType == "Boss")
+        {
+            target = ref Objects[3];
+        }
+        else if (pivotType == "Player1")
+        {
+            if (Objects[0].activeSelf)
+            {
+                target = ref Objects [0];
+            }
+            else
+            {
+                target = ref Objects [OnlinePlayerID];
+            }
+        }
+        else if (pivotType == "Player2")
+        {
+            if (Objects[1].activeSelf)
+            {
+                target = ref Objects[1];
+            }
+            else
+            {
+                target = ref Objects[OnlinePlayerID];
+            }
+        }
+        else if (pivotType == "Player3")
+        {
+            if (Objects[2].activeSelf)
+            {
+                target = ref Objects[2];
+            }
+            else
+            {
+                target = ref Objects[OnlinePlayerID];
+            }
+        }
+        return ref target;
+    }
     void FixedUpdate()
     {
         if (Input.GetKeyDown("9"))
@@ -252,10 +424,10 @@ public class GameManager : MonoBehaviour
                             Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
-                            
+
                             if (!debugStart)
                             {
-                                
+
                                 //Debug.Log(p.id+" : pid");
                                 Objects[pid].GetComponentInChildren<HexCellPosition>().setDirection((byte)p.dir);
                                 Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
@@ -286,10 +458,10 @@ public class GameManager : MonoBehaviour
                             //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
                             //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
-                            if(target_id != 3) // is not boss
+                            if (target_id != 3) // is not boss
                             {
                                 HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
-                                
+
                                 Objects[target_id].GetComponentInChildren<PlayerManager>().StunTrig();
                                 //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
@@ -297,23 +469,23 @@ public class GameManager : MonoBehaviour
                                 if (target_id == myPlayerID)
                                 {
                                     resultsData.damaged += (hm.CurrentHP - p.hp);
-                                    
+
                                     CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
                                 }
 
                                 hm.Damage(hm.CurrentHP - p.hp);
 
-                                
+
                             }
                             else
                             {
                                 //Objects[ServerID_To_ClientID(p.id)].GetComponentInChildren<PlayerManager>().AttackTrig();
                                 HPManager hm = Objects[target_id].GetComponentInChildren<EnemyManager>().HP;
                                 resultsData.attack += (hm.CurrentHP - p.hp);
-                                
+
                                 hm.Damage(hm.CurrentHP - p.hp);
 
-                                
+
                                 //Objects[target_id].GetComponentInChildren<EnemyManager>().StunTrig();
                             }
 
@@ -410,27 +582,27 @@ public class GameManager : MonoBehaviour
                             int tid = -1;
                             if (p.target_id != -1)
                                 tid = ServerID_To_ClientID(p.target_id);
-                            
+
                             // ÇÃ·¹ÀÌ¾î ½ºÅ³ ÀÌÆåÆ®¸¸ ¿©±â¼­ Ãâ·Â ¹øÈ£´Â 55¹ø
                             switch (p.effect_type)
                             {
                                 case 3:
-                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time,3);
+                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time, 3);
                                     break;
                                 case 4:
-                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time,4);
+                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time, 4);
                                     break;
                                 case 99:
                                     EffectManager.instance.OneTileEffect(p.x, p.y, p.z, p.charging_time);
                                     break;
                                 case 5:
                                     EffectManager.instance.BossWaterGunEffect(Objects[pid].transform.localPosition, Objects[tid].transform.localPosition, p.charging_time);
-                                break;
+                                    break;
                                 case 6:
                                     EffectManager.instance.BossQuakeEffect(p.x, p.y, p.z, p.charging_time, Objects[tid].GetComponent<HexCellPosition>().direction);
                                     break;
                                 case 10:
-                                    EffectManager.instance.BossTargetingEffect(Objects[pid].transform.localPosition,ref Objects[tid], p.charging_time);
+                                    EffectManager.instance.BossTargetingEffect(Objects[pid].transform.localPosition, ref Objects[tid], p.charging_time);
                                     break;
 
                                 case 55:// skill
@@ -445,7 +617,7 @@ public class GameManager : MonoBehaviour
                                         case 2:
                                             {
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
-                                                EffectManager.instance.PlayerQuakeEffect(cell.X,cell.Y,cell.Z, p.charging_time);
+                                                EffectManager.instance.PlayerQuakeEffect(cell.X, cell.Y, cell.Z, p.charging_time);
                                                 //Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " skill attack");
 
                                             }
@@ -476,28 +648,28 @@ public class GameManager : MonoBehaviour
                             if (p.end_type == 0)
                             {
                                 gameOverImage.SetGameEnd(GameEndTraits.Lose);
-                                gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack,resultsData.damaged,0);
+                                gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack, resultsData.damaged, 0);
                                 Debug.Log("Game_Over");
                             }
                             else if (p.end_type == 1)
                             {
                                 gameOverImage.SetGameEnd(GameEndTraits.Win);
-                                gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack,resultsData.damaged,
-                                                            resultsData.perfect*1000 + resultsData.great*500 - resultsData.miss*50 + resultsData.attack*100 - resultsData.damaged*20);
+                                gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack, resultsData.damaged,
+                                                            resultsData.perfect * 1000 + resultsData.great * 500 - resultsData.miss * 50 + resultsData.attack * 100 - resultsData.damaged * 20);
                                 Debug.Log("Game_Clear");
                             }
                             else
                             {
                                 Debug.Log("Game_Error");
                             }
-                            
-                            
+
+
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PARRYING:
                         {
                             Protocol.sc_packet_parrying p = Protocol.sc_packet_parrying.SetByteToVar(data);
-                            
+
                             int pid = ServerID_To_ClientID(p.id);
                             Objects[pid].GetComponentInChildren<PlayerManager>().ParryTrig();
 
@@ -518,7 +690,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_PING_TEST:
                         {
                             Protocol.sc_packet_ping_test p = Protocol.sc_packet_ping_test.SetByteToVar(data);
-                            
+
                             int ping = System.DateTime.Now.Millisecond - p.ping_time;
                             ping_data[ping_index++] = ping;
                             ping_index = ping_index % ping_data.Length;
@@ -575,7 +747,7 @@ public class GameManager : MonoBehaviour
                 MidNote.notePerfect();
                 //DEBUG ÆÛÆåÆ® ÆÄÆ¼Å¬ Ãß°¡
 
-                if (beatCounter <= JudgementTiming/2f)
+                if (beatCounter <= JudgementTiming / 2f)
                 {
                     resultsData.perfect++;
                     JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
@@ -598,7 +770,7 @@ public class GameManager : MonoBehaviour
             {
                 MidNote.notePerfect();
 
-                if ((timeByBeat - beatCounter) <= JudgementTiming/2f)
+                if ((timeByBeat - beatCounter) <= JudgementTiming / 2f)
                 {
                     resultsData.perfect++;
                     JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
@@ -622,13 +794,13 @@ public class GameManager : MonoBehaviour
                 resultsData.miss++;
                 JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.BAD);
                 //ParticleEffect.ParticleApply(JudgeCases.BAD);
-                ComboEffect.CountApply(ref nowCombo,true);
+                ComboEffect.CountApply(ref nowCombo, true);
                 return 0;   //ï¿½ß¸ï¿½ ï¿½ï¿½ï¿½ï¿½
             }
         }
         else
         {
-            ComboEffect.CountApply(ref nowCombo,true);
+            ComboEffect.CountApply(ref nowCombo, true);
             //MidNote.noteEnd();
             //Debug.Log("Cutting");
         }
