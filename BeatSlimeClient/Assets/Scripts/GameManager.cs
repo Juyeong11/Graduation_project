@@ -486,6 +486,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     resultsData.damaged += (hm.CurrentHP - p.hp);
 
+                                    ComboEffect.CountApply(ref nowCombo, true);
                                     CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
                                 }
 
@@ -811,7 +812,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            ComboEffect.CountApply(ref nowCombo, true);
+            //ComboEffect.CountApply(ref nowCombo, true);
             //MidNote.noteEnd();
             //Debug.Log("Cutting");
         }

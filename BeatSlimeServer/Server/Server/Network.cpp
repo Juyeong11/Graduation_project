@@ -909,7 +909,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 				for (const auto pl : gr->player_ids) {
 					send_game_start(pl->id, game_start_time);
-					reinterpret_cast<Client*>(pl)->cur_room_num = gr->game_room_id;
+					reinterpret_cast<Client*>(pl)->cur_room_num = gr->game_room_id; 
 
 				}
 
