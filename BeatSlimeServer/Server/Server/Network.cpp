@@ -54,8 +54,8 @@ Network::Network() {
 		maps[i] = new MapInfo;
 	}
 
-	maps[FIELD_MAP]->SetMap("Map\\Field", "Music\\flower_load.csv");
-	maps[WITCH_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
+	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
+	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
@@ -312,18 +312,7 @@ void Network::send_ping(int c_id, int time)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
-void Network::send_game_elapsed_time(int c_id, int time)
-{
-	sc_packet_game_elapsed_time packet;
-	packet.type = SC_PACKET_ELAPSED_TIME;
-	packet.size = sizeof(packet);
-	packet.elapsed_time = time;
 
-	EXP_OVER* ex_over;
-	while (!exp_over_pool.try_pop(ex_over));
-	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
-}
 void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
@@ -1078,7 +1067,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_PING_TEST:
 	{
 		cs_packet_ping_test* packet = reinterpret_cast<cs_packet_ping_test*>(p);
-
+		
 		send_ping(client_id, packet->ping_time);
 	}
 	break;

@@ -70,8 +70,9 @@ public class GameManager : MonoBehaviour
 
     //server time
     int GameStartTime;
-    int GameElapsedTime;
+
     int avgPing;
+    float prePingTestTime;
     void Awake()
     {
         print("Start");
@@ -112,6 +113,7 @@ public class GameManager : MonoBehaviour
         loader.LoadMap();
 
         offsetTime = 0;
+        prePingTestTime = 5.0f;
         //DEBUG
         enemy.GetComponent<HexCellPosition>().setInitPosition(0, 0);
         PM = PatternManager.data;
@@ -370,7 +372,12 @@ public class GameManager : MonoBehaviour
 
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
-            //if(GameElapsedTime/1000)
+            prePingTestTime -= Time.deltaTime;
+            if (prePingTestTime < 0)
+            {
+                prePingTestTime = 5.0f;
+                FieldGameManager.Net.SendPingTestPacket();
+            }
         }
         if (FieldGameManager.Net.isServerOnline())
         {
@@ -684,13 +691,6 @@ public class GameManager : MonoBehaviour
                             ParticleEffect.ParticleApply(JudgeCases.PERFECT);
                             nowCombo++;
                             Debug.Log("Parrying Success");
-                        }
-                        break;
-                    case Protocol.CONSTANTS.SC_PACKET_ELAPSED_TIME:
-                        {
-                            Protocol.sc_packet_elapsed_time p = Protocol.sc_packet_elapsed_time.SetByteToVar(data);
-
-                            GameElapsedTime = p.elapsed_time;
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PING_TEST:

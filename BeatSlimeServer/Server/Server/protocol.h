@@ -30,7 +30,7 @@ const char SC_PACKET_GAME_END = 10;
 const char SC_PACKET_PARRYING = 11;
 const char SC_PACKET_GAME_INIT = 12;
 const char SC_PACKET_CHANGE_SKILL = 13;
-const char SC_PACKET_ELAPSED_TIME = 14;
+
 const char SC_PACKET_PING_TEST = 15;
 
 #pragma pack (push, 1)
@@ -203,12 +203,6 @@ struct sc_packet_change_skill {
 	int		id;
 	char	skill_type;
 	char	skill_level;
-};
-
-struct sc_packet_game_elapsed_time {
-	unsigned char size;
-	char	type;
-	int		elapsed_time; // milliseconds
 };
 
 struct sc_packet_ping_test {

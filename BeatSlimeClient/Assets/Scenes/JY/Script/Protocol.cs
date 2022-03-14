@@ -44,7 +44,7 @@ namespace Protocol
         public const byte SC_PACKET_PARRYING = 11;
         public const byte SC_PACKET_GAME_INIT = 12;
         public const byte SC_PACKET_CHANGE_SKILL = 13;
-        public const byte SC_PACKET_ELAPSED_TIME = 14;
+
         public const byte SC_PACKET_PING_TEST = 15;
 
     }
@@ -352,14 +352,6 @@ namespace Protocol
         public byte skill_type;
     }
 
-    [Serializable]
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public class sc_packet_elapsed_time : ISerializeble<sc_packet_elapsed_time>
-    {
-        public byte size;
-        public byte type;
-        public int elapsed_time;
-    }
 
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
