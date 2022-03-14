@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
 
         if (grid.TMP)
         {
-            loader.Match(grid);
+            loader.Match(ref grid);
             loader.LoadMap();
         }
 
@@ -110,7 +110,6 @@ public class GameManager : MonoBehaviour
     {
         if (!FieldGameManager.Net.isServerOnline()) FieldGameManager.Net.CreateAndConnect();
         FieldGameManager.Net.SendChangeSceneDonePacket(1);
-        loader.LoadMap();
 
         offsetTime = 0;
         prePingTestTime = 5.0f;

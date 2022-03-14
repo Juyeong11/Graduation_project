@@ -10,7 +10,7 @@ public class MapLoader : MonoBehaviour
     public string MapName;
     public GameObject GRID;
 
-    public void Match(HexGrid hg)
+    public void Match(ref HexGrid hg)
     {
         grid = hg;
     }
