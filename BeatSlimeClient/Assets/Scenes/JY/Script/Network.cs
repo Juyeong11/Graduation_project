@@ -10,13 +10,15 @@ using System.Runtime.InteropServices;
 public class Network
 {
     static public Queue<byte[]> MessQueue = new Queue<byte[]>();
+    static public int[] ping_data = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+    static public int ping_index;
 
     const int BUFSIZE = 256;
 
     Socket ClientSocket;
 
     byte[] receiveBytes = new byte[BUFSIZE];
-    byte[] tempBytes = new byte[BUFSIZE * 2];
+
 
     public bool debugOnline = false;
     public bool isOnline = false;
@@ -96,6 +98,18 @@ public class Network
             Debug.Log(ex.SocketErrorCode);
             CreateAndConnect();
         }
+    }
+
+    static public int GetPingAvg()
+    {
+        int i = 0;
+        int sum = 0;
+        for(;i< ping_data.Length; ++i)
+        {
+            if (ping_data[i] == -1) break;
+            sum += ping_data[i];
+        }
+        return sum/i;
     }
     public void SendLogIn()
     {

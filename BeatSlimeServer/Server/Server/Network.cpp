@@ -312,7 +312,18 @@ void Network::send_ping(int c_id, int time)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
+void Network::send_game_elapsed_time(int c_id, int time)
+{
+	sc_packet_game_elapsed_time packet;
+	packet.type = SC_PACKET_ELAPSED_TIME;
+	packet.size = sizeof(packet);
+	packet.elapsed_time = time;
 
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+}
 void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)

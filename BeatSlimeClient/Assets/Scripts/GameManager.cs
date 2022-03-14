@@ -71,8 +71,7 @@ public class GameManager : MonoBehaviour
     //server time
     int GameStartTime;
     int GameElapsedTime;
-    int[] ping_data = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-    int ping_index;
+    int avgPing;
     void Awake()
     {
         print("Start");
@@ -112,6 +111,7 @@ public class GameManager : MonoBehaviour
         FieldGameManager.Net.SendChangeSceneDonePacket(1);
         loader.LoadMap();
 
+        offsetTime = 0;
         //DEBUG
         enemy.GetComponent<HexCellPosition>().setInitPosition(0, 0);
         PM = PatternManager.data;
@@ -346,7 +346,7 @@ public class GameManager : MonoBehaviour
         {
             int prevBeats = nowBeat.addBeat;
 
-            nowSongTime = SoundManager.instance.GetMusicLapsedTime() - offsetTime;
+            nowSongTime = SoundManager.instance.GetMusicLapsedTime() + offsetTime + avgPing;
             if (nowSongTime > 0)
             {
                 nowBeat.SetBeatTime(nowSongTime);
@@ -370,6 +370,7 @@ public class GameManager : MonoBehaviour
 
             if (alreadyMoved > 0)
                 alreadyMoved -= (int)(Time.deltaTime * 1000f);
+            //if(GameElapsedTime/1000)
         }
         if (FieldGameManager.Net.isServerOnline())
         {
@@ -407,6 +408,7 @@ public class GameManager : MonoBehaviour
                             PatternManager.data.Load(myPlayerID);
 
                             FieldGameManager.Net.SendGameStartReadyPacket();
+                            FieldGameManager.Net.SendPingTestPacket();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:
@@ -414,7 +416,11 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
 
                             GameStartTime = p.game_start_time;
+                            int Delay = System.DateTime.Now.Millisecond;
+
                             PlaySound();
+                            offsetTime = System.DateTime.Now.Millisecond - Delay;
+                            Debug.Log("Delay : " + offsetTime);
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
@@ -692,8 +698,10 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_ping_test p = Protocol.sc_packet_ping_test.SetByteToVar(data);
 
                             int ping = System.DateTime.Now.Millisecond - p.ping_time;
-                            ping_data[ping_index++] = ping;
-                            ping_index = ping_index % ping_data.Length;
+                            Network.ping_data[Network.ping_index++] = ping;
+                            Network.ping_index = Network.ping_index % Network.ping_data.Length;
+                            avgPing = Network.GetPingAvg();
+                            Debug.Log(avgPing);
                             Debug.Log(ping);
                         }
                         break;
