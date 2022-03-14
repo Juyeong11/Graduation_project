@@ -48,7 +48,7 @@ public class PatternManager : MonoBehaviour
             pattern.Add(tmpP);
             //print("patternLoad : " + tmpP.id);
             //DEBUG : 이펙트 패킷은 서버에서 보내줄 필요 없이 여기서 바로 읽어서 저장해놓고 사용하기 (동접자 올릴 때)
-
+            
             //자신에게 날아오는 보스의 유도 공격만!
             if (tmpP.noteType.ToString() == "10" && tmpP.pivotType == ("Player" + PID))
             {
@@ -67,6 +67,42 @@ public class PatternManager : MonoBehaviour
         {
             SettedPattern = pattern[0];
             SetSkill.Invoke();
+            //여기서 이펙트 출력하면 되겠군
+            //
+
+            HexCoordinates TargetPos = GameManager.data.GetTargetPos(pattern[0].pivotType);
+            HexCoordinates BossPos = GameManager.data.GetBossPos();
+            TargetPos.plus(pattern[0].pivot.X, pattern[0].pivot.Z);
+            int charging_time = pattern[0].warningBeatOffset.GetBeatTime();
+            switch (pattern[0].noteType)
+            {
+                case 3:
+                case 4:
+                    EffectManager.instance.BossTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].noteType);
+                    break;
+
+                case 99:
+                    EffectManager.instance.OneTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time);
+                    break;
+
+                case 5:
+                    EffectManager.instance.BossWaterGunEffect(BossPos.getRealPosition(), TargetPos.getRealPosition(), charging_time);
+
+                    break;
+
+                case 6:
+                    EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, GameManager.data.GetBossDir());
+
+                    break;
+
+                case 10:
+                    EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
+
+                    break;
+
+            }
+            
+
             settedPattern.Add(pattern[0]);
             pattern.RemoveAt(0);
             patNums++;
