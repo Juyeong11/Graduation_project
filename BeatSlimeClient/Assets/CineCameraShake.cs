@@ -38,10 +38,10 @@ public class CineCameraShake : MonoBehaviour
         float intensity = damage * intensityFactor;
         float time = intensity * timeFactor;
 
-        if (intensity > 5f)
-            intensity = 5f;
-        if (time > 1f)
-            time = 1f;
+        if (intensity > 3f)
+            intensity = 3f;
+        if (time > 0.5f)
+            time = 0.5f;
 
         noise.m_AmplitudeGain = intensity;
         
