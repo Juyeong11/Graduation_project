@@ -45,6 +45,7 @@ public:
 	char name[MAX_NAME_SIZE];
 	int		id;
 	short	x, y,z;
+	short	pre_x, pre_y, pre_z;
 	int direction;
 	std::atomic_int hp;
 	GO_TYPE		type;
@@ -53,11 +54,13 @@ public:
 	std::mutex state_lock;
 
 
-	int		last_move_time;
+	int		last_packet_time;
+	std::chrono::system_clock::time_point last_move_time;
 	GameObject() :state(ST_FREE) {
-		x = 0;
-		y = 0;
-		z = 0;
+		pre_x = x = 0;
+		pre_y = y = 0;
+		pre_z = z = 0;
+		//last_move_time = 0;
 		hp = 100;
 	}
 

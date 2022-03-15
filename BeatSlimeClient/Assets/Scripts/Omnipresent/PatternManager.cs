@@ -52,7 +52,7 @@ public class PatternManager : MonoBehaviour
             //자신에게 날아오는 보스의 유도 공격만!
             if (tmpP.noteType.ToString() == "10" && tmpP.pivotType == ("Player" + PID))
             {
-                Debug.Log(tmpP.id + " " + tmpP.noteType + " " + tmpP.pivotType);
+                //Debug.Log(tmpP.id + " " + tmpP.noteType + " " + tmpP.pivotType);
                 Factory.attackNotesBeats.Add(tmpP.rhythmBeat.GetBeatTime());
             }
             //DEBUG : 장판 공격도 작은 노트 보여주고싶음 (비트 알려주기 위해)
@@ -101,7 +101,7 @@ public class PatternManager : MonoBehaviour
                     break;
 
             }
-            
+            //Debug.Log("patternType : " + pattern[0].noteType);
 
             settedPattern.Add(pattern[0]);
             pattern.RemoveAt(0);

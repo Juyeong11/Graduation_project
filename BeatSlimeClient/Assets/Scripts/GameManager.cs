@@ -291,7 +291,7 @@ public class GameManager : MonoBehaviour
         }
         return ref target;
     }
-    void FixedUpdate()
+    void Update()
     {
         if (Input.GetKeyDown("9"))
         {
@@ -318,36 +318,7 @@ public class GameManager : MonoBehaviour
         //}
 
 
-        if (isGameStart && !FieldGameManager.Net.isServerOnline())
-        {
-            int prevBeats = nowBeat.addBeat;
-
-            nowSongTime = SoundManager.instance.GetMusicLapsedTime() - offsetTime;
-            if (nowSongTime > 0)
-            {
-                nowBeat.SetBeatTime(nowSongTime);
-
-                //Debug.Log(nowBeat.ToString() + " : now");
-
-                beatCounter -= (int)(Time.deltaTime * 1000f);
-
-                PM.PeekPattern(nowBeat);
-                PM.ServePattern(nowBeat);
-
-                if (prevBeats != nowBeat.addBeat)
-                {
-                    player.GetComponent<PlayerManager>().Beat();
-                    enemy.GetComponent<EnemyManager>().Beat();
-                    grid.Beat();
-                    soundEffectManager.BeatEffect();
-                    beatCounter = timeByBeat;
-                }
-            }
-
-            if (alreadyMoved > 0)
-                alreadyMoved -= (int)(Time.deltaTime * 1000f);
-        }
-        else if (isGameStart && FieldGameManager.Net.isServerOnline())
+    if (isGameStart && FieldGameManager.Net.isServerOnline())
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -437,7 +408,7 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
-                            Debug.Log("MOVE PACKET x : " + p.x);
+                            //Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
 
@@ -648,7 +619,7 @@ public class GameManager : MonoBehaviour
                                             }
                                             break;
                                     }
-                                    Debug.Log(p.y + " skill type");
+                                   // Debug.Log(p.y + " skill type");
                                     break;
                             }
                             //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));
@@ -694,7 +665,7 @@ public class GameManager : MonoBehaviour
                             JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
                             ParticleEffect.ParticleApply(JudgeCases.PERFECT);
                             ComboEffect.CountApply(ref nowCombo);
-                            Debug.Log("Parrying Success");
+                            //Debug.Log("Parrying Success");
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PING_TEST:
@@ -705,8 +676,8 @@ public class GameManager : MonoBehaviour
                             Network.ping_data[Network.ping_index++] = ping;
                             Network.ping_index = Network.ping_index % Network.ping_data.Length;
                             avgPing = Network.GetPingAvg();
-                            Debug.Log(avgPing);
-                            Debug.Log(ping);
+                            Debug.Log("avgPing : " + avgPing);
+                            //Debug.Log(ping);
                         }
                         break;
                     default:
@@ -802,7 +773,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 //MidNote.noteEnd();
-                Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
+               // Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
                 resultsData.miss++;
                 JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.BAD);
                 //ParticleEffect.ParticleApply(JudgeCases.BAD);
@@ -823,12 +794,12 @@ public class GameManager : MonoBehaviour
     {
         if (beatCounter <= JudgementTiming)
         {
-            Debug.Log("Judge : -" + beatCounter);
+            //Debug.Log("Judge : -" + beatCounter);
 
         }
         else if (timeByBeat - beatCounter <= JudgementTiming)
         {
-            Debug.Log("Judge : +" + (timeByBeat - beatCounter));
+            //Debug.Log("Judge : +" + (timeByBeat - beatCounter));
         }
 
         alreadyMoved = JudgementTiming * 2;

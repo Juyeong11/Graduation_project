@@ -54,6 +54,7 @@ public class Cell
 
     public Vector3 getCellRealPosition()
     {
+        if (obejct == null) return new Vector3(0, -1, 0);
         Vector3 neu = new Vector3();
         neu.x = obejct.transform.position.x;
         neu.y = obejct.transform.position.y + 0.128f;   ///

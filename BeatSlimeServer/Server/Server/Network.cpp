@@ -55,7 +55,7 @@ Network::Network() {
 	}
 
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
-	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
+	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\test.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
@@ -184,7 +184,7 @@ void Network::send_move_object(int c_id, int mover)
 	packet.z = clients[mover]->z;
 	packet.dir = clients[mover]->direction;
 
-	packet.move_time = clients[mover]->last_move_time;
+	packet.move_time = clients[mover]->last_packet_time;
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -536,7 +536,13 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (false == cl.is_active) break;
 
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
-		cl.last_move_time = packet->move_time;
+		cl.last_packet_time = packet->move_time;
+		cl.last_move_time = std::chrono::system_clock::now();
+
+		cl.pre_x = cl.x;
+		cl.pre_y = cl.y;
+		cl.pre_z = cl.z;
+
 		short& x = cl.x;
 		short& y = cl.y;
 		short& z = cl.z;
@@ -1308,7 +1314,7 @@ void Network::worker()
 			else {
 				//std::cout << parrying_end_time << " " << player_parring_time << " player parrying failed\n";
 				//패링 못했으니 플레이어를 때리자
-				clients[target_id]->hp -= 10;
+				clients[target_id]->hp -= 1;
 				for (const auto& p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 					send_attack_player(game_room[game_room_id]->boss_id->id, target_id, p->id);
@@ -1346,63 +1352,75 @@ void Network::worker()
 			int pivot_x = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) *3));
 			int pivot_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
 			int pivot_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
+			int charging_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
 
-
+			
 			// 시작 위치를 중심으로 패턴 공격
 			// 공격 이펙트 보내고
 			// 서버에서 공격 처리할 이벤트 추가
 			int target_id = game_room[game_room_id]->find_online_player();
 
-			if (target_id == -1) break;
+			if (target_id == -1) { 
+				std::cout << "tile attack : wrong target id\n";
+				break; 
+			}
 			int pos_x, pos_z, pos_y, dir = 0;
+	
 			//printf("%d %d %d\n", pivot_x, pivot_y, pivot_z);
 			switch (pivotType)
 			{
 			case PlayerM:
 				target_id = game_room[game_room_id]->find_max_hp_player();
-				pos_x = clients[target_id]->x + pivot_x;
-				pos_z = clients[target_id]->z + pivot_z;
-				pos_y = -pos_x - pos_z;
+
 				break;
 			case Playerm:
 				target_id = game_room[game_room_id]->find_min_hp_player();
-				pos_x = clients[target_id]->x + pivot_x;
-				pos_z = clients[target_id]->z + pivot_z;
-				pos_y = -pos_x - pos_z;
+
 				break;
 			case World:
-				pos_x = pivot_x;
-				pos_y = pivot_y;
-				pos_z = pivot_z;
+
 				break;
 			case Boss:
 				target_id = game_room[game_room_id]->boss_id->id;
-				pos_x = clients[target_id]->x + pivot_x;
-				pos_z = clients[target_id]->z + pivot_z;
-				pos_y = -pos_x - pos_z;
+
 				break;
 			case Player1:
 				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
-				pos_x = clients[target_id]->x + pivot_x;
-				pos_z = clients[target_id]->z + pivot_z;
-				pos_y = -pos_x - pos_z;
+
 				break;
 			case Player2:
 				if (game_room[game_room_id]->player_ids[1] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[1]->id;
-				pos_x = clients[target_id]->x + pivot_x;
-				pos_z = clients[target_id]->z + pivot_z;
-				pos_y = -pos_x - pos_z;
+
 				break;
 			case Player3:
 				if (game_room[game_room_id]->player_ids[2] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[2]->id;
-				pos_x = clients[target_id]->x + pivot_x;
-				pos_z = clients[target_id]->z + pivot_z;
-				pos_y = -pos_x - pos_z;
+
 				break;
 			}
+			if(pivotType == World){
+				pos_x = pivot_x;
+				pos_y = pivot_y;
+				pos_z = pivot_z;
+			}
+			else {
+				
+				std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clients[target_id]->last_move_time).count() << std::endl;
+				std::cout << charging_time << std::endl;
+				if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clients[target_id]->last_move_time).count() > charging_time)
+				{
+					pos_x = clients[target_id]->x + pivot_x;
+					pos_z = clients[target_id]->z + pivot_z;
+				}
+				else {
+					pos_x = clients[target_id]->pre_x + pivot_x;
+					pos_z = clients[target_id]->pre_z + pivot_z;
+				}
+					pos_y = -pos_x - pos_z;
+			}
+
 
 			switch (pattern_type)
 			{
@@ -1413,6 +1431,7 @@ void Network::worker()
 						PatternInfo::HexPattern3[i][0] + pos_x,
 						PatternInfo::HexPattern3[i][1] + pos_y,
 						PatternInfo::HexPattern3[i][2] + pos_z);
+					
 				}
 			}
 			break;
@@ -1436,12 +1455,12 @@ void Network::worker()
 			break;
 			case 5:
 			{
-				target_id = game_room[game_room_id]->find_max_distance_player();
+				
 
 				do_npc_tile_attack(game_room_id,
-					clients[target_id]->x,
-					clients[target_id]->y,
-					clients[target_id]->z);
+					pos_x,
+					pos_y,
+					pos_z);
 			}
 			break;
 			case 6:// 보스가 보는 방향으로 지진
@@ -1527,6 +1546,7 @@ void Network::do_timer() {
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.x;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.y;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.z;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.charging_time;
 					break;
 
 				case EVENT_PLAYER_PARRYING:
@@ -1600,7 +1620,7 @@ void Network::set_next_pattern(int room_id)
 		tev.game_room_id = room_id;
 		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
 		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
-		//tev.charging_time = t.speed;
+		tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
 		timer_queue.push(tev);
 		break;

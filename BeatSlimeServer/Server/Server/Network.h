@@ -19,7 +19,7 @@ struct timer_event {
 	int game_room_id;
 	int x, y, z;
 	int type;
-	//int charging_time;
+	int charging_time;
 	int pivotType;
 	std::chrono::system_clock::time_point start_time;
 	EVENT_TYPE ev;

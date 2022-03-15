@@ -31,7 +31,7 @@ public class EffectManager : MonoBehaviour
     // 1방향 공격
     public void OneTileEffect(int start_x, int start_y, int start_z, int speed)
     {
-
+        
         GameObject go = Instantiate(TileEffectPrefab, GameManager.data.grid.cellMaps.Get(start_x, start_y, start_z).getCellRealPosition(), Quaternion.identity);
         float s = speed * 1 / 1000f;
         //Debug.Log("effect t" + Time.time);
