@@ -76,8 +76,13 @@ public class PatternManager : MonoBehaviour
             int charging_time = pattern[0].warningBeatOffset.GetBeatTime();
             switch (pattern[0].noteType)
             {
+                case -1:
+                    //GameManager.data.GetEnemyAnim().SetTrigger("Move");
+                    break;
+
                 case 3:
                 case 4:
+                    //GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
                     EffectManager.instance.BossTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].noteType);
                     break;
 
@@ -86,11 +91,13 @@ public class PatternManager : MonoBehaviour
                     break;
 
                 case 5:
+                    //GameManager.data.GetEnemyAnim().SetTrigger("Attack");
                     EffectManager.instance.BossWaterGunEffect(BossPos.getRealPosition(), TargetPos.getRealPosition(), charging_time);
 
                     break;
 
                 case 6:
+                    //GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
                     EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, GameManager.data.GetBossDir());
 
                     break;

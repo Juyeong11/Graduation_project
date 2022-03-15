@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject player;
     public GameObject enemy;
+    Animator enemyAnim;
     public GameObject tilemap;
     public HexGrid grid;
     public MapLoader loader;
@@ -101,10 +102,15 @@ public class GameManager : MonoBehaviour
         timeBy16Beat = timeByBeat / 4;
 
         player.GetComponent<PlayerManager>().SetHPImages(HPGM.HPs[0], HPGM.prevHPs[0]);
+        enemyAnim = enemy.GetComponentInChildren<Animator>();
     }
     private void OnApplicationQuit()
     {
         FieldGameManager.Net.CloseSocket();
+    }
+    public Animator GetEnemyAnim()
+    {
+        return enemyAnim;
     }
     void Start()
     {
@@ -342,13 +348,12 @@ public class GameManager : MonoBehaviour
     {
         if (Input.GetKeyDown("9"))
         {
-            JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
-            ParticleEffect.ParticleApply(JudgeCases.PERFECT);
-            ComboEffect.CountApply(ref nowCombo);
+            enemyAnim.SetTrigger("Attack");
         }
         if (Input.GetKeyDown("8"))
         {
-            player.GetComponent<PlayerManager>().JumpTrigger.SetTrigger("Dead");
+            enemyAnim.SetTrigger("Move");
+            //player.GetComponent<PlayerManager>().JumpTrigger.SetTrigger("Dead");
         }
         //if (Input.GetKeyDown("1"))
         //{
@@ -559,7 +564,7 @@ public class GameManager : MonoBehaviour
                                         // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "�÷��̾� ����");
                                         Objects[pid] = enemy;
                                         Objects[pid].SetActive(true);
-                                        Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
+                                        enemyAnim.SetFloat("Speed", bpm / 45.0f);
 
                                         Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         break;
