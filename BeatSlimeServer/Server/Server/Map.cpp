@@ -153,6 +153,10 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			pivotType = 5;
 		else if (pattern["pivotType"][i] == "Player3")
 			pivotType = 6;
+		else if (pattern["pivotType"][i] == "PlayerF")
+			pivotType = 7;
+		else if (pattern["pivotType"][i] == "PlayerN")
+			pivotType = 8;
 		else if (pattern["pivotType"][i] == "END")
 			std::cout << std::endl << music_name + " - pattern csv load done.\n";
 		else
@@ -293,6 +297,22 @@ int GameRoom::find_max_distance_player() const {
 		distance = abs(boss_id->x - pl->x) + abs(boss_id->z - pl->z);
 		if (distance > max_distance) {
 			max_distance = distance;
+			ret_id = pl->id;
+		};
+	}
+	return ret_id;
+}
+int GameRoom::find_min_distance_player() const {
+	int min_distance = 0xffff;
+	int distance = 0;
+	int ret_id;
+
+	for (const auto pl : player_ids) {
+		if (pl == nullptr) continue;
+
+		distance = abs(boss_id->x - pl->x) + abs(boss_id->z - pl->z);
+		if (distance < min_distance) {
+			min_distance = distance;
 			ret_id = pl->id;
 		};
 	}

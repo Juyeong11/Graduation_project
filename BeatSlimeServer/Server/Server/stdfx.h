@@ -37,7 +37,7 @@ enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_BOSS_MOVE, OP_PLAYER_PARRYING,
 };
 enum GO_TYPE {PLAYER, WITCH, BOSS2, SKILL_TRADER, CURATOR};
 
-enum PIVOTTYPE { PlayerM, Playerm, World, Boss, Player1, Player2, Player3 };
+enum PIVOTTYPE { PlayerM, Playerm, World, Boss, Player1, Player2, Player3,PlayerF,PlayerN };
 
 enum DIR {
 	LEFTUP, UP, RIGHTUP, LEFTDOWN, DOWN, RIGHTDOWN

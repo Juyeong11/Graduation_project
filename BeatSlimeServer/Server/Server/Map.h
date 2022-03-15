@@ -153,6 +153,7 @@ public:
 	int find_max_hp_player() const;
 	int find_min_hp_player() const;
 	int find_max_distance_player() const;
+	int find_min_distance_player() const;
 
 
 	void game_end();

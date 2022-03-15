@@ -155,6 +155,42 @@ public class GameManager : MonoBehaviour
         }
         return ret;
     }
+
+    int FindMinDistanceHpID()
+    {
+        float min = 99999;
+        int ret = -1;
+        for (int i = 0; i < 3; ++i)
+        {
+            if (false == Objects[i].activeSelf) continue;
+
+            float distance = Vector3.Distance(Objects[3].transform.position, Objects[i].transform.position);
+            if (min > distance)
+            {
+                min = distance;
+                ret = i;
+            }
+        }
+        return ret;
+    }
+    int FindMaxDistanceHpID()
+    {
+        float max = 0;
+        int ret = -1;
+        for (int i = 0; i < 3; ++i)
+        {
+            if (false == Objects[i].activeSelf) continue;
+
+            float distance = Vector3.Distance(Objects[3].transform.position, Objects[i].transform.position);
+
+            if (max < distance)
+            {
+                max = distance;
+                ret = i;
+            }
+        }
+        return ret;
+    }
     int FindOnlineID()
     {
         for (int i = 0; i < 3; ++i)
@@ -185,6 +221,17 @@ public class GameManager : MonoBehaviour
         else if (pivotType == "Playerm")
         {
             target_pos = Objects[FindMinHpID()].GetComponent<HexCellPosition>().coordinates;
+        }
+        else if (pivotType == "PlayerF")
+        {
+           // Debug.Log("PlayerF : " + FindMaxDistanceHpID());
+            target_pos = Objects[FindMaxDistanceHpID()].GetComponent<HexCellPosition>().coordinates;
+        }
+        else if (pivotType == "PlayerN")
+        {
+            //Debug.Log("PlayerN : " + FindMinDistanceHpID());
+
+            target_pos = Objects[FindMinDistanceHpID()].GetComponent<HexCellPosition>().coordinates;
         }
         else if (pivotType == "World")
         {

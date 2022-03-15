@@ -55,7 +55,7 @@ Network::Network() {
 	}
 
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
-	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\test.csv");
+	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
@@ -915,7 +915,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 				for (const auto pl : gr->player_ids) {
 					send_game_start(pl->id, game_start_time);
-					reinterpret_cast<Client*>(pl)->cur_room_num = gr->game_room_id; 
+					reinterpret_cast<Client*>(pl)->cur_room_num = gr->game_room_id;
 
 				}
 
@@ -1073,7 +1073,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_PING_TEST:
 	{
 		cs_packet_ping_test* packet = reinterpret_cast<cs_packet_ping_test*>(p);
-		
+
 		send_ping(client_id, packet->ping_time);
 	}
 	break;
@@ -1307,7 +1307,7 @@ void Network::worker()
 			auto player_parring_time = reinterpret_cast<Client*>(clients[target_id])->pre_parrying_pattern;
 
 			if (parrying_end_time - player_parring_time < 200) {
-				std::cout << parrying_end_time <<" " << player_parring_time << " player already parrying\n";
+				std::cout << parrying_end_time << " " << player_parring_time << " player already parrying\n";
 				//패링 했으니 넘어가자
 				//패링 한 뒤 동작은 이미 worker thread에서 수행된 상태이다
 			}
@@ -1349,23 +1349,23 @@ void Network::worker()
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			int pattern_type = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
 			int pivotType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
-			int pivot_x = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) *3));
+			int pivot_x = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
 			int pivot_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
 			int pivot_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
 			int charging_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
 
-			
+
 			// 시작 위치를 중심으로 패턴 공격
 			// 공격 이펙트 보내고
 			// 서버에서 공격 처리할 이벤트 추가
 			int target_id = game_room[game_room_id]->find_online_player();
 
-			if (target_id == -1) { 
+			if (target_id == -1) {
 				std::cout << "tile attack : wrong target id\n";
-				break; 
+				break;
 			}
 			int pos_x, pos_z, pos_y, dir = 0;
-	
+
 			//printf("%d %d %d\n", pivot_x, pivot_y, pivot_z);
 			switch (pivotType)
 			{
@@ -1399,16 +1399,24 @@ void Network::worker()
 					target_id = game_room[game_room_id]->player_ids[2]->id;
 
 				break;
+			case PlayerF:
+				target_id = game_room[game_room_id]->find_max_distance_player();
+
+				break;
+			case PlayerN:
+				target_id = game_room[game_room_id]->find_min_distance_player();
+
+				break;
 			}
-			if(pivotType == World){
+			if (pivotType == World) {
 				pos_x = pivot_x;
 				pos_y = pivot_y;
 				pos_z = pivot_z;
 			}
 			else {
-				
-				std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clients[target_id]->last_move_time).count() << std::endl;
-				std::cout << charging_time << std::endl;
+
+				//std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clients[target_id]->last_move_time).count() << std::endl;
+				//std::cout << charging_time << std::endl;
 				if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clients[target_id]->last_move_time).count() > charging_time)
 				{
 					pos_x = clients[target_id]->x + pivot_x;
@@ -1418,7 +1426,7 @@ void Network::worker()
 					pos_x = clients[target_id]->pre_x + pivot_x;
 					pos_z = clients[target_id]->pre_z + pivot_z;
 				}
-					pos_y = -pos_x - pos_z;
+				pos_y = -pos_x - pos_z;
 			}
 
 
@@ -1431,7 +1439,7 @@ void Network::worker()
 						PatternInfo::HexPattern3[i][0] + pos_x,
 						PatternInfo::HexPattern3[i][1] + pos_y,
 						PatternInfo::HexPattern3[i][2] + pos_z);
-					
+
 				}
 			}
 			break;
@@ -1455,7 +1463,7 @@ void Network::worker()
 			break;
 			case 5:
 			{
-				
+
 
 				do_npc_tile_attack(game_room_id,
 					pos_x,
