@@ -21,6 +21,7 @@ struct timer_event {
 	int type;
 	int charging_time;
 	int pivotType;
+	char dir;
 	std::chrono::system_clock::time_point start_time;
 	EVENT_TYPE ev;
 	//int target_id;

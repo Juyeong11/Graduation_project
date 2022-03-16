@@ -60,7 +60,7 @@ public:
 		pre_x = x = 0;
 		pre_y = y = 0;
 		pre_z = z = 0;
-		//last_move_time = 0;
+		last_move_time = std::chrono::system_clock::now();
 		hp = 100;
 	}
 

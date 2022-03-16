@@ -60,6 +60,7 @@ public class PatternManager : MonoBehaviour
         yield return null;
     }
 
+
     public int PeekPattern(Beat b)
     {
         int patNums = 0;
@@ -93,12 +94,13 @@ public class PatternManager : MonoBehaviour
                 case 5:
                     //GameManager.data.GetEnemyAnim().SetTrigger("Attack");
                     EffectManager.instance.BossWaterGunEffect(BossPos.getRealPosition(), TargetPos.getRealPosition(), charging_time);
-
                     break;
 
                 case 6:
                     //GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
-                    EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, GameManager.data.GetBossDir());
+
+                    EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].direction);
+
 
                     break;
 

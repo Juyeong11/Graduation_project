@@ -17,7 +17,9 @@ public class EffectManager : MonoBehaviour
     public GameObject PlayerHealEffectPrefab;
 
 
-    int[,] around = new int[6, 3] { { 1, -1, 0 }, { 1, 0, -1 }, { 0, 1, -1 }, { -1, 1, 0 }, { -1, 0, 1 }, { 0, -1, 1 } };
+    int[,] around = new int[6, 3] {    
+        {0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
+    { 0, 1, -1 },{ -1, 1, 0 }, { -1, 0, 1 } };
 
     Effects HexPattern;
 

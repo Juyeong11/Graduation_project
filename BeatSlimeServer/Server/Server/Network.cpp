@@ -425,7 +425,7 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 
 void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
-	const int damage = 5;
+	const int damage = 1;
 	for (const auto& pl : game_room[game_room_id]->player_ids) {
 		if (pl == nullptr) continue;
 		if (false == is_attack(pl->id, x, z)) continue;
@@ -550,7 +550,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		int cur_map = 0;
 		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
-		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
+		//std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -1353,6 +1353,7 @@ void Network::worker()
 			int pivot_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
 			int pivot_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
 			int charging_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
+			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 7));
 
 
 			// 시작 위치를 중심으로 패턴 공격
@@ -1364,7 +1365,7 @@ void Network::worker()
 				std::cout << "tile attack : wrong target id\n";
 				break;
 			}
-			int pos_x, pos_z, pos_y, dir = 0;
+			int pos_x, pos_z, pos_y;
 
 			//printf("%d %d %d\n", pivot_x, pivot_y, pivot_z);
 			switch (pivotType)
@@ -1471,14 +1472,25 @@ void Network::worker()
 					pos_z);
 			}
 			break;
-			case 6:// 보스가 보는 방향으로 지진
+			case 6:// 패턴파일에 적힌 방향으로 지진
 			{
-				dir = game_room[game_room_id]->boss_id->direction;
+				int up = (int)(dir - 1 < DIR::LEFTUP ? DIR::RIGHTDOWN : dir - 1);
+				int mid = (int)dir;
+				int down = (int)(dir + 1 > DIR::RIGHTDOWN ? DIR::LEFTUP : dir + 1);
+				//std::cout << dir << std::endl;
 				for (int i = 0; i < 5; ++i) {
 					do_npc_tile_attack(game_room_id,
-						PatternInfo::HexCellAround[dir][0] * i + pos_x,
-						PatternInfo::HexCellAround[dir][1] * i + pos_y,
-						PatternInfo::HexCellAround[dir][2] * i + pos_z);
+						PatternInfo::HexCellAround[up][0] * i + pos_x,
+						PatternInfo::HexCellAround[up][1] * i + pos_y,
+						PatternInfo::HexCellAround[up][2] * i + pos_z);
+					do_npc_tile_attack(game_room_id,
+						PatternInfo::HexCellAround[mid][0] * i + pos_x,
+						PatternInfo::HexCellAround[mid][1] * i + pos_y,
+						PatternInfo::HexCellAround[mid][2] * i + pos_z);
+					do_npc_tile_attack(game_room_id,
+						PatternInfo::HexCellAround[down][0] * i + pos_x,
+						PatternInfo::HexCellAround[down][1] * i + pos_y,
+						PatternInfo::HexCellAround[down][2] * i + pos_z);
 				}
 			}
 			break;
@@ -1555,6 +1567,7 @@ void Network::do_timer() {
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.y;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.z;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.charging_time;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 7) = ev.dir;
 					break;
 
 				case EVENT_PLAYER_PARRYING:
@@ -1630,6 +1643,7 @@ void Network::set_next_pattern(int room_id)
 		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
 		tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
+		tev.dir = t.dir;
 		timer_queue.push(tev);
 		break;
 
