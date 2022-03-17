@@ -48,6 +48,35 @@ public class EnemyManager : MonoBehaviour
         reflectPosition();
         EnemyWCheck();
         CalcHPSlider();
+        EnemyRotateToLookAt();
+    }
+
+    public void EnemyRotateToLookAt()
+    {
+        switch(selfCoord.direction)
+        {
+            case HexDirection.LeftUp:
+                //Vector3 c = Vector3.Cross(transform.rotation.eulerAngles, new Vector3(0, -120, 0));
+                //transform.Rotate(0, c.x * 3f, 0);
+
+                transform.rotation = Quaternion.Euler(new Vector3(0, -120 - 90, 0));
+                break;
+            case HexDirection.Up:
+                transform.rotation = Quaternion.Euler(new Vector3(0, -90 - 90, 0));
+                break;
+            case HexDirection.RightUp:
+                transform.rotation = Quaternion.Euler(new Vector3(0, -30 - 90, 0));
+                break;
+            case HexDirection.Down:
+                transform.rotation = Quaternion.Euler(new Vector3(0, 90 - 90, 0));
+                break;
+            case HexDirection.LeftDown:
+                transform.rotation = Quaternion.Euler(new Vector3(0, 120 - 90, 0));
+                break;
+            case HexDirection.RightDown:
+                transform.rotation = Quaternion.Euler(new Vector3(0, 30 - 90, 0));
+                break;
+        }
     }
 
     public void EnemyWCheck()

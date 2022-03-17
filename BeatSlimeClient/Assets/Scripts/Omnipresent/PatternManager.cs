@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Events;
 
 public class PatternManager : MonoBehaviour
 {
     public static PatternManager data;
-    public UnityEvent SetSkill;
-    public UnityEvent CastSkill;
+    //public UnityEvent SetSkill;
+    //public UnityEvent CastSkill;
     public List<Pattern> pattern;
     public List<Pattern> settedPattern;
 
@@ -16,11 +17,15 @@ public class PatternManager : MonoBehaviour
 
     public MovementNoteFactory Factory;
 
+    public Image LOGO;
+
     private void Awake()
     {
         pattern = new List<Pattern>();
         settedPattern = new List<Pattern>();
         data = this;
+        LOGO.gameObject.SetActive(false);
+        LOGO.fillAmount = 0;
     }
 
     public void Load(int myType)
@@ -67,7 +72,7 @@ public class PatternManager : MonoBehaviour
         while(pattern.Count > 0 && pattern[0].GetAppearBeat() <= b)
         {
             SettedPattern = pattern[0];
-            SetSkill.Invoke();
+            //SetSkill.Invoke();
             //여기서 이펙트 출력하면 되겠군
             //
 
@@ -78,12 +83,13 @@ public class PatternManager : MonoBehaviour
             switch (pattern[0].noteType)
             {
                 case -1:
-                    //GameManager.data.GetEnemyAnim().SetTrigger("Move");
+                    //이동만 이례적으로 애니메이션 바인드
+                    GameManager.data.GetEnemyAnim().SetTrigger("Move");
+                    //GameManager.data.enemy
                     break;
 
                 case 3:
                 case 4:
-                    //GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
                     EffectManager.instance.BossTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].noteType);
                     break;
 
@@ -92,15 +98,11 @@ public class PatternManager : MonoBehaviour
                     break;
 
                 case 5:
-                    //GameManager.data.GetEnemyAnim().SetTrigger("Attack");
                     EffectManager.instance.BossWaterGunEffect(BossPos.getRealPosition(), TargetPos.getRealPosition(), charging_time);
                     break;
 
                 case 6:
-                    //GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
-
                     EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].direction);
-
 
                     break;
 
@@ -109,6 +111,29 @@ public class PatternManager : MonoBehaviour
 
                     break;
 
+                case 600:   //게임 시작 패널
+                    StartCoroutine(LogoLoad(true));
+                    break;
+                case 601:   //게임 시작 패널
+                    StartCoroutine(LogoLoad(false));
+                    break;
+
+                //보스 애니메이션
+                case 1000:
+                    GameManager.data.GetEnemyAnim().SetTrigger("Move");
+                    break;
+                case 1001:
+                    GameManager.data.GetEnemyAnim().SetTrigger("Attack");
+                    break;
+                case 1002:
+                    GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
+                    break;
+                case 1003:
+                    GameManager.data.GetEnemyAnim().SetTrigger("Attack3");
+                    break;
+                case 1004:
+                    GameManager.data.GetEnemyAnim().SetTrigger("Attack4");
+                    break;
             }
             //Debug.Log("patternType : " + pattern[0].noteType);
 
@@ -126,10 +151,32 @@ public class PatternManager : MonoBehaviour
         {
             CastedPattern = settedPattern[0];
             //패턴 사용?
-            CastSkill.Invoke();
+            //CastSkill.Invoke();
             settedPattern.RemoveAt(0);
             patNums++;
         }
         return patNums;
+    }
+
+    IEnumerator LogoLoad(bool open)
+    {
+        if (open)
+        {
+            LOGO.gameObject.SetActive(true);
+            while (LOGO.fillAmount < 1)
+            {
+                LOGO.fillAmount += 0.01f;
+                yield return new WaitForSeconds(0.01f);
+            }
+        }
+        else
+        {
+            while (LOGO.fillAmount > 0)
+            {
+                LOGO.fillAmount -= 0.02f;
+                yield return new WaitForSeconds(0.01f);
+            }
+            LOGO.gameObject.SetActive(false);
+        }
     }
 }
