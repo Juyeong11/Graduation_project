@@ -1,6 +1,9 @@
 # Beat Slime (wt. PulseCast)
 . 2021-2022 KPU Graduation Project
+
 . Copyrightⓒ2022 "Team ErrorList" All rights Reserved
+
+
 
 Members.
 - 정내훈 교수님 (zzapuno) / Academic Adviser
