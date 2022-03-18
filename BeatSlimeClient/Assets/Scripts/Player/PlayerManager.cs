@@ -201,6 +201,16 @@ public class PlayerManager : MonoBehaviour
         }
         return false;
     }
+
+    bool ParryCheck(KeyCode k)
+    {
+        if (PatternManager.data.Factory.parryCheck())
+        {
+            return true;
+        }
+        return false;
+    }
+
     public void PlayerMove(int x, int y, int z)
     {
         //GameManager.data.setMoved();
@@ -365,11 +375,10 @@ public class PlayerManager : MonoBehaviour
 
             }
         }
-        else if (Input.GetKeyDown(KeyCode.Space))
+        else if (Input.GetKeyDown(KeyCode.Space) && ParryCheck(KeyCode.Space))
         {
             if (FieldGameManager.Net.isOnline)
             {
-                // ������ �и� ����
                 FieldGameManager.Net.SendParryingPacket();
             }
         }

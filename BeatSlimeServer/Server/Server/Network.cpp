@@ -942,50 +942,73 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (-1 == gr->FindPlayer(client_id)) { std::cout << "Can not find player game room\n"; }
 		int id = gr->FindPlayerID_by_GameRoom(client_id);
 		// 게임시간이 얼마나 지났는지 확인하고
-		int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
-		// 현재시간에 패링패턴이 있었는지 확인
-		const std::vector<PatternInfo>& pt = maps[gr->map_type]->GetPatternTime();
-
-
-		for (auto& pattern : pt) {
-			// 패링 노트인지 채크
-			if (10 != pattern.type) {
-				continue;
-			}
-			// 타겟이 된 플레이어인지 체크
-			if (id != (pattern.pivotType - 4)) {
-				continue;
-			}
-
-			//100ms보다 작으면
-			if (abs(running_time - pattern.time) < 100) {
-				//패링 성공
+//		int running_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - gr->start_time).count();
+//		// 현재시간에 패링패턴이 있었는지 확인
+//		const std::vector<PatternInfo>& pt = maps[gr->map_type]->GetPatternTime();
+//
+//
+//		for (auto& pattern : pt) {
+//			// 패링 노트인지 채크
+//			if (10 != pattern.type) {
+//				continue;
+//			}
+//			// 타겟이 된 플레이어인지 체크
+//			if (id != (pattern.pivotType - 4)) {
+//				continue;
+//			}
+//
+//			//100ms보다 작으면
+//			if (abs(running_time - pattern.time) < 100) {
+//				//패링 성공
+//				// 패링 성공 패킷을 클라이언트로 보냄
+//#ifdef DEBUG
+//				printf("%d parry successed : %d in %d\n", id, running_time, pattern.time);
+//#endif
+//				reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
+//					= std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
+//
+//				//수정
+//				gr->boss_id->hp -= 10;
+//				if (gr->boss_id->hp < 0) {
+//					timer_event tev;
+//					tev.ev = EVENT_GAME_END;
+//					tev.game_room_id = gr->game_room_id;
+//					//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+//					tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+//
+//					timer_queue.push(tev);
+//				}
+//				for (const auto pl : gr->player_ids) {
+//					if (pl == nullptr) continue;
+//					send_parrying(pl->id, client_id);
+//					send_attack_player(client_id, gr->boss_id->id, pl->id);
+//				}
+//			}
+//		}
+						//패링 성공
 				// 패링 성공 패킷을 클라이언트로 보냄
 #ifdef DEBUG
-				printf("%d parry successed : %d in %d\n", id, running_time, pattern.time);
+		printf("%d parry successed", id);
 #endif
-				reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
-					= std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
+		reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
+			= std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
 
-				//수정
-				gr->boss_id->hp -= 10;
-				if (gr->boss_id->hp < 0) {
-					timer_event tev;
-					tev.ev = EVENT_GAME_END;
-					tev.game_room_id = gr->game_room_id;
-					//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-					tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+		//수정
+		gr->boss_id->hp -= 10;
+		if (gr->boss_id->hp < 0) {
+			timer_event tev;
+			tev.ev = EVENT_GAME_END;
+			tev.game_room_id = gr->game_room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
 
-					timer_queue.push(tev);
-				}
-				for (const auto pl : gr->player_ids) {
-					if (pl == nullptr) continue;
-					send_parrying(pl->id, client_id);
-					send_attack_player(client_id, gr->boss_id->id, pl->id);
-				}
-			}
+			timer_queue.push(tev);
 		}
-
+		for (const auto pl : gr->player_ids) {
+			if (pl == nullptr) continue;
+			send_parrying(pl->id, client_id);
+			send_attack_player(client_id, gr->boss_id->id, pl->id);
+		}
 	}
 	break;
 	case CS_PACKET_USE_SKILL:

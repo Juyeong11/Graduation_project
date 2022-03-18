@@ -108,8 +108,8 @@ public class MovementNoteFactory : MonoBehaviour
                         moveNotesBeats.RemoveAt(0);
                         if (moveNotesBeats.Count < leftNote.Count)
                         {
-                            leftNote.RemoveAt(leftNote.Count-1);
-                            rightNote.RemoveAt(leftNote.Count-1);
+                            leftNote.RemoveAt(leftNote.Count - 1);
+                            rightNote.RemoveAt(leftNote.Count - 1);
                         }
                     }
 
@@ -146,5 +146,39 @@ public class MovementNoteFactory : MonoBehaviour
                 }
             }
         }
+    }
+
+    public bool parryCheck()
+    {
+        float beatPercentage = GameManager.data.nowSongTime;
+        float distance = float.MaxValue;
+        int finder = -1;
+
+        for (int i = 0; i < attackNotesBeats.Count; i++)
+        {
+            if (attackNotesBeats[i] - beatPercentage > GameManager.data.JudgementTiming)
+                break;
+
+            if (distance > Mathf.Abs(attackNotesBeats[i] - beatPercentage))
+            {
+                distance = Mathf.Abs(attackNotesBeats[i] - beatPercentage);
+                finder = i;
+            }
+
+        }
+
+        for (int i=0;i<=finder;++i)
+        {
+            leftANote[(ANoteIndex) % leftANote.Count].anchoredPosition = new Vector3(-1000f, 0f);
+            rightANote[(ANoteIndex) % rightANote.Count].anchoredPosition = new Vector3(1000f, 0f);
+
+            attackNotesBeats.RemoveAt(0);
+            ANoteIndex++;
+        }
+
+        if (finder != -1)
+            return true;
+
+        return false;
     }
 }
