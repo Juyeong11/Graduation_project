@@ -331,10 +331,12 @@ void GameRoom::game_end()
 	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
 
 	for (auto p : player_ids) {
+		if (p == nullptr) continue;
 		p->x = portal->x;
 		p->y = portal->y;
 		p->z = portal->z;
 		reinterpret_cast<Client*>(p)->cur_room_num = -1;
+		reinterpret_cast<Client*>(p)->is_active = true;
 	}
 	portal = nullptr;
 	player_ids[0] = nullptr;

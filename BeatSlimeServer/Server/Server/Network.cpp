@@ -336,17 +336,23 @@ void Network::disconnect_client(int c_id)
 		}
 		else target.vl.unlock();
 	}
+
+	//여기서 end 패킷 보내고 종료 처리를 하자
+
 	if (client.cur_room_num != -1) {
 		for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 			if (clients[c_id] == game_room[client.cur_room_num]->player_ids[i]) {
 				game_room[client.cur_room_num]->player_ids[i] = nullptr;
+				timer_event tev;
+				tev.ev = EVENT_GAME_END;
+				tev.game_room_id = client.cur_room_num;
+				//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+				tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+				timer_queue.push(tev);
+				game_room[client.cur_room_num]->pattern_progress = -1;
 			}
 		}
-		bool isDone = true;
-		for (auto p : game_room[client.cur_room_num]->player_ids) {
-			if (p != nullptr) isDone = false;
-		}
-		if (isDone)game_room[client.cur_room_num]->pattern_progress = -1;
 	}
 
 	clients[c_id]->state_lock.lock();
@@ -436,26 +442,17 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		}
 
 		if (pl->hp < 0) {
-			// 게임 끝
-			reinterpret_cast<Client*>(pl)->is_active = false;
-			bool is_game_end = true;
+			// 한 명이라도 죽으면 게임 끝
+			timer_event tev;
+			tev.ev = EVENT_GAME_END;
+			tev.game_room_id = game_room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+			timer_queue.push(tev);
 			for (const auto& p : game_room[game_room_id]->player_ids) {
 				if (p == nullptr) continue;
-				if (p->hp > 0) is_game_end = false;
-			}
-
-			if (is_game_end) {
-				//게임룸 돌리고
-				//씬 변경도 해야됨
-				//게임이 끝난 게임룸의 이벤트는 모두 제거해야됨
-				//이미 들어간건 찾을 수 없는데 
-				//한번에 다 넣지 말고 한 패턴 끝나면 넣고 이런식으로 해야되나 -> 고려해볼만 하구만
-				for (const auto& p : game_room[game_room_id]->player_ids) {
-					if (p == nullptr) continue;
-					send_game_end(p->id, GAME_OVER);
-					reinterpret_cast<Client*>(p)->is_active = true;
-				}
-				game_room[game_room_id]->game_end();
+				reinterpret_cast<Client*>(p)->is_active = false;
 			}
 		}
 
@@ -1320,21 +1317,16 @@ void Network::worker()
 					send_attack_player(game_room[game_room_id]->boss_id->id, target_id, p->id);
 				}
 				if (clients[target_id]->hp < 0) {
-					// 게임 끝
-					reinterpret_cast<Client*>(clients[target_id])->is_active = false;
-					bool is_game_end = true;
+					timer_event tev;
+					tev.ev = EVENT_GAME_END;
+					tev.game_room_id = game_room_id;
+					//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+					tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+					timer_queue.push(tev);
 					for (const auto& p : game_room[game_room_id]->player_ids) {
 						if (p == nullptr) continue;
-						if (p->hp > 0) is_game_end = false;
-					}
-
-					if (is_game_end) {
-						for (const auto& p : game_room[game_room_id]->player_ids) {
-							if (p == nullptr) continue;
-							send_game_end(p->id, GAME_OVER);
-							reinterpret_cast<Client*>(p)->is_active = true;
-						}
-						game_room[game_room_id]->game_end();
+						reinterpret_cast<Client*>(p)->is_active = false;
 					}
 				}
 
@@ -1510,17 +1502,36 @@ void Network::worker()
 			int boss_id = game_room[game_room_id]->boss_id->id;
 			//if(clients[boss_id]->hp<10;
 			//체력에 따라 클리어 유무
+
+			bool isabnormal = false;
+			bool isDie = false;
 			for (const auto p : game_room[game_room_id]->player_ids) {
-				if (p == nullptr) continue;
-				send_game_end(p->id, GAME_CLEAR);
-				reinterpret_cast<Client*>(p)->is_active = true;
-
+				if (p == nullptr) { isabnormal = true; break; }
+				if (p->hp < 0) isDie = true;
 			}
-			//for (const auto p : game_room[game_room_id]->player_ids)
-			//	send_change_scene(p->id, FIELD_MAP);
+			if (isabnormal) {
+				
+				for (const auto p : game_room[game_room_id]->player_ids) {
+					if (p == nullptr) continue;
+					send_game_end(p->id, GAME_OVER);
+				}
+				game_room[game_room_id]->game_end();
 
+				break;
+			}
+			if (isDie) {
+				for (const auto p : game_room[game_room_id]->player_ids) {
+					send_game_end(p->id, GAME_OVER);
+				}
+				game_room[game_room_id]->game_end();
+
+				break;
+			}
+
+			for (const auto p : game_room[game_room_id]->player_ids) {
+				send_game_end(p->id, GAME_CLEAR);
+			}
 			game_room[game_room_id]->game_end();
-
 
 
 			exp_over_pool.push(exp_over);
@@ -1603,6 +1614,8 @@ void Network::do_timer() {
 }
 void Network::set_next_pattern(int room_id)
 {
+	// GetPatternTime을 하던 중 pattern_progress가 -1이 된다면? 안쓰이는 패턴이 등록된거고 만약 게임 방의 player들이 이미 null로 정의된 상태면 프로그램이 터지게됨
+	//const PattenrInfo... 바로 전에 한다해도 중간 시간을 줄이는 거지 원인을 제거한게 아니잖아
 	if (game_room[room_id]->pattern_progress == -1) return;
 	const std::vector<PatternInfo>& pt = maps[game_room[room_id]->map_type]->GetPatternTime();
 	const PatternInfo& t = pt[game_room[room_id]->pattern_progress++];
@@ -1625,7 +1638,7 @@ void Network::set_next_pattern(int room_id)
 		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
 		//tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
-		timer_queue.push(tev);// 여기 move를 사용해도 될까?
+		timer_queue.push(tev);
 		break;
 	case 3:// 패턴 3번
 	case 4:// 패턴 4번
