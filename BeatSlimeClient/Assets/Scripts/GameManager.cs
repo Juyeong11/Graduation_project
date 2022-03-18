@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager data;
 
+    [System.NonSerialized]
     public int mapCellid = 0;
 
     public PatternManager PM;
@@ -19,35 +20,51 @@ public class GameManager : MonoBehaviour
 
     public SoundManager soundManager;
     public SoundEffectManager soundEffectManager;
-    public SoundProgressBar soundProgressBar;
 
-    public BeatManager beatManager;
 
     public bool isGameStart;
     bool debugStart;
 
     public string SongName;
 
+    [System.NonSerialized]
     public float bpm;
     public int barCounts = 4;
+
+    [System.NonSerialized]
     public int totalSongTime;
+
+    [System.NonSerialized]
     public int nowSongTime;
+
+    [System.NonSerialized]
     public int timeByBar;
+
+    [System.NonSerialized]
     public int timeByBeat;
+
+    [System.NonSerialized]
     public int timeBy24Beat;
+
+    [System.NonSerialized]
     public int timeBy16Beat;
     //public int nowBars;
     //public int nowBeats;
     //public int now24Beats;
     //public int now32Beats;
     public Beat nowBeat;
+    
+    [System.NonSerialized]
     public int beatCounter = 0;
 
     private int offsetTime;
     public int offsetMusicFrontTime;
+    public int offsetPatternSinker;
+    public int offsetMusicSinker;
 
     public int JudgementTiming;
 
+    [System.NonSerialized]
     public int alreadyMoved;
 
     public DoomChi MidNote;
@@ -65,6 +82,7 @@ public class GameManager : MonoBehaviour
     public ResultsData resultsData;
 
     //
+    [System.NonSerialized]
     public GameObject[] Objects = new GameObject[4];
     int[] ids;
     int myPlayerID = -1;
@@ -76,6 +94,7 @@ public class GameManager : MonoBehaviour
     int avgPing;
     float prePingTestTime;
 
+    [System.NonSerialized]
     public float MusicStartOffset;
 
     void Awake()
@@ -392,9 +411,9 @@ public class GameManager : MonoBehaviour
         {
             int prevBeats = nowBeat.addBeat;
 
-            if (!___cord) { ___cord = true; Debug.Log("LAPSED TIME : " +  SoundManager.instance.GetMusicLapsedTime()); MusicStartOffset = SoundManager.instance.GetMusicLapsedTime(); }
+            if (!___cord) { ___cord = true; Debug.Log("LAPSED TIME : " +  SoundManager.instance.GetMusicLapsedTime()); MusicStartOffset = SoundManager.instance.GetMusicLapsedTime() + offsetPatternSinker; }
             
-            nowSongTime = SoundManager.instance.GetMusicLapsedTime() + offsetTime - (int)MusicStartOffset - offsetMusicFrontTime;
+            nowSongTime = SoundManager.instance.GetMusicLapsedTime() + offsetTime - (int)MusicStartOffset - offsetMusicFrontTime - offsetMusicSinker;
             if (nowSongTime > 0)
             {
                 nowBeat.SetBeatTime(nowSongTime);
