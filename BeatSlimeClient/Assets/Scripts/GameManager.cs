@@ -346,14 +346,26 @@ public class GameManager : MonoBehaviour
     }
     void Update()
     {
-        if (Input.GetKeyDown("9"))
+        // if (Input.GetKeyDown("9"))
+        // {
+        //     enemyAnim.SetTrigger("Attack");
+        // }
+        // if (Input.GetKeyDown("8"))
+        // {
+        //     enemyAnim.SetTrigger("Move");
+        //     //player.GetComponent<PlayerManager>().JumpTrigger.SetTrigger("Dead");
+        // }
+
+        if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            enemyAnim.SetTrigger("Attack");
+            PM.Factory.scrollSpeed += 0.05f;
+            PM.Factory.scrollUpdate();
         }
-        if (Input.GetKeyDown("8"))
+
+        if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            enemyAnim.SetTrigger("Move");
-            //player.GetComponent<PlayerManager>().JumpTrigger.SetTrigger("Dead");
+            PM.Factory.scrollSpeed -= 0.05f;
+            PM.Factory.scrollUpdate();
         }
         //if (Input.GetKeyDown("1"))
         //{

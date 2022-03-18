@@ -72,6 +72,11 @@ public class MovementNoteFactory : MonoBehaviour
 
     }
 
+    public void scrollUpdate()
+    {
+        translator = new Vector3(scrollSpeed, 0, 0);
+    }
+
 
     void Update()
     {
