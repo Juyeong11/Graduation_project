@@ -91,44 +91,39 @@ public class MovementNoteFactory : MonoBehaviour
                 //Debug.Log(attackNotesBeats.Count);
                 if (moveNotesBeats.Count > 0)
                 {
-                    if (beatPercentage >= moveNotesBeats[0] + GameManager.data.JudgementTiming)
+                    for (int i = 0; i < leftNote.Count; ++i)
+                    {
+                        leftNote[i].anchoredPosition = -translator * (moveNotesBeats[i] + GameManager.data.MusicStartOffset - beatPercentage) + Zero;
+                        rightNote[i].anchoredPosition = translator * (moveNotesBeats[i] + GameManager.data.MusicStartOffset - beatPercentage) + Zero;
+
+                        if (leftNote[i].anchoredPosition.x >= 0)
+                            leftNote[i].anchoredPosition = new Vector3(-1000f, 0f);
+
+                        if (rightNote[i].anchoredPosition.x <= 0)
+                            rightNote[i].anchoredPosition = new Vector3(-1000f, 0f);
+                    }
+
+                    if (beatPercentage >= moveNotesBeats[0] + GameManager.data.JudgementTiming + GameManager.data.MusicStartOffset)
                     {
                         moveNotesBeats.RemoveAt(0);
-                    }
-                    if (moveNotesBeats.Count > 0)
-                    {
-                        for (int i = 0; i < leftNote.Count; ++i)
+                        if (moveNotesBeats.Count < leftNote.Count)
                         {
-                            leftNote[i].anchoredPosition = -translator * (moveNotesBeats[i] - beatPercentage) + Zero;
-                            rightNote[i].anchoredPosition = translator * (moveNotesBeats[i] - beatPercentage) + Zero;
-
-                            if (leftNote[i].anchoredPosition.x >= 0)
-                                leftNote[i].anchoredPosition = new Vector3(-1000f, 0f);
-
-                            if (rightNote[i].anchoredPosition.x <= 0)
-                                rightNote[i].anchoredPosition = new Vector3(-1000f, 0f);
+                            leftNote.RemoveAt(leftNote.Count-1);
+                            rightNote.RemoveAt(leftNote.Count-1);
                         }
                     }
+
                 }
 
                 if (attackNotesBeats.Count > 0)
                 {
-                    while (beatPercentage >= attackNotesBeats[0] + GameManager.data.JudgementTiming)
-                    {
-                        attackNotesBeats.RemoveAt(0);
-                        ANoteIndex++;
-                        if (attackNotesBeats.Count <= 0)
-                        {
-                            break;
-                        }
-                    }
                     for (int i = 0; i < attackNotesBeats.Count; ++i)
                     {
                         //Ç®¸µ
                         if (attackNotesBeats[i] - beatPercentage < 3000f)
                         {
-                            leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition = -translator * (attackNotesBeats[i] - beatPercentage) + Zero;
-                            rightANote[(ANoteIndex + i) % rightANote.Count].anchoredPosition = translator * (attackNotesBeats[i] - beatPercentage) + Zero;
+                            leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition = -translator * (attackNotesBeats[i] + GameManager.data.MusicStartOffset - beatPercentage) + Zero;
+                            rightANote[(ANoteIndex + i) % rightANote.Count].anchoredPosition = translator * (attackNotesBeats[i] + GameManager.data.MusicStartOffset - beatPercentage) + Zero;
 
                             if (leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition.x >= 0)
                                 leftANote[(ANoteIndex + i) % leftANote.Count].anchoredPosition = new Vector3(-1000f, 0f);
@@ -139,6 +134,14 @@ public class MovementNoteFactory : MonoBehaviour
                         else
                             break;
 
+                    }
+
+                    while (beatPercentage >= attackNotesBeats[0] + GameManager.data.JudgementTiming + GameManager.data.MusicStartOffset)
+                    {
+                        attackNotesBeats.RemoveAt(0);
+                        ANoteIndex++;
+                        if (attackNotesBeats.Count <= 0)
+                            break;
                     }
                 }
             }

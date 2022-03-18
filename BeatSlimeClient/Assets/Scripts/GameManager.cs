@@ -43,7 +43,8 @@ public class GameManager : MonoBehaviour
     public Beat nowBeat;
     public int beatCounter = 0;
 
-    public int offsetTime;
+    private int offsetTime;
+    public int offsetMusicFrontTime;
 
     public int JudgementTiming;
 
@@ -74,6 +75,9 @@ public class GameManager : MonoBehaviour
 
     int avgPing;
     float prePingTestTime;
+
+    public float MusicStartOffset;
+
     void Awake()
     {
         print("Start");
@@ -344,6 +348,8 @@ public class GameManager : MonoBehaviour
         }
         return ref target;
     }
+
+    bool ___cord = false;
     void Update()
     {
         // if (Input.GetKeyDown("9"))
@@ -386,7 +392,9 @@ public class GameManager : MonoBehaviour
         {
             int prevBeats = nowBeat.addBeat;
 
-            nowSongTime = SoundManager.instance.GetMusicLapsedTime() + offsetTime + avgPing;
+            if (!___cord) { ___cord = true; Debug.Log("LAPSED TIME : " +  SoundManager.instance.GetMusicLapsedTime()); MusicStartOffset = SoundManager.instance.GetMusicLapsedTime(); }
+            
+            nowSongTime = SoundManager.instance.GetMusicLapsedTime() + offsetTime - (int)MusicStartOffset - offsetMusicFrontTime;
             if (nowSongTime > 0)
             {
                 nowBeat.SetBeatTime(nowSongTime);
@@ -465,6 +473,7 @@ public class GameManager : MonoBehaviour
 
                             PlaySound();
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
+                            
                             Debug.Log("Delay : " + offsetTime);
                         }
                         break;
@@ -725,10 +734,14 @@ public class GameManager : MonoBehaviour
                             int pid = ServerID_To_ClientID(p.id);
                             Objects[pid].GetComponentInChildren<PlayerManager>().ParryTrig();
 
-                            MidANote.notePerfect();
-                            JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
-                            ParticleEffect.ParticleApply(JudgeCases.PERFECT);
-                            ComboEffect.CountApply(ref nowCombo);
+                            if (pid == myPlayerID)
+                            {
+                                MidANote.notePerfect();
+                                JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
+                                ParticleEffect.ParticleApply(JudgeCases.PERFECT);
+                                ComboEffect.CountApply(ref nowCombo);
+                            }
+
                             //Debug.Log("Parrying Success");
                         }
                         break;
