@@ -343,14 +343,18 @@ void Network::disconnect_client(int c_id)
 		for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 			if (clients[c_id] == game_room[client.cur_room_num]->player_ids[i]) {
 				game_room[client.cur_room_num]->player_ids[i] = nullptr;
+
+				// 예상되는 버그
+				// GameRoom::gmae_end를 호출하기 전 한 명이 더 나가서 이벤트 등록을 한번 더한다면?
 				timer_event tev;
 				tev.ev = EVENT_GAME_END;
 				tev.game_room_id = client.cur_room_num;
 				//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-				tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+				tev.start_time = std::chrono::system_clock::now();
 
 				timer_queue.push(tev);
 				game_room[client.cur_room_num]->pattern_progress = -1;
+				reinterpret_cast<Client*>(clients[c_id])->cur_room_num = -1;
 			}
 		}
 	}
@@ -523,7 +527,53 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//cl.x = maps[FIELD_MAP]->LengthX / 2;
 		//cl.z = maps[FIELD_MAP]->LengthZ / 2;
 		//cl.y = -cl.z - cl.x;
+					// login OK 에서 했던 로직을 가져오자
+			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
+		for (int i = 0; i < MAX_USER; ++i)
+		{
+			Client* other = reinterpret_cast<Client*>(clients[i]);
+			if (i == client_id) continue;
+			other->state_lock.lock();
+			if (ST_INGAME != other->state) {
+				other->state_lock.unlock();
+				continue;
+			}
+			other->state_lock.unlock();
 
+			if (false == is_near(other->id, client_id))
+				continue;
+
+			// 새로 들어온 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
+			other->vl.lock();
+			other->viewlist.insert(client_id);
+			other->vl.unlock();
+
+			send_put_object(other->id, client_id);
+		}
+
+		//새로 접속한 클라이언트에게 현재 객체들의 현황을 알려줌
+		for (auto* other : clients) {
+			//여기서 NPC도 알려줘야지
+
+			if (other->id == client_id) continue;
+			other->state_lock.lock();
+			if (ST_INGAME != other->state) {
+				other->state_lock.unlock();
+				continue;
+			}
+			other->state_lock.unlock();
+
+			if (false == is_near(other->id, client_id))
+				continue;
+
+			// 기존에 있던 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
+			cl.vl.lock();
+			cl.viewlist.insert(other->id);
+			cl.vl.unlock();
+
+			send_put_object(client_id, other->id);
+		}
+		send_move_object(client_id, client_id);
 
 
 	}
@@ -919,6 +969,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				std::cout << "Game Start\n";
 
 			}
+			//gr->ready_player_cnt = 0;
 			gr->ready_lock.unlock();
 			break;
 		}

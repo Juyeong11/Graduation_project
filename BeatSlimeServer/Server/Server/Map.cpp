@@ -324,7 +324,7 @@ void GameRoom::game_end()
 	isGaming = false;
 	map_type = -1;
 	ready_player_cnt = 0;
-	game_room_id = -1;
+	//game_room_id = -1;
 
 	boss_id = nullptr;
 	pattern_progress = -1;
