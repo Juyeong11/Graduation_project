@@ -35,6 +35,7 @@ public class IndicatorJudgeEffect : MonoBehaviour
         switch(c)
         {
             case JudgeCases.PERFECT:
+                judgeImage.sprite = judgeSprites[((int)countee)%4];
                 perfected = true;
                 judgeImage.color = new Color(judgeImage.color.r, judgeImage.color.g, judgeImage.color.b, 1f);
                 break;

@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 5902877849715521789}
   - component: {fileID: 843431181024979281}
   - component: {fileID: 8508236358476320499}
+  - component: {fileID: 7649367304509878755}
   m_Layer: 0
   m_Name: Ground4
-  m_TagString: Untagged
+  m_TagString: Cells
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -139,3 +140,17 @@ MonoBehaviour:
   landOffsetScale: 0
   landType: 0
   preBeatedTime: 0
+--- !u!64 &7649367304509878755
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5398620032970201384}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5791823748547884724, guid: 232e1674504b7404da8ed26c89a43b48, type: 3}

@@ -108,9 +108,10 @@ GameObject:
   - component: {fileID: 5179697282232116017}
   - component: {fileID: 6918950102624147451}
   - component: {fileID: 6178250186199294203}
+  - component: {fileID: 231550220624792512}
   m_Layer: 0
   m_Name: Portal
-  m_TagString: Untagged
+  m_TagString: Cells
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -207,3 +208,17 @@ MonoBehaviour:
   landOffsetScale: 0
   landType: 0
   preBeatedTime: 0
+--- !u!64 &231550220624792512
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8864755350029415982}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5791823748547884724, guid: 232e1674504b7404da8ed26c89a43b48, type: 3}

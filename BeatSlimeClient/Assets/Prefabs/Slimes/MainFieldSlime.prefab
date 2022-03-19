@@ -183,9 +183,10 @@ GameObject:
   - component: {fileID: 1716323181130211769}
   - component: {fileID: 8516564980019855440}
   - component: {fileID: 5139615764296778085}
+  - component: {fileID: 9126014727925352717}
   m_Layer: 0
   m_Name: Sphere001
-  m_TagString: Untagged
+  m_TagString: Slimes
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -285,6 +286,20 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!64 &9126014727925352717
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4760618676633695439}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 973877516759717424, guid: c70106caf1ec25446b561c7ee384b248, type: 3}
 --- !u!1 &8322171590553733044
 GameObject:
   m_ObjectHideFlags: 0
@@ -298,7 +313,7 @@ GameObject:
   - component: {fileID: 9206457873449502372}
   m_Layer: 0
   m_Name: MainFieldSlime
-  m_TagString: Untagged
+  m_TagString: Slimes
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
