@@ -684,7 +684,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 1.8, z: -4}
+  m_FollowOffset: {x: 0, y: 3, z: -3.7}
   m_XDamping: 1
   m_YDamping: 4
   m_ZDamping: 1
@@ -709,16 +709,16 @@ MonoBehaviour:
   m_LookaheadTime: 0.03
   m_LookaheadSmoothing: 0
   m_LookaheadIgnoreY: 0
-  m_HorizontalDamping: 0.5
-  m_VerticalDamping: 0.5
+  m_HorizontalDamping: 5
+  m_VerticalDamping: 3
   m_ScreenX: 0.5
   m_ScreenY: 0.5
-  m_DeadZoneWidth: 0.24
-  m_DeadZoneHeight: 0.49
-  m_SoftZoneWidth: 0.69
-  m_SoftZoneHeight: 0.83
+  m_DeadZoneWidth: 0
+  m_DeadZoneHeight: 0.08
+  m_SoftZoneWidth: 0.33
+  m_SoftZoneHeight: 0.41
   m_BiasX: 0
-  m_BiasY: 0.00700004
+  m_BiasY: 0.0070021013
   m_CenterOnActivate: 0
 --- !u!114 &132048417
 MonoBehaviour:
@@ -849,10 +849,10 @@ MonoBehaviour:
   m_StreamingVersion: 20170927
   m_Priority: 10
   m_StandbyUpdate: 2
-  m_LookAt: {fileID: 0}
+  m_LookAt: {fileID: 1739654812}
   m_Follow: {fileID: 1739654812}
   m_Lens:
-    FieldOfView: 60
+    FieldOfView: 50
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 1000
@@ -873,8 +873,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400982002}
-  m_LocalRotation: {x: 0.34201998, y: 0.0008528817, z: -0.0003104235, w: 0.93969226}
-  m_LocalPosition: {x: 0, y: 2.8, z: -4}
+  m_LocalRotation: {x: 0.33409968, y: -1e-45, z: 0, w: 0.9425378}
+  m_LocalPosition: {x: 0, y: 4, z: -3.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 132048414}
@@ -1753,7 +1753,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 50
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1778,8 +1778,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930881972}
-  m_LocalRotation: {x: 0.34201998, y: 0.0008528817, z: -0.0003104235, w: 0.93969226}
-  m_LocalPosition: {x: 0, y: 2.8, z: -4}
+  m_LocalRotation: {x: 0.33409968, y: -1e-45, z: 0, w: 0.9425378}
+  m_LocalPosition: {x: 0, y: 4, z: -3.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2010,6 +2010,7 @@ MonoBehaviour:
   Menus:
   - {fileID: 1830904761}
   - {fileID: 237649127}
+  CCO: {fileID: 400982003}
 --- !u!4 &1968955332
 Transform:
   m_ObjectHideFlags: 0
