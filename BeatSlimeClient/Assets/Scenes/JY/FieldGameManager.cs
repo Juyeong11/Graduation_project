@@ -56,8 +56,12 @@ public class FieldGameManager : MonoBehaviour
 
     }
 
-    void FixedUpdate()
+    void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            soundManager.StopBGM();
+        }
 
         if (Net.isOnline)
         {
