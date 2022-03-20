@@ -196,11 +196,28 @@ int MapInfo::GetTileType(int x, int z)
 	int _x = x - offsetX;
 	int _z = z - offsetZ;
 
-	std::cout << "x : " << _x << " z : " << _z << std::endl;
+	//std::cout << "x : " << _x << " z : " << _z << std::endl;
 	if (_x > LengthX || _x < 0) return -1;
 	if (_z > LengthZ || _z < 0) return -1;
 
 	return map[_z * LengthX + _x];
+}
+
+void MapInfo::SetTileType(int x, int z, int pre_x, int pre_z)
+{
+	int p_x = pre_x - offsetX;
+	int p_z = pre_z - offsetZ;
+	// 이전 좌표는 범위 밖에 있을 수 없다.
+	map[p_z * LengthX + p_x] = 0;
+
+	int _x = x - offsetX;
+	int _z = z - offsetZ;
+
+	//std::cout << "x : " << _x << " z : " << _z << std::endl;
+	if (_x > LengthX || _x < 0) return ;
+	if (_z > LengthZ || _z < 0) return ;
+
+	map[_z * LengthX + _x] = 1;
 }
 
 GameRoom::GameRoom() :bpm(0) {

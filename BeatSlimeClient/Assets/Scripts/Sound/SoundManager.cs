@@ -53,6 +53,7 @@ public class SoundManager : MonoBehaviour
             }
         }
     }
+
     public int GetBGMBpm(string p_bgmName)
     {
         for (int i = 0; i < bgm.Length; ++i)
