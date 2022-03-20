@@ -235,6 +235,8 @@ void Network::send_put_object(int c_id, int target) {
 	packet.y = clients[target]->y;
 	packet.z = clients[target]->z;
 
+
+
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
@@ -252,6 +254,8 @@ void Network::send_remove_object(int c_id, int victim)
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+
+
 
 	if (true == is_npc(victim)) {
 		reinterpret_cast<Npc*>(clients[victim])->is_active = false;
@@ -318,6 +322,11 @@ void Network::disconnect_client(int c_id)
 	if (c_id >= MAX_USER)
 		std::cout << "disconnect_client : unexpected id range" << std::endl;
 	Client& client = *reinterpret_cast<Client*>(clients[c_id]);
+
+	int room_num = reinterpret_cast<Client*>(clients[c_id])->cur_room_num;
+	if (room_num == -1) {
+		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->x);
+	}
 
 	client.vl.lock();
 	std::unordered_set <int> my_vl = client.viewlist;
@@ -424,6 +433,37 @@ int Network::get_game_room_id()
 	return -1;
 }
 
+int Network::set_new_player_pos(int client_id)
+{
+	short orgin_x = clients[client_id]->x;
+	short orgin_z = clients[client_id]->z;
+
+
+	short& _x = clients[client_id]->x;
+	short& _y = clients[client_id]->y;
+	short& _z = clients[client_id]->z;
+
+	int i = 0;
+	int step = 1;
+	while (maps[FIELD_MAP]->GetTileType(_x, _z) != 0) {
+		_x = PatternInfo::HexCellAround[i][0]*step + orgin_x;
+		_z = PatternInfo::HexCellAround[i][2]*step + orgin_z;
+		_y = -_x - _z;
+		i++;
+		if (i == 6) {
+			step++;
+			i = 0;
+		}
+		if (step > 6) {
+			std::cout << "Can not find empty pos\n";
+			return -1;
+		}
+	}
+
+	maps[FIELD_MAP]->SetTileType(_x, _z, _x, _z);
+	return 1;
+}
+
 void Network::do_npc_move(int npc_id) {
 
 
@@ -523,7 +563,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 		cl.state = ST_INGAME;
 		cl.state_lock.unlock();
 
-
+		//새로 들어온 친구의 위치를 정해주자
+		
+			
 		//cl.x = maps[FIELD_MAP]->LengthX / 2;
 		//cl.z = maps[FIELD_MAP]->LengthZ / 2;
 		//cl.y = -cl.z - cl.x;
@@ -597,6 +639,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		int cur_map = 0;
 		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
+
 		//std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		switch (packet->direction) {
@@ -639,6 +682,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 		default:
 			std::cout << "Invalid move in client " << client_id << std::endl;
 			exit(-1);
+		}
+		if (cur_map == 0) {
+			maps[cur_map]->SetTileType(x, z, cl.pre_x,cl.pre_z);
 		}
 
 		// 이동한 클라이언트에 대한 nearlist 생성
@@ -1230,6 +1276,7 @@ void Network::worker()
 			cl.x = 0;
 			cl.y = 0;
 			cl.z = 0;
+			set_new_player_pos(new_id);
 			cl.id = new_id;
 			cl.prev_recv_size = 0;
 			cl.recv_over._comp_op = OP_RECV;

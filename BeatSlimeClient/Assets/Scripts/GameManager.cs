@@ -116,6 +116,7 @@ public class GameManager : MonoBehaviour
         resultsData = new ResultsData();
         nowBeat = new Beat();
 
+
         bpm = SoundManager.instance.GetBGMBpm(SongName);
         totalSongTime = (int)(SoundManager.instance.GetMusicLength(SongName) * 1000f);
         nowSongTime = 0;
@@ -411,7 +412,12 @@ public class GameManager : MonoBehaviour
         {
             int prevBeats = nowBeat.addBeat;
 
-            if (!___cord) { ___cord = true; Debug.Log("LAPSED TIME : " +  SoundManager.instance.GetMusicLapsedTime()); MusicStartOffset = SoundManager.instance.GetMusicLapsedTime() + offsetPatternSinker; }
+            if (!___cord) 
+            {
+                ___cord = true;
+                Debug.Log("LAPSED TIME : " +  SoundManager.instance.GetMusicLapsedTime());
+                MusicStartOffset = SoundManager.instance.GetMusicLapsedTime() + offsetPatternSinker;
+            }
             
             nowSongTime = SoundManager.instance.GetMusicLapsedTime() + offsetTime - (int)MusicStartOffset - offsetMusicFrontTime - offsetMusicSinker;
             if (nowSongTime > 0)

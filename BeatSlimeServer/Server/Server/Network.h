@@ -112,6 +112,7 @@ public:
 	int get_npc_id(int monsterType);
 
 	int get_game_room_id();
+	int set_new_player_pos(int client_id);
 	void Initialize_NPC() {
 		for (int i = NPC_ID_START; i < NPC_ID_END; ++i) {
 			sprintf_s(clients[i]->name, "NPC%d", i);
