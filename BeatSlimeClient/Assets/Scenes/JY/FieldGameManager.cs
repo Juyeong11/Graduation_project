@@ -75,6 +75,8 @@ public class FieldGameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_login_ok p = Protocol.sc_packet_login_ok.SetByteToVar(data);
 
+                            soundManager.PlayBGM("riverside");
+                            player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             myPlayerID = p.id;
                             Objects[p.id] = player;
                             //PutPlayerObject(p.type, p.id, p.x, p.y);

@@ -491,6 +491,7 @@ public class GameManager : MonoBehaviour
                             int Delay = System.DateTime.Now.Millisecond;
 
                             PlaySound();
+                            player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
                             
                             Debug.Log("Delay : " + offsetTime);

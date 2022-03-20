@@ -714,11 +714,11 @@ MonoBehaviour:
   m_ScreenX: 0.5
   m_ScreenY: 0.5
   m_DeadZoneWidth: 0
-  m_DeadZoneHeight: 0.08
-  m_SoftZoneWidth: 0.33
-  m_SoftZoneHeight: 0.41
+  m_DeadZoneHeight: 0
+  m_SoftZoneWidth: 0.55
+  m_SoftZoneHeight: 0.6
   m_BiasX: 0
-  m_BiasY: 0.0070021013
+  m_BiasY: 0
   m_CenterOnActivate: 0
 --- !u!114 &132048417
 MonoBehaviour:
@@ -873,7 +873,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400982002}
-  m_LocalRotation: {x: 0.33409968, y: -1e-45, z: 0, w: 0.9425378}
+  m_LocalRotation: {x: 0.33409896, y: -1e-45, z: 0, w: 0.942538}
   m_LocalPosition: {x: 0, y: 4, z: -3.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1617,9 +1617,9 @@ MonoBehaviour:
   - name: Attack
     clip: {fileID: 8300000, guid: a98292501fcda4148a4c9b23eda4ad65, type: 3}
   bgm:
-  - name: BAD_SEC
-    clip: {fileID: 8300000, guid: 77edb4e76abe3404ab00442f1aedcf22, type: 3}
-    bpm: 124
+  - name: riverside
+    clip: {fileID: 8300000, guid: eab80a009769dad4a9672b2e67cbacc4, type: 3}
+    bpm: 100
   bgmPlayer: {fileID: 1931281404}
   sfxPlayer:
   - {fileID: 72865752}
@@ -1778,7 +1778,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930881972}
-  m_LocalRotation: {x: 0.33409968, y: -1e-45, z: 0, w: 0.9425378}
+  m_LocalRotation: {x: 0.33409896, y: -1e-45, z: 0, w: 0.942538}
   m_LocalPosition: {x: 0, y: 4, z: -3.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -1879,10 +1879,10 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 7684504199864074472, guid: df51a0812a6f07a4cb4f424f6aa6b39d, type: 2}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
+  m_PlayOnAwake: 0
+  m_Volume: 0.9
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

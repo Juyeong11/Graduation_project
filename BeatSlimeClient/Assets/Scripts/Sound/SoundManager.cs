@@ -45,7 +45,9 @@ public class SoundManager : MonoBehaviour
         {
             if (p_bgmName == bgm[i].name)
             {
-                GameManager.data.player.GetComponentInChildren<Animator>().SetFloat("Speed", bgm[i].bpm / pAnimUnitBPM);
+                PlayerPrefs.SetFloat("pAnimSpeed",bgm[i].bpm / pAnimUnitBPM);
+
+                //GameManager.data.player.GetComponentInChildren<Animator>().SetFloat("Speed", bgm[i].bpm / pAnimUnitBPM);
                 bgmPlayer.clip = bgm[i].clip;
 
                 bgmPlayer.Play();

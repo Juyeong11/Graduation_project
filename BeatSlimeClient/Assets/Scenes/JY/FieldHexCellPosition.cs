@@ -7,7 +7,7 @@ public class FieldHexCellPosition : MonoBehaviour
 
     public HexDirection direction;
 
-    float preBeatedTime;
+    public float preBeatedTime;
 
     public void setInitPosition(int x, int z,int w=0)
     {
@@ -37,36 +37,36 @@ public class FieldHexCellPosition : MonoBehaviour
     }
 
     //¿©±â¼­ Lerp
-    public Vector3 calculatePlayerPosition()
-    {
-        float tick = 1f;
-        float newX;
-        float newY;
-        float newZ;
+    // public Vector3 calculatePlayerPosition()
+    // {
+    //     float tick = 1f;
+    //     float newX;
+    //     float newY;
+    //     float newZ;
 
-        newX = Mathf.Lerp(preCoordinates.X * 0.866f, coordinates.X * 0.866f, tick);
-        newZ = Mathf.Lerp(preCoordinates.X * 0.5f + preCoordinates.Z, coordinates.X * 0.5f + coordinates.Z, tick);
-        newY = SlimeWLerp(calculateWPosition(preCoordinates.W), calculateWPosition(coordinates.W), tick);
+    //     newX = Mathf.Lerp(preCoordinates.X * 0.866f, coordinates.X * 0.866f, tick);
+    //     newZ = Mathf.Lerp(preCoordinates.X * 0.5f + preCoordinates.Z, coordinates.X * 0.5f + coordinates.Z, tick);
+    //     newY = SlimeWLerp(calculateWPosition(preCoordinates.W), calculateWPosition(coordinates.W), tick);
 
-        if (tick >= 1f)
-        {
-            preCoordinates = coordinates;
-        }
+    //     if (tick >= 1f)
+    //     {
+    //         preCoordinates = coordinates;
+    //     }
 
-        return new Vector3(newX, newY, newZ);
-    }
+    //     return new Vector3(newX, newY, newZ);
+    // }
 
-    public float LerpSquare(float tick)
-    {
-        if (tick < 0.3f)
-            return 0f;
-        else if (tick < 0.7f)
-        {
-            return (tick - 0.3f) * 2.5f;
-        }
-        else
-            return 1f;
-    }
+    // public float LerpSquare(float tick)
+    // {
+    //     if (tick < 0.3f)
+    //         return 0f;
+    //     else if (tick < 0.7f)
+    //     {
+    //         return (tick - 0.3f) * 2.5f;
+    //     }
+    //     else
+    //         return 1f;
+    // }
     
     public void beat()
     {

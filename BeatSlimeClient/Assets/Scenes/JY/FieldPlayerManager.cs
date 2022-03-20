@@ -107,10 +107,57 @@ public class FieldPlayerManager : MonoBehaviour
             selfCoord.coordinates.W = grid.cellMaps.Get(selfCoord.coordinates).w + 1;
         }
         //Debug.Log("P1 : " + PlayerTransform.position.x + " " + selfCoord.coordinates.X);
-        PlayerTransform.position = selfCoord.calculatePlayerPosition();
+        PlayerTransform.position = calculatePlayerPosition();
         //Debug.Log("P2 :" + PlayerTransform.position.x + " " + selfCoord.coordinates.X);
         //Debug.Log("z : " + gameObject.transform.position.z);
 
+    }
+
+      public Vector3 calculatePlayerPosition()
+    {
+        int beatTime = 500;
+
+        float tick = LerpSquare((Time.time - selfCoord.preBeatedTime) * 1000f / beatTime);
+        float newX;
+        float newY;
+        float newZ;
+
+        newX = Mathf.Lerp(selfCoord.preCoordinates.X * 0.866f, selfCoord.coordinates.X * 0.866f, tick);
+        newZ = Mathf.Lerp(selfCoord.preCoordinates.X * 0.5f + selfCoord.preCoordinates.Z, selfCoord.coordinates.X * 0.5f + selfCoord.coordinates.Z, tick);
+        newY = SlimeWLerp(HexCellPosition.calculateWPosition(selfCoord.preCoordinates.W), HexCellPosition.calculateWPosition(selfCoord.coordinates.W), tick);
+
+        if (tick >= 1f)
+        {
+            selfCoord.preCoordinates = selfCoord.coordinates;
+        }
+
+        return new Vector3(newX, newY, newZ);
+    }
+
+    public float LerpSquare(float tick)
+    {
+        if (tick < 0.3f)
+            return 0f;
+        else if (tick < 0.7f)
+        {
+            return (tick - 0.3f) * 2.5f;
+        }
+        else
+            return 1f;
+    }
+
+    public float SlimeWLerp(float a, float b, float t)
+    {
+        float skyHigh = (a + b) * 0.5f + 2f;
+
+        if (t < 0.5f)
+        {
+            return Mathf.Lerp(a, skyHigh, t);
+        }
+        else
+        {
+            return Mathf.Lerp(skyHigh, b, t);
+        }
     }
 
     public void PlayerRotateToLookAt()
