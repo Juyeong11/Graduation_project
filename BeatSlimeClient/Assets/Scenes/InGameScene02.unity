@@ -1269,7 +1269,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400982002}
   m_LocalRotation: {x: 0.19080885, y: 0.00089094223, z: -0.00017318156, w: 0.9816268}
-  m_LocalPosition: {x: 0, y: 4.02, z: -4}
+  m_LocalPosition: {x: 0.764, y: 4.02, z: -3.869}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 132048414}
@@ -1533,7 +1533,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 200464357357826149, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 0.764
       objectReference: {fileID: 0}
     - target: {fileID: 200464357357826149, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1541,7 +1541,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 200464357357826149, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.131
       objectReference: {fileID: 0}
     - target: {fileID: 200464357357826149, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1595,6 +1595,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainPlayerSlime
       objectReference: {fileID: 0}
+    - target: {fileID: 922465704640310587, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5a598fba948dff7409a0dae59a144bad, type: 2}
     - target: {fileID: 4101853915968575908, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -1630,6 +1634,10 @@ PrefabInstance:
     - target: {fileID: 7866717380901440722, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_LocalScale.z
       value: 0.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 7866717380901440722, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.771
       objectReference: {fileID: 0}
     - target: {fileID: 7866717380901440722, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -4019,7 +4027,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930881972}
   m_LocalRotation: {x: 0.19080885, y: 0.00089094223, z: -0.00017318156, w: 0.9816268}
-  m_LocalPosition: {x: 0, y: 4.02, z: -4}
+  m_LocalPosition: {x: 0.764, y: 4.02, z: -3.869}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -4649,7 +4657,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76009d66e956dfb4cbb766c3683ae496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapCellid: 0
   PM: {fileID: 727645557}
   player: {fileID: 438602109}
   enemy: {fileID: 1711564687}
@@ -4658,22 +4665,13 @@ MonoBehaviour:
   loader: {fileID: 2121429946}
   soundManager: {fileID: 1756485883}
   soundEffectManager: {fileID: 1623220034}
-  soundProgressBar: {fileID: 0}
-  beatManager: {fileID: 0}
   isGameStart: 0
   SongName: flower_load
-  bpm: 0
   barCounts: 4
-  totalSongTime: 0
-  nowSongTime: 0
-  timeByBar: 0
-  timeByBeat: 0
-  timeBy24Beat: 0
-  timeBy16Beat: 0
-  beatCounter: 0
-  offsetTime: 12
+  offsetMusicFrontTime: 0
+  offsetPatternSinker: 0
+  offsetMusicSinker: 0
   JudgementTiming: 100
-  alreadyMoved: 0
   MidNote: {fileID: 710582776}
   MidANote: {fileID: 291758517}
   HPGM: {fileID: 2121429947}
@@ -4681,12 +4679,6 @@ MonoBehaviour:
   ComboEffect: {fileID: 1719363825}
   ParticleEffect: {fileID: 1719363826}
   gameOverImage: {fileID: 2224594054131023562}
-  Objects:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  MusicStartOffset: 0
 --- !u!114 &2121429944
 MonoBehaviour:
   m_ObjectHideFlags: 0
