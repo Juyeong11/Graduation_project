@@ -235,6 +235,8 @@ void Network::send_put_object(int c_id, int target) {
 	packet.y = clients[target]->y;
 	packet.z = clients[target]->z;
 
+	packet.direction = clients[target]->direction;
+
 
 
 	EXP_OVER* ex_over;

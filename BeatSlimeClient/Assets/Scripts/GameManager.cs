@@ -603,6 +603,7 @@ public class GameManager : MonoBehaviour
                                             Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 
                                             Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                            Objects[pid].GetComponentInChildren<HexCellPosition>().setDirection(p.direction);
                                         }
                                         break;
                                     }
