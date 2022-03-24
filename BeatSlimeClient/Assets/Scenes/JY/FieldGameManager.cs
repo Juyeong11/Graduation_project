@@ -73,8 +73,10 @@ public class FieldGameManager : MonoBehaviour
 
 
             //파티 요청이 오면 수락 여부를 알려줌 (0 거절, 1 수락)
-            // 두 번째인자는 myPlayerID를 넣어주면됨 
-            Net.SendPartyRequestAnwserPacket(0, myPlayerID);
+            // 두 번째인자는 요청한 플레이어 id를 넣어주면됨 
+            
+
+            Net.SendPartyRequestAnwserPacket(0, 0);
 
             //Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST: -> 파티 요청이 왔다.
             //Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST_ANWSER: -> 파티 요청에 대한 수락 여부가 왔다.
@@ -187,11 +189,12 @@ public class FieldGameManager : MonoBehaviour
                         {
                             //요청이 왔을 때 수락, 거부
                             //이미 파티가 있다면 이 패킷이 오지 않음
+                            Protocol.sc_packet_party_request p = Protocol.sc_packet_party_request.SetByteToVar(data);
 
                             //수락
-                            Net.SendPartyRequestAnwserPacket(1, myPlayerID);
+                            Net.SendPartyRequestAnwserPacket(1, p.requester_id);
                             //거절
-                            Net.SendPartyRequestAnwserPacket(0, myPlayerID);
+                            Net.SendPartyRequestAnwserPacket(0, p.requester_id);
 
                         }
                         break;
