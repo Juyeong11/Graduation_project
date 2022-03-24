@@ -100,6 +100,9 @@ public class FieldGameManager : MonoBehaviour
                             //Debug.Log((byte)p.dir);
                             Objects[p.id].GetComponent<FieldHexCellPosition>().setDirection((byte)p.dir);
                             Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
+
+                            //grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponent<HexCellPosition>().enableToMove_ForField = false;
+                            grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponentInChildren<SpriteRenderer>().enabled = false;
                             if (p.id < Protocol.CONSTANTS.MAX_USER)
                                 Objects[p.id].GetComponent<FieldPlayerManager>().JumpTrig();
                         }
@@ -119,6 +122,8 @@ public class FieldGameManager : MonoBehaviour
                                         Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", 120 / 45.0f);
 
                                         Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
+
+                                        //grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponent<HexCellPosition>().enableToMove_ForField = false;
                                         break;
                                     }
                             }

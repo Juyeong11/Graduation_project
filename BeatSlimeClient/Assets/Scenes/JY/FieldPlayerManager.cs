@@ -21,6 +21,13 @@ public class FieldPlayerManager : MonoBehaviour
 
     public Transform PlayerTransform;
 
+
+    //[System.NonSerialized]
+    //public HexCoordinates Destination;
+
+    //List<HexDirection> path = new List<HexDirection>();
+
+
     public void Start()
     {
         grid = FieldGameManager.data.grid;
@@ -380,4 +387,5 @@ public class FieldPlayerManager : MonoBehaviour
         }
 
     }
+
 }
