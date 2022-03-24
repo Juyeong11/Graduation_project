@@ -30,6 +30,8 @@ namespace Protocol
         public const byte CS_PACKET_USE_SKILL = 9;
         public const byte CS_PACKET_CHANGE_SKILL = 10;
         public const byte CS_PACKET_PING_TEST = 11;
+        public const byte CS_PACKET_GET_SINGLE_PLAYER_LIST = 12;
+        public const byte CS_PACKET_PARTY_REQUEST = 13;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -44,6 +46,7 @@ namespace Protocol
         public const byte SC_PACKET_PARRYING = 11;
         public const byte SC_PACKET_GAME_INIT = 12;
         public const byte SC_PACKET_CHANGE_SKILL = 13;
+        public const byte SC_PACKET_SINGLE_PLAYER_LIST = 14;
 
         public const byte SC_PACKET_PING_TEST = 15;
 
@@ -232,6 +235,7 @@ namespace Protocol
         public int id;
         public int dir;
         public short x, y, z;
+        public short pre_x, pre_y, pre_z;
     }
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

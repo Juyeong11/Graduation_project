@@ -1,7 +1,7 @@
 #pragma once
-#include "protocol.h"
-#include "PlayerSkill.h"
-void error_display(const char* err_p, int err_no);
+
+
+
 class EXP_OVER {
 public:
 	WSAOVERLAPPED	_wsa_over;
@@ -9,33 +9,15 @@ public:
 	WSABUF			_wsa_buf;
 	unsigned char	_net_buf[BUFSIZE];
 public:
-	EXP_OVER(COMP_OP comp_op, char num_bytes, void* mess) : _comp_op(comp_op)
-	{
-		ZeroMemory(&_wsa_over, sizeof(_wsa_over));
-		_wsa_buf.buf = reinterpret_cast<char*>(_net_buf);
-		_wsa_buf.len = num_bytes;
-		memcpy(_net_buf, mess, num_bytes);
-	}
+	EXP_OVER(COMP_OP comp_op, char num_bytes, void* mess);
 
-	EXP_OVER(COMP_OP comp_op) : _comp_op(comp_op) {}
+	EXP_OVER(COMP_OP comp_op);
 
-	EXP_OVER()
-	{
-		_comp_op = OP_RECV;
-	}
+	EXP_OVER();
 
-	~EXP_OVER()
-	{
-	}
-
-	void set_exp(COMP_OP comp_op, char num_bytes, void* mess)
-	{
-		_comp_op = comp_op;
-		ZeroMemory(&_wsa_over, sizeof(_wsa_over));
-		_wsa_buf.buf = reinterpret_cast<char*>(_net_buf);
-		_wsa_buf.len = num_bytes;
-		memcpy(_net_buf, mess, num_bytes);
-	}
+	~EXP_OVER() = default;
+	
+	void set_exp(COMP_OP comp_op, char num_bytes, void* mess);
 };
 
 
@@ -56,40 +38,28 @@ public:
 
 	int		last_packet_time;
 	std::chrono::system_clock::time_point last_move_time;
-	GameObject() :state(ST_FREE) {
-		pre_x = x = 0;
-		pre_y = y = 0;
-		pre_z = z = 0;
-		last_move_time = std::chrono::system_clock::now();
-		hp = 100;
-	}
+	GameObject();
 
 };
 class Npc: public GameObject {
 public:
 	std::atomic_bool is_active;
 
-	Npc() : is_active(false) {
-		
-	}
+	Npc();
 };
 
 class SkillTrader : public Npc {
 public:
 	std::atomic_bool is_talk;
 
-	SkillTrader() : is_talk (false) {
-
-	}
+	SkillTrader();
 };
 
 class Curator : public Npc {
 public:
 	std::atomic_bool is_talk;
 
-	Curator() : is_talk(false) {
-
-	}
+	Curator();
 };
 
 class Witch : public Npc {
@@ -98,32 +68,28 @@ public:
 	//공격을 몇 초마다 한다? -> 일단 이걸로 하자
 	//파일에서 읽어와서 한다?
 
-	Witch() : is_attack(false) {
-
-	}
+	Witch();
 };
 class Boss2 : public Npc {
 public:
 	std::atomic_bool is_attack;
 
-	Boss2() : is_attack(false) {
-
-	}
+	Boss2();
 };
 
-enum SKILL_TYPE{WATERGUN,QUAKE,HEAL};
-struct Skill
+
+class Skill
 {
+public:
 	int Delay;
 	int CoolTime;
 	int Speed;
 	int Damage;
 	int SkillLevel;
 	int SkillType;
-	Skill(int sl, int st) :SkillLevel(sl), SkillType(st) {
-		Damage = SkillLevel * SkillLevel;
-		CoolTime = 10/SkillLevel;
-	}
+	Skill(int sl, int st);
+	Skill();
+	
 };
 const int VIEW_RANGE = 10;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
@@ -144,18 +110,8 @@ public:
 	long long pre_parrying_pattern;
 public:
 
-	Client(Skill* sk) : skill(sk)
-	{
-		type = PLAYER;
-		is_active = true;
-		prev_recv_size = 0;
-		cur_room_num = -1;
-	}
-
-	~Client()
-	{
-		closesocket(socket);
-	}
+	Client(Skill* sk);
+	~Client();
 
 
 

@@ -3,7 +3,6 @@
 const short SERVER_PORT = 4000;
 
 
-
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
 const char CS_PACKET_READ_MAP = 3;
@@ -15,6 +14,8 @@ const char CS_PACKET_CHANGE_SCENE_DONE = 8;
 const char CS_PACKET_USE_SKILL = 9;
 const char CS_PACKET_CHANGE_SKILL = 10;
 const char CS_PACKET_PING_TEST = 11;
+const char CS_PACKET_GET_SINGLE_PLAYER_LIST = 12;
+const char CS_PACKET_PARTY_REQUEST = 13;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -30,6 +31,7 @@ const char SC_PACKET_GAME_END = 10;
 const char SC_PACKET_PARRYING = 11;
 const char SC_PACKET_GAME_INIT = 12;
 const char SC_PACKET_CHANGE_SKILL = 13;
+const char SC_PACKET_SINGLE_PLAYER_LIST = 14;
 
 const char SC_PACKET_PING_TEST = 15;
 
@@ -100,6 +102,18 @@ struct cs_packet_ping_test {
 	int		ping_time; //
 };
 
+struct cs_packet_get_single_player_list {
+	unsigned char size;
+	char	type;
+	char	name[20];// if name == -1 return near players else name player order by asc
+};
+
+struct cs_packet_party_request {
+	unsigned char size;
+	char	type;
+	char	name[20]; //
+};
+
 //server->client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -114,7 +128,8 @@ struct sc_packet_move {
 	int		id;
 	int dir;
 	short  x, y,z;
-	int		move_time;
+	short  pre_x, pre_y,pre_z;
+	//int		move_time;
 };
 
 struct sc_packet_attack {

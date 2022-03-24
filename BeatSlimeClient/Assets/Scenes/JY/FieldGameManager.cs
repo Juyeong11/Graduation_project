@@ -62,7 +62,20 @@ public class FieldGameManager : MonoBehaviour
         {
             soundManager.StopBGM();
         }
-
+        else if (Input.GetKeyDown(KeyCode.O))
+        {
+            //파티 신청 가능 플레이어 목록을 전송받는 부분
+            // 새로운 패킷을 만들어야 하낟? CS_PACKET_GET_SINGLE_PLAYER_LIST
+            // 플레이어를 검색할 수 도있어야하니 그것도 생각해두자
+        }
+        else if(Input.GetKeyDown(KeyCode.P))
+        {
+            //플레이어 목록에서 플레이어를 선택해 파티 신청 요청을 보냄 CS_PACKET_PARTY_REQUEST
+            //가까운 플레이어는 클라이언트에서 선택해서 보내도됨
+            
+        }
+        // 상대방의 요청 여부가 SC패킷으로 옴
+        
         if (Net.isOnline)
         {
             isGameStart = true;

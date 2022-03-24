@@ -1,21 +1,79 @@
 #include "stdfx.h"
-
+#include "protocol.h"
 #include "Client.h"
 
-void error_display(const char* err_p, int err_no)
+
+
+
+
+EXP_OVER::EXP_OVER(COMP_OP comp_op, char num_bytes, void* mess) : _comp_op(comp_op)
 {
-	WCHAR* lpMsgBuf;
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL, err_no,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR)&lpMsgBuf, 0, 0);
-	std::cout << err_p << std::endl;
-	std::wcout << lpMsgBuf << std::endl;
-	//while (true);
-	LocalFree(lpMsgBuf);
+	ZeroMemory(&_wsa_over, sizeof(_wsa_over));
+	_wsa_buf.buf = reinterpret_cast<char*>(_net_buf);
+	_wsa_buf.len = num_bytes;
+	memcpy(_net_buf, mess, num_bytes);
 }
 
+EXP_OVER::EXP_OVER(COMP_OP comp_op) : _comp_op(comp_op) {}
+
+EXP_OVER::EXP_OVER()
+{
+	_comp_op = OP_RECV;
+}
+
+void EXP_OVER::set_exp(COMP_OP comp_op, char num_bytes, void* mess)
+{
+	_comp_op = comp_op;
+	ZeroMemory(&_wsa_over, sizeof(_wsa_over));
+	_wsa_buf.buf = reinterpret_cast<char*>(_net_buf);
+	_wsa_buf.len = num_bytes;
+	memcpy(_net_buf, mess, num_bytes);
+}
+GameObject::GameObject() :state(ST_FREE) {
+	pre_x = x = 0;
+	pre_y = y = 0;
+	pre_z = z = 0;
+	last_move_time = std::chrono::system_clock::now();
+	hp = 100;
+}
+
+Npc::Npc() : is_active(false) {
+
+}
+
+SkillTrader::SkillTrader() : is_talk(false) {
+
+}
+Curator::Curator() : is_talk(false) {
+
+}
+Witch::Witch() : is_attack(false) {
+
+}
+
+Boss2::Boss2() : is_attack(false) {
+
+}
+
+Skill::Skill(int sl, int st) :SkillLevel(sl), SkillType(st) {
+	Damage = SkillLevel * SkillLevel;
+	CoolTime = 10 / SkillLevel;
+}
+Skill::Skill() {
+	
+}
+
+Client::Client(Skill* sk) : skill(sk)
+{
+	type = PLAYER;
+	is_active = true;
+	prev_recv_size = 0;
+	cur_room_num = -1;
+}
+Client::~Client()
+{
+	closesocket(socket);
+}
 void Client::do_recv()
 {
 	DWORD recv_flag = 0;
