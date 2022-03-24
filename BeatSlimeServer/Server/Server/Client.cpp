@@ -69,6 +69,10 @@ Client::Client(Skill* sk) : skill(sk)
 	is_active = true;
 	prev_recv_size = 0;
 	cur_room_num = -1;
+
+	for (int& i : party_player) {
+		i = -1;
+	}
 }
 Client::~Client()
 {

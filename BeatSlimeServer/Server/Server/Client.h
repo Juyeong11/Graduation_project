@@ -107,17 +107,15 @@ public:
 	int cur_room_num;
 	int		prev_recv_size;
 
+	int party_player[MAX_IN_GAME_PLAYER];
+
 	long long pre_parrying_pattern;
 public:
 
 	Client(Skill* sk);
 	~Client();
 
-
-
-
 	void do_recv();
 	void do_send(EXP_OVER* ex_over);
-
 };
 

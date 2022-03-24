@@ -231,9 +231,7 @@ void Network::send_move_object(int c_id, int mover)
 	packet.x = clients[mover]->x;
 	packet.y = clients[mover]->y;
 	packet.z = clients[mover]->z;
-	packet.pre_x = clients[mover]->pre_x;
-	packet.pre_y = clients[mover]->pre_y;
-	packet.pre_z = clients[mover]->pre_z;
+	
 	packet.dir = clients[mover]->direction;
 
 	//packet.move_time = clients[mover]->last_packet_time;
@@ -371,6 +369,33 @@ void Network::send_ping(int c_id, int time)
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
 
+
+void Network::send_party_request(int reciver, int sender)
+{
+	sc_packet_party_request packet;
+	packet.type = SC_PACKET_PARTY_REQUEST;
+	packet.size = sizeof(packet);
+	packet.requester_id = sender;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[reciver])->do_send(ex_over);
+}
+
+void Network::send_party_request_anwser(int reciver,int p_id ,int type)
+{
+	sc_packet_party_request_anwser packet;
+	packet.type = SC_PACKET_PARTY_REQUEST_ANWSER;
+	packet.size = sizeof(packet);
+	packet.anwser = type;
+	packet.p_id = p_id;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[reciver])->do_send(ex_over);
+}
 void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
@@ -1252,13 +1277,35 @@ void Network::process_packet(int client_id, unsigned char* p)
 		send_ping(client_id, packet->ping_time);
 	}
 	break;
-	case CS_PACKET_GET_SINGLE_PLAYER_LIST:
+	case CS_PACKET_PARTY_REQUEST:
 	{
-
+		cs_packet_party_request* packet = reinterpret_cast<cs_packet_party_request*>(p);
+		
+		bool inParty = false;
+		for (int i : reinterpret_cast<Client*>(clients[packet->id])->party_player) {
+			if (i != -1) { inParty = true; break; }
+		}
+		if (inParty) {
+			send_party_request_anwser(client_id, packet->id, -1);
+		}
+		else {
+			send_party_request(packet->id, client_id);
+		}
 	}
 	break;
+	case CS_PACKET_PARTY_REQUEST_ANWSER:
+	{
+		cs_packet_party_request_anwser* packet = reinterpret_cast<cs_packet_party_request_anwser*>(p);
+		if (packet->anwser == 1) {//수락
+			send_party_request_anwser(packet->requester, client_id, 1);
+		}
+		else if(packet->anwser == 0) {//거절
+			send_party_request_anwser(packet->requester, client_id, 0);
+		}
+	}
+		break;
 	default:
-		std::cout << "이상한 패킷 수신\n";
+		std::cout << "wrong packet\n";
 		break;
 	}
 }

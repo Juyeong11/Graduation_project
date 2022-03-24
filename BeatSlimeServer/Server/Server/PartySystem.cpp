@@ -28,6 +28,4 @@ GameObject** PartySystem::GetSinglePlayerList(char* name)
 		});
 
 	return sortedClients.data() + lastSearchPlayerID;
-	
-	
 }
