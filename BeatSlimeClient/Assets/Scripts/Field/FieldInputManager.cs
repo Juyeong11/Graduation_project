@@ -48,6 +48,10 @@ public class FieldInputManager : MonoBehaviour
                 else if (hit.collider.tag == "Cells")
                 {
                     //A* ¿Ãµø
+                    hit.transform.GetComponentInChildren<SpriteRenderer>().enabled = true;
+                    //FieldGameManager.data.player.GetComponent<FieldPlayerManager>().Destination = hit.transform.GetComponent<HexCellPosition>().coordinates;
+                    //FieldGameManager.data.player.GetComponent<FieldPlayerManager>().ASTAR();
+
                 }
 
                 preHittedObject = HittedObject;
