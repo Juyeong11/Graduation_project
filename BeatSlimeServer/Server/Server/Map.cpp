@@ -1,5 +1,5 @@
 #include"stdfx.h"
-#include"Network.h"
+#include"Client.h"	
 #include"Map.h"
 
 void MapInfo::SetMap(std::string map_name, std::string music_name)

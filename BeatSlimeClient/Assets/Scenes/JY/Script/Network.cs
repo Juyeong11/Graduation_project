@@ -224,6 +224,26 @@ public class Network
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
+    public void SendPartyRequestPacket(int id)
+    {
+        Protocol.cs_packet_party_request pk = new Protocol.cs_packet_party_request();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_party_request));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_PARTY_REQUEST;
+        pk.id = id;
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
+    public void SendPartyRequestAnwserPacket(byte type,int id)
+    {
+        Protocol.cs_packet_party_request_anwser pk = new Protocol.cs_packet_party_request_anwser();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_party_request_anwser));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_PARTY_REQUEST_ANWSER;
+        pk.requester = id;
+        pk.anwser = type;
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
 
     public void SendWriteMapPacket(ArrayList datas)
     {

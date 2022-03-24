@@ -42,6 +42,8 @@ enum PIVOTTYPE { PlayerM, Playerm, World, Boss, Player1, Player2, Player3,Player
 enum DIR {
 	LEFTUP, UP, RIGHTUP, LEFTDOWN, DOWN, RIGHTDOWN
 };
+extern void error_display(const char* err_p, int err_no);
+enum SKILL_TYPE { WATERGUN, QUAKE, HEAL };
 #define DEBUG
 const int BUFSIZE = 256;
 
