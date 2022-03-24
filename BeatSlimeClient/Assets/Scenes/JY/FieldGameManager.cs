@@ -27,6 +27,8 @@ public class FieldGameManager : MonoBehaviour
     static int myPlayerID = -1;
     public ArrayList Mapdata = new ArrayList();
 
+    int scene_num;
+
     void Awake()
     {
         print("Start");
@@ -62,6 +64,11 @@ public class FieldGameManager : MonoBehaviour
         {
             soundManager.StopBGM();
         }
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            scene_num = 2;
+            StartCoroutine(ChangeScene());
+        }
 
         if (Net.isOnline)
         {
@@ -89,7 +96,10 @@ public class FieldGameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_CHANGE_SCENE:
                         {
                             Protocol.sc_packet_change_scene p = Protocol.sc_packet_change_scene.SetByteToVar(data);
-                            SceneManager.LoadScene(p.scene_num);
+
+                            scene_num = p.scene_num;
+                            StartCoroutine(ChangeScene());
+                            
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
@@ -161,5 +171,17 @@ public class FieldGameManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    IEnumerator ChangeScene()
+    {
+        player.GetComponent<FieldPlayerManager>().PortalPlane.transform.SetParent(null);
+        //player.GetComponent<FieldPlayerManager>().PortalPlane.transform.localRotation = Quaternion.Euler(90,0,0);
+        player.GetComponent<FieldPlayerManager>().PortalPlane.SetActive(true);
+        
+        yield return new WaitForSeconds(2.0f);
+        player.GetComponent<FieldPlayerManager>().EnterPortal();
+        yield return new WaitForSeconds(0.5f);
+        SceneManager.LoadScene(scene_num);
     }
 }
