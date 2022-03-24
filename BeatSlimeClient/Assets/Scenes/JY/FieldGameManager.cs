@@ -27,6 +27,8 @@ public class FieldGameManager : MonoBehaviour
     static int myPlayerID = -1;
     public ArrayList Mapdata = new ArrayList();
 
+    int scene_num;
+
     void Awake()
     {
         print("Start");
@@ -62,26 +64,34 @@ public class FieldGameManager : MonoBehaviour
         {
             soundManager.StopBGM();
         }
-        else if (Input.GetKeyDown(KeyCode.O))
+
+        if (Input.GetKeyDown(KeyCode.O))
         {
-            //id¸¦ Á¤ÇØ¼­ SendPartyRequestPacketÀÇ ÀÎÀÚ·Î Àü´Ş
-            //ÆÄÆ¼¸¦ ÇÏ°í ½ÍÀº ÇÃ·¹ÀÌ¾î¸¦ Á¤ÇØ¼­ id¸¦ ÀÎÀÚ·Î ÇÏ°í ¾Æ·¡ ÇÔ¼ö¸¦ È£ÃâÇÏ¸éµÊ(Å¬¶ó¿Í ¼­¹ö´Â °°Àº id¸¦ ¾²°í ÀÖÀ½)
+            //idë¥¼ ì •í•´ì„œ SendPartyRequestPacketì˜ ì¸ìë¡œ ì „ë‹¬
+            //íŒŒí‹°ë¥¼ í•˜ê³  ì‹¶ì€ í”Œë ˆì´ì–´ë¥¼ ì •í•´ì„œ idë¥¼ ì¸ìë¡œ í•˜ê³  ì•„ë˜ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•˜ë©´ë¨(í´ë¼ì™€ ì„œë²„ëŠ” ê°™ì€ idë¥¼ ì“°ê³  ìˆìŒ)
             Net.SendPartyRequestPacket(0);
 
 
-            //ÆÄÆ¼ ¿äÃ»ÀÌ ¿À¸é ¼ö¶ô ¿©ºÎ¸¦ ¾Ë·ÁÁÜ (0 °ÅÀı, 1 ¼ö¶ô)
-            // µÎ ¹øÂ°ÀÎÀÚ´Â myPlayerID¸¦ ³Ö¾îÁÖ¸éµÊ 
+            //íŒŒí‹° ìš”ì²­ì´ ì˜¤ë©´ ìˆ˜ë½ ì—¬ë¶€ë¥¼ ì•Œë ¤ì¤Œ (0 ê±°ì ˆ, 1 ìˆ˜ë½)
+            // ë‘ ë²ˆì§¸ì¸ìëŠ” myPlayerIDë¥¼ ë„£ì–´ì£¼ë©´ë¨ 
             Net.SendPartyRequestAnwserPacket(0, myPlayerID);
 
-            //Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST: -> ÆÄÆ¼ ¿äÃ»ÀÌ ¿Ô´Ù.
-            //Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST_ANWSER: -> ÆÄÆ¼ ¿äÃ»¿¡ ´ëÇÑ ¼ö¶ô ¿©ºÎ°¡ ¿Ô´Ù.
+            //Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST: -> íŒŒí‹° ìš”ì²­ì´ ì™”ë‹¤.
+            //Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST_ANWSER: -> íŒŒí‹° ìš”ì²­ì— ëŒ€í•œ ìˆ˜ë½ ì—¬ë¶€ê°€ ì™”ë‹¤.
         }
-        // »ó´ë¹æÀÇ ¿äÃ» ¼ö¶ô ¿©ºÎ°¡ SCÆĞÅ¶À¸·Î ¿È
+        // ìƒëŒ€ë°©ì˜ ìš”ì²­ ìˆ˜ë½ ì—¬ë¶€ê°€ SCíŒ¨í‚·ìœ¼ë¡œ ì˜´
+
+        if (Input.GetKeyDown(KeyCode.Alpha9))
+        {
+            scene_num = 2;
+            StartCoroutine(ChangeScene());
+        }
+
 
         if (Net.isOnline)
         {
             isGameStart = true;
-            // ³×Æ®¿öÅ© ¸Ş¼¼Áö Å¥
+            // ë„¤íŠ¸ì›Œí¬ ë©”ì„¸ì§€ í
             if (Network.MessQueue.Count > 0)
             {
                 byte[] data = Network.MessQueue.Dequeue();
@@ -104,17 +114,23 @@ public class FieldGameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_CHANGE_SCENE:
                         {
                             Protocol.sc_packet_change_scene p = Protocol.sc_packet_change_scene.SetByteToVar(data);
-                            SceneManager.LoadScene(p.scene_num);
+
+                            scene_num = p.scene_num;
+                            StartCoroutine(ChangeScene());
+                            
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
-                            //Debug.Log(p.id+"ÀÌµ¿");
+                            //Debug.Log(p.id+"ì´ë™");
                             //Debug.Log((byte)p.dir);
                             Objects[p.id].GetComponent<FieldHexCellPosition>().setDirection((byte)p.dir);
                             Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
+
+                            //grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponent<HexCellPosition>().enableToMove_ForField = false;
+                            grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponentInChildren<SpriteRenderer>().enabled = false;
                             if (p.id < Protocol.CONSTANTS.MAX_USER)
                                 Objects[p.id].GetComponent<FieldPlayerManager>().JumpTrig();
                         }
@@ -128,12 +144,14 @@ public class FieldGameManager : MonoBehaviour
                             {
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
-                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "ÇÃ·¹ÀÌ¾î ³ÖÀ½");
+                                        // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "í”Œë ˆì´ì–´ ë„£ìŒ");
                                         Objects[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                         Objects[p.id].SetActive(true);
                                         Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", 120 / 45.0f);
 
                                         Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
+
+                                        //grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponent<HexCellPosition>().enableToMove_ForField = false;
                                         break;
                                     }
                             }
@@ -154,43 +172,55 @@ public class FieldGameManager : MonoBehaviour
                                 Objects[p.id].SetActive(false);
                             }
 
-                            //´Ù¸¥ ÇÃ·¹ÀÌ¾î¸é ´Ù¸¥ÇÃ·¹ÀÌ¾î Ç®¿¡
-                            //ÀûÀÌ¸é ÀûÇ®¿¡ ³ÖÀÚ
+                            //ë‹¤ë¥¸ í”Œë ˆì´ì–´ë©´ ë‹¤ë¥¸í”Œë ˆì´ì–´ í’€ì—
+                            //ì ì´ë©´ ì í’€ì— ë„£ì
                             //ReMoveObject(p.id);
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_CHANGE_SKILL:
                         {
                             Protocol.sc_packet_change_skill p = Protocol.sc_packet_change_skill.SetByteToVar(data);
-                            Debug.Log(p.id + "°¡ " + p.skill_type + "À¸·Î ½ºÅ³À» ¹Ù²Ş");
+                            Debug.Log(p.id + "ê°€ " + p.skill_type + "ìœ¼ë¡œ ìŠ¤í‚¬ì„ ë°”ê¿ˆ");
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST:
                         {
-                            //¿äÃ»ÀÌ ¿ÔÀ» ¶§ ¼ö¶ô, °ÅºÎ
-                            //ÀÌ¹Ì ÆÄÆ¼°¡ ÀÖ´Ù¸é ÀÌ ÆĞÅ¶ÀÌ ¿ÀÁö ¾ÊÀ½
+                            //ìš”ì²­ì´ ì™”ì„ ë•Œ ìˆ˜ë½, ê±°ë¶€
+                            //ì´ë¯¸ íŒŒí‹°ê°€ ìˆë‹¤ë©´ ì´ íŒ¨í‚·ì´ ì˜¤ì§€ ì•ŠìŒ
 
-                            //¼ö¶ô
+                            //ìˆ˜ë½
                             Net.SendPartyRequestAnwserPacket(1, myPlayerID);
-                            //°ÅÀı
+                            //ê±°ì ˆ
                             Net.SendPartyRequestAnwserPacket(0, myPlayerID);
 
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST_ANWSER:
                         {
-                            //³»°¡ º¸³½ ¿äÃ»ÀÌ °ÅÀı µÆ´ÂÁö ¼ö¶ô µÆ´ÂÁö ¾Ë·ÁÁÖ´Â ÆĞÅ¶
+                            //ë‚´ê°€ ë³´ë‚¸ ìš”ì²­ì´ ê±°ì ˆ ëëŠ”ì§€ ìˆ˜ë½ ëëŠ”ì§€ ì•Œë ¤ì£¼ëŠ” íŒ¨í‚·
                             Protocol.sc_packet_party_request_anwser p = Protocol.sc_packet_party_request_anwser.SetByteToVar(data);
 
-                            Debug.Log(p.p_id + "°¡ " + p.anwser + " ÀÌ¶ó°í ÀÀ´äÇÔ");
+                            Debug.Log(p.p_id + "ê°€ " + p.anwser + " ì´ë¼ê³  ì‘ë‹µí•¨");
 
                         }
                         break;
                     default:
-                        Debug.Log("ÀÌ»óÇÑ Å¸ÀÔÀÌ³×");
+                        Debug.Log("ì´ìƒí•œ íƒ€ì…ì´ë„¤");
                         break;
                 }
             }
         }
+    }
+
+    IEnumerator ChangeScene()
+    {
+        player.GetComponent<FieldPlayerManager>().PortalPlane.transform.SetParent(null);
+        //player.GetComponent<FieldPlayerManager>().PortalPlane.transform.localRotation = Quaternion.Euler(90,0,0);
+        player.GetComponent<FieldPlayerManager>().PortalPlane.SetActive(true);
+        
+        yield return new WaitForSeconds(2.0f);
+        player.GetComponent<FieldPlayerManager>().EnterPortal();
+        yield return new WaitForSeconds(0.5f);
+        SceneManager.LoadScene(scene_num);
     }
 }
