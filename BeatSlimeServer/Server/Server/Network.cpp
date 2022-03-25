@@ -396,6 +396,21 @@ void Network::send_party_request_anwser(int reciver,int p_id ,int type)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[reciver])->do_send(ex_over);
 }
+void Network::send_chat_packet(int user_id, int my_id, char* mess)
+{
+	sc_packet_chat packet;
+
+	strcpy_s(packet.mess, mess);
+	packet.id = my_id;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_CHAT;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[user_id])->do_send(ex_over);
+}
+
 void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
@@ -1302,6 +1317,22 @@ void Network::process_packet(int client_id, unsigned char* p)
 		else if(packet->anwser == 0) {//거절
 			send_party_request_anwser(packet->requester, client_id, 0);
 		}
+	}
+		break;
+	case CS_PACKET_CHAT:
+	{
+		cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(p);
+		std::cout << packet->mess << std::endl;
+		Client* client = reinterpret_cast<Client*>(clients[client_id]);
+		client->vl.lock();
+		std::unordered_set<int> c_vl{ client->viewlist };
+		client->vl.unlock();
+		for (int i : c_vl) {
+			if (false == is_player(i)) continue;
+			send_chat_packet(i, client_id, packet->mess);
+		}
+		send_chat_packet(client_id, client_id, packet->mess);
+
 	}
 		break;
 	default:

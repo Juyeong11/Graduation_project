@@ -9,7 +9,7 @@ public:
 	WSABUF			_wsa_buf;
 	unsigned char	_net_buf[BUFSIZE];
 public:
-	EXP_OVER(COMP_OP comp_op, char num_bytes, void* mess);
+	EXP_OVER(COMP_OP comp_op, unsigned char num_bytes, void* mess);
 
 	EXP_OVER(COMP_OP comp_op);
 
@@ -17,7 +17,7 @@ public:
 
 	~EXP_OVER() = default;
 	
-	void set_exp(COMP_OP comp_op, char num_bytes, void* mess);
+	void set_exp(COMP_OP comp_op,unsigned char num_bytes, void* mess);
 };
 
 

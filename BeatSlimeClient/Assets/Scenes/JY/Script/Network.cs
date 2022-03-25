@@ -13,7 +13,7 @@ public class Network
     static public int[] ping_data = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
     static public int ping_index;
 
-    const int BUFSIZE = 256;
+    const int BUFSIZE = 512;
 
     Socket ClientSocket;
 
@@ -241,6 +241,19 @@ public class Network
         pk.type = Protocol.CONSTANTS.CS_PACKET_PARTY_REQUEST_ANWSER;
         pk.requester = id;
         pk.anwser = type;
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
+    public void SendChatMess(string mess)
+    {
+        Protocol.cs_packet_chat pk = new Protocol.cs_packet_chat();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_chat));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_CHAT;
+
+        Buffer.BlockCopy(System.Text.Encoding.UTF8.GetBytes(mess), 0, pk.mess, 0, System.Text.Encoding.UTF8.GetBytes(mess).Length);
+
+
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }

@@ -13,6 +13,7 @@ namespace Protocol
         public const int WORLD_HEIGHT = 2000;
         public const int WORLD_WIDTH = 2000;
         public const int MAX_NAME_SIZE = 20;
+        public const int CHAT_BUF_SIZE = 122;
         public const int MAX_USER = 5000;
         public const int MAX_NPC = 4;
         public const int NPC_ID_START = MAX_USER;
@@ -33,6 +34,7 @@ namespace Protocol
         //public const byte CS_PACKET_GET_SINGLE_PLAYER_LIST = 12;
         public const byte CS_PACKET_PARTY_REQUEST = 13;
         public const byte CS_PACKET_PARTY_REQUEST_ANWSER = 14;
+        public const byte CS_PACKET_CHAT = 15;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -50,6 +52,7 @@ namespace Protocol
         public const byte SC_PACKET_PING_TEST = 14;
         public const byte SC_PACKET_PARTY_REQUEST = 15;
         public const byte SC_PACKET_PARTY_REQUEST_ANWSER = 16;
+        public const byte SC_PACKET_CHAT = 17;
 
 
     }
@@ -235,6 +238,16 @@ namespace Protocol
         public byte anwser; //
         public int requester; //
     }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_chat : ISerializeble<cs_packet_chat>
+    {
+        public byte size;
+        public byte type;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.CHAT_BUF_SIZE)]
+        public byte[] mess = new byte[CONSTANTS.CHAT_BUF_SIZE];
+    }
     //Server -> Client
 
     [Serializable]
@@ -403,6 +416,17 @@ namespace Protocol
         public byte size;
         public byte type;
         public byte anwser;
+        public int p_id;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_chat : ISerializeble<sc_packet_chat>
+    {
+        public byte size;
+        public byte type;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.CHAT_BUF_SIZE)]
+        public byte[] mess = new byte[CONSTANTS.CHAT_BUF_SIZE];
         public int p_id;
     }
 }

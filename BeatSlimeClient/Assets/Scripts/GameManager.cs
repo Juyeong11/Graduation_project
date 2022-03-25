@@ -784,6 +784,7 @@ public class GameManager : MonoBehaviour
                             //Debug.Log(ping);
                         }
                         break;
+                        
                     default:
                         Debug.Log("wrong + type");
 

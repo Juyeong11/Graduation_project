@@ -17,7 +17,7 @@ public class FieldGameManager : MonoBehaviour
 
     public SoundManager soundManager;
     public SoundEffectManager soundEffectManager;
-
+    public ChattingManager chattingManager;
     public bool isGameStart;
 
     //
@@ -205,6 +205,14 @@ public class FieldGameManager : MonoBehaviour
 
                             Debug.Log(p.p_id + "가 " + p.anwser + " 이라고 응답함");
 
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_CHAT:
+                        {
+                            Protocol.sc_packet_chat p = Protocol.sc_packet_chat.SetByteToVar(data);
+
+                            Debug.Log(System.Text.Encoding.UTF8.GetString(p.mess));
+                            chattingManager.SetMess(System.Text.Encoding.UTF8.GetString(p.mess));
                         }
                         break;
                     default:
