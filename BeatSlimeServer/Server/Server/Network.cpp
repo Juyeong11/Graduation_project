@@ -1,8 +1,11 @@
 ﻿#include "stdfx.h"
 
+#include"protocol.h"
 #include"Map.h"
 #include "DataBase.h"
 #include "Network.h"
+#include"Client.h"
+
 
 Network* Network::instance = nullptr;
 
@@ -16,7 +19,7 @@ Network::Network() {
 	//인스턴스는 한 개만!!
 	assert(instance == nullptr);
 	instance = this;
-
+	accept_ex = new EXP_OVER();
 	for (int i = 0; i < SKILL_CNT; ++i) {
 		skills[i] = new Skill(i % 3 + 1, i / 3 + 1);
 	}
@@ -67,6 +70,7 @@ Network::Network() {
 Network::~Network() {
 	//스레드가 종료된 후 이기 때문에 락을 할 필요가 없다
 //accpet상태일 때 문제가 생긴다
+	delete accept_ex;
 	for (int i = 0; i < MAX_USER; ++i)
 		if (ST_INGAME == clients[i]->state)
 			disconnect_client(clients[i]->id);
@@ -91,6 +95,51 @@ Network::~Network() {
 	for (int i = 1; i <= SKILL_CNT; ++i) {
 		delete skills[i];
 	}
+}
+
+void Network::start_accept() {
+	SOCKET c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
+
+	*(reinterpret_cast<SOCKET*>(accept_ex->_net_buf)) = c_socket;
+
+	ZeroMemory(&accept_ex->_wsa_over, sizeof(accept_ex->_wsa_over));
+	accept_ex->_comp_op = OP_ACCEPT;
+
+	AcceptEx(g_s_socket, c_socket, accept_ex->_net_buf + sizeof(SOCKET), 0, sizeof(SOCKADDR_IN) + 16,
+		sizeof(SOCKADDR_IN) + 16, NULL, &accept_ex->_wsa_over);
+}
+void Network::Initialize_NPC() {
+	for (int i = NPC_ID_START; i < NPC_ID_END; ++i) {
+		sprintf_s(clients[i]->name, "NPC%d", i);
+		clients[i]->x = 0;
+		clients[i]->z = 0;
+		clients[i]->id = i;
+		clients[i]->state = ST_ACCEPT;
+		clients[i]->direction = DOWN;
+		clients[i]->type = WITCH;
+
+	}
+}
+bool Network::is_attack(int a, int x, int z)
+{
+	if (abs(clients[a]->x != x)) return false;
+	if (abs(clients[a]->z != z)) return false;
+
+	return true;
+}
+bool Network::is_attack(int a, int b)
+{
+	if (ATTACK_RANGE < abs(clients[a]->x - clients[b]->x)) return false;
+	if (ATTACK_RANGE < abs(clients[a]->z - clients[b]->z)) return false;
+
+	return true;
+}
+bool Network::is_near(int a, int b)
+{
+	if (VIEW_RANGE < abs(clients[a]->x - clients[b]->x)) return false;
+	if (VIEW_RANGE < abs(clients[a]->z - clients[b]->z)) return false;
+
+	return true;
 }
 void Network::send_login_ok(int c_id)
 {
@@ -182,9 +231,10 @@ void Network::send_move_object(int c_id, int mover)
 	packet.x = clients[mover]->x;
 	packet.y = clients[mover]->y;
 	packet.z = clients[mover]->z;
+	
 	packet.dir = clients[mover]->direction;
 
-	packet.move_time = clients[mover]->last_packet_time;
+	//packet.move_time = clients[mover]->last_packet_time;
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -319,6 +369,33 @@ void Network::send_ping(int c_id, int time)
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
 
+
+void Network::send_party_request(int reciver, int sender)
+{
+	sc_packet_party_request packet;
+	packet.type = SC_PACKET_PARTY_REQUEST;
+	packet.size = sizeof(packet);
+	packet.requester_id = sender;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[reciver])->do_send(ex_over);
+}
+
+void Network::send_party_request_anwser(int reciver,int p_id ,int type)
+{
+	sc_packet_party_request_anwser packet;
+	packet.type = SC_PACKET_PARTY_REQUEST_ANWSER;
+	packet.size = sizeof(packet);
+	packet.anwser = type;
+	packet.p_id = p_id;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[reciver])->do_send(ex_over);
+}
 void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
@@ -327,7 +404,7 @@ void Network::disconnect_client(int c_id)
 
 	int room_num = reinterpret_cast<Client*>(clients[c_id])->cur_room_num;
 	if (room_num == -1) {
-		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->x);
+		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->z);
 	}
 
 	client.vl.lock();
@@ -885,21 +962,25 @@ void Network::process_packet(int client_id, unsigned char* p)
 				GameObject* players[MAX_IN_GAME_PLAYER];
 				if (p->player_ids.size() >= MAX_IN_GAME_PLAYER) {
 					// 씬 전환
+
 					int i = 0;
 					for (int id : p->player_ids) { // 이미 change 씬
 						players[i] = clients[id];
 						i++;
+						maps[FIELD_MAP]->SetTileType(-1, -1, clients[id]->x, clients[id]->x);
+
 						if (i > MAX_IN_GAME_PLAYER) break;
 					}
+					//std::cout << "시작" << std::endl;
 
 					for (int id : p->player_ids) {
+
 						send_change_scene(id, p->map_type);
 					}
 					// 포탈에서 GameRoom으로 이동
 					int room_id = get_game_room_id();
 					int boss_id = get_npc_id(p->map_type);
 					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players, p);
-					//std::cout << "시작" << std::endl;
 					p->player_ids.clear();
 					p->ready_player_cnt = 0;
 				}
@@ -1196,8 +1277,35 @@ void Network::process_packet(int client_id, unsigned char* p)
 		send_ping(client_id, packet->ping_time);
 	}
 	break;
+	case CS_PACKET_PARTY_REQUEST:
+	{
+		cs_packet_party_request* packet = reinterpret_cast<cs_packet_party_request*>(p);
+		
+		bool inParty = false;
+		for (int i : reinterpret_cast<Client*>(clients[packet->id])->party_player) {
+			if (i != -1) { inParty = true; break; }
+		}
+		if (inParty) {
+			send_party_request_anwser(client_id, packet->id, -1);
+		}
+		else {
+			send_party_request(packet->id, client_id);
+		}
+	}
+	break;
+	case CS_PACKET_PARTY_REQUEST_ANWSER:
+	{
+		cs_packet_party_request_anwser* packet = reinterpret_cast<cs_packet_party_request_anwser*>(p);
+		if (packet->anwser == 1) {//수락
+			send_party_request_anwser(packet->requester, client_id, 1);
+		}
+		else if(packet->anwser == 0) {//거절
+			send_party_request_anwser(packet->requester, client_id, 0);
+		}
+	}
+		break;
 	default:
-		std::cout << "이상한 패킷 수신\n";
+		std::cout << "wrong packet\n";
 		break;
 	}
 }

@@ -1,5 +1,6 @@
 #include"stdfx.h"
 #include"Network.h"
+#include"protocol.h"
 using namespace std;
 
 Network network;

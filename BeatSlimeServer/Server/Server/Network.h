@@ -2,8 +2,6 @@
 
 
 
-#include"protocol.h"
-#include"Client.h"
 
 
 enum EVENT_TYPE {
@@ -37,6 +35,10 @@ class DataBase;
 class GameRoom;
 class MapInfo;
 class Portal;
+class GameObject;
+class Client;
+class EXP_OVER;
+class Skill;
 class Network
 {
 private:
@@ -50,17 +52,7 @@ public:
 	~Network();
 
 
-	void start_accept() {
-		SOCKET c_socket = WSASocket(AF_INET, SOCK_STREAM, IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
-
-		*(reinterpret_cast<SOCKET*>(accept_ex._net_buf)) = c_socket;
-
-		ZeroMemory(&accept_ex._wsa_over, sizeof(accept_ex._wsa_over));
-		accept_ex._comp_op = OP_ACCEPT;
-
-		AcceptEx(g_s_socket, c_socket, accept_ex._net_buf + sizeof(SOCKET), 0, sizeof(SOCKADDR_IN) + 16,
-			sizeof(SOCKADDR_IN) + 16, NULL, &accept_ex._wsa_over);
-	}
+	void start_accept();
 
 	void send_login_ok(int client_id);
 	void send_move_object(int client_id, int mover_id);
@@ -75,31 +67,15 @@ public:
 	void send_parrying(int client_id,int actor_id);
 	void send_change_skill(int client_id,int actor_id);
 	void send_ping(int client_id,int time);
+	void send_party_request(int reciver,int sender);
+	void send_party_request_anwser(int reciver,int p_id,int type);
 
 	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z);
 	void disconnect_client(int client_id);
 
-	bool is_near(int a, int b)
-	{
-		if (VIEW_RANGE < abs(clients[a]->x - clients[b]->x)) return false;
-		if (VIEW_RANGE < abs(clients[a]->z - clients[b]->z)) return false;
-
-		return true;
-	}
-	bool is_attack(int a, int b)
-	{
-		if (ATTACK_RANGE < abs(clients[a]->x - clients[b]->x)) return false;
-		if (ATTACK_RANGE < abs(clients[a]->z - clients[b]->z)) return false;
-
-		return true;
-	}
-	bool is_attack(int a, int x, int z)
-	{
-		if (abs(clients[a]->x != x)) return false;
-		if (abs(clients[a]->z != z)) return false;
-
-		return true;
-	}
+	bool is_near(int a, int b);
+	bool is_attack(int a, int b);
+	bool is_attack(int a, int x, int z);
 	bool is_npc(int id)
 	{
 		return (id >= NPC_ID_START) && (id <= NPC_ID_END);
@@ -113,18 +89,7 @@ public:
 
 	int get_game_room_id();
 	int set_new_player_pos(int client_id);
-	void Initialize_NPC() {
-		for (int i = NPC_ID_START; i < NPC_ID_END; ++i) {
-			sprintf_s(clients[i]->name, "NPC%d", i);
-			clients[i]->x = 0;
-			clients[i]->z = 0;
-			clients[i]->id = i;
-			clients[i]->state = ST_ACCEPT;
-			clients[i]->direction = DOWN;
-			clients[i]->type = WITCH;
-
-		}
-	}
+	void Initialize_NPC();
 	void do_npc_move(int npc_id);
 	void do_npc_attack(int npc_id, int target_id, int receiver);
 	void do_npc_tile_attack(int game_room_id,int x,int y, int z);
@@ -138,20 +103,11 @@ public:
 
 	void set_next_pattern(int room_id);
 
-	void check_game_over(int game_room_id, int dead_charactor_id) {
-		// 게임 오버 패킷을 보내고
-
-	}
-
-	void check_game_clear(int hp) {
-		// 게임  패킷을 보내고
-
-	}
 private:
 	concurrency::concurrent_priority_queue<timer_event> timer_queue;
 	concurrency::concurrent_queue<EXP_OVER*> exp_over_pool;
 	std::array<GameObject*, MAX_OBJECT> clients;// 200, 200 맵을 존으로 나누어 뷰 리스트 제작할 것
-	EXP_OVER accept_ex;
+	EXP_OVER* accept_ex;
 
 private:
 	std::array<GameRoom*, MAX_GAME_ROOM_NUM> game_room;

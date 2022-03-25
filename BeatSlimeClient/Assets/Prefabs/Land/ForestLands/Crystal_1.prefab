@@ -15,7 +15,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &449288802549640539
 Transform:
@@ -57,6 +57,9 @@ MonoBehaviour:
   landOffsetY: 0
   landOffsetZ: 0
   landOffsetRotate: 0
+  landOffsetScale: 0
+  landType: 0
+  preBeatedTime: 0
 --- !u!1 &4941798863568602688
 GameObject:
   m_ObjectHideFlags: 0
@@ -73,7 +76,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &1591120764023285955
 Transform:
@@ -152,7 +155,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &449288802471798856
 Transform:

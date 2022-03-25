@@ -6,6 +6,10 @@ public class HexCellPosition : MonoBehaviour
     public HexCoordinates preCoordinates;
     public HexDirection direction;
 
+    //[System.NonSerialized]
+    //public bool enableToMove_ForField = true;
+
+
     public float landOffsetX = 0;
     public float landOffsetY = 0;
     public float landOffsetZ = 0;

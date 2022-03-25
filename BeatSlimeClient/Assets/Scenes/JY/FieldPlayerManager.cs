@@ -21,6 +21,14 @@ public class FieldPlayerManager : MonoBehaviour
 
     public Transform PlayerTransform;
 
+    public GameObject PortalPlane;
+
+    //[System.NonSerialized]
+    //public HexCoordinates Destination;
+
+    //List<HexDirection> path = new List<HexDirection>();
+
+
     public void Start()
     {
         grid = FieldGameManager.data.grid;
@@ -380,4 +388,12 @@ public class FieldPlayerManager : MonoBehaviour
         }
 
     }
+
+    public void EnterPortal()
+    {
+        selfDirection = HexDirection.Down;
+        selfCoord.plus(0, 0, 0, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
+        JumpTrig();
+    }
+
 }

@@ -101,7 +101,7 @@ Transform:
   m_GameObject: {fileID: 5531710822585620627}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 5531710822875299479}
   m_Father: {fileID: 0}
@@ -119,7 +119,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a944e334d2ad0f4597fa74bf7dfa880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  camTransform: {fileID: 0}
 --- !u!1 &5531710822875299478
 GameObject:
   m_ObjectHideFlags: 0
