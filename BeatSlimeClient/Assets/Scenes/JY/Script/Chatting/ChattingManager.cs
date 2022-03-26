@@ -17,6 +17,7 @@ public class ChattingManager : MonoBehaviour
     // 서버에서 메세지가 오면 출력한다.
     // 왔던 메세지들을 저장해두고 보여준다.
     string[] message;
+    System.Text.StringBuilder chatmess;
     int curIndex;
     const int messageBoxSize = 10;
 
@@ -30,7 +31,7 @@ public class ChattingManager : MonoBehaviour
         message = new string[messageBoxSize];   
         inputField = GetComponent<InputField>();
         image = GetComponent<Image>();
-
+        chatmess = new System.Text.StringBuilder();
 
         //inputField.ac;
     }
@@ -69,13 +70,10 @@ public class ChattingManager : MonoBehaviour
         message[curIndex] = mess;
         curIndex++;
         curIndex = curIndex % messageBoxSize;
-        string t = text.text;
-        Debug.Log(t);
-        Debug.Log(mess);
-        Debug.Log(mess + t);
 
-        text.text = mess ;
-        //Debug.Log(text.text);
+        chatmess.Append('\n' + mess );
+
+        text.text = chatmess.ToString();
         ShowMess();
     }
 
@@ -90,6 +88,7 @@ public class ChattingManager : MonoBehaviour
     {
         BackGround.SetActive(false);
         text.text = "";
+        chatmess.Clear();
         curIndex = 0;
     }
 }

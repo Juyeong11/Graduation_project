@@ -211,8 +211,9 @@ public class FieldGameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_chat p = Protocol.sc_packet_chat.SetByteToVar(data);
 
-                            Debug.Log(System.Text.Encoding.UTF8.GetString(p.mess));
-                            chattingManager.SetMess(System.Text.Encoding.UTF8.GetString(p.mess));
+                            string mess = System.Text.Encoding.UTF8.GetString(p.mess).Split('\0')[0];
+                            //Debug.Log(System.Text.Encoding.UTF8.GetString(p.mess));
+                            chattingManager.SetMess(mess);
                         }
                         break;
                     default:
