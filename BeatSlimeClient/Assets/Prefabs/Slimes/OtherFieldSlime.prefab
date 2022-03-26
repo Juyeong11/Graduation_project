@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: 4911084585068379427}
   - component: {fileID: 4886932897758848649}
   - component: {fileID: 7383083645639068150}
+  - component: {fileID: 1851506889252280682}
   m_Layer: 0
   m_Name: OtherFieldSlime
   m_TagString: Slimes
@@ -226,6 +227,7 @@ MonoBehaviour:
     z: 0
     w: 0
   direction: 0
+  preBeatedTime: 0
 --- !u!114 &7383083645639068150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,6 +252,19 @@ MonoBehaviour:
   selfCoord: {fileID: 4886932897758848649}
   grid: {fileID: 0}
   PlayerTransform: {fileID: 4911084585068379427}
+--- !u!114 &1851506889252280682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5723087508864362393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adf81edc4d4470049acba1f8681a85df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selfMesh: {fileID: 9080147774469510370}
 --- !u!1 &9080147774469510370
 GameObject:
   m_ObjectHideFlags: 0
