@@ -48,8 +48,13 @@ public class ChattingManager : MonoBehaviour
         {
 
             ShowMess();
+
+
             image.SetActive(!image.activeSelf);
-            inputField.Select();
+
+            //inputField.Select();
+            inputField.ActivateInputField();
+
 
 
             //inputField.ActivateInputField();
@@ -89,10 +94,10 @@ public class ChattingManager : MonoBehaviour
     {
         curIndex++;
         //curIndex = curIndex % messageBoxSize;
-        if(curIndex >= 10)
+        if (curIndex >= 10)
         {
-           int end = chatmess.ToString().IndexOf('\n',1);
-           chatmess.Remove(0, end);
+            int end = chatmess.ToString().IndexOf('\n', 1);
+            chatmess.Remove(0, end);
         }
         chatmess.Append('\n' + mess);
 
