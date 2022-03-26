@@ -23,6 +23,8 @@ public class FieldPlayerManager : MonoBehaviour
 
     public GameObject PortalPlane;
 
+    public ChattingManager CM;
+
     //[System.NonSerialized]
     //public HexCoordinates Destination;
 
@@ -77,7 +79,8 @@ public class FieldPlayerManager : MonoBehaviour
 
         if (FieldGameManager.data.isGameStart)
         {
-            KeyHandler();
+            if (!CM.isActive())
+                KeyHandler();
             PlayerRotateToLookAt();
             PlayerWCheck();
             PlayerPortalCheck();
@@ -240,6 +243,8 @@ public class FieldPlayerManager : MonoBehaviour
     }
     void KeyHandler()
     {
+        
+
         if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
         {
             if (FieldGameManager.Net.isOnline)

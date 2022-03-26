@@ -58,6 +58,7 @@ public class ChattingManager : MonoBehaviour
 
 
 
+
             //inputField.ActivateInputField();
 
             if (inputField.text.Length > 0)
@@ -119,5 +120,10 @@ public class ChattingManager : MonoBehaviour
         text.text = "";
         chatmess.Clear();
         curIndex = 0;
+    }
+
+    public bool isActive()
+    {
+        return image.activeSelf;
     }
 }
