@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
-public class BillboardUI : MonoBehaviour
+public class ResponseBillboardUI : MonoBehaviour
 {
     private Transform Target;
 
     [System.NonSerialized]
-    public int p;
+    public int from;
 
+    public TMPro.TMP_Text from_text;
     void Update()
     {
      	transform.position = Vector3.Lerp(transform.position, Target.position, Time.deltaTime * 2f);
@@ -24,7 +26,8 @@ public class BillboardUI : MonoBehaviour
     {
         gameObject.SetActive(true);
         Target = t;
-        p = pid;
+        from = pid;
+        from_text.text = pid.ToString();
         StartCoroutine(BlinkOn());
     }
 
@@ -51,9 +54,15 @@ public class BillboardUI : MonoBehaviour
         yield return null;
     }
 
-    public void SendPartyRequest()
+    public void Adapt()
     {
-        FieldGameManager.Net.SendPartyRequestPacket(p);
+        FieldGameManager.Net.SendPartyRequestAnwserPacket(1, from);
+        GetOff();
+    }
+
+    public void Deny()
+    {
+        FieldGameManager.Net.SendPartyRequestAnwserPacket(0, from);
         GetOff();
     }
 }
