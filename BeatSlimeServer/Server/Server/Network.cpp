@@ -1323,15 +1323,38 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(p);
 		std::cout << packet->mess << std::endl;
-		Client* client = reinterpret_cast<Client*>(clients[client_id]);
-		client->vl.lock();
-		std::unordered_set<int> c_vl{ client->viewlist };
-		client->vl.unlock();
-		for (int i : c_vl) {
-			if (false == is_player(i)) continue;
-			send_chat_packet(i, client_id, packet->mess);
+		
+
+		if (packet->sendType == 0)
+		{
+
+			for (int i = 0; i < MAX_USER;++i) {
+				if (ST_INGAME != clients[i]->state) continue;
+				send_chat_packet(i, client_id, packet->mess);
+			}
+			
 		}
-		send_chat_packet(client_id, client_id, packet->mess);
+		else if (packet->sendType == 1) {
+			Client* client = reinterpret_cast<Client*>(clients[client_id]);
+			for (int i = 0; i < MAX_IN_GAME_PLAYER-1; ++i) {
+				if (client->party_player[i] == -1) continue;
+				send_chat_packet(i, client_id, packet->mess);
+
+			}
+			send_chat_packet(client_id, client_id, packet->mess);
+
+		}
+		else if(packet->sendType == 2) {
+
+			for (int i = 0; i < MAX_USER; ++i) {
+				if (ST_INGAME != clients[i]->state) continue;
+				if (i == packet->reciver) {
+					send_chat_packet(i, client_id, packet->mess);
+					break;
+				}
+			}
+			send_chat_packet(client_id, client_id, packet->mess);
+		}
 
 	}
 		break;

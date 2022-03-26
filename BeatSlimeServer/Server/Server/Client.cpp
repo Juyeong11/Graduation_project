@@ -70,7 +70,7 @@ Client::Client(Skill* sk) : skill(sk)
 	prev_recv_size = 0;
 	cur_room_num = -1;
 
-	for (int& i : party_player) {
+	for (auto& i : party_player) {
 		i = -1;
 	}
 }

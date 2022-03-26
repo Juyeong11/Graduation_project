@@ -213,7 +213,7 @@ public class FieldGameManager : MonoBehaviour
 
                             string mess = System.Text.Encoding.UTF8.GetString(p.mess).Split('\0')[0];
                             //Debug.Log(System.Text.Encoding.UTF8.GetString(p.mess));
-                            chattingManager.SetMess(mess);
+                            chattingManager.SetMess(p.p_id+ ": " + mess);
                         }
                         break;
                     default:

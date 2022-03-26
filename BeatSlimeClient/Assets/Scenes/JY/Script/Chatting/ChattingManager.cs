@@ -6,13 +6,17 @@ using UnityEngine.UI;
 public class ChattingManager : MonoBehaviour
 {
     InputField inputField;
-    Image image;
+
+    [SerializeField]
+    GameObject image;
 
     [SerializeField]
     GameObject BackGround;
 
     [SerializeField]
     Text text;
+    [SerializeField]
+    Dropdown SendType;
 
     // 서버에서 메세지가 오면 출력한다.
     // 왔던 메세지들을 저장해두고 보여준다.
@@ -21,17 +25,18 @@ public class ChattingManager : MonoBehaviour
     int curIndex;
     const int messageBoxSize = 10;
 
-    const float MaxShowTime = 2;
+    const float MaxShowTime = 5;
     float showTime;
     // Start is called before the first frame update
     void Awake()
     {
         curIndex = 0;
         showTime = 0;
-        message = new string[messageBoxSize];   
-        inputField = GetComponent<InputField>();
-        image = GetComponent<Image>();
+        message = new string[messageBoxSize];
+        inputField = GetComponentInChildren<InputField>();
         chatmess = new System.Text.StringBuilder();
+
+        image.SetActive(false);
 
         //inputField.ac;
     }
@@ -41,24 +46,39 @@ public class ChattingManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            
+
+            ShowMess();
+            image.SetActive(!image.activeSelf);
+            inputField.Select();
+
+
             //inputField.ActivateInputField();
 
-            if(inputField.text.Length > 0)
+            if (inputField.text.Length > 0)
             {
-                FieldGameManager.Net.SendChatMess(inputField.text);
+                byte sendtype = (byte)SendType.value;
+                if (sendtype == 2)//귓말이면
+                {
+                    string id = inputField.text.Split(' ')[0];
+                    FieldGameManager.Net.SendChatMess(inputField.text, sendtype, int.Parse(id));
+
+                }
+                else
+                {
+                    FieldGameManager.Net.SendChatMess(inputField.text, sendtype, -1);
+                }
                 //SetMess(inputField.text);
                 inputField.text = "";
-                
+
 
             }
-            inputField.Select();
-            image.enabled = !image.enabled;
 
-           
+
+
+
         }
 
-        if(BackGround.activeSelf && showTime < Time.time)
+        if (BackGround.activeSelf && showTime < Time.time)
         {
             CloseMess();
         }
@@ -67,11 +87,14 @@ public class ChattingManager : MonoBehaviour
 
     public void SetMess(string mess)
     {
-        message[curIndex] = mess;
         curIndex++;
-        curIndex = curIndex % messageBoxSize;
-
-        chatmess.Append('\n' + mess );
+        //curIndex = curIndex % messageBoxSize;
+        if(curIndex >= 10)
+        {
+           int end = chatmess.ToString().IndexOf('\n',1);
+           chatmess.Remove(0, end);
+        }
+        chatmess.Append('\n' + mess);
 
         text.text = chatmess.ToString();
         ShowMess();

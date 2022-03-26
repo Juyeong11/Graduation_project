@@ -107,7 +107,7 @@ public:
 	int cur_room_num;
 	int		prev_recv_size;
 
-	int party_player[MAX_IN_GAME_PLAYER];
+	std::atomic_int party_player[MAX_IN_GAME_PLAYER-1];
 
 	long long pre_parrying_pattern;
 public:

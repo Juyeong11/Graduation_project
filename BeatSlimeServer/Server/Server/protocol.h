@@ -121,6 +121,8 @@ struct cs_packet_party_request_anwser {
 struct cs_packet_chat {
 	unsigned char size;
 	char	type;
+	char	sendType;
+	int		reciver;
 	char	mess[CHAT_BUF_SIZE];
 };
 

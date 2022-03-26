@@ -245,12 +245,13 @@ public class Network
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
 
-    public void SendChatMess(string mess)
+    public void SendChatMess(string mess,byte sendType,int reciver)
     {
         Protocol.cs_packet_chat pk = new Protocol.cs_packet_chat();
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_chat));
         pk.type = Protocol.CONSTANTS.CS_PACKET_CHAT;
-
+        pk.sendType = sendType;
+        pk.reciver = reciver;
         Buffer.BlockCopy(System.Text.Encoding.UTF8.GetBytes(mess), 0, pk.mess, 0, System.Text.Encoding.UTF8.GetBytes(mess).Length);
 
 

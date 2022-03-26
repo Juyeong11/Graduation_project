@@ -245,6 +245,8 @@ namespace Protocol
     {
         public byte size;
         public byte type;
+        public byte sendType;
+        public int reciver;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.CHAT_BUF_SIZE)]
         public byte[] mess = new byte[CONSTANTS.CHAT_BUF_SIZE];
     }
