@@ -7,7 +7,6 @@ public class FieldInputManager : MonoBehaviour
 {
     //-----------------------------------
     public List<GameObject> Menus;
-
     private int menuDuplicate;
     private int preHittedObject;
     private int HittedObject;
@@ -43,10 +42,7 @@ public class FieldInputManager : MonoBehaviour
                 if (hit.collider.tag == "Slimes" && (preHittedObject != HittedObject || (Menus[0].activeSelf == false && Menus[1].activeSelf == false)))
                 {
                     Menus[menuDuplicate].transform.position = hit.transform.position;
-                    if (hit.transform.parent.gameObject != FieldGameManager.data.player)
-                        Menus[menuDuplicate].GetComponent<BillboardUI>().GetOn(hit.transform, hit.transform.parent.GetComponent<FieldOtherPlayerManager>().pID);
-                    else
-                        Menus[menuDuplicate].GetComponent<BillboardUI>().GetOn(hit.transform, -1);
+                    Menus[menuDuplicate].GetComponent<BillboardUI>().GetOn(hit.transform);
                     //print("hit!");
                 }
                 else if (hit.collider.tag == "Cells")
