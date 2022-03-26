@@ -33,6 +33,7 @@ public class ChattingManager : MonoBehaviour
         curIndex = 0;
         showTime = 0;
         message = new string[messageBoxSize];
+        image.SetActive(true);
         inputField = GetComponentInChildren<InputField>();
         chatmess = new System.Text.StringBuilder();
 
