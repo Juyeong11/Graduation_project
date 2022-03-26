@@ -1,6 +1,7 @@
 #pragma once
 
 const short SERVER_PORT = 4000;
+const short CHAT_BUF_SIZE = 122;
 
 
 const char CS_PACKET_LOGIN = 1;
@@ -17,6 +18,7 @@ const char CS_PACKET_PING_TEST = 11;
 const char CS_PACKET_GET_SINGLE_PLAYER_LIST = 12;
 const char CS_PACKET_PARTY_REQUEST = 13;
 const char CS_PACKET_PARTY_REQUEST_ANWSER = 14;
+const char CS_PACKET_CHAT = 15;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -35,6 +37,7 @@ const char SC_PACKET_CHANGE_SKILL = 13;
 const char SC_PACKET_PING_TEST = 14;
 const char SC_PACKET_PARTY_REQUEST = 15;
 const char SC_PACKET_PARTY_REQUEST_ANWSER = 16;
+const char SC_PACKET_CHAT = 17;
 
 #pragma pack (push, 1)
 //client -> server
@@ -108,11 +111,19 @@ struct cs_packet_party_request {
 	char	type;
 	int		id; //
 };
-struct cs_packet_party_request_anwser{
+struct cs_packet_party_request_anwser {
 	unsigned char size;
 	char	type;
 	char	anwser; //
 	int		requester; //
+};
+
+struct cs_packet_chat {
+	unsigned char size;
+	char	type;
+	char	sendType;
+	int		reciver;
+	char	mess[CHAT_BUF_SIZE];
 };
 
 //server->client
@@ -120,7 +131,7 @@ struct sc_packet_login_ok {
 	unsigned char size;
 	char type;
 	int		id;
-	short	x, y,z;
+	short	x, y, z;
 };
 
 struct sc_packet_move {
@@ -128,7 +139,7 @@ struct sc_packet_move {
 	char type;
 	int		id;
 	int dir;
-	short  x, y,z;
+	short  x, y, z;
 	//int		move_time;
 };
 
@@ -146,7 +157,7 @@ struct sc_packet_put_object {
 	unsigned char size;
 	char type;
 	int id;
-	short x, y,z;
+	short x, y, z;
 	char object_type;
 	char direction;
 
@@ -183,7 +194,7 @@ struct sc_packet_game_init
 	int boss_id;
 };
 
-struct sc_packet_effect 
+struct sc_packet_effect
 {
 	unsigned char size;
 	char type;
@@ -192,7 +203,7 @@ struct sc_packet_effect
 	int id;
 	int target_id;
 	int charging_time;
-	int x,y,z;
+	int x, y, z;
 };
 struct sc_packet_map_data
 {
@@ -239,5 +250,12 @@ struct sc_packet_party_request_anwser {
 	char	anwser; //
 	int		p_id; //
 
+};
+
+struct sc_packet_chat {
+	unsigned char size;
+	char	type;
+	char	mess[CHAT_BUF_SIZE];
+	int id;
 };
 #pragma pack(pop)

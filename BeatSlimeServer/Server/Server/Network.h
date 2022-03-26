@@ -69,6 +69,7 @@ public:
 	void send_ping(int client_id,int time);
 	void send_party_request(int reciver,int sender);
 	void send_party_request_anwser(int reciver,int p_id,int type);
+	void send_chat_packet(int user_id, int my_id, char* mess);
 
 	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z);
 	void disconnect_client(int client_id);
