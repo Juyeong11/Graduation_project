@@ -21,8 +21,11 @@ public class FieldOtherPlayerManager : MonoBehaviour
 
     public Transform PlayerTransform;
 
+    public int pID;
+
     public void Start()
     {
+        //pID = 0;
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
         selfCoord.direction = HexDirection.Up;
