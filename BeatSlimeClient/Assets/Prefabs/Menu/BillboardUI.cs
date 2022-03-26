@@ -6,6 +6,9 @@ public class BillboardUI : MonoBehaviour
 {
     private Transform Target;
 
+    [System.NonSerialized]
+    public int p;
+
     void Update()
     {
      	transform.position = Vector3.Lerp(transform.position, Target.position, Time.deltaTime * 2f);
@@ -15,13 +18,13 @@ public class BillboardUI : MonoBehaviour
     {
         gameObject.SetActive(true);
         StartCoroutine(BlinkOff());
-        
     }
 
-    public void GetOn(Transform t)
+    public void GetOn(Transform t, int pid = -1)
     {
         gameObject.SetActive(true);
         Target = t;
+        p = pid;
         StartCoroutine(BlinkOn());
     }
 
@@ -46,5 +49,11 @@ public class BillboardUI : MonoBehaviour
 
         gameObject.SetActive(false);
         yield return null;
+    }
+
+    public void SendPartyRequest()
+    {
+        FieldGameManager.Net.SendPartyRequestPacket(p);
+        GetOff();
     }
 }
