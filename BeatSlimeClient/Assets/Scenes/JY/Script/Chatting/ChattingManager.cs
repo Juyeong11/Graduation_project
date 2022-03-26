@@ -33,6 +33,7 @@ public class ChattingManager : MonoBehaviour
         curIndex = 0;
         showTime = 0;
         message = new string[messageBoxSize];
+        image.SetActive(true);
         inputField = GetComponentInChildren<InputField>();
         chatmess = new System.Text.StringBuilder();
 
@@ -54,6 +55,7 @@ public class ChattingManager : MonoBehaviour
 
             //inputField.Select();
             inputField.ActivateInputField();
+
 
 
 
@@ -118,5 +120,10 @@ public class ChattingManager : MonoBehaviour
         text.text = "";
         chatmess.Clear();
         curIndex = 0;
+    }
+
+    public bool isActive()
+    {
+        return image.activeSelf;
     }
 }
