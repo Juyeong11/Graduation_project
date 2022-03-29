@@ -23,6 +23,9 @@ Network::Network() {
 	for (int i = 0; i < SKILL_CNT; ++i) {
 		skills[i] = new Skill(i % 3 + 1, i / 3 + 1);
 	}
+	for (int i = 0; i < MAX_USER / 2; ++i) {
+		PartyPool[i] = new Party();
+	}
 
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
@@ -94,6 +97,10 @@ Network::~Network() {
 
 	for (int i = 1; i <= SKILL_CNT; ++i) {
 		delete skills[i];
+	}
+
+	for (int i = 0; i < MAX_USER / 2; ++i) {
+		delete PartyPool[i];
 	}
 }
 
@@ -231,7 +238,7 @@ void Network::send_move_object(int c_id, int mover)
 	packet.x = clients[mover]->x;
 	packet.y = clients[mover]->y;
 	packet.z = clients[mover]->z;
-	
+
 	packet.dir = clients[mover]->direction;
 
 	//packet.move_time = clients[mover]->last_packet_time;
@@ -383,7 +390,7 @@ void Network::send_party_request(int reciver, int sender)
 	reinterpret_cast<Client*>(ex_over, clients[reciver])->do_send(ex_over);
 }
 
-void Network::send_party_request_anwser(int reciver,int p_id ,int type)
+void Network::send_party_request_anwser(int reciver, int p_id, int type)
 {
 	sc_packet_party_request_anwser packet;
 	packet.type = SC_PACKET_PARTY_REQUEST_ANWSER;
@@ -461,6 +468,23 @@ void Network::disconnect_client(int c_id)
 			}
 		}
 	}
+
+	if (client.party != nullptr) {
+		client.party->partyLock.lock();
+		client.party->DelPartyPlayer(c_id);
+		client.party->partyLock.unlock();
+
+		if (client.party->curPlayerNum == 0) {
+			client.party = nullptr;
+		}
+		else {
+			for (auto p : client.party->partyPlayer) {
+				if (p == -1)continue;
+				send_party_request_anwser(p, c_id, 3);
+			}
+		}
+	}
+
 
 	clients[c_id]->state_lock.lock();
 	closesocket(reinterpret_cast<Client*>(clients[c_id])->socket);
@@ -540,8 +564,8 @@ int Network::set_new_player_pos(int client_id)
 	int i = 0;
 	int step = 1;
 	while (maps[FIELD_MAP]->GetTileType(_x, _z) != 0) {
-		_x = PatternInfo::HexCellAround[i][0]*step + orgin_x;
-		_z = PatternInfo::HexCellAround[i][2]*step + orgin_z;
+		_x = PatternInfo::HexCellAround[i][0] * step + orgin_x;
+		_z = PatternInfo::HexCellAround[i][2] * step + orgin_z;
 		_y = -_x - _z;
 		i++;
 		if (i == 6) {
@@ -658,8 +682,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 		cl.state_lock.unlock();
 
 		//새로 들어온 친구의 위치를 정해주자
-		
-			
+
+
 		//cl.x = maps[FIELD_MAP]->LengthX / 2;
 		//cl.z = maps[FIELD_MAP]->LengthZ / 2;
 		//cl.y = -cl.z - cl.x;
@@ -778,7 +802,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			exit(-1);
 		}
 		if (cur_map == 0) {
-			maps[cur_map]->SetTileType(x, z, cl.pre_x,cl.pre_z);
+			maps[cur_map]->SetTileType(x, z, cl.pre_x, cl.pre_z);
 		}
 
 		// 이동한 클라이언트에 대한 nearlist 생성
@@ -1295,56 +1319,117 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_PARTY_REQUEST:
 	{
 		cs_packet_party_request* packet = reinterpret_cast<cs_packet_party_request*>(p);
-		
-		bool inParty = false;
-		for (int i : reinterpret_cast<Client*>(clients[packet->id])->party_player) {
-			if (i != -1) { inParty = true; break; }
-		}
-		if (inParty) {
-			send_party_request_anwser(client_id, packet->id, -1);
-		}
-		else {
-			send_party_request(packet->id, client_id);
-		}
+		if (false == is_player(packet->id) || packet->id == client_id) break;
+
+		send_party_request(packet->id, client_id);
 	}
 	break;
 	case CS_PACKET_PARTY_REQUEST_ANWSER:
 	{
 		cs_packet_party_request_anwser* packet = reinterpret_cast<cs_packet_party_request_anwser*>(p);
-		if (packet->anwser == 1) {//수락
-			send_party_request_anwser(packet->requester, client_id, 1);
+
+		Client* accepter = reinterpret_cast<Client*>(clients[client_id]);
+
+		// 이 경우는 파티를 탈퇴할 때
+		if (false == is_player(packet->requester)) {
+			if (accepter->party == nullptr) { std::cout << "can't empty party exit\n"; break; }
+
+			accepter->party->partyLock.lock();
+			accepter->party->DelPartyPlayer(client_id);
+			accepter->party->partyLock.unlock();
+
+			if (accepter->party->curPlayerNum == 0) {
+				accepter->party = nullptr;
+			}
+			else {
+				for (auto p : accepter->party->partyPlayer) {
+					if (p == -1)continue;
+					send_party_request_anwser(p, client_id, 3);
+				}
+			}
+
+			break;
 		}
-		else if(packet->anwser == 0) {//거절
-			send_party_request_anwser(packet->requester, client_id, 0);
+
+		Client* requester = reinterpret_cast<Client*>(clients[packet->requester]);
+
+		Party* requesterParty = requester->party;
+		if (packet->anwser == 1)
+		{
+
+			//기존 파티가 없는 상태에서 파티 신청을 한거면 새로운 파티를 지정해줌
+			if (requesterParty == nullptr) {
+				for (auto p : PartyPool) {
+					p->partyLock.lock();
+					if (p->curPlayerNum == 0) {
+						requesterParty = requester->party = p;
+						accepter->party = p;
+						p->partyPlayer[p->curPlayerNum++] = requester->id;
+						p->partyPlayer[p->curPlayerNum++] = accepter->id;
+						p->partyLock.unlock();
+						break;
+					}
+					p->partyLock.unlock();
+				}
+			}
+			else {
+				// 파티 요청한 사람이 파티가 있다면 그 파티에 들어감
+
+				if (false == requesterParty->SetPartyPlayer(accepter->id)) {
+					//파티 요청한 사람의 파티가 가득 찬경우
+					//수락한 사람한테 다시 거절 메세지를 보냄
+					send_party_request_anwser(client_id, packet->requester, 2);
+
+				}
+
+			}
+			for (auto p : requesterParty->partyPlayer) {
+				if (p != -1)
+					send_party_request_anwser(p, client_id, 1);
+			}
 		}
+		else if (packet->anwser == 0)
+		{
+			if (requesterParty == nullptr) {
+				send_party_request_anwser(packet->requester, client_id, 0);
+			}
+			else {
+				for (auto p : requesterParty->partyPlayer) {
+					if (p != -1)
+						send_party_request_anwser(p, client_id, 1);
+				}
+			}
+		}
+
 	}
-		break;
+	break;
 	case CS_PACKET_CHAT:
 	{
 		cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(p);
 		std::cout << packet->mess << std::endl;
-		
+
 
 		if (packet->sendType == 0)
 		{
 
-			for (int i = 0; i < MAX_USER;++i) {
+			for (int i = 0; i < MAX_USER; ++i) {
 				if (ST_INGAME != clients[i]->state) continue;
 				send_chat_packet(i, client_id, packet->mess);
 			}
-			
+
 		}
 		else if (packet->sendType == 1) {
 			Client* client = reinterpret_cast<Client*>(clients[client_id]);
-			for (int i = 0; i < MAX_IN_GAME_PLAYER-1; ++i) {
-				if (client->party_player[i] == -1) continue;
-				send_chat_packet(i, client_id, packet->mess);
+			if (client->party == nullptr) break;
+			for (int id : client->party->partyPlayer) {
+				if (id == -1) continue;
+				send_chat_packet(id, client_id, packet->mess);
 
 			}
-			send_chat_packet(client_id, client_id, packet->mess);
+			//send_chat_packet(client_id, client_id, packet->mess);
 
 		}
-		else if(packet->sendType == 2) {
+		else if (packet->sendType == 2) {
 
 			for (int i = 0; i < MAX_USER; ++i) {
 				if (ST_INGAME != clients[i]->state) continue;
@@ -1357,7 +1442,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 
 	}
-		break;
+	break;
 	default:
 		std::cout << "wrong packet\n";
 		break;
@@ -1437,9 +1522,11 @@ void Network::worker()
 			if (-1 == new_id) continue;
 
 			Client& cl = *(reinterpret_cast<Client*>(clients[new_id]));
-			cl.x = 0;
-			cl.y = 0;
-			cl.z = 0;
+			cl.x = 13;
+			cl.y = 12;
+			cl.z = -25;
+			//13, 12, -25
+			//4, 0, -4
 			set_new_player_pos(new_id);
 			cl.id = new_id;
 			cl.prev_recv_size = 0;
@@ -1795,7 +1882,7 @@ void Network::worker()
 				if (p->hp < 0) isDie = true;
 			}
 			if (isabnormal) {
-				
+
 				for (const auto p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 					send_game_end(p->id, GAME_OVER);

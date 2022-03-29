@@ -67,23 +67,6 @@ public class FieldGameManager : MonoBehaviour
             soundManager.StopBGM();
         }
 
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            //id를 정해서 SendPartyRequestPacket의 인자로 전달
-            //파티를 하고 싶은 플레이어를 정해서 id를 인자로 하고 아래 함수를 호출하면됨(클라와 서버는 같은 id를 쓰고 있음)
-            Net.SendPartyRequestPacket(0);
-
-
-            //파티 요청이 오면 수락 여부를 알려줌 (0 거절, 1 수락)
-            // 두 번째인자는 요청한 플레이어 id를 넣어주면됨 
-            
-
-            Net.SendPartyRequestAnwserPacket(0, 0);
-
-            //Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST: -> 파티 요청이 왔다.
-            //Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST_ANWSER: -> 파티 요청에 대한 수락 여부가 왔다.
-        }
-        // 상대방의 요청 수락 여부가 SC패킷으로 옴
 
         if (Input.GetKeyDown(KeyCode.Alpha9))
         {
@@ -217,6 +200,14 @@ public class FieldGameManager : MonoBehaviour
                             Protocol.sc_packet_party_request_anwser p = Protocol.sc_packet_party_request_anwser.SetByteToVar(data);
 
                             Debug.Log(p.p_id + "가 " + p.anwser + " 이라고 응답함");
+
+                            /*
+                             * 0 요청 거절
+                             * 1 수락
+                             * 2 내가 수락한 파티의 인원이 이미 가득 찾을 경우 -> 파티 신청을 여러명에게 보낸경우
+                             * 3 다른 사람이 파티에서 탈퇴한경우
+                             *  - CS_PACKET_PARTY_REQUEST_ANWSER패킷을 서버에 보낼 때  requester id가 -1이면 파티에 탈퇴하려고 하는 걸로 알고 서버에서 처리함
+                             */
 
                         }
                         break;
