@@ -39,6 +39,7 @@ class GameObject;
 class Client;
 class EXP_OVER;
 class Skill;
+class Party;
 class Network
 {
 private:
@@ -116,5 +117,6 @@ private:
 	std::array<Portal*, PORTAL_NUM> portals;
 
 	std::array<Skill*, SKILL_CNT> skills;
+	std::array<Party*, MAX_USER/2> PartyPool;
 };
 

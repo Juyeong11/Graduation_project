@@ -55,12 +55,12 @@ Boss2::Boss2() : is_attack(false) {
 
 }
 
-Skill::Skill(int sl, int st) :SkillLevel(sl), SkillType(st) {
+Skill::Skill(int sl, int st) : SkillLevel(sl), SkillType(st) {
 	Damage = SkillLevel * SkillLevel;
 	CoolTime = 10 / SkillLevel;
 }
 Skill::Skill() {
-	
+
 }
 
 Client::Client(Skill* sk) : skill(sk)
@@ -69,10 +69,7 @@ Client::Client(Skill* sk) : skill(sk)
 	is_active = true;
 	prev_recv_size = 0;
 	cur_room_num = -1;
-
-	for (auto& i : party_player) {
-		i = -1;
-	}
+	party = nullptr;
 }
 Client::~Client()
 {
@@ -101,4 +98,30 @@ void Client::do_send(EXP_OVER* ex_over)
 		if (ERROR_IO_PENDING != error_num)
 			error_display("send", error_num);
 	}
+}
+
+Party::Party()
+{
+	for (auto& i : partyPlayer)
+		i = -1;
+	curPlayerNum = 0;
+}
+
+bool Party::SetPartyPlayer(int id)
+{
+	partyLock.lock();
+	if (curPlayerNum >= MAX_IN_GAME_PLAYER) { partyLock.unlock(); return false; }
+	partyPlayer[curPlayerNum++] = id;
+	partyLock.unlock();
+	return true;;
+}
+
+bool Party::DelPartyPlayer(int id)
+{
+	for (auto& i : partyPlayer)
+	{
+		if (i == id) { i = -1; return true; }
+	}
+	curPlayerNum--;
+	return false;
 }

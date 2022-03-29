@@ -91,6 +91,15 @@ public:
 	Skill();
 	
 };
+class Party {
+public:
+	int partyPlayer[MAX_IN_GAME_PLAYER];
+	std::mutex partyLock;
+	int curPlayerNum;
+	Party();
+	bool SetPartyPlayer(int id);
+	bool DelPartyPlayer(int id);
+};
 const int VIEW_RANGE = 10;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
 class Client : public GameObject
@@ -107,7 +116,9 @@ public:
 	int cur_room_num;
 	int		prev_recv_size;
 
-	std::atomic_int party_player[MAX_IN_GAME_PLAYER-1];
+	//자기 자신 빼고 2명
+	Party* party;
+
 
 	long long pre_parrying_pattern;
 public:
