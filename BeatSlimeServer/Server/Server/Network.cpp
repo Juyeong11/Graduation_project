@@ -463,8 +463,10 @@ void Network::disconnect_client(int c_id)
 				tev.start_time = std::chrono::system_clock::now();
 
 				timer_queue.push(tev);
-				game_room[client.cur_room_num]->pattern_progress = -1;
-				reinterpret_cast<Client*>(clients[c_id])->cur_room_num = -1;
+				break;
+				//game_room[client.cur_room_num]->pattern_progress = -1;
+				//reinterpret_cast<Client*>(clients[c_id])->cur_room_num = -1;
+
 			}
 		}
 	}
@@ -758,7 +760,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
 
-		//std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
+		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -1406,7 +1408,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_CHAT:
 	{
 		cs_packet_chat* packet = reinterpret_cast<cs_packet_chat*>(p);
-		std::cout << packet->mess << std::endl;
+		//std::cout << packet->mess << std::endl;
 
 
 		if (packet->sendType == 0)
@@ -1563,7 +1565,7 @@ void Network::worker()
 
 			int pivot_x, pivot_y, pivot_z;
 
-			if (target_id == -1) break;
+			if (target_id == -1) { game_room[game_room_id]->pattern_progress = -1; break; }
 			// 보스가 무엇을 기준으로 움직이는지
 			switch (pivotType)
 			{
@@ -1640,7 +1642,7 @@ void Network::worker()
 			long long parrying_end_time = *(reinterpret_cast<long long*>(exp_over->_net_buf + sizeof(int) * 3));//std::chrono::system_clock::now();//
 
 			target_id = game_room[game_room_id]->find_online_player();
-			if (target_id == -1) break;
+			if (target_id == -1) { game_room[game_room_id]->pattern_progress = -1; break; }
 
 			switch (pivotType)
 			{
@@ -1727,6 +1729,7 @@ void Network::worker()
 
 			if (target_id == -1) {
 				std::cout << "tile attack : wrong target id\n";
+				game_room[game_room_id]->pattern_progress = -1;
 				break;
 			}
 			int pos_x, pos_z, pos_y;
@@ -2076,8 +2079,14 @@ void Network::game_start(int room_id)
 	for (auto i : game_room[room_id]->player_ids) {
 		i->hp = 100;
 		reinterpret_cast<Client*>(i)->pre_parrying_pattern = -1;
+		maps[FIELD_MAP]->SetTileType(-1, -1, i->x, i->z);
 	}
 	set_next_pattern(room_id);
+
+	if (room_id == -1) {
+		
+	}
+
 	{
 
 		//for (const auto& t : pt) {

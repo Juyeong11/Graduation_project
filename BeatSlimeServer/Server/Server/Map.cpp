@@ -21,6 +21,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 	
 	// ¸Ê È®ÀÎ¿ë
+	/*
 	std::cout << LengthX << std::endl;
 	std::cout << LengthZ << std::endl;
 	std::cout << offsetX << std::endl;
@@ -35,7 +36,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 				std::cout << " " ;
 		}
 	}
-	
+	*/
 
 	std::ifstream in_m{ music_name, std::ios::binary };
 	if (!in_m) return;
@@ -354,6 +355,10 @@ void GameRoom::game_end()
 		p->z = portal->z;
 		reinterpret_cast<Client*>(p)->cur_room_num = -1;
 		reinterpret_cast<Client*>(p)->is_active = true;
+		reinterpret_cast<Client*>(p)->vl.lock();
+		reinterpret_cast<Client*>(p)->viewlist.clear();
+		reinterpret_cast<Client*>(p)->vl.unlock();
+
 	}
 	portal = nullptr;
 	player_ids[0] = nullptr;

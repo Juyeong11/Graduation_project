@@ -109,6 +109,8 @@ Party::Party()
 
 bool Party::SetPartyPlayer(int id)
 {
+	for (auto i : partyPlayer)
+		if (i == id) return false;
 	partyLock.lock();
 	if (curPlayerNum >= MAX_IN_GAME_PLAYER) { partyLock.unlock(); return false; }
 	partyPlayer[curPlayerNum++] = id;
