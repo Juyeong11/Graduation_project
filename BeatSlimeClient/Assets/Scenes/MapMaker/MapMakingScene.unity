@@ -2037,6 +2037,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: LandType.Array.size
+      value: 23
+      objectReference: {fileID: 0}
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: LandType.Array.data[22]
+      value: 
+      objectReference: {fileID: 3040140641696765941, guid: 2af11dd78f8fb4a418e7149ca295a9fc, type: 3}
     - target: {fileID: 2181853409825296729, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: m_RootOrder
       value: 10

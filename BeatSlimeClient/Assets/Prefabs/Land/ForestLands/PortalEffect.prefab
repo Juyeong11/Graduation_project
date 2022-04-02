@@ -42,7 +42,6 @@ GameObject:
   - component: {fileID: 4852947513106776410}
   - component: {fileID: 3582904781583576602}
   - component: {fileID: 8688960007089012686}
-  - component: {fileID: 6600620362876948200}
   m_Layer: 0
   m_Name: '#Portal'
   m_TagString: Untagged
@@ -148,31 +147,3 @@ VFXRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &6600620362876948200
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5124474849200735387}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a6defb06d774d9a4b85bc5e60097dc2a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  coordinates:
-    x: 0
-    z: 0
-    w: 0
-  preCoordinates:
-    x: 0
-    z: 0
-    w: 0
-  direction: 0
-  landOffsetX: 0
-  landOffsetY: 0
-  landOffsetZ: 0
-  landOffsetRotate: 0
-  landOffsetScale: 0
-  landType: 0
-  preBeatedTime: 0
