@@ -23,6 +23,8 @@ public class FieldOtherPlayerManager : MonoBehaviour
 
     public int pID;
 
+    public int other_skillnum;
+
     public void Start()
     {
         //pID = 0;
@@ -230,5 +232,8 @@ public class FieldOtherPlayerManager : MonoBehaviour
         //selfDirection = HexDirection.LeftUp;
     }
     
-    
+    public void ChangeSkill(int skillNum)
+    {
+        other_skillnum = skillNum;
+    }
 }

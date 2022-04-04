@@ -12,16 +12,22 @@ public class FieldInputManager : MonoBehaviour
     private int preHittedObject;
     private int HittedObject;
 
+    private Vector3 pop = new Vector3(50, 50);
+    private Vector3 bas = new Vector3(-1000,0);
+
     //-----------------------------------
 
+    public RectTransform PM;
     public CinemachineVirtualCamera CCO;
     CinemachineTransposer CT;
+    Vector3 target;
 
     void Awake()
     {
         CT = CCO.GetCinemachineComponent<CinemachineTransposer>();
         preHittedObject = 0;
         menuDuplicate = 0;
+        target = CT.m_FollowOffset;
     }
  
     void Update ()
@@ -62,23 +68,36 @@ public class FieldInputManager : MonoBehaviour
             }
         }
 
+        CT.m_FollowOffset = Vector3.Lerp(CT.m_FollowOffset, target, Time.deltaTime * 2f);
+
         //Ä«¸Þ¶ó
-        if (Input.GetKeyDown(KeyCode.LeftBracket))
+        if (Input.GetKey(KeyCode.LeftBracket))
         {
             if (CT.m_FollowOffset.y < 10f)
             {
-                CT.m_FollowOffset.y += 0.3f;
-                CT.m_FollowOffset.z -= 0.2f;
+                target = new Vector3(CT.m_FollowOffset.x, CT.m_FollowOffset.y + 0.6f, CT.m_FollowOffset.z - 0.4f);
+                // CT.m_FollowOffset.y += 0.3f;
+                // CT.m_FollowOffset.z -= 0.2f;
             }
             
         }
-        if (Input.GetKeyDown(KeyCode.RightBracket))
+        if (Input.GetKey(KeyCode.RightBracket))
         {
             if (CT.m_FollowOffset.y > 0.5f)
             {
-                CT.m_FollowOffset.y -= 0.3f;
-                CT.m_FollowOffset.z += 0.2f;
+                target = new Vector3(CT.m_FollowOffset.x, CT.m_FollowOffset.y - 0.6f, CT.m_FollowOffset.z + 0.4f);
+                // CT.m_FollowOffset.y -= 0.3f;
+                // CT.m_FollowOffset.z += 0.2f;
             }
+        }
+
+        if (Input.GetKey(KeyCode.Tab))
+        {
+            PM.anchoredPosition = pop;
+        }
+        else
+        {
+            PM.anchoredPosition = bas;
         }
     }
 }
