@@ -25,6 +25,9 @@ public class FieldPlayerManager : MonoBehaviour
 
     public ChattingManager CM;
 
+    public int self_skillnum;
+    
+
     //[System.NonSerialized]
     //public HexCoordinates Destination;
 
@@ -33,6 +36,7 @@ public class FieldPlayerManager : MonoBehaviour
 
     public void Start()
     {
+        self_skillnum = 0;
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
@@ -84,6 +88,7 @@ public class FieldPlayerManager : MonoBehaviour
             PlayerRotateToLookAt();
             PlayerWCheck();
             PlayerPortalCheck();
+            gameObject.transform.position = new Vector3(PlayerTransform.position.x, HexCellPosition.calculateWPosition(selfCoord.preCoordinates.W), PlayerTransform.position.z);
         }
     }
     public void PlayerPortalCheck()
@@ -399,6 +404,11 @@ public class FieldPlayerManager : MonoBehaviour
         selfDirection = HexDirection.Down;
         selfCoord.plus(0, 0, 0, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
         JumpTrig();
+    }
+
+    public void ChangeSkill(int skillNum)
+    {
+        self_skillnum = skillNum;
     }
 
 }
