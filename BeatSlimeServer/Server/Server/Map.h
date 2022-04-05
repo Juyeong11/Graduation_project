@@ -69,7 +69,7 @@ public:
 	void SetMap(std::string map_name, std::string music_name);
 	int GetTileType(int x, int z);
 	void SetTileType(int x, int z,int pre_x,int pre_z);
-	const std::vector<PatternInfo>& const GetPatternTime() { return pattern_time; }
+	const std::vector<PatternInfo>& GetPatternTime() { return pattern_time; }
 	~MapInfo()
 	{
 		delete[] map;

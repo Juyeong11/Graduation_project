@@ -53,6 +53,9 @@ public class FieldInputManager : MonoBehaviour
                 {
                     //A* ¿Ãµø
                     hit.transform.GetComponentInChildren<SpriteRenderer>().enabled = true;
+                    HexCoordinates Destination = hit.transform.GetComponent<HexCellPosition>().coordinates;
+
+                    FieldGameManager.Net.SendSetPath((short)Destination.X, (short)Destination.Z);
                     //FieldGameManager.data.player.GetComponent<FieldPlayerManager>().Destination = hit.transform.GetComponent<HexCellPosition>().coordinates;
                     //FieldGameManager.data.player.GetComponent<FieldPlayerManager>().ASTAR();
 

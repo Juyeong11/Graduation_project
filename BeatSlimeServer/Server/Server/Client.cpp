@@ -1,5 +1,7 @@
 #include "stdfx.h"
 #include "protocol.h"
+#include "PathFinder.h"
+#include "Map.h"
 #include "Client.h"
 
 
@@ -33,9 +35,14 @@ GameObject::GameObject() :state(ST_FREE) {
 	pre_x = x = 0;
 	pre_y = y = 0;
 	pre_z = z = 0;
+	dest_x = -1;
+	dest_y = -1;
+	dest_z = -1;
 	last_move_time = std::chrono::system_clock::now();
 	hp = 100;
 }
+
+
 
 Npc::Npc() : is_active(false) {
 
@@ -63,16 +70,18 @@ Skill::Skill() {
 
 }
 
-Client::Client(Skill* sk) : skill(sk)
+Client::Client(Skill* sk, MapInfo* mapdata) : skill(sk)
 {
 	type = PLAYER;
 	is_active = true;
 	prev_recv_size = 0;
 	cur_room_num = -1;
 	party = nullptr;
+	Astar = new PathFinder(mapdata);
 }
 Client::~Client()
 {
+	delete Astar;
 	closesocket(socket);
 }
 void Client::do_recv()

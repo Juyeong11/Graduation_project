@@ -21,7 +21,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 
 	
 	// ¸Ê È®ÀÎ¿ë
-	/*
+	
 	std::cout << LengthX << std::endl;
 	std::cout << LengthZ << std::endl;
 	std::cout << offsetX << std::endl;
@@ -36,7 +36,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 				std::cout << " " ;
 		}
 	}
-	*/
+	
 
 	std::ifstream in_m{ music_name, std::ios::binary };
 	if (!in_m) return;

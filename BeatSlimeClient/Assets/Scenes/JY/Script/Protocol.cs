@@ -35,6 +35,7 @@ namespace Protocol
         public const byte CS_PACKET_PARTY_REQUEST = 13;
         public const byte CS_PACKET_PARTY_REQUEST_ANWSER = 14;
         public const byte CS_PACKET_CHAT = 15;
+        public const byte CS_PACKET_SET_PATH = 16;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -250,6 +251,15 @@ namespace Protocol
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.CHAT_BUF_SIZE)]
         public byte[] mess = new byte[CONSTANTS.CHAT_BUF_SIZE];
     }
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_set_path : ISerializeble<cs_packet_set_path>
+    {
+        public byte size;
+        public byte type;
+        public short x, z;
+    }
+
     //Server -> Client
 
     [Serializable]
