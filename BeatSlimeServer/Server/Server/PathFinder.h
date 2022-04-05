@@ -32,8 +32,8 @@ public:
 };
 typedef std::pair<int, Node*> fweight;
 
-const int dx[6] = { 1,-1, 0,0,-1,1};
-const int dy[6] = { 0, 0,-1,1,1,-1 };
+const int dx[6] = { -1,1, 1,-1, 0,0 };
+const int dy[6] = { 1,-1, 0, 0,-1,1 };
 
 
 

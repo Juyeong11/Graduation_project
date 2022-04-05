@@ -150,5 +150,12 @@ int PathFinder::find_path(GameObject* finder, const GameObject* const target) {
 	finder->z += now->z - MAX_DEPTH;
 	finder->y = -finder->x - finder->z;
 
+	for (int i = 0; i < 6; ++i) {
+		if (dx[i] != (finder->x - finder->pre_x)) continue;
+		if (dy[i] != (finder->z - finder->pre_z)) continue;
+		finder->direction = i;
+		break;
+	}
+
 	return 1;
 }
