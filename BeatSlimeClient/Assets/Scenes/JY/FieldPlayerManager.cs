@@ -206,6 +206,34 @@ public class FieldPlayerManager : MonoBehaviour
         }
     }
 
+    public void PlayerSpinDirection(int x, int y, int z)
+    {
+        if (selfCoord.coordinates.X - 1 == x && selfCoord.coordinates.Z + 1 == z)
+        {
+            selfDirection = HexDirection.LeftUp;
+        }
+        else if (selfCoord.coordinates.X == x && selfCoord.coordinates.Z + 1 == z)
+        {
+            selfDirection = HexDirection.Up;
+        }
+        else if (selfCoord.coordinates.X + 1 == x && selfCoord.coordinates.Z == z)
+        {
+            selfDirection = HexDirection.RightUp;
+        }
+        else if (selfCoord.coordinates.X - 1 == x && selfCoord.coordinates.Z == z)
+        {
+            selfDirection = HexDirection.LeftDown;
+        }
+        else if (selfCoord.coordinates.X == x && selfCoord.coordinates.Z - 1 == z)
+        {
+            selfDirection = HexDirection.Down;
+        }
+        else if (selfCoord.coordinates.X + 1 == x && selfCoord.coordinates.Z - 1 == z)
+        {
+            selfDirection = HexDirection.LeftDown;
+        }
+    }
+
     public void Beat()
     {
         //Debug.Log("BEAT");

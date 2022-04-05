@@ -109,21 +109,28 @@ public class FieldGameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
+                            
 
                             //Debug.Log(p.id+"¿Ãµø");
                             //Debug.Log((byte)p.dir);
-                            Objects[p.id].GetComponent<FieldHexCellPosition>().setDirection((byte)p.dir);
-                            Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
 
                             //grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponent<HexCellPosition>().enableToMove_ForField = false;
                             grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponentInChildren<SpriteRenderer>().enabled = false;
                             if (p.id < Protocol.CONSTANTS.MAX_USER)
                             {
                                 if (p.id == myPlayerID)
-                                    Objects[p.id].GetComponent<FieldPlayerManager>().JumpTrig();
+                                {
+                                    Objects[p.id].GetComponentInParent<FieldPlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
+                                    Objects[p.id].GetComponentInParent<FieldPlayerManager>().JumpTrig();
+                                }
                                 else
+                                {
+                                    Objects[p.id].GetComponent<FieldOtherPlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[p.id].GetComponent<FieldOtherPlayerManager>().JumpTrig();
+
+                                }
                             }
+                            Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
