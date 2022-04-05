@@ -230,7 +230,7 @@ public class FieldPlayerManager : MonoBehaviour
         }
         else if (selfCoord.coordinates.X + 1 == x && selfCoord.coordinates.Z - 1 == z)
         {
-            selfDirection = HexDirection.LeftDown;
+            selfDirection = HexDirection.RightDown;
         }
     }
 

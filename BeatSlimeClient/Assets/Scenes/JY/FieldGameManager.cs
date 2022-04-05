@@ -184,7 +184,7 @@ public class FieldGameManager : MonoBehaviour
                             Protocol.sc_packet_change_skill p = Protocol.sc_packet_change_skill.SetByteToVar(data);
 
                             if(p.id == myPlayerID)
-                                Objects[p.id].GetComponent<FieldPlayerManager>().ChangeSkill(p.skill_type);
+                                Objects[p.id].GetComponentInParent<FieldPlayerManager>().ChangeSkill(p.skill_type);
                             else
                             {
                                 Objects[p.id].GetComponent<FieldOtherPlayerManager>().ChangeSkill(p.skill_type);
@@ -265,12 +265,12 @@ public class FieldGameManager : MonoBehaviour
 
     IEnumerator ChangeScene()
     {
-        player.GetComponent<FieldPlayerManager>().PortalPlane.transform.SetParent(null);
+        player.GetComponentInParent<FieldPlayerManager>().PortalPlane.transform.SetParent(null);
         //player.GetComponent<FieldPlayerManager>().PortalPlane.transform.localRotation = Quaternion.Euler(90,0,0);
-        player.GetComponent<FieldPlayerManager>().PortalPlane.SetActive(true);
+        player.GetComponentInParent<FieldPlayerManager>().PortalPlane.SetActive(true);
         
         yield return new WaitForSeconds(2.0f);
-        player.GetComponent<FieldPlayerManager>().EnterPortal();
+        player.GetComponentInParent<FieldPlayerManager>().EnterPortal();
         yield return new WaitForSeconds(0.5f);
         SceneManager.LoadScene(scene_num);
     }

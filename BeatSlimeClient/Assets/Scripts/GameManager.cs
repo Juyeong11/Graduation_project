@@ -515,19 +515,25 @@ public class GameManager : MonoBehaviour
                             {
 
                                 //Debug.Log(p.id+" : pid");
-                                Objects[pid].GetComponentInChildren<HexCellPosition>().setDirection((byte)p.dir);
-                                Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                
                                 if (pid == myPlayerID)// 
                                 {
+                                    Objects[pid].GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
 
                                 }
                                 else if (pid < 3)   //
+                                {
+                                    Objects[pid].GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
+                                }
+
+                                
+                                Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                             }
                             else    //debug time
                             {
-                                player.GetComponent<HexCellPosition>().setDirection((byte)p.dir);
+                                player.GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                 player.GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                 player.GetComponent<PlayerManager>().JumpTrig();
                             }
@@ -612,7 +618,7 @@ public class GameManager : MonoBehaviour
                                         // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "�÷��̾� ����");
                                         Objects[pid] = enemy;
                                         Objects[pid].SetActive(true);
-                                        enemyAnim.SetFloat("Speed", bpm / 45.0f);
+                                        //enemyAnim.SetFloat("Speed", bpm / 45.0f);
 
                                         Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         break;

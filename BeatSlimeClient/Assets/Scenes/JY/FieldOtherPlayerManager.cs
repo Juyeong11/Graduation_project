@@ -215,7 +215,7 @@ public class FieldOtherPlayerManager : MonoBehaviour
         }
         else if (selfCoord.coordinates.X + 1 == x && selfCoord.coordinates.Z - 1 == z)
         {
-            selfCoord.direction = HexDirection.LeftDown;
+            selfCoord.direction = HexDirection.RightDown;
         }
     }
 
