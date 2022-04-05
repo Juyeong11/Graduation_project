@@ -103,7 +103,7 @@ public class FieldOtherPlayerManager : MonoBehaviour
     {
         if (selfCoord.coordinates.W != grid.cellMaps.Get(selfCoord.coordinates).w + 1)
         {
-            Debug.LogError(">Player W Coordinate Error!<");
+            //Debug.LogError(">Player W Coordinate Error!<");
             print("Self W : " + selfCoord.coordinates.W);
             print("Self W : " + grid.cellMaps.Get(selfCoord.coordinates).w);
             selfCoord.coordinates.W = grid.cellMaps.Get(selfCoord.coordinates).w + 1;

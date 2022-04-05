@@ -30,6 +30,7 @@ public class FieldGameManager : MonoBehaviour
     int scene_num;
 
     public GameObject ResponseMenu;
+    public MusicName MN;
 
     void Awake()
     {
@@ -74,6 +75,11 @@ public class FieldGameManager : MonoBehaviour
             StartCoroutine(ChangeScene());
         }
 
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            MN.ChangeMusicName("flower load - zeroste.");
+        }
+
         if (Net.isOnline)
         {
             isGameStart = true;
@@ -91,6 +97,7 @@ public class FieldGameManager : MonoBehaviour
                             Protocol.sc_packet_login_ok p = Protocol.sc_packet_login_ok.SetByteToVar(data);
 
                             soundManager.PlayBGM("riverside");
+                            MN.ChangeMusicName("riverside - zeroste.");
                             player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             myPlayerID = p.id;
                             Objects[p.id] = player;
