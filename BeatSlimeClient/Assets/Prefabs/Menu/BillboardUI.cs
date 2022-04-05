@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BillboardUI : MonoBehaviour
 {
     private Transform Target;
+    public Sprite join;
+    public Sprite exit;
+    public Image pops;
 
     [System.NonSerialized]
     public int p;
@@ -25,6 +29,14 @@ public class BillboardUI : MonoBehaviour
         gameObject.SetActive(true);
         Target = t;
         p = pid;
+        if (pid == -1)
+        {
+            pops.sprite = exit;
+        }
+        else
+        {
+            pops.sprite = join;
+        }
         StartCoroutine(BlinkOn());
     }
 
@@ -53,7 +65,15 @@ public class BillboardUI : MonoBehaviour
 
     public void SendPartyRequest()
     {
-        FieldGameManager.Net.SendPartyRequestPacket(p);
+        if (p == -1)
+        {
+            FieldGameManager.Net.SendPartyRequestAnwserPacket(0, FieldGameManager.myPlayerID);
+        }
+        else
+        {
+            FieldGameManager.Net.SendPartyRequestPacket(p);
+        }
+
         GetOff();
     }
 }

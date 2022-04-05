@@ -24,7 +24,7 @@ public class FieldGameManager : MonoBehaviour
     public static Network Net = new Network();
     static GameObject[] Objects = new GameObject[Protocol.CONSTANTS.MAX_OBJECT];
 
-    static int myPlayerID = -1;
+    public static int myPlayerID = -1;
     public ArrayList Mapdata = new ArrayList();
 
     int scene_num;
@@ -73,7 +73,6 @@ public class FieldGameManager : MonoBehaviour
             scene_num = 2;
             StartCoroutine(ChangeScene());
         }
-
 
         if (Net.isOnline)
         {
@@ -142,9 +141,11 @@ public class FieldGameManager : MonoBehaviour
                                         Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", 120 / 45.0f);
 
                                         Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
-
+                                        Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().direction = (HexDirection)p.direction;
                                         //Debug.Log(p.id + " 플레이어 넣음");
                                         Objects[p.id].GetComponent<FieldOtherPlayerManager>().pID = p.id;
+
+                                        //Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillnum = p.skill_type;
                                         //grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponent<HexCellPosition>().enableToMove_ForField = false;
                                         break;
                                     }
@@ -174,6 +175,14 @@ public class FieldGameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_CHANGE_SKILL:
                         {
                             Protocol.sc_packet_change_skill p = Protocol.sc_packet_change_skill.SetByteToVar(data);
+
+                            if(p.id == myPlayerID)
+                                Objects[p.id].GetComponent<FieldPlayerManager>().ChangeSkill(p.skill_type);
+                            else
+                            {
+                                Objects[p.id].GetComponent<FieldOtherPlayerManager>().ChangeSkill(p.skill_type);
+                                PartyManager.instance.PartyChangeClass(p.id, p.skill_type);
+                            }
                             Debug.Log(p.id + "가 " + p.skill_type + "으로 스킬을 바꿈");
                         }
                         break;
@@ -208,7 +217,26 @@ public class FieldGameManager : MonoBehaviour
                              * 3 다른 사람이 파티에서 탈퇴한경우
                              *  - CS_PACKET_PARTY_REQUEST_ANWSER패킷을 서버에 보낼 때  requester id가 -1이면 파티에 탈퇴하려고 하는 걸로 알고 서버에서 처리함
                              */
+                            switch (p.anwser)
+                            {
+                                case 0:
+                                chattingManager.SetMess("<color=red>상대가 파티 신청을 거절했습니다!</color>");
+                                break;
 
+                                case 1:
+                                chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
+                                PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_skillnum);
+                                break;
+
+                                case 2:
+                                chattingManager.SetMess("<color=red>상대의 파티에 남은 자리가 없습니다!</color>");
+                                break;
+
+                                case 3:
+                                chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
+                                PartyManager.instance.DelParty(p.p_id);
+                                break;
+                            }
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_CHAT:
