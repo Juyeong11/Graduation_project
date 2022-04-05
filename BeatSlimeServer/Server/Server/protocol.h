@@ -19,6 +19,7 @@ const char CS_PACKET_GET_SINGLE_PLAYER_LIST = 12;
 const char CS_PACKET_PARTY_REQUEST = 13;
 const char CS_PACKET_PARTY_REQUEST_ANWSER = 14;
 const char CS_PACKET_CHAT = 15;
+const char CS_PACKET_SET_PATH = 16;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -114,7 +115,7 @@ struct cs_packet_party_request {
 struct cs_packet_party_request_anwser {
 	unsigned char size;
 	char	type;
-	char	anwser; //
+	char	answer; //
 	int		requester; //
 };
 
@@ -124,6 +125,12 @@ struct cs_packet_chat {
 	char	sendType;
 	int		reciver;
 	char	mess[CHAT_BUF_SIZE];
+};
+
+struct cs_packet_set_path {
+	unsigned char size;
+	char	type;
+	short x, z;
 };
 
 //server->client
@@ -247,7 +254,7 @@ struct sc_packet_party_request {
 struct sc_packet_party_request_anwser {
 	unsigned char size;
 	char	type;
-	char	anwser; //
+	char	answer; //
 	int		p_id; //
 
 };

@@ -259,6 +259,19 @@ public class Network
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
 
+    public void SendSetPath(short x, short z)
+    {
+        Protocol.cs_packet_set_path pk = new Protocol.cs_packet_set_path();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_set_path));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_SET_PATH;
+        pk.x = x;
+        pk.z = z;
+
+
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
     public void SendWriteMapPacket(ArrayList datas)
     {
         foreach (Protocol.Map m in datas)

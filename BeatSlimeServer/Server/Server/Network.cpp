@@ -5,6 +5,7 @@
 #include "DataBase.h"
 #include "Network.h"
 #include"Client.h"
+#include"PathFinder.h"
 
 
 Network* Network::instance = nullptr;
@@ -27,10 +28,16 @@ Network::Network() {
 		PartyPool[i] = new Party();
 	}
 
+	for (int i = 0; i < MAP_NUM; ++i) {
+		maps[i] = new MapInfo;
+	}
+
+	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
+	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
 	for (int i = 0; i < MAX_USER; ++i) {
-		clients[i] = new Client(skills[0]);
+		clients[i] = new Client(skills[0], maps[FIELD_MAP]);
 	}
 	for (int i = SKILL_TRADER_ID_START; i < SKILL_TRADER_ID_END; ++i) {
 		clients[i] = new SkillTrader();
@@ -56,12 +63,7 @@ Network::Network() {
 	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
 		game_room[i] = new GameRoom(i);
 	}
-	for (int i = 0; i < MAP_NUM; ++i) {
-		maps[i] = new MapInfo;
-	}
 
-	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
-	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
@@ -395,7 +397,7 @@ void Network::send_party_request_anwser(int reciver, int p_id, int type)
 	sc_packet_party_request_anwser packet;
 	packet.type = SC_PACKET_PARTY_REQUEST_ANWSER;
 	packet.size = sizeof(packet);
-	packet.anwser = type;
+	packet.answer = type;
 	packet.p_id = p_id;
 
 	EXP_OVER* ex_over;
@@ -423,7 +425,9 @@ void Network::disconnect_client(int c_id)
 	if (c_id >= MAX_USER)
 		std::cout << "disconnect_client : unexpected id range" << std::endl;
 	Client& client = *reinterpret_cast<Client*>(clients[c_id]);
-
+	client.dest_x = -1;
+	client.dest_y = -1;
+	client.dest_z = -1;
 	int room_num = reinterpret_cast<Client*>(clients[c_id])->cur_room_num;
 	if (room_num == -1) {
 		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->z);
@@ -751,7 +755,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 		cl.pre_x = cl.x;
 		cl.pre_y = cl.y;
 		cl.pre_z = cl.z;
-
+		cl.dest_x = -1;
+		cl.dest_y = -1;
+		cl.dest_z = -1;
 		short& x = cl.x;
 		short& y = cl.y;
 		short& z = cl.z;
@@ -1302,8 +1308,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 		*/
 		Client* c = reinterpret_cast<Client*>(clients[client_id]);
 		c->skill = skills[packet->skill_type * 3 - 1];
-
-		for (int i : c->viewlist) {
+		c->vl.lock();
+		std::unordered_set<int> my_vl{ c->viewlist };
+		c->vl.unlock();
+		for (int i : my_vl) {
 			if (false == is_player(i)) continue;
 			send_change_skill(i, client_id);
 		}
@@ -1356,7 +1364,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		Client* requester = reinterpret_cast<Client*>(clients[packet->requester]);
 
 		Party* requesterParty = requester->party;
-		if (packet->anwser == 1)
+		if (packet->answer == 1)
 		{
 
 			//기존 파티가 없는 상태에서 파티 신청을 한거면 새로운 파티를 지정해줌
@@ -1389,8 +1397,12 @@ void Network::process_packet(int client_id, unsigned char* p)
 				if (p != -1)
 					send_party_request_anwser(p, client_id, 1);
 			}
+			for (auto p : requesterParty->partyPlayer) {
+				if (p != -1)
+					send_party_request_anwser(client_id, p, 1);
+			}
 		}
-		else if (packet->anwser == 0)
+		else if (packet->answer == 0)
 		{
 			if (requesterParty == nullptr) {
 				send_party_request_anwser(packet->requester, client_id, 0);
@@ -1398,7 +1410,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			else {
 				for (auto p : requesterParty->partyPlayer) {
 					if (p != -1)
-						send_party_request_anwser(p, client_id, 1);
+						send_party_request_anwser(p, client_id, 0);
 				}
 			}
 		}
@@ -1443,6 +1455,30 @@ void Network::process_packet(int client_id, unsigned char* p)
 			send_chat_packet(client_id, client_id, packet->mess);
 		}
 
+	}
+	break;
+	case CS_PACKET_SET_PATH:
+	{
+		cs_packet_set_path* packet = reinterpret_cast<cs_packet_set_path*>(p);
+		if (clients[client_id]->dest_x == -1) {
+			clients[client_id]->dest_x = packet->x;
+			clients[client_id]->dest_z = packet->z;
+			clients[client_id]->dest_y = -packet->x - packet->z;
+
+			timer_event tev;
+			tev.ev = EVENT_PALYER_MOVE;
+			tev.obj_id = client_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+			timer_queue.push(tev);
+		}
+		else {
+			clients[client_id]->dest_x = packet->x;
+			clients[client_id]->dest_z = packet->z;
+			clients[client_id]->dest_y = -packet->x - packet->z;
+		}
+		
 	}
 	break;
 	default:
@@ -1912,6 +1948,47 @@ void Network::worker()
 			exp_over_pool.push(exp_over);
 		}
 		break;
+		case OP_PLAYER_MOVE:
+		{
+			int mover_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			Client* cl = reinterpret_cast<Client*>(clients[mover_id]);
+			int isMove = cl->Astar->find_path(clients[mover_id], clients[mover_id]);
+			//std::cout << dir << std::endl;
+
+			if (isMove == -1)
+			{
+				cl->dest_x = -1;
+				cl->dest_y = -1;
+				cl->dest_z = -1;
+				//길찾기 종료
+			}
+			else if (isMove == 1)
+			{
+				maps[FIELD_MAP]->SetTileType(cl->x, cl->z, cl->pre_x, cl->pre_z);
+
+				cl->vl.lock();
+				std::unordered_set<int> my_vl{ cl->viewlist };
+				cl->vl.unlock();
+				for (auto i : my_vl) {
+					if (false == is_player(i)) continue;
+					send_move_object(i, cl->id);
+				}
+				send_move_object(cl->id, cl->id);
+
+				timer_event tev;
+				tev.ev = EVENT_PALYER_MOVE;
+				tev.obj_id = client_id;
+				//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+				tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+				timer_queue.push(tev);
+			}
+
+
+
+			
+		}
+		break;
 		default:
 			break;
 		}
@@ -1969,6 +2046,13 @@ void Network::do_timer() {
 					ex_over->_comp_op = OP_GAME_END;
 					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
 					break;
+				case EVENT_PALYER_MOVE:
+				{
+					ex_over->_comp_op = OP_PLAYER_MOVE;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.obj_id;
+
+				}
+				break;
 				default:
 					break;
 				}
@@ -2080,11 +2164,14 @@ void Network::game_start(int room_id)
 		i->hp = 100;
 		reinterpret_cast<Client*>(i)->pre_parrying_pattern = -1;
 		maps[FIELD_MAP]->SetTileType(-1, -1, i->x, i->z);
+		i->dest_x = -1;
+		i->dest_y = -1;
+		i->dest_z = -1;
 	}
 	set_next_pattern(room_id);
 
 	if (room_id == -1) {
-		
+
 	}
 
 	{

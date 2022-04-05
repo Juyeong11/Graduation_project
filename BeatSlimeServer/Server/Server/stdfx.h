@@ -5,6 +5,7 @@
 #include<array>
 #include<vector>
 #include<map>
+#include<queue>
 #include<format>
 #include<string>
 #include<string_view>
@@ -33,7 +34,8 @@ enum MAP_TYPE { FIELD_MAP, WITCH_MAP };
 enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_BOSS_MOVE, OP_PLAYER_PARRYING,
 	OP_BOSS_TILE_ATTACK,
 	OP_GAME_END,
-	OP_PLAYER_SKILL
+	OP_PLAYER_SKILL,
+	OP_PLAYER_MOVE
 };
 enum GO_TYPE {PLAYER, WITCH, BOSS2, SKILL_TRADER, CURATOR};
 

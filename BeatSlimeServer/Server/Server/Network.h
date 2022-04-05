@@ -8,7 +8,8 @@ enum EVENT_TYPE {
 	EVENT_BOSS_MOVE, EVENT_PLAYER_PARRYING,
 	EVENT_BOSS_TILE_ATTACK,
 	EVENT_GAME_END,
-	EVENT_PLAYER_SKILL
+	EVENT_PLAYER_SKILL,
+	EVENT_PALYER_MOVE
 };
 enum PATTERN_TYPE { ONE_LINE, SIX_LINE, AROUND };
 struct timer_event {
@@ -104,6 +105,7 @@ public:
 	void game_start(int room_id);
 
 	void set_next_pattern(int room_id);
+	std::array<MapInfo*, MAP_NUM>& get_map() { return maps; }
 
 private:
 	concurrency::concurrent_priority_queue<timer_event> timer_queue;

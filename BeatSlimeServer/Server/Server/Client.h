@@ -28,6 +28,7 @@ public:
 	int		id;
 	short	x, y,z;
 	short	pre_x, pre_y, pre_z;
+	short	dest_x, dest_y, dest_z;
 	int direction;
 	std::atomic_int hp;
 	GO_TYPE		type;
@@ -40,6 +41,7 @@ public:
 	std::chrono::system_clock::time_point last_move_time;
 	GameObject();
 
+	//void SetDestination(short x, short z);
 };
 class Npc: public GameObject {
 public:
@@ -100,8 +102,11 @@ public:
 	bool SetPartyPlayer(int id);
 	bool DelPartyPlayer(int id);
 };
-const int VIEW_RANGE = 10;// test를 위한 거리
+const int VIEW_RANGE = 20;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
+
+class PathFinder;
+class MapInfo;
 class Client : public GameObject
 {
 public:
@@ -119,11 +124,12 @@ public:
 	//자기 자신 빼고 2명
 	Party* party;
 
+	PathFinder* Astar = nullptr;
 
 	long long pre_parrying_pattern;
 public:
 
-	Client(Skill* sk);
+	Client(Skill* sk, MapInfo* mapdata);
 	~Client();
 
 	void do_recv();
