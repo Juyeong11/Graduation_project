@@ -105,8 +105,8 @@ int PathFinder::find_path(GameObject* finder, const GameObject* const target) {
 			});
 
 		now = *cur;
-		Open.erase(cur);
-		if (*now == end) {
+		Open.erase(cur); step++;
+		if (*now == end || step> MAX_STEP) {
 			//now = cur;
 			break;
 		}
@@ -130,7 +130,7 @@ int PathFinder::find_path(GameObject* finder, const GameObject* const target) {
 	}
 
 	Open.clear();
-	if (now->pre == nullptr) return 1;
+	if (now->pre == nullptr) return -1;
 	if (step > MAX_STEP) {
 		//reinterpret_cast<Npc*>(finder)->target_id = -1;
 		std::cout << "can't find path" << std::endl;
@@ -150,12 +150,6 @@ int PathFinder::find_path(GameObject* finder, const GameObject* const target) {
 	finder->z += now->z - MAX_DEPTH;
 	finder->y = -finder->x - finder->z;
 
-	for (int i = 0; i < 6; ++i) {
-		if (dx[i] != (finder->x - finder->pre_x)) continue;
-		if (dy[i] != (finder->z - finder->pre_z)) continue;
-		finder->direction = i;
-		break;
-	}
 
 	return 1;
 }

@@ -250,6 +250,10 @@ public class FieldGameManager : MonoBehaviour
                                 chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
                                 PartyManager.instance.DelParty(p.p_id);
                                 break;
+
+                                case 4:
+                                    chattingManager.SetMess("<color=red>상대는 이미 파티가 있습니다!</color>");
+                                    break;
                             }
                         }
                         break;

@@ -129,10 +129,36 @@ bool Party::SetPartyPlayer(int id)
 
 bool Party::DelPartyPlayer(int id)
 {
+
+	partyLock.lock();
 	for (auto& i : partyPlayer)
 	{
-		if (i == id) { i = -1; return true; }
+		if (i == id) {
+			i = -1;
+			curPlayerNum--;
+			partyLock.unlock();
+			return true;
+		}
 	}
-	curPlayerNum--;
+	partyLock.unlock();
 	return false;
+}
+
+int Party::DelParty()
+{
+	partyLock.lock();
+	int ret = 0;
+	for (auto& i : partyPlayer)
+	{
+		if (i != -1) {
+			ret = i;
+			i = -1;
+			break;
+		}
+	}
+
+	curPlayerNum = 0;
+	partyLock.unlock();
+	return ret;
+
 }

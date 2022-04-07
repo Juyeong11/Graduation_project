@@ -476,19 +476,21 @@ void Network::disconnect_client(int c_id)
 	}
 
 	if (client.party != nullptr) {
-		client.party->partyLock.lock();
-		client.party->DelPartyPlayer(c_id);
-		client.party->partyLock.unlock();
 
-		if (client.party->curPlayerNum == 0) {
-			client.party = nullptr;
+		client.party->DelPartyPlayer(c_id);
+
+		for (auto p : client.party->partyPlayer) {
+			if (p == -1)continue;
+			send_party_request_anwser(p, c_id, 3);
 		}
-		else {
-			for (auto p : client.party->partyPlayer) {
-				if (p == -1)continue;
-				send_party_request_anwser(p, c_id, 3);
-			}
+
+		if (client.party->curPlayerNum == 1) {
+			int last_id = client.party->DelParty();
+			Client* lastPartyPlayer = reinterpret_cast<Client*>(clients[last_id]);
+
+			lastPartyPlayer->party = nullptr;
 		}
+		client.party = nullptr;
 	}
 
 
@@ -1330,34 +1332,45 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		cs_packet_party_request* packet = reinterpret_cast<cs_packet_party_request*>(p);
 		if (false == is_player(packet->id) || packet->id == client_id) break;
+		Client* accepter = reinterpret_cast<Client*>(clients[packet->id]);
+		Party* accepterParty = accepter->party;
+		if (accepterParty != nullptr) {
+			send_party_request_anwser(client_id, packet->id, 4);
 
+			break;
+		}
 		send_party_request(packet->id, client_id);
+
+
 	}
 	break;
 	case CS_PACKET_PARTY_REQUEST_ANWSER:
 	{
 		cs_packet_party_request_anwser* packet = reinterpret_cast<cs_packet_party_request_anwser*>(p);
-
+		if (false == is_player(packet->requester)) break;
 		Client* accepter = reinterpret_cast<Client*>(clients[client_id]);
 
+
 		// 이 경우는 파티를 탈퇴할 때
-		if (false == is_player(packet->requester)) {
+		if (client_id == packet->requester) {
 			if (accepter->party == nullptr) { std::cout << "can't empty party exit\n"; break; }
 
-			accepter->party->partyLock.lock();
+			for (auto p : accepter->party->partyPlayer) {
+				if (p == -1)continue;
+				send_party_request_anwser(p, client_id, 3);
+			}
+
 			accepter->party->DelPartyPlayer(client_id);
-			accepter->party->partyLock.unlock();
 
-			if (accepter->party->curPlayerNum == 0) {
-				accepter->party = nullptr;
-			}
-			else {
-				for (auto p : accepter->party->partyPlayer) {
-					if (p == -1)continue;
-					send_party_request_anwser(p, client_id, 3);
-				}
-			}
 
+			if (accepter->party->curPlayerNum == 1) {
+				int last_id = accepter->party->DelParty();
+				Client* lastPartyPlayer = reinterpret_cast<Client*>(clients[last_id]);
+
+				lastPartyPlayer->party = nullptr;
+			}
+		
+			accepter->party = nullptr;
 			break;
 		}
 
@@ -1390,17 +1403,18 @@ void Network::process_packet(int client_id, unsigned char* p)
 					//수락한 사람한테 다시 거절 메세지를 보냄
 					send_party_request_anwser(client_id, packet->requester, 2);
 
+
+					break;
+
 				}
+				accepter->party = requester->party;
 
 			}
 			for (auto p : requesterParty->partyPlayer) {
 				if (p != -1)
 					send_party_request_anwser(p, client_id, 1);
 			}
-			for (auto p : requesterParty->partyPlayer) {
-				if (p != -1)
-					send_party_request_anwser(client_id, p, 1);
-			}
+
 		}
 		else if (packet->answer == 0)
 		{
@@ -1478,7 +1492,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			clients[client_id]->dest_z = packet->z;
 			clients[client_id]->dest_y = -packet->x - packet->z;
 		}
-		
+
 	}
 	break;
 	default:
@@ -1986,7 +2000,7 @@ void Network::worker()
 
 
 
-			
+
 		}
 		break;
 		default:
