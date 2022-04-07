@@ -101,6 +101,7 @@ public:
 	Party();
 	bool SetPartyPlayer(int id);
 	bool DelPartyPlayer(int id);
+	int DelParty();
 };
 const int VIEW_RANGE = 20;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
