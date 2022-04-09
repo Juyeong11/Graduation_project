@@ -5,6 +5,5 @@ using UnityEngine.UI;
 
 public class HPImagesForGameManager : MonoBehaviour
 {
-    public List<Image> HPs;
-    public List<Image> prevHPs;
+    public List<IngamePartyUISetter> PlayerHPs;
 }

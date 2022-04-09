@@ -9,7 +9,6 @@ public class FieldOtherPlayerManager : MonoBehaviour
     public UnityEvent onPlayerStand;
     public UnityEvent onPlayerFly;
 
-    private bool isFly = false;
     bool isReady = false;
 
     public playerState state;
@@ -33,7 +32,6 @@ public class FieldOtherPlayerManager : MonoBehaviour
         selfCoord.direction = HexDirection.Up;
         other_skillnum = 1;
         //onPlayerFly.Invoke();
-        isFly = true;
     }
     public void LoginOk()
     {
@@ -41,7 +39,6 @@ public class FieldOtherPlayerManager : MonoBehaviour
         state = playerState.Idle;
         selfCoord.direction = HexDirection.Up;
         //onPlayerFly.Invoke();
-        isFly = true;
     }
 
     public void JumpTrig()

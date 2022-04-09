@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class SoundEffectManager : MonoBehaviour
 {
-    [SerializeField] Animator LeftSpeakerAnimator = null;
-    [SerializeField] Animator RightSpeakerAnimator = null;
-    string beat = "Beat";
+    // [SerializeField] Animator LeftSpeakerAnimator = null;
+    // [SerializeField] Animator RightSpeakerAnimator = null;
+    // string beat = "Beat";
 
     public void BeatEffect()
     {

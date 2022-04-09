@@ -97,6 +97,9 @@ public class GameManager : MonoBehaviour
     [System.NonSerialized]
     public float MusicStartOffset;
 
+
+    public MusicName MN;
+
     void Awake()
     {
         print("Start");
@@ -125,8 +128,11 @@ public class GameManager : MonoBehaviour
         timeBy24Beat = timeByBeat / 6;
         timeBy16Beat = timeByBeat / 4;
 
-        player.GetComponent<PlayerManager>().SetHPImages(HPGM.HPs[0], HPGM.prevHPs[0]);
         enemyAnim = enemy.GetComponentInChildren<Animator>();
+
+        //¿©±â¼­ ÇÒ ¼ö¹Û¿¡ ¾øÀ½
+        player.GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.PlayerHPs[0].HPImage, HPGM.PlayerHPs[0].prevHPImage);
+        HPGM.PlayerHPs[0].Set(PlayerPrefs.GetInt("mySkill"), PlayerPrefs.GetString("myName", "NotHappy"));
     }
     private void OnApplicationQuit()
     {
@@ -497,6 +503,7 @@ public class GameManager : MonoBehaviour
                             int Delay = System.DateTime.Now.Millisecond;
 
                             PlaySound();
+                            MN.ChangeMusicName(SongName + " - zeroste.");
                             player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
                             
@@ -603,8 +610,12 @@ public class GameManager : MonoBehaviour
                                             // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½");
                                             Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                             Objects[pid].SetActive(true);
-                                            Objects[pid].GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.HPs[HPGMStaticInt], GameManager.data.HPGM.prevHPs[HPGMStaticInt]);
+                                            Objects[pid].GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.PlayerHPs[HPGMStaticInt].HPImage, HPGM.PlayerHPs[HPGMStaticInt].prevHPImage);
+                                            Objects[pid].GetComponentInChildren<PlayerManager>().playerClassofSkill = p.skillType;
+                                            Objects[pid].GetComponentInChildren<PlayerManager>().playerLevelofSkill = p.skillLevel;
+                                            HPGM.PlayerHPs[HPGMStaticInt].Set(p.skillType, System.Text.Encoding.UTF8.GetString(p.name));
                                             HPGMStaticInt++;
+
 
                                             Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
 

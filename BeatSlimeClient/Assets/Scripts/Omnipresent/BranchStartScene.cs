@@ -8,15 +8,20 @@ public class BranchStartScene : MonoBehaviour
     bool isField;
     void Start()
     {
+        SceneManager.LoadScene("FieldScene");
         isField = true;
-        Invoke("Loaden",0.5f);
+        //Invoke("Loaden",3f);
     }
 
     void Update()
     {
-        if (Input.GetKey(KeyCode.Escape))
+        if (Input.GetMouseButtonDown(1))
         {
-            isField = false;
+            SceneManager.LoadScene("LoginScene");
+        }
+        if (Input.GetMouseButtonDown(0))
+        {
+            SceneManager.LoadScene("FieldScene");
         }
     }
 
@@ -25,10 +30,6 @@ public class BranchStartScene : MonoBehaviour
         if (isField)
         {
             SceneManager.LoadScene("FieldScene");
-        }
-        else
-        {
-            SceneManager.LoadScene("LoginScene");
         }
     }
 }

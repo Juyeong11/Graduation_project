@@ -8,7 +8,7 @@ public class PartyManager : MonoBehaviour
 {
     static public PartyManager instance;
     public List<GameObject> partyObjects;
-    public List<Sprite> images;
+    public ClassImageObject CIO;
     Dictionary<int,GameObject> party;
 
     void Awake()
@@ -21,7 +21,7 @@ public class PartyManager : MonoBehaviour
     {
         party.Add(pid, partyObjects[party.Count]);
         
-        party[pid].GetComponent<Image>().sprite = images[cid-1];
+        party[pid].GetComponent<Image>().sprite = CIO.ClassSprites[cid];
         party[pid].GetComponentInChildren<TMPro.TMP_Text>().text = pid.ToString();
         party[pid].SetActive(true);
 
@@ -47,7 +47,7 @@ public class PartyManager : MonoBehaviour
     {
         if (party.ContainsKey(pid))
         {
-            party[pid].GetComponent<Image>().sprite = images[cid-1];
+            party[pid].GetComponent<Image>().sprite = CIO.ClassSprites[cid-1];
         }
     }
 }

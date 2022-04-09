@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class Test : MonoBehaviour
 {
-    float t = 0;
-    float i = 0;
+    
 
     GameObject Target;
     public GameObject Prefeb;

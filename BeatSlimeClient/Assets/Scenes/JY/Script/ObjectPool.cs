@@ -12,7 +12,7 @@ public class ObjectInfo
 public class ObjectPool : MonoBehaviour
 {
     public static ObjectPool instance;
-    static int nums = 1;
+    //static int nums = 1;
 
     public Queue<GameObject> PlayerObjectQueue = new Queue<GameObject>();
     public Queue<GameObject> EnemyObjectQueue = new Queue<GameObject>();

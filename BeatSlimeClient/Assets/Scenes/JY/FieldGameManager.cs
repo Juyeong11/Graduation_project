@@ -58,6 +58,11 @@ public class FieldGameManager : MonoBehaviour
     {
         if (false == Net.isOnline)
             Net.CreateAndConnect();
+        PlayerPrefs.DeleteKey("myName");
+        PlayerPrefs.DeleteKey("mySkill");
+        PlayerPrefs.DeleteKey("mySkillLevel");
+        PlayerPrefs.SetInt("mySkill",1);
+        PlayerPrefs.SetString("myName", "soHappy");
 
     }
 
@@ -161,6 +166,8 @@ public class FieldGameManager : MonoBehaviour
 
                                         Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
                                         Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().direction = (HexDirection)p.direction;
+                                        
+                                        Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillnum = p.skillType;
                                         //Debug.Log(p.id + " 플레이어 넣음");
                                         Objects[p.id].GetComponent<FieldOtherPlayerManager>().pID = p.id;
 
@@ -196,13 +203,18 @@ public class FieldGameManager : MonoBehaviour
                             Protocol.sc_packet_change_skill p = Protocol.sc_packet_change_skill.SetByteToVar(data);
 
                             if(p.id == myPlayerID)
+                            {
                                 Objects[p.id].GetComponentInParent<FieldPlayerManager>().ChangeSkill(p.skill_type);
+                                PlayerPrefs.SetInt("mySkill", player.GetComponentInParent<FieldPlayerManager>().self_skillnum);
+                                PlayerPrefs.SetInt("mySkillLevel", player.GetComponentInParent<FieldPlayerManager>().self_skilllevel);
+                            }
                             else
                             {
                                 Objects[p.id].GetComponent<FieldOtherPlayerManager>().ChangeSkill(p.skill_type);
                                 PartyManager.instance.PartyChangeClass(p.id, p.skill_type);
                             }
                             Debug.Log(p.id + "가 " + p.skill_type + "으로 스킬을 바꿈");
+                            
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST:
@@ -304,6 +316,9 @@ public class FieldGameManager : MonoBehaviour
         //player.GetComponent<FieldPlayerManager>().PortalPlane.transform.localRotation = Quaternion.Euler(90,0,0);
         player.GetComponentInParent<FieldPlayerManager>().PortalPlane.SetActive(true);
         
+
+
+
         yield return new WaitForSeconds(2.0f);
         player.GetComponentInParent<FieldPlayerManager>().EnterPortal();
         yield return new WaitForSeconds(0.5f);

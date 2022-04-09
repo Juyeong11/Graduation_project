@@ -1311,7 +1311,8 @@ MonoBehaviour:
   PlayerTransform: {fileID: 1739654812}
   PortalPlane: {fileID: 1359265541}
   CM: {fileID: 1848353656}
-  self_skillnum: 0
+  self_skillnum: 1
+  self_skilllevel: 1
 --- !u!1 &377567541
 GameObject:
   m_ObjectHideFlags: 0
@@ -3498,10 +3499,7 @@ MonoBehaviour:
   partyObjects:
   - {fileID: 2132158698}
   - {fileID: 1789069350}
-  images:
-  - {fileID: 21300000, guid: 71e64dfce09a97842ab825028934f2be, type: 3}
-  - {fileID: 21300000, guid: 710c4d02fee87dd48b35eb6cecaa1215, type: 3}
-  - {fileID: 21300000, guid: 8b5c23595a818c34a82056b1625f2c8c, type: 3}
+  CIO: {fileID: 11400000, guid: f31047e91a4f89046b8c0520c154e025, type: 2}
 --- !u!1 &1694771482
 GameObject:
   m_ObjectHideFlags: 0

@@ -37,6 +37,7 @@ public class PlayerManager : MonoBehaviour
 
     public bool isThisCurrentPlayingPlayerObject;
     public int playerClassofSkill;
+    public int playerLevelofSkill;
 
     public void Start()
     {
@@ -49,7 +50,7 @@ public class PlayerManager : MonoBehaviour
         playerDieAnimTriggered = false;
 
         //DEBUG :
-        playerClassofSkill = 2;
+        //playerClassofSkill = 2;
 
         HP.Initialized(false);
         //onPlayerFly.Invoke();

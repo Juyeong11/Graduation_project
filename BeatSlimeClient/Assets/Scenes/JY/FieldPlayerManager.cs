@@ -8,8 +8,6 @@ public class FieldPlayerManager : MonoBehaviour
     public Animator JumpTrigger;
     public UnityEvent onPlayerStand;
     public UnityEvent onPlayerFly;
-
-    private bool isFly = false;
     bool isReady = false;
 
     public playerState state;
@@ -25,7 +23,8 @@ public class FieldPlayerManager : MonoBehaviour
 
     public ChattingManager CM;
 
-    public int self_skillnum;
+    public int self_skillnum = 1;
+    public int self_skilllevel = 1;
     
 
     //[System.NonSerialized]
@@ -36,12 +35,10 @@ public class FieldPlayerManager : MonoBehaviour
 
     public void Start()
     {
-        self_skillnum = 0;
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
-        isFly = true;
 
     }
     public void LoginOk()
@@ -50,7 +47,6 @@ public class FieldPlayerManager : MonoBehaviour
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
-        isFly = true;
     }
 
     public void JumpTrig()

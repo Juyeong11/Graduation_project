@@ -8,8 +8,6 @@ public class InGameOtherPlayerManager : MonoBehaviour
     public Animator JumpTrigger;
     public UnityEvent onPlayerStand;
     public UnityEvent onPlayerFly;
-
-    private bool isFly = false;
     bool isReady = false;
 
     public playerState state;
@@ -27,7 +25,6 @@ public class InGameOtherPlayerManager : MonoBehaviour
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
-        isFly = true;
     }
     public void LoginOk()
     {
@@ -35,7 +32,6 @@ public class InGameOtherPlayerManager : MonoBehaviour
         state = playerState.Idle;
         selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
-        isFly = true;
     }
 
     public void JumpTrig()
