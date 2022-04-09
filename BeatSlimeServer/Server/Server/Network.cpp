@@ -1037,7 +1037,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 					for (int id : p->player_ids) {
 
-						send_change_scene(id, p->map_type);
+						send_change_scene(id, p->map_type + 2);
 					}
 					// 포탈에서 GameRoom으로 이동
 					int room_id = get_game_room_id();
