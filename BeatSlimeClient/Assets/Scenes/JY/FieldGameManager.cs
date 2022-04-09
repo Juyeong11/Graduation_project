@@ -227,7 +227,7 @@ public class FieldGameManager : MonoBehaviour
                             //내가 보낸 요청이 거절 됐는지 수락 됐는지 알려주는 패킷
                             Protocol.sc_packet_party_request_anwser p = Protocol.sc_packet_party_request_anwser.SetByteToVar(data);
 
-                            Debug.Log(p.ids[0] + "가 " + p.anwser + " 이라고 응답함");
+                            Debug.Log(p.p_id + "가 " + p.anwser + " 이라고 응답함");
 
                             /*
                              * 0 요청 거절
@@ -245,15 +245,15 @@ public class FieldGameManager : MonoBehaviour
                                 break;
 
                                 case 1:
-                               //chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
-                               //if (p.p_id == myPlayerID)
-                               //{
-                               //    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldPlayerManager>().self_skillnum);
-                               //}
-                               //else
-                               //{
-                               //    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_skillnum);
-                               //}
+                                chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
+                                if (p.p_id == myPlayerID)
+                                {
+                                    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldPlayerManager>().self_skillnum);
+                                }
+                                else
+                                {
+                                    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_skillnum);
+                                }
                                 break;
 
                                 case 2:
@@ -261,12 +261,12 @@ public class FieldGameManager : MonoBehaviour
                                 break;
 
                                 case 3:
-                                //chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
-                                //PartyManager.instance.DelParty(p.p_id);
-                                //if (p.p_id == myPlayerID)
-                                //{
-                                //    PartyManager.instance.DelParty();
-                                //}
+                                chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
+                                PartyManager.instance.DelParty(p.p_id);
+                                if (p.p_id == myPlayerID)
+                                {
+                                    PartyManager.instance.DelParty();
+                                }
                                 break;
 
                                 case 4:

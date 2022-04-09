@@ -436,7 +436,8 @@ namespace Protocol
         public byte size;
         public byte type;
         public byte anwser;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.CHAT_BUF_SIZE)]
+        public int p_id;
+       [MarshalAs(UnmanagedType.ByValArray)]
         public int[] ids = new int[3];
     }
 

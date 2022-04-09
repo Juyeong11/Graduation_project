@@ -261,6 +261,7 @@ struct sc_packet_party_request_anwser {
 	unsigned char size;
 	char	type;
 	char	answer; //
+	int	new_party_id; //
 	int		p[MAX_IN_GAME_PLAYER]; //
 };
 

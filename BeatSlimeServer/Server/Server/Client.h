@@ -95,7 +95,7 @@ public:
 };
 class Party {
 public:
-	std::array<int, MAX_IN_GAME_PLAYER> partyPlayer;
+	int partyPlayer[MAX_IN_GAME_PLAYER];
 	std::mutex partyLock;
 	int curPlayerNum;
 	Party();
