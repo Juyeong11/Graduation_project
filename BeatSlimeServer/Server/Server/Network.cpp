@@ -1353,13 +1353,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			break;
 		}
 
-		//본인이 파티가 있는 경우
-		Client* my = reinterpret_cast<Client*>(clients[client_id]);
-		if (my->party != nullptr) {
-			send_party_request_anwser(client_id, -1,nullptr, 5);
 
-			break;
-		}
 		send_party_request(packet->id, client_id);
 
 

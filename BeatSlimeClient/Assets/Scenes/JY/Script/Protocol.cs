@@ -437,7 +437,7 @@ namespace Protocol
         public byte type;
         public byte anwser;
         public int p_id;
-       [MarshalAs(UnmanagedType.ByValArray)]
+       [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
         public int[] ids = new int[3];
     }
 
