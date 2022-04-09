@@ -326,9 +326,11 @@ namespace Protocol
         public short x, y, z;
         public byte obj_type;
         public byte direction;
+        public byte skillType;
+        public byte skillLevel;
 
-        /*        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
-                public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
+        public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];
     }
 
     [Serializable]

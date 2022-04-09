@@ -296,8 +296,10 @@ void Network::send_put_object(int c_id, int target) {
 
 	packet.direction = clients[target]->direction;
 
-
-
+	packet.skill_type = reinterpret_cast<Client*>(clients[target])->skill->SkillType;
+	packet.skill_level = reinterpret_cast<Client*>(clients[target])->skill->SkillLevel;
+	strcpy_s(packet.name, "happy");
+	
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);

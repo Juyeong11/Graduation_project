@@ -174,7 +174,10 @@ struct sc_packet_put_object {
 	char object_type;
 	char direction;
 
-	//char	name[MAX_NAME_SIZE];
+	char skill_type;
+	char skill_level;
+
+	char	name[MAX_NAME_SIZE];
 };
 
 struct sc_packet_remove_object {
