@@ -52,62 +52,20 @@ DataBase::~DataBase() {
 	SQLFreeHandle(SQL_HANDLE_ENV, henv);
 }
 
-void DataBase::read_map_data()
+void DataBase::checkPlayer(const char* name)
 {
-	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-
-	db_map_data.clear();
-	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)L"SELECT * FROM Map", SQL_NTS);
-	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
-
-		// Bind columns 1, 2, and 3  
-		// 미리 읽어둘 변수를 bind해준다.
-		retcode = SQLBindCol(hstmt, 1, SQL_C_LONG, &MapSchema.p_id, 2, &MapSchema.cb_id);
-		retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &MapSchema.p_x, 2, &MapSchema.cb_x);
-		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &MapSchema.p_y, 2, &MapSchema.cb_y);
-		retcode = SQLBindCol(hstmt, 4, SQL_C_LONG, &MapSchema.p_z, 2, &MapSchema.cb_z);
-		retcode = SQLBindCol(hstmt, 5, SQL_C_LONG, &MapSchema.p_w, 2, &MapSchema.cb_w);
-		retcode = SQLBindCol(hstmt, 6, SQL_C_LONG, &MapSchema.p_color, 2, &MapSchema.cb_color);
-		retcode = SQLBindCol(hstmt, 7, SQL_C_LONG, &MapSchema.p_type, 2, &MapSchema.cb_type);
-
-		// Fetch and print each row of data. On an error, display a message and exit.  
-		for (int i = 0; ; i++) {
-			retcode = SQLFetch(hstmt);
-			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
-			{
-				//replace wprintf with printf
-				//%S with %ls
-				//warning C4477: 'wprintf' : format string '%S' requires an argument of type 'char *'
-				//but variadic argument 2 has type 'SQLWCHAR *'
-				//wprintf(L"%d: %S %S %S\n", i + 1, sCustID, szName, szPhone);  
-				//printf("%d: %d \t %d \t  %d \t  %d \t  %d \t %d\n", i + 1, MapSchema.p_x, MapSchema.p_y, MapSchema.p_z, MapSchema.p_w, MapSchema.p_color, MapSchema.p_type);
-				db_map_data.emplace_back(MapSchema.p_id, MapSchema.p_x, MapSchema.p_y, MapSchema.p_z,
-					MapSchema.p_w, MapSchema.p_color, MapSchema.p_type);
-			}
-			else {
-				break;
-			}
-		}
-	}
-	else
-		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
-	// Process data  
-	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
-		SQLCancel(hstmt);
-		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
-	}
-
+	
 
 }
 
-void DataBase::insert_map_data(const Map& shell)
+void DataBase::insertPlayer(const wchar_t* name)
 {
 	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
 	
-	//std::wstring command= std::format(L"INSERT INTO Map (id, x, y, z, w, color, type) VALUES ({}, {}, {}, {}, {}, {}, {})", shell.id, shell.x, shell.y, shell.z, shell.w, shell.color, shell.type);
+	std::wstring command = std::format(L"EXEC insertPlayer '{}'", name);
 
-	//retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 	}
 	else
@@ -122,7 +80,7 @@ void DataBase::insert_map_data(const Map& shell)
 
 }
 
-void DataBase::update_map_data(const Map& shell)
+void DataBase::update_map_data()
 {
 	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
