@@ -13,7 +13,7 @@ public class TransparentSliding : MonoBehaviour
     
     void Update()
     {
-        tr = 0.2f*Mathf.Sin(Time.time) + 1.2f;
+        tr = 0.3f*Mathf.Sin(Time.time) + 1.05f;
         mat.SetFloat("_TransparentPower", tr);
     }
 }
