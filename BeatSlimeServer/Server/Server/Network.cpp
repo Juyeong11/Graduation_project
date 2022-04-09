@@ -67,7 +67,7 @@ Network::Network() {
 
 	// 포탈의 위치를 나타내는 자료필요
 	for (int i = 0; i < PORTAL_NUM; ++i) {
-		portals[i] = new Portal(2, -2);
+		portals[i] = new Portal(17, -21);
 	}
 
 
@@ -395,7 +395,7 @@ void Network::send_party_request(int reciver, int sender)
 void Network::send_party_request_anwser(int reciver, int p_id, int type)
 {
 	sc_packet_party_request_anwser packet;
-	packet.type = SC_PACKET_PARTY_REQUEST_ANWSER;
+	packet.type = SC_PACKET_PARTY_REQUEST_ANSWER;
 	packet.size = sizeof(packet);
 	packet.answer = type;
 	packet.p_id = p_id;
@@ -1344,7 +1344,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 	}
 	break;
-	case CS_PACKET_PARTY_REQUEST_ANWSER:
+	case CS_PACKET_PARTY_REQUEST_ANSWER:
 	{
 		cs_packet_party_request_anwser* packet = reinterpret_cast<cs_packet_party_request_anwser*>(p);
 		if (false == is_player(packet->requester)) break;
@@ -1369,7 +1369,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 				lastPartyPlayer->party = nullptr;
 			}
-		
+
 			accepter->party = nullptr;
 			break;
 		}
@@ -1492,6 +1492,61 @@ void Network::process_packet(int client_id, unsigned char* p)
 			clients[client_id]->dest_z = packet->z;
 			clients[client_id]->dest_y = -packet->x - packet->z;
 		}
+
+	}
+	break;
+	case CS_PACKET_TELEPORT:
+	{
+		cs_packet_teleport* packet = reinterpret_cast<cs_packet_teleport*>(p);
+
+		if (packet->pos == 0) {
+			/*
+			17   4 - 21
+			16   4 - 20
+			17   3 - 20
+			*/
+			int x[3] = { 17,16,17 };
+			int y[3] = { 4,4,3 };
+			int z[3] = { -21,-20,-20 };
+			cl.pre_x = cl.x;
+			cl.pre_y = cl.y;
+			cl.pre_z = cl.z;
+			for (int i = 0; i < 3; ++i) {
+				if (maps[FIELD_MAP]->GetTileType(x[i], z[i]) == 0) {
+					cl.x = x[i];
+					cl.y = y[i];
+					cl.z = z[i];
+					break;
+				}
+			}
+
+
+		}
+		else if (packet->pos == 1) {
+
+		}
+		else {
+			cl.pre_x = cl.x;
+			cl.pre_y = cl.y;
+			cl.pre_z = cl.z;
+			do
+			{
+				cl.x = rand() % 20;
+				cl.z = rand() % 20;
+				cl.y = -cl.x - cl.z;
+			} while (maps[FIELD_MAP]->GetTileType(cl.x, cl.z) != 0);
+
+		}
+		maps[FIELD_MAP]->SetTileType(cl.x, cl.z, cl.pre_x, cl.pre_z);
+		cl.vl.lock();
+		std::unordered_set<int> my_vl{ cl.viewlist };
+		cl.vl.unlock();
+
+		for (int id : my_vl) {
+			if (false == is_player(id)) continue;
+			send_move_object(id, client_id);
+		}
+		send_move_object(client_id, client_id);
 
 	}
 	break;
@@ -2173,15 +2228,42 @@ void Network::game_start(int room_id)
 
 	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
 	//수정
+	int x[3] = { 0,1,0 };
+	int y[3] = { 0,0,1 };
+	int z[3] = { 0,-1,-1 };
 	boss->hp = 1000;
-	for (auto i : game_room[room_id]->player_ids) {
-		i->hp = 100;
-		reinterpret_cast<Client*>(i)->pre_parrying_pattern = -1;
-		maps[FIELD_MAP]->SetTileType(-1, -1, i->x, i->z);
-		i->dest_x = -1;
-		i->dest_y = -1;
-		i->dest_z = -1;
+
+	int i = 0;
+	for (auto p : game_room[room_id]->player_ids) {
+		p->hp = 100;
+		Client* cl = reinterpret_cast<Client*>(p);
+
+		cl->pre_parrying_pattern = -1;
+		maps[FIELD_MAP]->SetTileType(-1, -1, p->x, p->z);
+		p->dest_x = -1;
+		p->dest_y = -1;
+		p->dest_z = -1;
+
+		p->pre_x = 0;
+		p->pre_y = 0;
+		p->pre_z = 0;
+
+		p->x = x[i];
+		p->y = y[i];
+		p->z = z[i];
+		i++;
+
+
+
+		for (auto id : game_room[room_id]->player_ids) {
+
+			send_move_object(id->id, p->id);
+		}
+		send_move_object(p->id, p->id);
 	}
+
+
+
 	set_next_pattern(room_id);
 
 	if (room_id == -1) {

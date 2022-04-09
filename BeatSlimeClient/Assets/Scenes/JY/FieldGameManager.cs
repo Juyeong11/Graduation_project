@@ -80,6 +80,11 @@ public class FieldGameManager : MonoBehaviour
             MN.ChangeMusicName("flower load - zeroste.");
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            Net.SendTeleportPacket(0); // 1번 포탈로 이동
+        }
+
         if (Net.isOnline)
         {
             isGameStart = true;

@@ -97,9 +97,10 @@ public class FieldPlayerManager : MonoBehaviour
         // -> 맞다면 ready상태 이펙트 패킷 전송 -> 3명이 다 준비되면 씬 전환
 
         // 포탈 타일인지 확인 지금은 0,0,0     1,0,-1     0,1,-1로 함 -> 씬 전환 잘되면 Cell에 type 추가해 비교하는 방법으로 바꾸자
-        if(selfCoord.coordinates.X == 3 && selfCoord.coordinates.Z == -3 ||
-            selfCoord.coordinates.X == 3 && selfCoord.coordinates.Z == -2 ||
-            selfCoord.coordinates.X == 2 && selfCoord.coordinates.Z == -2)
+        
+        if(selfCoord.coordinates.X == 17 && selfCoord.coordinates.Z == -21 ||
+            selfCoord.coordinates.X == 16 && selfCoord.coordinates.Z == -20 ||
+            selfCoord.coordinates.X == 17 && selfCoord.coordinates.Z == -20)
         {
             if (isReady) return;
             FieldGameManager.Net.SendChangeSceneReadyPacket(1);
