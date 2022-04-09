@@ -68,6 +68,7 @@ public class BillboardUI : MonoBehaviour
         if (p == -1)
         {
             FieldGameManager.Net.SendPartyRequestAnwserPacket(0, FieldGameManager.myPlayerID);
+            PartyManager.instance.DelParty();
         }
         else
         {

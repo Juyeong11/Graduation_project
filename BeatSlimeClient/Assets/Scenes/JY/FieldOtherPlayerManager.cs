@@ -31,6 +31,7 @@ public class FieldOtherPlayerManager : MonoBehaviour
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
         selfCoord.direction = HexDirection.Up;
+        other_skillnum = 1;
         //onPlayerFly.Invoke();
         isFly = true;
     }

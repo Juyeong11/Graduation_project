@@ -21,7 +21,7 @@ public class PartyManager : MonoBehaviour
     {
         party.Add(pid, partyObjects[party.Count]);
         
-        party[pid].GetComponent<Image>().sprite = images[cid];
+        party[pid].GetComponent<Image>().sprite = images[cid-1];
         party[pid].GetComponentInChildren<TMPro.TMP_Text>().text = pid.ToString();
         party[pid].SetActive(true);
 
@@ -34,8 +34,12 @@ public class PartyManager : MonoBehaviour
             party.Remove(pid);
         }
     }
-       public void DelParty()
+    public void DelParty()
     {
+        foreach (var item in party)
+        {
+            item.Value.SetActive(false);
+        }
         party.Clear();
     }
 
@@ -43,7 +47,7 @@ public class PartyManager : MonoBehaviour
     {
         if (party.ContainsKey(pid))
         {
-            party[pid].GetComponent<Image>().sprite = images[cid];
+            party[pid].GetComponent<Image>().sprite = images[cid-1];
         }
     }
 }

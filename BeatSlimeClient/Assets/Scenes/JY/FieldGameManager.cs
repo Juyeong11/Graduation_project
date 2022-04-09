@@ -211,6 +211,7 @@ public class FieldGameManager : MonoBehaviour
                             //이미 파티가 있다면 이 패킷이 오지 않음
                             Protocol.sc_packet_party_request p = Protocol.sc_packet_party_request.SetByteToVar(data);
 
+                            
                             ResponseMenu.transform.position = player.transform.position;
                             ResponseMenu.GetComponent<ResponseBillboardUI>().GetOn(player.transform, p.requester_id);
 
@@ -238,6 +239,8 @@ public class FieldGameManager : MonoBehaviour
                              * 5 내가 이미 파티가 있는대 파티 신청을 보낸경우
                              *  - CS_PACKET_PARTY_REQUEST_ANWSER패킷을 서버에 보낼 때  requester id가 -1이면 파티에 탈퇴하려고 하는 걸로 알고 서버에서 처리함
                              */
+
+                             
                             switch (p.anwser)
                             {
                                 case 0:
@@ -246,13 +249,12 @@ public class FieldGameManager : MonoBehaviour
 
                                 case 1:
                                 chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
-                                if (p.p_id == myPlayerID)
+                                foreach (var i in p.ids)
                                 {
-                                    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldPlayerManager>().self_skillnum);
-                                }
-                                else
-                                {
-                                    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_skillnum);
+                                    if (i == myPlayerID || i == -1)
+                                        continue; 
+                                    print(i);
+                                    PartyManager.instance.SetParty(i, Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
                                 }
                                 break;
 
