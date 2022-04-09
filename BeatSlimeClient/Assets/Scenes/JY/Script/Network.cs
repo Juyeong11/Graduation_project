@@ -308,7 +308,15 @@ public class Network
         ClientSocket.BeginSend(end_pk.GetBytes(), 0, end_pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
 
     }
-
+    public void SendTeleportPacket(byte pos)
+    {
+        Protocol.cs_packet_teleport pk = new Protocol.cs_packet_teleport();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_teleport));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_TELEPORT;
+        pk.pos = pos;
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
     public bool isServerOnline()
     {
         return debugOnline || isOnline;

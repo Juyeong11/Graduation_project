@@ -17,9 +17,10 @@ const char CS_PACKET_CHANGE_SKILL = 10;
 const char CS_PACKET_PING_TEST = 11;
 const char CS_PACKET_GET_SINGLE_PLAYER_LIST = 12;
 const char CS_PACKET_PARTY_REQUEST = 13;
-const char CS_PACKET_PARTY_REQUEST_ANWSER = 14;
+const char CS_PACKET_PARTY_REQUEST_ANSWER = 14;
 const char CS_PACKET_CHAT = 15;
 const char CS_PACKET_SET_PATH = 16;
+const char CS_PACKET_TELEPORT = 17;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -37,7 +38,7 @@ const char SC_PACKET_GAME_INIT = 12;
 const char SC_PACKET_CHANGE_SKILL = 13;
 const char SC_PACKET_PING_TEST = 14;
 const char SC_PACKET_PARTY_REQUEST = 15;
-const char SC_PACKET_PARTY_REQUEST_ANWSER = 16;
+const char SC_PACKET_PARTY_REQUEST_ANSWER = 16;
 const char SC_PACKET_CHAT = 17;
 
 #pragma pack (push, 1)
@@ -133,6 +134,11 @@ struct cs_packet_set_path {
 	short x, z;
 };
 
+struct cs_packet_teleport {
+	unsigned char size;
+	char type;
+	char pos;
+};
 //server->client
 struct sc_packet_login_ok {
 	unsigned char size;

@@ -36,6 +36,7 @@ namespace Protocol
         public const byte CS_PACKET_PARTY_REQUEST_ANWSER = 14;
         public const byte CS_PACKET_CHAT = 15;
         public const byte CS_PACKET_SET_PATH = 16;
+        public const byte CS_PACKET_TELEPORT = 17;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -259,7 +260,14 @@ namespace Protocol
         public byte type;
         public short x, z;
     }
-
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_teleport : ISerializeble<cs_packet_teleport>
+    {
+        public byte size;
+        public byte type;
+        public byte pos;
+    }
     //Server -> Client
 
     [Serializable]
