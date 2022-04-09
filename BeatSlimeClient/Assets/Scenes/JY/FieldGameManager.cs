@@ -227,13 +227,15 @@ public class FieldGameManager : MonoBehaviour
                             //내가 보낸 요청이 거절 됐는지 수락 됐는지 알려주는 패킷
                             Protocol.sc_packet_party_request_anwser p = Protocol.sc_packet_party_request_anwser.SetByteToVar(data);
 
-                            Debug.Log(p.p_id + "가 " + p.anwser + " 이라고 응답함");
+                            Debug.Log(p.ids[0] + "가 " + p.anwser + " 이라고 응답함");
 
                             /*
                              * 0 요청 거절
                              * 1 수락
                              * 2 내가 수락한 파티의 인원이 이미 가득 찾을 경우 -> 파티 신청을 여러명에게 보낸경우
                              * 3 다른 사람이 파티에서 탈퇴한경우
+                             * 4 상대가 파티가 이미 있는경우
+                             * 5 내가 이미 파티가 있는대 파티 신청을 보낸경우
                              *  - CS_PACKET_PARTY_REQUEST_ANWSER패킷을 서버에 보낼 때  requester id가 -1이면 파티에 탈퇴하려고 하는 걸로 알고 서버에서 처리함
                              */
                             switch (p.anwser)
@@ -243,15 +245,15 @@ public class FieldGameManager : MonoBehaviour
                                 break;
 
                                 case 1:
-                                chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
-                                if (p.p_id == myPlayerID)
-                                {
-                                    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldPlayerManager>().self_skillnum);
-                                }
-                                else
-                                {
-                                    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_skillnum);
-                                }
+                               //chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
+                               //if (p.p_id == myPlayerID)
+                               //{
+                               //    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldPlayerManager>().self_skillnum);
+                               //}
+                               //else
+                               //{
+                               //    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_skillnum);
+                               //}
                                 break;
 
                                 case 2:
@@ -259,16 +261,20 @@ public class FieldGameManager : MonoBehaviour
                                 break;
 
                                 case 3:
-                                chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
-                                PartyManager.instance.DelParty(p.p_id);
-                                if (p.p_id == myPlayerID)
-                                {
-                                    PartyManager.instance.DelParty();
-                                }
+                                //chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
+                                //PartyManager.instance.DelParty(p.p_id);
+                                //if (p.p_id == myPlayerID)
+                                //{
+                                //    PartyManager.instance.DelParty();
+                                //}
                                 break;
 
                                 case 4:
                                     chattingManager.SetMess("<color=red>상대는 이미 파티가 있습니다!</color>");
+                                    break;
+                                case 5:
+                                    chattingManager.SetMess("<color=red>이미 가입된 파티가 있습니다!</color>");
+
                                     break;
                             }
                         }

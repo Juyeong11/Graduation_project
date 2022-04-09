@@ -392,13 +392,24 @@ void Network::send_party_request(int reciver, int sender)
 	reinterpret_cast<Client*>(ex_over, clients[reciver])->do_send(ex_over);
 }
 
-void Network::send_party_request_anwser(int reciver, int p_id, int type)
+void Network::send_party_request_anwser(int reciver, Party* party, int type)
 {
 	sc_packet_party_request_anwser packet;
 	packet.type = SC_PACKET_PARTY_REQUEST_ANSWER;
 	packet.size = sizeof(packet);
 	packet.answer = type;
-	packet.p_id = p_id;
+	
+	if (party != nullptr) {
+
+	party->partyLock.lock();
+	memcpy_s(packet.p, sizeof(int) * 3, party->partyPlayer, sizeof(int) * 3);
+	party->partyLock.unlock();
+	}
+	else {
+		packet.p[0] = -1;
+		packet.p[1] = -1;
+		packet.p[2] = -1;
+	}
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -481,7 +492,7 @@ void Network::disconnect_client(int c_id)
 
 		for (auto p : client.party->partyPlayer) {
 			if (p == -1)continue;
-			send_party_request_anwser(p, c_id, 3);
+			send_party_request_anwser(p, client.party, 3);
 		}
 
 		if (client.party->curPlayerNum == 1) {
@@ -1331,11 +1342,21 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_PARTY_REQUEST:
 	{
 		cs_packet_party_request* packet = reinterpret_cast<cs_packet_party_request*>(p);
+		
 		if (false == is_player(packet->id) || packet->id == client_id) break;
+		// 상대가 파티가 있는 경우
 		Client* accepter = reinterpret_cast<Client*>(clients[packet->id]);
 		Party* accepterParty = accepter->party;
 		if (accepterParty != nullptr) {
-			send_party_request_anwser(client_id, packet->id, 4);
+			send_party_request_anwser(client_id, nullptr, 4);
+
+			break;
+		}
+
+		//본인이 파티가 있는 경우
+		Client* my = reinterpret_cast<Client*>(clients[client_id]);
+		if (my->party != nullptr) {
+			send_party_request_anwser(client_id, nullptr, 5);
 
 			break;
 		}
@@ -1357,7 +1378,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 			for (auto p : accepter->party->partyPlayer) {
 				if (p == -1)continue;
-				send_party_request_anwser(p, client_id, 3);
+				send_party_request_anwser(p, accepter->party, 3);
 			}
 
 			accepter->party->DelPartyPlayer(client_id);
@@ -1401,7 +1422,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				if (false == requesterParty->SetPartyPlayer(accepter->id)) {
 					//파티 요청한 사람의 파티가 가득 찬경우
 					//수락한 사람한테 다시 거절 메세지를 보냄
-					send_party_request_anwser(client_id, packet->requester, 2);
+					send_party_request_anwser(client_id, requesterParty, 2);
 
 
 					break;
@@ -1412,19 +1433,19 @@ void Network::process_packet(int client_id, unsigned char* p)
 			}
 			for (auto p : requesterParty->partyPlayer) {
 				if (p != -1)
-					send_party_request_anwser(p, client_id, 1);
+					send_party_request_anwser(p, requesterParty, 1);
 			}
 
 		}
 		else if (packet->answer == 0)
 		{
 			if (requesterParty == nullptr) {
-				send_party_request_anwser(packet->requester, client_id, 0);
+				send_party_request_anwser(packet->requester, nullptr, 0);
 			}
 			else {
 				for (auto p : requesterParty->partyPlayer) {
 					if (p != -1)
-						send_party_request_anwser(p, client_id, 0);
+						send_party_request_anwser(p, requesterParty, 0);
 				}
 			}
 		}

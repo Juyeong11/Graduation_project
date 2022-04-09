@@ -261,8 +261,7 @@ struct sc_packet_party_request_anwser {
 	unsigned char size;
 	char	type;
 	char	answer; //
-	int		p_id; //
-
+	int		p[MAX_IN_GAME_PLAYER]; //
 };
 
 struct sc_packet_chat {
