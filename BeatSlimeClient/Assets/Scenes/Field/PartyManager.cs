@@ -9,7 +9,13 @@ public class PartyManager : MonoBehaviour
     static public PartyManager instance;
     public List<GameObject> partyObjects;
     public List<Sprite> images;
-    Dictionary<int,GameObject> party = new Dictionary<int,GameObject>();
+    Dictionary<int,GameObject> party;
+
+    void Awake()
+    {
+        instance = this;
+        party = new Dictionary<int,GameObject>();
+    }
 
     public void SetParty(int pid, int cid)
     {
@@ -27,6 +33,10 @@ public class PartyManager : MonoBehaviour
             partyObjects[pid].SetActive(false);
             party.Remove(pid);
         }
+    }
+       public void DelParty()
+    {
+        party.Clear();
     }
 
     public void PartyChangeClass(int pid, int cid)

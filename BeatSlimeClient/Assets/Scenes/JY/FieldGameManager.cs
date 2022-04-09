@@ -244,7 +244,14 @@ public class FieldGameManager : MonoBehaviour
 
                                 case 1:
                                 chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
-                                PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_skillnum);
+                                if (p.p_id == myPlayerID)
+                                {
+                                    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldPlayerManager>().self_skillnum);
+                                }
+                                else
+                                {
+                                    PartyManager.instance.SetParty(p.p_id, Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_skillnum);
+                                }
                                 break;
 
                                 case 2:
@@ -254,6 +261,10 @@ public class FieldGameManager : MonoBehaviour
                                 case 3:
                                 chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
                                 PartyManager.instance.DelParty(p.p_id);
+                                if (p.p_id == myPlayerID)
+                                {
+                                    PartyManager.instance.DelParty();
+                                }
                                 break;
 
                                 case 4:
