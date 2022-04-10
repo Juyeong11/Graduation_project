@@ -75,6 +75,7 @@ Client::Client(Skill* sk, MapInfo* mapdata) : skill(sk)
 	type = PLAYER;
 	is_active = true;
 	prev_recv_size = 0;
+	money = 0;
 	cur_room_num = -1;
 	party = nullptr;
 	Astar = new PathFinder(mapdata);
@@ -107,6 +108,11 @@ void Client::do_send(EXP_OVER* ex_over)
 		if (ERROR_IO_PENDING != error_num)
 			error_display("send", error_num);
 	}
+}
+
+int Client::GetMoney()
+{
+	return money;
 }
 
 Party::Party()
