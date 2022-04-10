@@ -57,6 +57,7 @@ public:
 	void start_accept();
 
 	void send_login_ok(int client_id);
+	void send_login_fail(int client_id);
 	void send_move_object(int client_id, int mover_id);
 	void send_attack_player(int attacker, int target_id, int receiver);
 	void send_put_object(int client_id, int target_id);

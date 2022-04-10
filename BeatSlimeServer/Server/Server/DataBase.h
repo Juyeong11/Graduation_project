@@ -6,19 +6,25 @@ void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCod
 struct PlayerTableRow {
 	SQLWCHAR p_name[MAX_NAME_SIZE];
 
-	SQLINTEGER p_level, p_exp;
-	SQLINTEGER p_x, p_y;
+	SQLINTEGER p_x, p_z;
+	SQLINTEGER p_money;
 	SQLCHAR p_isUsing;
 
 
-	SQLLEN cb_id = 0, cb_name = 0, cb_level = 0, cb_exp = 0;
-	SQLLEN cb_x = 0, cb_y = 0, cb_using = 0;
+	SQLLEN cb_id = 0, cb_name = 0, cb_money = 0, cb_exp = 0;
+	SQLLEN cb_x = 0, cb_z = 0, cb_using = 0;
+};
+struct PlayerData {
+	std::wstring name;
+	int x, z;
+	int money;
+
 };
 
 class DataBase
 {
 public:
-	PlayerTableRow PlayerSchema;
+	PlayerTableRow PlayerDataSchema;
 
 	SQLHENV henv;
 	SQLHDBC hdbc;
@@ -28,9 +34,9 @@ public:
 	~DataBase();
 
 	void read_map_data();
-	void checkPlayer(const char* name);
-	void insertPlayer(const wchar_t* name);
-	void update_map_data();
+	bool checkPlayer(PlayerData& name);
+	void insertPlayer(PlayerData& name);
+	void updatePlayer(const Client* const player,bool isend);
 	
 };
 

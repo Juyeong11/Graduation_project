@@ -114,6 +114,15 @@ public class FieldGameManager : MonoBehaviour
                             //PutPlayerObject(p.type, p.id, p.x, p.y);
                         }
                         break;
+                    case Protocol.CONSTANTS.SC_PACKET_LOGIN_FAIL:
+                        {
+                            Protocol.sc_packet_login_fail p = Protocol.sc_packet_login_fail.SetByteToVar(data);
+                            if(p.reason == 0)
+                            {
+                                Debug.Log("해당 아이디는 이미 사용 중 입니다.");
+                            }
+                        }
+                        break;
                     case Protocol.CONSTANTS.SC_PACKET_CHANGE_SCENE:
                         {
                             Protocol.sc_packet_change_scene p = Protocol.sc_packet_change_scene.SetByteToVar(data);

@@ -1,4 +1,5 @@
 #include"stdfx.h"
+#include"Client.h"
 #include "DataBase.h"
 
 
@@ -52,18 +53,78 @@ DataBase::~DataBase() {
 	SQLFreeHandle(SQL_HANDLE_ENV, henv);
 }
 
-void DataBase::checkPlayer(const char* name)
+bool DataBase::checkPlayer(PlayerData& data)
 {
-	
+	SQLHSTMT hstmt = 0;
+	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+
+
+	std::wstring command = std::format(L"EXEC playerLogin '{}'", data.name);
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), SQL_NTS);
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+
+		//	// Bind columns 1, 2, and 3  
+		//	// 미리 읽어둘 변수를 bind해준다.
+		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, &PlayerDataSchema.p_name, MAX_NAME_SIZE, &PlayerDataSchema.cb_name);
+		retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &PlayerDataSchema.p_x, 4, &PlayerDataSchema.cb_x);
+		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &PlayerDataSchema.p_z, 4, &PlayerDataSchema.cb_z);
+		retcode = SQLBindCol(hstmt, 4, SQL_C_LONG, &PlayerDataSchema.p_money, 4, &PlayerDataSchema.cb_money);
+		retcode = SQLBindCol(hstmt, 5, SQL_C_TINYINT, &PlayerDataSchema.p_isUsing, 1, &PlayerDataSchema.cb_using);
+
+		// Fetch and print each row of data. On an error, display a message and exit.  
+		for (int i = 0; ; i++) {
+			retcode = SQLFetch(hstmt);
+			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+			{
+				data.name = PlayerDataSchema.p_name;
+
+				data.x = PlayerDataSchema.p_x;
+				data.z = PlayerDataSchema.p_z;
+				data.money = PlayerDataSchema.p_money;
+
+				int is_using = PlayerDataSchema.p_isUsing;
+				SQLCancel(hstmt);
+				SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+
+				if (is_using)
+					return false;
+				return true;
+
+			}
+			else {
+				break;
+			}
+		}
+		SQLCancel(hstmt);
+		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+
+		//data.name;
+		data.money = 0;
+		data.x = 13;
+		data.z = -25;
+		insertPlayer(data);
+		return true;
+
+	}
+	else {
+
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
+		SQLCancel(hstmt);
+		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+
+		return false;
+	}
+
+
 
 }
 
-void DataBase::insertPlayer(const wchar_t* name)
+void DataBase::insertPlayer(PlayerData& name)
 {
 	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
-	
-	std::wstring command = std::format(L"EXEC insertPlayer '{}'", name);
+
+	std::wstring command = std::format(L"EXEC insertPlayer '{}'", name.name);
 
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
@@ -80,14 +141,28 @@ void DataBase::insertPlayer(const wchar_t* name)
 
 }
 
-void DataBase::update_map_data()
+void DataBase::updatePlayer(const Client* const pl, bool isend)
 {
 	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
-	//std::wstring command = std::format(L"UPDATE Map SET id = {}, x = {}, y = {}, z = {}, w = {}, color = {}, type = {} WHERE id = {}\n SELECT * FROM Map", shell.id, shell.x, shell.y, shell.z, shell.w, shell.color, shell.type, shell.id);
 
 
-	//retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
+	std::wstring name = std::wstring(pl->name, &pl->name[strlen(pl->name)]);
+	if (name == L"happy") {
+		return;
+	}
+	int x = pl->x;
+	int z = pl->z;
+	int hp = pl->hp;
+	int skilltype = pl->skill->SkillType;
+	int skilllevel = pl->skill->SkillLevel;
+	int isEnd = isend;
+	std::wstring command = std::format(L"EXEC updatePlayerData '{}',{},{},{},{},{},{},{}",
+		name, x,z,hp,
+		skilltype,skilllevel,0,isEnd);
+
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 	}
 	else

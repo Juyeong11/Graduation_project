@@ -75,11 +75,7 @@ public class Network
         isOnline = true;
         tempSocket.EndConnect(ar);
         ClientSocket.BeginReceive(receiveBytes, 0, BUFSIZE, SocketFlags.None, new System.AsyncCallback(receiveComplet), ClientSocket);
-
-        SendLogIn();
-
-
-
+        SendLogIn("Happy");
     }
     public void CreateAndConnect()
     {
@@ -111,12 +107,12 @@ public class Network
         }
         return sum/i;
     }
-    public void SendLogIn()
+    public void SendLogIn(string name)
     {
         Protocol.cs_packet_login pk = new Protocol.cs_packet_login();
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_login));
         pk.type = Protocol.CONSTANTS.CS_PACKET_LOGIN;
-
+        pk.name = System.Text.Encoding.UTF8.GetBytes(name);
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
 

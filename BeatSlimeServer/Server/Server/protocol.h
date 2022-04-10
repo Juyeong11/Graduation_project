@@ -40,13 +40,14 @@ const char SC_PACKET_PING_TEST = 14;
 const char SC_PACKET_PARTY_REQUEST = 15;
 const char SC_PACKET_PARTY_REQUEST_ANSWER = 16;
 const char SC_PACKET_CHAT = 17;
+const char SC_PACKET_LOGIN_FAIL = 18;
 
 #pragma pack (push, 1)
 //client -> server
 struct cs_packet_login {
 	unsigned char size;
 	char	type;
-	//char	name[MAX_NAME_SIZE];
+	char	name[MAX_NAME_SIZE];
 };
 
 struct cs_packet_move {
@@ -146,6 +147,12 @@ struct sc_packet_login_ok {
 	int		id;
 	short	x, y, z;
 };
+struct sc_packet_login_fail {
+	unsigned char size;
+	char type;
+	char	 reason;		// 0: 중복 ID,  1:사용자 Full
+};
+
 
 struct sc_packet_move {
 	unsigned char size;

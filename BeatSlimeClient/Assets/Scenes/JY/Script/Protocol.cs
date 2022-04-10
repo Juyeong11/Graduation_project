@@ -55,6 +55,7 @@ namespace Protocol
         public const byte SC_PACKET_PARTY_REQUEST = 15;
         public const byte SC_PACKET_PARTY_REQUEST_ANWSER = 16;
         public const byte SC_PACKET_CHAT = 17;
+        public const byte SC_PACKET_LOGIN_FAIL = 18;
 
 
     }
@@ -130,8 +131,8 @@ namespace Protocol
         public byte size;
         public byte type;
 
-        /*        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
-                public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];*/
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
+        public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];
     }
 
     [Serializable]
@@ -278,6 +279,15 @@ namespace Protocol
         public byte type;
         public int id;
         public short x, y, z;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_login_fail : ISerializeble<sc_packet_login_fail>
+    {
+        public byte size;
+        public byte type;
+        public byte reason;
     }
 
     [Serializable]

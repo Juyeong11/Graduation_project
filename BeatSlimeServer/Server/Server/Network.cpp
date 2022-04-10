@@ -165,6 +165,18 @@ void Network::send_login_ok(int c_id)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
+void Network::send_login_fail(int client_id)
+{
+	sc_packet_login_fail packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_LOGIN_FAIL;
+	packet.reason = 1;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[client_id])->do_send(ex_over);
+}
 void Network::send_change_scene(int c_id, int map_type)
 {
 	sc_packet_change_scene packet;
@@ -465,7 +477,7 @@ void Network::disconnect_client(int c_id)
 		}
 		else target.vl.unlock();
 	}
-
+	DB->updatePlayer(&client, false);
 	//여기서 end 패킷 보내고 종료 처리를 하자
 
 	if (client.cur_room_num != -1) {
@@ -698,6 +710,22 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
 		//strcpy_s(cl.name, packet->name);
+
+		PlayerData player_data;
+		player_data.name = std::wstring(packet->name, &packet->name[strnlen_s(packet->name, MAX_NAME_SIZE)]);
+		if (player_data.name != L"Happy") {
+			if (DB->checkPlayer(player_data)) {
+				strcpy_s(cl.name, packet->name);
+				//cl.set_staus(MAX_HP * player_data.level, player_data.level, player_data.exp);
+				cl.x = player_data.x;
+				cl.z = player_data.z;
+				cl.y = -cl.x - cl.z;
+			}
+			else {
+				send_login_fail(client_id);
+				break;
+			}
+		}
 		send_login_ok(client_id);
 
 		cl.state_lock.lock();

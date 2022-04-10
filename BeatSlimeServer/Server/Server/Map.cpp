@@ -201,6 +201,7 @@ int MapInfo::GetTileType(int x, int z)
 	if (_x > LengthX || _x < 0) return -1;
 	if (_z > LengthZ || _z < 0) return -1;
 
+	//10 -> ªÛ¡°
 	return map[_z * LengthX + _x];
 }
 
