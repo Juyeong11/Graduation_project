@@ -40,8 +40,8 @@ public:
 	int		last_packet_time;
 	std::chrono::system_clock::time_point last_move_time;
 	GameObject();
-
-	//void SetDestination(short x, short z);
+	virtual ~GameObject() {};
+	virtual int GetMoney() { return 0; };
 };
 class Npc: public GameObject {
 public:
@@ -122,7 +122,8 @@ public:
 	int cur_room_num;
 	int		prev_recv_size;
 
-	//자기 자신 빼고 2명
+	int		money;
+	
 	Party* party;
 
 	PathFinder* Astar = nullptr;
@@ -135,5 +136,6 @@ public:
 
 	void do_recv();
 	void do_send(EXP_OVER* ex_over);
+	virtual int GetMoney();
 };
 
