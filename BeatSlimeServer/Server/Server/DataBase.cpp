@@ -148,7 +148,7 @@ void DataBase::updatePlayer(const Client* const pl, bool isend)
 
 
 	std::wstring name = std::wstring(pl->name, &pl->name[strlen(pl->name)]);
-	if (name == L"happy") {
+	if (name == L"Happy") {
 		return;
 	}
 	int x = pl->x;
