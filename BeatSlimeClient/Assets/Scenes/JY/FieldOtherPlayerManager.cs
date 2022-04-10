@@ -21,7 +21,7 @@ public class FieldOtherPlayerManager : MonoBehaviour
     public Transform PlayerTransform;
 
     public int pID;
-
+    public string other_playerName;
     public int other_skillnum;
     public int other_skillLevel;
 

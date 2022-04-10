@@ -68,7 +68,11 @@ public class MapLoader : MonoBehaviour
                 tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
                 tmpcell.name = "cell" + MapMaker.cellId++;
                 tmpcell.transform.parent = GRID.transform;
-                fGrid.cellMaps.Add(tmpcell, x, y, z, w);
+
+                if (t == 10)
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Shop);
+                else
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w);
             }
 
             if(LoadByGameManagersSongName)

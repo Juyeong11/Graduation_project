@@ -96,6 +96,22 @@ public class MapMaker : MonoBehaviour
             {
                 recipt.SetActive(false);
             }
+            if (Input.GetKeyDown(KeyCode.F4))
+            {
+                grid.cellMaps.map_Get(playerPosition.coordinates.X, playerPosition.coordinates.Z);
+                {
+                    foreach(var v in Mapdata)
+                    {
+                        if (v.x == playerPosition.coordinates.X &&  v.z == playerPosition.coordinates.Z)
+                        {
+                            v.type = 10;
+                            Debug.Log("SHOP");
+                            break;
+                        }
+                    }
+                }
+                
+            }
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 landOffsetX -= 0.05f;

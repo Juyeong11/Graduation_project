@@ -7,6 +7,7 @@ public enum cellState
     Normal,
     Damaged,
     None,
+    Shop,
 }
 
 public class Cell
@@ -23,7 +24,6 @@ public class Cell
         get;
         set;
     }
-    public string sprite;
 
     public Cell()
     {
@@ -33,10 +33,9 @@ public class Cell
         z = 1000;
         w = 1000;
         state = cellState.None;
-        sprite = "none";
     }
 
-    public Cell(GameObject cell, int x, int y,int z, int w, cellState state, string sp)
+    public Cell(GameObject cell, int x, int y,int z, int w, cellState state)
     {
         obejct = cell;
         this.x = x;
@@ -44,7 +43,6 @@ public class Cell
         this.z = z;
         this.w = w;
         this.state = state;
-        sprite = sp;
     }
 
     public (int,int,int, int) getCoordinate()
@@ -94,11 +92,11 @@ public class CellMap
 
     public void Add(GameObject cell,int x, int y,int z,int w=0)
     {
-        cellMaps.Add(new Cell(cell, x, y, z,w, cellState.Normal, "default"));
+        cellMaps.Add(new Cell(cell, x, y, z,w, cellState.Normal));
     }
-    public void Add(GameObject cell, int x, int y, int z, int w, cellState state, string name)
+    public void Add(GameObject cell, int x, int y, int z, int w, cellState state)
     {
-        cellMaps.Add(new Cell(cell, x, y, z,w, state, name));
+        cellMaps.Add(new Cell(cell, x, y, z,w, state));
     }
 
     public bool Remove(int x, int z)

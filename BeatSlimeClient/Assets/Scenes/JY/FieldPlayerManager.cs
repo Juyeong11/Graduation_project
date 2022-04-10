@@ -421,6 +421,14 @@ public class FieldPlayerManager : MonoBehaviour
             Debug.Log("skill change 3");
 
         }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            var t = FieldGameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
+            if (t.obejct && t.state == cellState.Shop)
+            {
+                FieldGameManager.data.ShopOpen();
+            }
+        }
 
     }
 

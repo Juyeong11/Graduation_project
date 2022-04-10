@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class BillboardUI : MonoBehaviour
 {
     private Transform Target;
+    public TMP_Text NAME;
     public Sprite join;
     public Sprite exit;
     public Image pops;
@@ -31,10 +33,12 @@ public class BillboardUI : MonoBehaviour
         p = pid;
         if (pid == -1)
         {
+            NAME.text = PlayerPrefs.GetString("myName");
             pops.sprite = exit;
         }
         else
         {
+            NAME.text = t.parent.GetComponent<FieldOtherPlayerManager>().other_playerName;
             pops.sprite = join;
         }
         StartCoroutine(BlinkOn());

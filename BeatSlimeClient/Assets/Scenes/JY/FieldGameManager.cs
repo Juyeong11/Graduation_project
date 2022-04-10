@@ -176,6 +176,7 @@ public class FieldGameManager : MonoBehaviour
                                         else
                                         {
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().selfCoord.direction = (HexDirection)p.direction;
+                                            Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_playerName = System.Text.Encoding.UTF8.GetString(p.name);
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillnum = p.skillType;
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillLevel = p.skillLevel;
                                             //Debug.Log(p.id + " 플레이어 넣음");
@@ -332,5 +333,10 @@ public class FieldGameManager : MonoBehaviour
         player.GetComponentInParent<FieldPlayerManager>().EnterPortal();
         yield return new WaitForSeconds(0.5f);
         SceneManager.LoadScene(scene_num);
+    }
+
+    public void ShopOpen()
+    {
+        Debug.Log("SHOP!");
     }
 }
