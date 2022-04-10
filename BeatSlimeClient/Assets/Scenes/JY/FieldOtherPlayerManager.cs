@@ -23,21 +23,22 @@ public class FieldOtherPlayerManager : MonoBehaviour
     public int pID;
 
     public int other_skillnum;
+    public int other_skillLevel;
 
     public void Start()
     {
         //pID = 0;
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
-        selfCoord.direction = HexDirection.Up;
-        other_skillnum = 1;
+        //selfCoord.direction = HexDirection.Up;
+        //other_skillnum = 1;
         //onPlayerFly.Invoke();
     }
     public void LoginOk()
     {
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
-        selfCoord.direction = HexDirection.Up;
+        //selfCoord.direction = HexDirection.Up;
         //onPlayerFly.Invoke();
     }
 

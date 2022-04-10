@@ -144,7 +144,6 @@ public class FieldGameManager : MonoBehaviour
                                 {
                                     Objects[p.id].GetComponent<FieldOtherPlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[p.id].GetComponent<FieldOtherPlayerManager>().JumpTrig();
-
                                 }
                             }
                             Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
@@ -164,12 +163,24 @@ public class FieldGameManager : MonoBehaviour
                                         Objects[p.id].SetActive(true);
                                         Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", 120 / 45.0f);
 
-                                        Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
-                                        Objects[p.id].GetComponentInChildren<FieldHexCellPosition>().direction = (HexDirection)p.direction;
+                                        Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
+
+                                        //print("myPlayerID : " + myPlayerID + " p.id :" + p.id + " p.skillType : " + p.skillType + " direction : " + p.direction);
                                         
-                                        Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillnum = p.skillType;
-                                        //Debug.Log(p.id + " 플레이어 넣음");
-                                        Objects[p.id].GetComponent<FieldOtherPlayerManager>().pID = p.id;
+                                        if (p.id == myPlayerID)
+                                        {
+                                            Objects[p.id].GetComponentInParent<FieldPlayerManager>().selfDirection = (HexDirection)p.direction;
+                                            Objects[p.id].GetComponentInParent<FieldPlayerManager>().self_skillnum = p.skillType;
+                                            Objects[p.id].GetComponentInParent<FieldPlayerManager>().self_skillLevel = p.skillLevel;
+                                        }
+                                        else
+                                        {
+                                            Objects[p.id].GetComponent<FieldOtherPlayerManager>().selfCoord.direction = (HexDirection)p.direction;
+                                            Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillnum = p.skillType;
+                                            Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillLevel = p.skillLevel;
+                                            //Debug.Log(p.id + " 플레이어 넣음");
+                                            Objects[p.id].GetComponent<FieldOtherPlayerManager>().pID = p.id;
+                                        }
 
                                         //Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillnum = p.skill_type;
                                         //grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponent<HexCellPosition>().enableToMove_ForField = false;
@@ -206,7 +217,7 @@ public class FieldGameManager : MonoBehaviour
                             {
                                 Objects[p.id].GetComponentInParent<FieldPlayerManager>().ChangeSkill(p.skill_type);
                                 PlayerPrefs.SetInt("mySkill", player.GetComponentInParent<FieldPlayerManager>().self_skillnum);
-                                PlayerPrefs.SetInt("mySkillLevel", player.GetComponentInParent<FieldPlayerManager>().self_skilllevel);
+                                PlayerPrefs.SetInt("mySkillLevel", player.GetComponentInParent<FieldPlayerManager>().self_skillLevel);
                             }
                             else
                             {
@@ -251,8 +262,6 @@ public class FieldGameManager : MonoBehaviour
                              * 5 내가 이미 파티가 있는대 파티 신청을 보낸경우
                              *  - CS_PACKET_PARTY_REQUEST_ANWSER패킷을 서버에 보낼 때  requester id가 -1이면 파티에 탈퇴하려고 하는 걸로 알고 서버에서 처리함
                              */
-
-                             
                             switch (p.anwser)
                             {
                                 case 0:
@@ -265,7 +274,7 @@ public class FieldGameManager : MonoBehaviour
                                 {
                                     if (i == myPlayerID || i == -1)
                                         continue; 
-                                    print(i);
+                                    print(i + " of skill : " + Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
                                     PartyManager.instance.SetParty(i, Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
                                 }
                                 break;

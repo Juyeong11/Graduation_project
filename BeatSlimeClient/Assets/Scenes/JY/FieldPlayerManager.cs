@@ -24,7 +24,7 @@ public class FieldPlayerManager : MonoBehaviour
     public ChattingManager CM;
 
     public int self_skillnum = 1;
-    public int self_skilllevel = 1;
+    public int self_skillLevel = 1;
     
 
     //[System.NonSerialized]
@@ -37,7 +37,7 @@ public class FieldPlayerManager : MonoBehaviour
     {
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
-        selfDirection = HexDirection.Up;
+        //selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
 
     }
@@ -45,7 +45,7 @@ public class FieldPlayerManager : MonoBehaviour
     {
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
-        selfDirection = HexDirection.Up;
+        //selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
     }
 

@@ -19,19 +19,24 @@ public class PartyManager : MonoBehaviour
 
     public void SetParty(int pid, int cid)
     {
-        party.Add(pid, partyObjects[party.Count]);
-        
-        party[pid].GetComponent<Image>().sprite = CIO.ClassSprites[cid];
-        party[pid].GetComponentInChildren<TMPro.TMP_Text>().text = pid.ToString();
-        party[pid].SetActive(true);
+        if (!party.ContainsKey(pid))
+        {
+            party.Add(pid, partyObjects[party.Count]);
+
+            party[pid].GetComponent<Image>().sprite = CIO.ClassSprites[cid];
+            party[pid].GetComponentInChildren<TMPro.TMP_Text>().text = pid.ToString();
+            party[pid].SetActive(true);
+        }
 
     }
     public void DelParty(int pid)
     {
         if (party.ContainsKey(pid))
         {
-            partyObjects[pid].SetActive(false);
+            party[pid].SetActive(false);
+            //Debug.LogError("!A " + party.Count);
             party.Remove(pid);
+            //Debug.LogError("B! " + party.Count);
         }
     }
     public void DelParty()
@@ -47,7 +52,7 @@ public class PartyManager : MonoBehaviour
     {
         if (party.ContainsKey(pid))
         {
-            party[pid].GetComponent<Image>().sprite = CIO.ClassSprites[cid-1];
+            party[pid].GetComponent<Image>().sprite = CIO.ClassSprites[cid];
         }
     }
 }

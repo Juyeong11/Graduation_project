@@ -313,7 +313,7 @@ public class GameManager : MonoBehaviour
         else if (pivotType == "END")
             Debug.Log("Pattern End");
         else
-            Debug.Log("Load : wrong pivotType\n");
+            Debug.Log("Load : wrong pivotType " + pivotType);
 
         return target_pos;
     }
