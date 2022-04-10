@@ -13,11 +13,11 @@ public class FieldInputManager : MonoBehaviour
     private int HittedObject;
 
     private Vector3 pop = new Vector3(50, 50);
-    private Vector3 bas = new Vector3(-1000,0);
+    private Vector3 bas = new Vector3(-150,0);
 
     //-----------------------------------
 
-    public RectTransform PM;
+    public Animator PM;
     public CinemachineVirtualCamera CCO;
     CinemachineTransposer CT;
     Vector3 target;
@@ -96,11 +96,11 @@ public class FieldInputManager : MonoBehaviour
 
         if (Input.GetKey(KeyCode.Tab))
         {
-            PM.anchoredPosition = pop;
+            PM.SetBool("pop",true);
         }
         else
         {
-            PM.anchoredPosition = bas;
+            PM.SetBool("pop", false);
         }
     }
 }
