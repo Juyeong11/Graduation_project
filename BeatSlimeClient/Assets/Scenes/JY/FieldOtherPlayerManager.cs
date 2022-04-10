@@ -6,8 +6,6 @@ using System.Collections.Generic;
 public class FieldOtherPlayerManager : MonoBehaviour
 {
     public Animator JumpTrigger;
-    public UnityEvent onPlayerStand;
-    public UnityEvent onPlayerFly;
 
     bool isReady = false;
 

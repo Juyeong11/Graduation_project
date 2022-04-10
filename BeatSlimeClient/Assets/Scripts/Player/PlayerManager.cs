@@ -14,8 +14,6 @@ public class PlayerManager : MonoBehaviour
     public bool isDebug;
 
     public Animator JumpTrigger;
-    public UnityEvent onPlayerStand;
-    public UnityEvent onPlayerFly;
 
     public playerState state;
     public PlayerKeyHandler handle;     //Invalid
