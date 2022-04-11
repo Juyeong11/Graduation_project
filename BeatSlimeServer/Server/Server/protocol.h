@@ -155,10 +155,12 @@ struct sc_packet_login_ok {
 	char type;
 	int		id;
 	short	x, y, z;
-	int money;
+	int		money;
 	char cur_skill_type;
 	char cur_skill_level;
 	char skill_progress[3];
+	char name[MAX_NAME_SIZE];
+
 };
 struct sc_packet_login_fail {
 	unsigned char size;

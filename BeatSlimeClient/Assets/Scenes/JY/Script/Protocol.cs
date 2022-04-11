@@ -294,6 +294,9 @@ namespace Protocol
         public byte cur_skill_level;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
         public byte[] skill_progress = new byte[3];
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
+        public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];
     }
 
     [Serializable]

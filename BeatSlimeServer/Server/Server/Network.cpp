@@ -163,6 +163,7 @@ void Network::send_login_ok(int c_id)
 	packet.x = clients[c_id]->x;
 	packet.y = clients[c_id]->y;
 	packet.z = clients[c_id]->z;
+	strcpy_s(packet.name, clients[c_id]->name);
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -301,7 +302,6 @@ void Network::send_change_skill(int c_id, int target) {
 void Network::send_put_object(int c_id, int target) {
 	sc_packet_put_object packet;
 
-	//strcpy_s(packet.name, clients[target]->name);
 	packet.id = target;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_PUT_OBJECT;
@@ -745,6 +745,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				break;
 			}
 		}
+		strcpy_s(cl.name, packet->name);
 		send_login_ok(client_id);
 
 		cl.state_lock.lock();
