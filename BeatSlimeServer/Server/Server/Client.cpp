@@ -115,6 +115,11 @@ int Client::GetMoney()
 	return money;
 }
 
+void Client::SetMoney(int m)
+{
+	money += m;
+}
+
 Party::Party()
 {
 	for (auto& i : partyPlayer)

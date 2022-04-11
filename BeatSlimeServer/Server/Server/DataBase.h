@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Network.h"
+
 void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCode);
 
 struct PlayerTableRow {
@@ -20,16 +20,26 @@ struct PlayerData {
 	int money;
 
 };
+struct ItemTableRow {
+	SQLWCHAR p_name[MAX_NAME_SIZE];
 
+	SQLINTEGER p_price;
+
+	SQLLEN cb_price = 0, cb_name = 0;
+};
+struct Item;
+class Client;
 class DataBase
 {
 public:
 	PlayerTableRow PlayerDataSchema;
+	ItemTableRow ItemDataSchema;
 
 	SQLHENV henv;
 	SQLHDBC hdbc;
 	SQLHSTMT hstmt = 0;
 
+	bool isConnect;
 	DataBase();
 	~DataBase();
 
@@ -37,6 +47,7 @@ public:
 	bool checkPlayer(PlayerData& name);
 	void insertPlayer(PlayerData& name);
 	void updatePlayer(const Client* const player,bool isend);
-	
+	void readItems(std::array<Item*,9>& items);
+
 };
 

@@ -16,8 +16,8 @@ public:
 	EXP_OVER();
 
 	~EXP_OVER() = default;
-	
-	void set_exp(COMP_OP comp_op,unsigned char num_bytes, void* mess);
+
+	void set_exp(COMP_OP comp_op, unsigned char num_bytes, void* mess);
 };
 
 
@@ -26,7 +26,7 @@ class GameObject {
 public:
 	char name[MAX_NAME_SIZE];
 	int		id;
-	short	x, y,z;
+	short	x, y, z;
 	short	pre_x, pre_y, pre_z;
 	short	dest_x, dest_y, dest_z;
 	int direction;
@@ -42,8 +42,9 @@ public:
 	GameObject();
 	virtual ~GameObject() {};
 	virtual int GetMoney() { return 0; };
+	virtual void SetMoney(int m) {  };
 };
-class Npc: public GameObject {
+class Npc : public GameObject {
 public:
 	std::atomic_bool is_active;
 
@@ -79,7 +80,19 @@ public:
 	Boss2();
 };
 
+class Inventory {
+public:
+	//Item* items[MAX_IN_GAME_PLAYER];
+	//int curPlayerNum;
+	//Inventory();
 
+};
+
+
+struct Item {
+	int itemType;
+	int itemPrice;
+};
 class Skill
 {
 public:
@@ -91,7 +104,7 @@ public:
 	int SkillType;
 	Skill(int sl, int st);
 	Skill();
-	
+
 };
 class Party {
 public:
@@ -123,7 +136,7 @@ public:
 	int		prev_recv_size;
 
 	int		money;
-	
+
 	Party* party;
 
 	PathFinder* Astar = nullptr;
@@ -137,5 +150,6 @@ public:
 	void do_recv();
 	void do_send(EXP_OVER* ex_over);
 	virtual int GetMoney();
+	virtual void SetMoney(int money);
 };
 

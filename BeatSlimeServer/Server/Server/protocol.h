@@ -15,12 +15,13 @@ const char CS_PACKET_CHANGE_SCENE_DONE = 8;
 const char CS_PACKET_USE_SKILL = 9;
 const char CS_PACKET_CHANGE_SKILL = 10;
 const char CS_PACKET_PING_TEST = 11;
-const char CS_PACKET_GET_SINGLE_PLAYER_LIST = 12;
+//const char CS_PACKET_GET_SINGLE_PLAYER_LIST = 12;
 const char CS_PACKET_PARTY_REQUEST = 13;
 const char CS_PACKET_PARTY_REQUEST_ANSWER = 14;
 const char CS_PACKET_CHAT = 15;
 const char CS_PACKET_SET_PATH = 16;
 const char CS_PACKET_TELEPORT = 17;
+const char CS_PACKET_BUY = 18;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -41,6 +42,7 @@ const char SC_PACKET_PARTY_REQUEST = 15;
 const char SC_PACKET_PARTY_REQUEST_ANSWER = 16;
 const char SC_PACKET_CHAT = 17;
 const char SC_PACKET_LOGIN_FAIL = 18;
+const char SC_PACKET_BUY_RESULT = 19;
 
 #pragma pack (push, 1)
 //client -> server
@@ -140,6 +142,13 @@ struct cs_packet_teleport {
 	char type;
 	char pos;
 };
+
+struct cs_packet_buy {
+	unsigned char size;
+	char type;
+	char itemType;
+};
+
 //server->client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -280,5 +289,12 @@ struct sc_packet_chat {
 	char	type;
 	char	mess[CHAT_BUF_SIZE];
 	int id;
+};
+
+struct sc_packet_buy_result {
+	unsigned char size;
+	char	type;
+	char	itemType;
+	char	result;
 };
 #pragma pack(pop)

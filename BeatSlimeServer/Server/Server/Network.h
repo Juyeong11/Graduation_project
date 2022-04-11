@@ -32,6 +32,7 @@ struct timer_event {
 };
 
 
+
 class DataBase;
 class GameRoom;
 class MapInfo;
@@ -41,6 +42,7 @@ class Client;
 class EXP_OVER;
 class Skill;
 class Party;
+struct Item;
 class Network
 {
 private:
@@ -73,6 +75,7 @@ public:
 	void send_party_request(int reciver,int sender);
 	void send_party_request_anwser(int reciver,int newPlayerid,Party* party,int type);
 	void send_chat_packet(int user_id, int my_id, char* mess);
+	void send_buy_result(int user_id, int itemType, char result);
 
 	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z);
 	void disconnect_client(int client_id);
@@ -87,6 +90,10 @@ public:
 	bool is_player(int id)
 	{
 		return (id >= 0) && (id < MAX_USER);
+	}
+	bool is_item(int id)
+	{
+		return (id >= 0) && (id < 9);
 	}
 	int get_new_id();
 	int get_npc_id(int monsterType);
@@ -121,5 +128,6 @@ private:
 
 	std::array<Skill*, SKILL_CNT> skills;
 	std::array<Party*, MAX_USER/2> PartyPool;
+	std::array<Item*, 9> items;
 };
 

@@ -37,6 +37,7 @@ namespace Protocol
         public const byte CS_PACKET_CHAT = 15;
         public const byte CS_PACKET_SET_PATH = 16;
         public const byte CS_PACKET_TELEPORT = 17;
+        public const byte CS_PACKET_BUY = 18;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -56,6 +57,7 @@ namespace Protocol
         public const byte SC_PACKET_PARTY_REQUEST_ANWSER = 16;
         public const byte SC_PACKET_CHAT = 17;
         public const byte SC_PACKET_LOGIN_FAIL = 18;
+        public const byte SC_PACKET_BUY_RESULT = 19;
 
 
     }
@@ -269,6 +271,14 @@ namespace Protocol
         public byte type;
         public byte pos;
     }
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_buy : ISerializeble<cs_packet_buy>
+    {
+        public byte size;
+        public byte type;
+        public byte itemType;
+    }
     //Server -> Client
 
     [Serializable]
@@ -462,5 +472,14 @@ namespace Protocol
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.CHAT_BUF_SIZE)]
         public byte[] mess = new byte[CONSTANTS.CHAT_BUF_SIZE];
         public int p_id;
+    }
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_buy_result : ISerializeble<sc_packet_buy_result>
+    {
+        public byte size;
+        public byte type;
+        public byte itemType;
+        public byte result;
     }
 }

@@ -61,7 +61,7 @@ public class FieldGameManager : MonoBehaviour
         PlayerPrefs.DeleteKey("myName");
         PlayerPrefs.DeleteKey("mySkill");
         PlayerPrefs.DeleteKey("mySkillLevel");
-        PlayerPrefs.SetInt("mySkill",1);
+        PlayerPrefs.SetInt("mySkill", 1);
         PlayerPrefs.SetString("myName", "soHappy");
 
     }
@@ -89,7 +89,25 @@ public class FieldGameManager : MonoBehaviour
         {
             Net.SendTeleportPacket(0); // 1번 포탈로 이동
         }
+        if (Input.GetKeyDown(KeyCode.F12))
+        {
+            Net.SendTeleportPacket(1); // 100골드 획득
+        }
+        if (Input.GetKeyDown(KeyCode.F11))
+        {
+            //아이템 목록    가격
+            //0 : ADLev1    	50
+            //1 : ADLev2    	150
+            //2 : ADLev3    	500
+            //3 : TankLev1  	50
+            //4 : TankLev2  	150
+            //5 : TankLev3  	500
+            //6 : SupLev1   	50
+            //7 : SupLev2   	200
+            //8 : SupLev3   	800
 
+            Net.SendBuyPacket(0); // 0번 아이템 구매
+        }
         if (Net.isOnline)
         {
             isGameStart = true;
@@ -117,7 +135,7 @@ public class FieldGameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_LOGIN_FAIL:
                         {
                             Protocol.sc_packet_login_fail p = Protocol.sc_packet_login_fail.SetByteToVar(data);
-                            if(p.reason == 0)
+                            if (p.reason == 0)
                             {
                                 Debug.Log("해당 아이디는 이미 사용 중 입니다.");
                             }
@@ -129,13 +147,13 @@ public class FieldGameManager : MonoBehaviour
 
                             scene_num = p.scene_num;
                             StartCoroutine(ChangeScene());
-                            
+
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
-                            
+
 
                             //Debug.Log(p.id+"이동");
                             //Debug.Log((byte)p.dir);
@@ -175,7 +193,7 @@ public class FieldGameManager : MonoBehaviour
                                         Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
 
                                         //print("myPlayerID : " + myPlayerID + " p.id :" + p.id + " p.skillType : " + p.skillType + " direction : " + p.direction);
-                                        
+
                                         if (p.id == myPlayerID)
                                         {
                                             Objects[p.id].GetComponentInParent<FieldPlayerManager>().selfDirection = (HexDirection)p.direction;
@@ -223,7 +241,7 @@ public class FieldGameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_change_skill p = Protocol.sc_packet_change_skill.SetByteToVar(data);
 
-                            if(p.id == myPlayerID)
+                            if (p.id == myPlayerID)
                             {
                                 Objects[p.id].GetComponentInParent<FieldPlayerManager>().ChangeSkill(p.skill_type);
                                 PlayerPrefs.SetInt("mySkill", player.GetComponentInParent<FieldPlayerManager>().self_skillnum);
@@ -235,7 +253,7 @@ public class FieldGameManager : MonoBehaviour
                                 PartyManager.instance.PartyChangeClass(p.id, p.skill_type);
                             }
                             Debug.Log(p.id + "가 " + p.skill_type + "으로 스킬을 바꿈");
-                            
+
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PARTY_REQUEST:
@@ -244,12 +262,12 @@ public class FieldGameManager : MonoBehaviour
                             //이미 파티가 있다면 이 패킷이 오지 않음
                             Protocol.sc_packet_party_request p = Protocol.sc_packet_party_request.SetByteToVar(data);
 
-                            
+
                             ResponseMenu.transform.position = player.transform.position;
                             ResponseMenu.GetComponent<ResponseBillboardUI>().GetOn(player.transform, p.requester_id);
 
                             //수락
-                            
+
                             //Net.SendPartyRequestAnwserPacket(1, p.requester_id);
                             //거절
                             //Net.SendPartyRequestAnwserPacket(0, p.requester_id);
@@ -275,32 +293,32 @@ public class FieldGameManager : MonoBehaviour
                             switch (p.anwser)
                             {
                                 case 0:
-                                chattingManager.SetMess("<color=red>상대가 파티 신청을 거절했습니다!</color>");
-                                break;
+                                    chattingManager.SetMess("<color=red>상대가 파티 신청을 거절했습니다!</color>");
+                                    break;
 
                                 case 1:
-                                chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
-                                foreach (var i in p.ids)
-                                {
-                                    if (i == myPlayerID || i == -1)
-                                        continue; 
-                                    print(i + " of skill : " + Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
-                                    PartyManager.instance.SetParty(i, Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
-                                }
-                                break;
+                                    chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
+                                    foreach (var i in p.ids)
+                                    {
+                                        if (i == myPlayerID || i == -1)
+                                            continue;
+                                        print(i + " of skill : " + Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
+                                        PartyManager.instance.SetParty(i, Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
+                                    }
+                                    break;
 
                                 case 2:
-                                chattingManager.SetMess("<color=red>상대의 파티에 남은 자리가 없습니다!</color>");
-                                break;
+                                    chattingManager.SetMess("<color=red>상대의 파티에 남은 자리가 없습니다!</color>");
+                                    break;
 
                                 case 3:
-                                chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
-                                PartyManager.instance.DelParty(p.p_id);
-                                if (p.p_id == myPlayerID)
-                                {
-                                    PartyManager.instance.DelParty();
-                                }
-                                break;
+                                    chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
+                                    PartyManager.instance.DelParty(p.p_id);
+                                    if (p.p_id == myPlayerID)
+                                    {
+                                        PartyManager.instance.DelParty();
+                                    }
+                                    break;
 
                                 case 4:
                                     chattingManager.SetMess("<color=red>상대는 이미 파티가 있습니다!</color>");
@@ -318,7 +336,14 @@ public class FieldGameManager : MonoBehaviour
 
                             string mess = System.Text.Encoding.UTF8.GetString(p.mess).Split('\0')[0];
                             //Debug.Log(System.Text.Encoding.UTF8.GetString(p.mess));
-                            chattingManager.SetMess(p.p_id+ ": " + mess);
+                            chattingManager.SetMess(p.p_id + ": " + mess);
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_BUY_RESULT:
+                        {
+                            Protocol.sc_packet_buy_result p = Protocol.sc_packet_buy_result.SetByteToVar(data);
+                            // p->itemType  구매 시도한 아이템
+                            // p->result    0 구매 실패 1 구매 성공
                         }
                         break;
                     default:
@@ -334,7 +359,7 @@ public class FieldGameManager : MonoBehaviour
         player.GetComponentInParent<FieldPlayerManager>().PortalPlane.transform.SetParent(null);
         //player.GetComponent<FieldPlayerManager>().PortalPlane.transform.localRotation = Quaternion.Euler(90,0,0);
         player.GetComponentInParent<FieldPlayerManager>().PortalPlane.SetActive(true);
-        
+
 
 
 

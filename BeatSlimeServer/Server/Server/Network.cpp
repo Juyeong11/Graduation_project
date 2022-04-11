@@ -31,7 +31,11 @@ Network::Network() {
 	for (int i = 0; i < MAP_NUM; ++i) {
 		maps[i] = new MapInfo;
 	}
-
+	DB = new DataBase;
+	for (int i = 0; i < 9; ++i) {
+		items[i] = new Item;
+	}
+	DB->readItems(items);
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
 	//수정
@@ -58,7 +62,7 @@ Network::Network() {
 		exp_over_pool.push(new EXP_OVER);
 	}
 	Initialize_NPC();
-	DB = new DataBase;
+
 
 	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
 		game_room[i] = new GameRoom(i);
@@ -447,6 +451,20 @@ void Network::send_chat_packet(int user_id, int my_id, char* mess)
 	reinterpret_cast<Client*>(ex_over, clients[user_id])->do_send(ex_over);
 }
 
+void Network::send_buy_result(int user_id, int itemType, char result)
+{
+	sc_packet_buy_result packet;
+	packet.result = result;
+	packet.itemType = itemType;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_BUY_RESULT;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[user_id])->do_send(ex_over);
+}
+
 void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
@@ -455,6 +473,7 @@ void Network::disconnect_client(int c_id)
 	client.dest_x = -1;
 	client.dest_y = -1;
 	client.dest_z = -1;
+	client.money  =0;
 	int room_num = reinterpret_cast<Client*>(clients[c_id])->cur_room_num;
 	if (room_num == -1) {
 		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->z);
@@ -1520,7 +1539,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		}
 		else if (packet->pos == 1) {
-
+			//  임시로 재화를 획득하는 패킷으로 변경한다.
+			cl.SetMoney(100);
+			std::cout << "id :" << client_id << " get 100 money \ntotal : " << cl.GetMoney();
 		}
 		else {
 			cl.pre_x = cl.x;
@@ -1545,6 +1566,17 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 		send_move_object(client_id, client_id);
 
+	}
+	break;
+	case CS_PACKET_BUY:
+	{
+		cs_packet_buy* packet = reinterpret_cast<cs_packet_buy*>(p);
+		if (false == is_item(packet->itemType))break;
+		if (cl.money < items[packet->itemType]->itemPrice) { 
+			send_buy_result(client_id, packet->itemType, 0); break; }
+
+		cl.money -= items[packet->itemType]->itemPrice;
+		send_buy_result(client_id, packet->itemType, 1);
 	}
 	break;
 	default:
