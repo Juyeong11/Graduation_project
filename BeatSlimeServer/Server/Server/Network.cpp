@@ -163,6 +163,12 @@ void Network::send_login_ok(int c_id)
 	packet.x = clients[c_id]->x;
 	packet.y = clients[c_id]->y;
 	packet.z = clients[c_id]->z;
+	packet.cur_skill_type = 0;
+	packet.cur_skill_level = 0;
+	packet.skill_progress[0] = 0;
+	packet.skill_progress[1] = 0;
+	packet.skill_progress[2] = 0;
+	packet.money = 0;
 	strcpy_s(packet.name, clients[c_id]->name);
 
 	EXP_OVER* ex_over;
