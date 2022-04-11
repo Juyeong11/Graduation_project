@@ -289,6 +289,9 @@ namespace Protocol
         public byte type;
         public int id;
         public short x, y, z;
+        public int money;
+        public byte skill_type;
+        public byte skill_level;
     }
 
     [Serializable]
