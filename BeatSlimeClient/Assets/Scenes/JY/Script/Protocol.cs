@@ -290,8 +290,10 @@ namespace Protocol
         public int id;
         public short x, y, z;
         public int money;
-        public byte skill_type;
-        public byte skill_level;
+        public byte cur_skill_type;
+        public byte cur_skill_level;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+        public byte[] skill_progress = new byte[3];
     }
 
     [Serializable]
