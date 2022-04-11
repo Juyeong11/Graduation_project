@@ -21,8 +21,12 @@ public class FieldPlayerManager : MonoBehaviour
 
     public ChattingManager CM;
 
-    public int self_skillnum = 1;
-    public int self_skillLevel = 1;
+    public int self_skillnum = 1;   //1~3
+    public int self_skillLevel = 1; //0~3
+    public int[] skillLevelsContainer = new int[3]; // only for shop
+
+    public ShopManager SM;
+    bool shopOpened = false;
     
 
     //[System.NonSerialized]
@@ -407,7 +411,18 @@ public class FieldPlayerManager : MonoBehaviour
             var t = FieldGameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
             if (t.obejct && t.state == cellState.Shop)
             {
-                FieldGameManager.data.ShopOpen();
+                if (shopOpened)
+                {
+                    SM.ShopClose();
+                    shopOpened = false;
+                }
+                else
+                {
+                    SM.ShopOpen(this);
+                    shopOpened = true;
+                }
+                
+                
             }
         }
 
@@ -420,9 +435,28 @@ public class FieldPlayerManager : MonoBehaviour
         JumpTrig();
     }
 
-    public void ChangeSkill(int skillNum)
+    public void ChangeSkill(int skillNum, int skillLevel)
     {
         self_skillnum = skillNum;
+        self_skillLevel = skillLevel;
+
+        if (skillNum == 0)
+            self_skillnum = 1;
+
+        PlayerPrefs.SetInt("mySkill", self_skillnum);
+        PlayerPrefs.SetInt("mySkillLevel", self_skillLevel);
+    }
+
+    public void SetSkillLevelContainer(int a, int b, int c)
+    {
+        skillLevelsContainer[0] = a;
+        skillLevelsContainer[1] = b;
+        skillLevelsContainer[2] = c;
+    }
+
+    public void SetSkillLevelContainer(int index, int level)
+    {
+        skillLevelsContainer[index] = level;
     }
 
 }

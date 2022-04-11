@@ -1371,6 +1371,8 @@ MonoBehaviour:
   CM: {fileID: 1848353656}
   self_skillnum: 1
   self_skillLevel: 1
+  skillLevelsContainer: 000000000000000000000000
+  SM: {fileID: 456259168}
 --- !u!1 &377567541
 GameObject:
   m_ObjectHideFlags: 0
@@ -1517,7 +1519,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400982002}
-  m_LocalRotation: {x: 0.33409896, y: -1e-45, z: 1e-45, w: 0.942538}
+  m_LocalRotation: {x: 0.33409896, y: -1e-45, z: 0, w: 0.942538}
   m_LocalPosition: {x: 0, y: 4, z: -3.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -2241,6 +2243,34 @@ PrefabInstance:
       propertyPath: m_TargetGraphic
       value: 
       objectReference: {fileID: 523948622}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 456259168}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BuySkill
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ShopManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 685366888510963933, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
       propertyPath: m_Name
       value: SkillButton1
@@ -4969,6 +4999,34 @@ PrefabInstance:
       propertyPath: m_TargetGraphic
       value: 
       objectReference: {fileID: 1841408891}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 456259168}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BuySkill
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ShopManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 685366888510963933, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
       propertyPath: m_Name
       value: SkillButton2
@@ -5527,7 +5585,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930881972}
-  m_LocalRotation: {x: 0.33409896, y: -1e-45, z: 1e-45, w: 0.942538}
+  m_LocalRotation: {x: 0.33409896, y: -1e-45, z: 0, w: 0.942538}
   m_LocalPosition: {x: 0, y: 4, z: -3.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -6165,6 +6223,7 @@ MonoBehaviour:
   isGameStart: 1
   ResponseMenu: {fileID: 1834125206}
   MN: {fileID: 401868625}
+  shopPrices: {fileID: 11400000, guid: 860a0e3fbc7947148b6c402725bd22be, type: 2}
 --- !u!114 &2121429944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6212,6 +6271,54 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 456259165}
     m_Modifications:
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_Navigation.m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 456259168}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 456259168}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: BuySkill
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: BuySkill
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: ShopManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: ShopManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_IntArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 685366888510963921, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 685366888510963933, guid: 2c3049efc079ce941bd3b50eb8ed7867, type: 3}
       propertyPath: m_Name
       value: SkillButton0

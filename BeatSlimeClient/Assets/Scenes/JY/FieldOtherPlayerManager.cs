@@ -257,8 +257,9 @@ public class FieldOtherPlayerManager : MonoBehaviour
         //selfDirection = HexDirection.LeftUp;
     }
     
-    public void ChangeSkill(int skillNum)
+    public void ChangeSkill(int skillNum, int skillLevel)
     {
         other_skillnum = skillNum;
+        other_skillLevel = skillLevel;
     }
 }
