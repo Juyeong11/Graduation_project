@@ -430,6 +430,7 @@ namespace Protocol
         public byte type;
         public int id;
         public byte skill_type;
+        public byte skill_level;
     }
 
 
