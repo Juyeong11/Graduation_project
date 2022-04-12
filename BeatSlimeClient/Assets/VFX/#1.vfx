@@ -80,9 +80,9 @@ MonoBehaviour:
   uiBounds:
     serializedVersion: 2
     x: 45
-    y: -966
-    width: 5800
-    height: 2918
+    y: -946
+    width: 4855
+    height: 2898
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -5358,21 +5358,21 @@ MonoBehaviour:
     linkedSlots:
     - outputSlot: {fileID: 8926484042661614827}
       inputSlot: {fileID: 8926484042661614937}
-    position: {x: 2811, y: 870}
+    position: {x: 2917.5999, y: 865.6}
     expandedSlots: []
     expanded: 0
   - m_Id: 4
     linkedSlots:
     - outputSlot: {fileID: 8926484042661614827}
       inputSlot: {fileID: 8926484042661615000}
-    position: {x: 3453, y: 864}
+    position: {x: 3577.5999, y: 862.39996}
     expandedSlots: []
     expanded: 0
   - m_Id: 5
     linkedSlots:
     - outputSlot: {fileID: 8926484042661614827}
       inputSlot: {fileID: 8926484042661615047}
-    position: {x: 4363, y: 857}
+    position: {x: 4469.6, y: 816.8}
     expandedSlots: []
     expanded: 0
 --- !u!114 &8926484042661614827
@@ -5404,7 +5404,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0,
           Culture=neutral, PublicKeyToken=null
-      m_SerializableObject: '{"r":2.18949818611145,"g":1.087890625,"b":3.075103998184204,"a":1.0}'
+      m_SerializableObject: '{"r":2.969390392303467,"g":1.5647395849227906,"b":4.105504989624023,"a":1.0}'
     m_Space: 2147483647
   m_Property:
     name: o
@@ -7025,7 +7025,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 3
+      m_SerializableObject: 3.5
     m_Space: 2147483647
   m_Property:
     name: DelayBeforeLoop
@@ -7274,7 +7274,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
-  m_UIPosition: {x: 2555, y: -10}
+  m_UIPosition: {x: 2686, y: -60}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -7447,7 +7447,7 @@ MonoBehaviour:
       m_Type:
         m_SerializableType: System.Single, mscorlib, Version=4.0.0.0, Culture=neutral,
           PublicKeyToken=b77a5c561934e089
-      m_SerializableObject: 0.5
+      m_SerializableObject: 0.4
     m_Space: 2147483647
   m_Property:
     name: Lifetime
@@ -8518,7 +8518,7 @@ MonoBehaviour:
   - {fileID: 8926484042661614999}
   - {fileID: 8926484042661615004}
   - {fileID: 8926484042661615006}
-  m_UIPosition: {x: 3583, y: 341}
+  m_UIPosition: {x: 3583, y: 150}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
@@ -8962,7 +8962,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 8926484042661614992}
   m_Children: []
-  m_UIPosition: {x: 0, y: 337}
+  m_UIPosition: {x: 0, y: 338}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots:
