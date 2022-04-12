@@ -5,7 +5,7 @@ using UnityEngine;
 public class TargetingEffect : MonoBehaviour
 {
 
-    const int roketCnt = 10;
+    const int roketCnt = 8;
     public GameObject Root;
 
     public GameObject RoketPrefab;
@@ -15,10 +15,12 @@ public class TargetingEffect : MonoBehaviour
     float[] speed = new float[roketCnt];
 
     float diameter = 0.5f;
-    float size = 0.2f;
+    float size = 0.3f;
 
     float offsetH = 1.44f;
     float offsetZ = 0.8f;
+
+    public float a = 240.0f;
     // Start is called before the first frame update
     void OnEnable()
     {
@@ -56,7 +58,7 @@ public class TargetingEffect : MonoBehaviour
         {
             if (launchReady[i] == false) continue;
             float length = diameter;
-            float angle = (i + 1) * 360.0f / roketCnt;
+            float angle = (((i+1) * 240.0f / (roketCnt)) - 40);
             float CosTheta = Mathf.Cos(angle * Mathf.Deg2Rad);
             float SinTheta = Mathf.Sin(angle * Mathf.Deg2Rad);
             Vector3 pos = new Vector3(length * CosTheta, length * SinTheta + offsetH, offsetZ);
@@ -65,7 +67,7 @@ public class TargetingEffect : MonoBehaviour
             pos += origin;
             Roket[i].transform.position = pos;
 
-            Vector3 roketForward = Root.transform.forward;
+            Vector3 roketForward = Root.transform.forward - Root.transform.up;
             Roket[i].transform.forward = roketForward;
         }
 
@@ -125,8 +127,8 @@ public class TargetingEffect : MonoBehaviour
         Vector3 start_Pos = Roket[index].transform.position;
         Vector3 p1 = Root.transform.position;
         p1.y += 5.0f;
-        p1.x += Random.Range(-1.0f, 1.0f);
-        p1.z += Random.Range(-1.0f, 1.0f);
+        p1.x += Random.Range(-5.0f, 5.0f);
+        p1.z += Random.Range(-5.0f, 5.0f);
         while (t <= 1.0f)
         {
             t += Time.deltaTime * 1 / speed[index];
