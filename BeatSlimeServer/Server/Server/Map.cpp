@@ -210,6 +210,9 @@ void MapInfo::SetTileType(int x, int z, int pre_x, int pre_z)
 	int p_x = pre_x - offsetX;
 	int p_z = pre_z - offsetZ;
 	// 이전 좌표는 범위 밖에 있을 수 없다.
+	if (p_x > LengthX || p_x < 0) return;
+	if (p_z > LengthZ || p_z < 0) return;
+
 	map[p_z * LengthX + p_x] = 0;
 
 	int _x = x - offsetX;

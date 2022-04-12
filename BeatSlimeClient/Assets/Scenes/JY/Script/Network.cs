@@ -112,7 +112,7 @@ public class Network
         Protocol.cs_packet_login pk = new Protocol.cs_packet_login();
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_login));
         pk.type = Protocol.CONSTANTS.CS_PACKET_LOGIN;
-        pk.name = System.Text.Encoding.UTF8.GetBytes(name);
+        pk.name = System.Text.Encoding.UTF8.GetBytes(name+'\0');
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
 

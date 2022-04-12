@@ -153,6 +153,10 @@ public class GameManager : MonoBehaviour
         enemy.GetComponent<HexCellPosition>().setInitPosition(0, 0);
         PM = PatternManager.data;
         ids = new int[4];
+
+
+
+
     }
     public HexDirection GetBossDir()
     {
@@ -489,8 +493,8 @@ public class GameManager : MonoBehaviour
                             Objects[3] = enemy;
                             Objects[3].SetActive(true);
 
-                            PatternManager.data.Load(myPlayerID);
 
+                            PatternManager.data.Load(myPlayerID);
                             FieldGameManager.Net.SendGameStartReadyPacket();
                             FieldGameManager.Net.SendPingTestPacket();
                         }
@@ -506,7 +510,8 @@ public class GameManager : MonoBehaviour
                             MN.ChangeMusicName(SongName + " - zeroste.");
                             player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
-                            
+
+                            EffectManager.instance.SetTargetingEffectParent(ref enemy);
                             Debug.Log("Delay : " + offsetTime);
                         }
                         break;

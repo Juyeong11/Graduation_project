@@ -11,6 +11,7 @@ public class EffectManager : MonoBehaviour
     public GameObject BossQuakeEffectPrefab;
     public GameObject BossWaterGunEffectPrefab;
     public GameObject BossTargetingEffectPrefab;
+    public GameObject BossRokets;
 
     public GameObject PlayerQuakeEffectPrefab;
     public GameObject PlayerWaterGunEffectPrefab;
@@ -28,8 +29,12 @@ public class EffectManager : MonoBehaviour
     {
         HexPattern = new Effects();
         instance = this;
-    }
 
+    }
+    private void OnDisable()
+    {
+        Destroy(BossRokets);
+    }
     // 1방향 공격
     public void OneTileEffect(int start_x, int start_y, int start_z, int speed)
     {
@@ -53,6 +58,12 @@ public class EffectManager : MonoBehaviour
      * 5번 물줄기의 경우는 그냥 단순한 공하나가 날아가는 걸로 (선형보간사용)
      * 6번 지진의 경우는 바닥 커지는 이펙트 그대로 사용 색만 바꿔서
      */
+    public void SetTargetingEffectParent(ref GameObject target)
+    {
+        if(BossRokets) Destroy(BossRokets);
+        BossRokets = Instantiate(BossTargetingEffectPrefab);
+        BossRokets.GetComponent<TargetingEffect>().SetEffectParent(ref target);
+    }
     public void BossWaterGunEffect(Vector3 start_pos, Vector3 end_pos, int speed)
     {
         GameObject go = Instantiate(BossWaterGunEffectPrefab, start_pos, Quaternion.identity);
@@ -65,12 +76,11 @@ public class EffectManager : MonoBehaviour
 
     public void BossTargetingEffect(Vector3 start_pos,ref GameObject target, int speed)
     {
-        GameObject go = Instantiate(BossTargetingEffectPrefab, start_pos, Quaternion.identity);
         float s = speed * 1 / 1000f;
-        //Debug.Log("effect w" + Time.time);
-        go.GetComponent<TargetingEffect>().speed = s;
-        go.GetComponent<TargetingEffect>().start_pos = start_pos;
-        go.GetComponent<TargetingEffect>().target = target;
+
+        BossRokets.GetComponent<TargetingEffect>().launch(ref target, s);
+        //go.GetComponent<TargetingEffect>().start_pos = start_pos;
+        //go.GetComponent<TargetingEffect>().target = target;
     }
     public void BossQuakeEffect(int start_x, int start_y, int start_z, int speed, HexDirection dir)
     {

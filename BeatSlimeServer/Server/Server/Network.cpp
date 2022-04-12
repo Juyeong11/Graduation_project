@@ -738,20 +738,20 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		PlayerData player_data;
 		player_data.name = std::wstring(packet->name, &packet->name[strnlen_s(packet->name, MAX_NAME_SIZE)]);
-		if (player_data.name != L"Happy") {
-			if (DB->checkPlayer(player_data)) {
-				strcpy_s(cl.name, packet->name);
-				//cl.set_staus(MAX_HP * player_data.level, player_data.level, player_data.exp);
-				cl.x = player_data.x;
-				cl.z = player_data.z;
-				cl.y = -cl.x - cl.z;
-			}
-			else {
-				send_login_fail(client_id);
-				break;
-			}
-		}
-		strcpy_s(cl.name, packet->name);
+		//if (player_data.name != L"Happy") {
+		//	if (DB->checkPlayer(player_data)) {
+		//		strcpy_s(cl.name, packet->name);
+		//		//cl.set_staus(MAX_HP * player_data.level, player_data.level, player_data.exp);
+		//		cl.x = player_data.x;
+		//		cl.z = player_data.z;
+		//		cl.y = -cl.x - cl.z;
+		//	}
+		//	else {
+		//		send_login_fail(client_id);
+		//		break;
+		//	}
+		//}
+ 		strcpy_s(cl.name, packet->name);
 		send_login_ok(client_id);
 
 		cl.state_lock.lock();
