@@ -35,6 +35,7 @@ public:
 	//volatile«ÿ¡‡æﬂ «—¥Ÿ.
 	volatile STATE state;
 	std::mutex state_lock;
+	int cur_room_num;
 
 
 	int		last_packet_time;
@@ -43,6 +44,7 @@ public:
 	virtual ~GameObject() {};
 	virtual int GetMoney() { return 0; };
 	virtual void SetMoney(int m) {  };
+	virtual bool Hit(int damage);
 };
 class Npc : public GameObject {
 public:
@@ -132,7 +134,6 @@ public:
 
 	Skill* skill;
 	bool is_active;
-	int cur_room_num;
 	int		prev_recv_size;
 
 	int		money;

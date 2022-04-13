@@ -137,10 +137,10 @@ int PathFinder::find_path(GameObject* finder, const GameObject* const target) {
 
 		return 1;
 	}
-	std::cout << now->x << ", " << now->z << std::endl;
+	//std::cout << now->x << ", " << now->z << std::endl;
 	while (now->pre->pre != nullptr) {
 		now = now->pre;
-		std::cout << now->x << ", " << now->z << std::endl;
+		//std::cout << now->x << ", " << now->z << std::endl;
 	}
 	finder->pre_x = finder->x;
 	finder->pre_z = finder->z;

@@ -102,6 +102,8 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
+
+
         print("Start");
         nowCombo = 0;
         //HPGM = gameObject.GetComponent<HPImagesForGameManager>();
@@ -412,10 +414,10 @@ public class GameManager : MonoBehaviour
         //{
         //    FieldGameManager.Net.SendreadPacket();
         //}
-        //if (Input.GetKeyDown(KeyCode.Return))
-        //{
-        //    FieldGameManager.Net.SendGameStartReadyPacket();
-        //}
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            FieldGameManager.Net.SendTeleportPacket(2);
+        }
 
 
     if (isGameStart && FieldGameManager.Net.isServerOnline())

@@ -42,6 +42,18 @@ GameObject::GameObject() :state(ST_FREE) {
 	hp = 100;
 }
 
+bool GameObject::Hit(int damage)
+{
+	hp -= damage;
+	
+	if (hp < 0)
+	{
+		hp = 0;
+		return true;
+	}
+	return false;
+}
+
 
 
 Npc::Npc() : is_active(false) {

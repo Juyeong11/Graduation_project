@@ -1,5 +1,6 @@
 #include"stdfx.h"
 #include"Client.h"	
+#include"Network.h"	
 #include"Map.h"
 
 void MapInfo::SetMap(std::string map_name, std::string music_name)
@@ -348,20 +349,19 @@ void GameRoom::game_end()
 	ready_player_cnt = 0;
 	//game_room_id = -1;
 
+	boss_id->cur_room_num = -1;
 	boss_id = nullptr;
 	pattern_progress = -1;
 	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
-
 	for (auto p : player_ids) {
 		if (p == nullptr) continue;
 		p->x = portal->x;
 		p->y = portal->y;
 		p->z = portal->z;
+		Network::GetInstance()->set_new_player_pos(p->id);
+
 		reinterpret_cast<Client*>(p)->cur_room_num = -1;
 		reinterpret_cast<Client*>(p)->is_active = true;
-		reinterpret_cast<Client*>(p)->vl.lock();
-		reinterpret_cast<Client*>(p)->viewlist.clear();
-		reinterpret_cast<Client*>(p)->vl.unlock();
 
 	}
 	portal = nullptr;

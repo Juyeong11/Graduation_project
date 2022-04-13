@@ -427,9 +427,9 @@ void Network::send_party_request_anwser(int reciver, int newPlayerid, Party* par
 	packet.new_party_id = newPlayerid;
 	if (party != nullptr) {
 
-	party->partyLock.lock();
-	memcpy_s(packet.p, sizeof(int) * 3, party->partyPlayer, sizeof(int) * 3);
-	party->partyLock.unlock();
+		party->partyLock.lock();
+		memcpy_s(packet.p, sizeof(int) * 3, party->partyPlayer, sizeof(int) * 3);
+		party->partyLock.unlock();
 	}
 	else {
 		packet.p[0] = -1;
@@ -479,7 +479,7 @@ void Network::disconnect_client(int c_id)
 	client.dest_x = -1;
 	client.dest_y = -1;
 	client.dest_z = -1;
-	client.money  =0;
+	client.money = 0;
 	int room_num = reinterpret_cast<Client*>(clients[c_id])->cur_room_num;
 	if (room_num == -1) {
 		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->z);
@@ -507,6 +507,8 @@ void Network::disconnect_client(int c_id)
 
 	if (client.cur_room_num != -1) {
 		for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
+			send_remove_object(game_room[client.cur_room_num]->player_ids[i]->id, c_id);
+
 			if (clients[c_id] == game_room[client.cur_room_num]->player_ids[i]) {
 				game_room[client.cur_room_num]->player_ids[i] = nullptr;
 
@@ -664,6 +666,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		}
 
 		if (pl->hp < 0) {
+
 			// 한 명이라도 죽으면 게임 끝
 			timer_event tev;
 			tev.ev = EVENT_GAME_END;
@@ -751,7 +754,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//		break;
 		//	}
 		//}
- 		strcpy_s(cl.name, packet->name);
+		strcpy_s(cl.name, packet->name);
 		send_login_ok(client_id);
 
 		cl.state_lock.lock();
@@ -880,10 +883,14 @@ void Network::process_packet(int client_id, unsigned char* p)
 			std::cout << "Invalid move in client " << client_id << std::endl;
 			exit(-1);
 		}
-		if (cur_map == 0) {
-			maps[cur_map]->SetTileType(x, z, cl.pre_x, cl.pre_z);
-		}
+		if (cur_map != 0) {
 
+			for (auto pl : game_room[cl.cur_room_num]->player_ids) {
+				send_move_object(pl->id, cl.id);
+			}
+			break;
+		}
+		maps[cur_map]->SetTileType(x, z, cl.pre_x, cl.pre_z);
 		// 이동한 클라이언트에 대한 nearlist 생성
 		// 꼭 unordered_set이여야 할까?
 		// 얼마나 추가될지 모르고, 데이터는 id이기 때문에 중복없음이 보장되있다. id로 구분안하는 경우가 있나?
@@ -891,6 +898,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 		std::unordered_set<int> nearlist;
 		for (auto* other : clients) {
 			if (other->id == client_id)
+				continue;
+			if (other->cur_room_num != -1)
 				continue;
 			if (ST_INGAME != other->state)
 				continue;
@@ -1075,6 +1084,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 		{
 		case FIELD_MAP:
 		{
+			cl.vl.lock();
+			cl.viewlist.clear();
+			cl.vl.unlock();
+
 			// login OK 에서 했던 로직을 가져오자
 			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
 			for (int i = 0; i < MAX_USER; ++i)
@@ -1087,7 +1100,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					continue;
 				}
 				other->state_lock.unlock();
-
+				if (other->cur_room_num != -1) continue;
 				if (false == is_near(other->id, client_id))
 					continue;
 
@@ -1110,7 +1123,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					continue;
 				}
 				other->state_lock.unlock();
-
+				if (other->cur_room_num != -1) continue;
 				if (false == is_near(other->id, client_id))
 					continue;
 
@@ -1129,6 +1142,24 @@ void Network::process_packet(int client_id, unsigned char* p)
 			for (auto* gr : game_room) {
 				if (false == gr->isGaming) continue;
 				if (-1 == gr->FindPlayer(client_id)) continue;
+
+				cl.vl.lock();
+				std::unordered_set <int> my_vl = cl.viewlist;
+				cl.vl.unlock();
+				for (auto other : my_vl) {
+					if (false == is_player(other)) continue;
+
+					Client& target = *reinterpret_cast<Client*>(clients[other]);
+					if (ST_INGAME != target.state)
+						continue;
+					target.vl.lock();
+					if (0 != target.viewlist.count(client_id)) {
+						target.viewlist.erase(client_id);
+						target.vl.unlock();
+						send_remove_object(other, client_id);
+					}
+					else target.vl.unlock();
+				}
 
 				send_game_init(client_id, gr->player_ids, gr->boss_id->id);
 				break;
@@ -1159,9 +1190,13 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 				for (const auto pl : gr->player_ids) {
 					send_game_start(pl->id, game_start_time);
-					reinterpret_cast<Client*>(pl)->cur_room_num = gr->game_room_id;
+					Client* p = reinterpret_cast<Client*>(pl);
+					p->cur_room_num = gr->game_room_id;
 
+					
 				}
+
+
 
 				std::cout << "Game Start\n";
 
@@ -1350,13 +1385,13 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_PARTY_REQUEST:
 	{
 		cs_packet_party_request* packet = reinterpret_cast<cs_packet_party_request*>(p);
-		
+
 		if (false == is_player(packet->id) || packet->id == client_id) break;
 		// 상대가 파티가 있는 경우
 		Client* accepter = reinterpret_cast<Client*>(clients[packet->id]);
 		Party* accepterParty = accepter->party;
 		if (accepterParty != nullptr) {
-			send_party_request_anwser(client_id, -1,nullptr, 4);
+			send_party_request_anwser(client_id, -1, nullptr, 4);
 
 			break;
 		}
@@ -1380,7 +1415,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 			for (auto p : accepter->party->partyPlayer) {
 				if (p == -1)continue;
-				send_party_request_anwser(p, client_id,accepter->party, 3);
+				send_party_request_anwser(p, client_id, accepter->party, 3);
 			}
 
 			accepter->party->DelPartyPlayer(client_id);
@@ -1424,7 +1459,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				if (false == requesterParty->SetPartyPlayer(client_id)) {
 					//파티 요청한 사람의 파티가 가득 찬경우
 					//수락한 사람한테 다시 거절 메세지를 보냄
-					send_party_request_anwser(client_id, -1,nullptr, 2);
+					send_party_request_anwser(client_id, -1, nullptr, 2);
 
 
 					break;
@@ -1435,19 +1470,19 @@ void Network::process_packet(int client_id, unsigned char* p)
 			}
 			for (auto p : requesterParty->partyPlayer) {
 				if (p != -1)
-					send_party_request_anwser(p, client_id,requesterParty, 1);
+					send_party_request_anwser(p, client_id, requesterParty, 1);
 			}
 
 		}
 		else if (packet->answer == 0)
 		{
 			if (requesterParty == nullptr) {
-				send_party_request_anwser(packet->requester, -1,nullptr, 0);
+				send_party_request_anwser(packet->requester, -1, nullptr, 0);
 			}
 			else {
 				for (auto p : requesterParty->partyPlayer) {
 					if (p != -1)
-						send_party_request_anwser(p, -1,requesterParty, 0);
+						send_party_request_anwser(p, -1, requesterParty, 0);
 				}
 			}
 		}
@@ -1550,6 +1585,26 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.SetMoney(100);
 			std::cout << "id :" << client_id << " get 100 money \ntotal : " << cl.GetMoney();
 		}
+		else if (packet->pos == 2) {
+			int room_id = reinterpret_cast<Client*>(clients[client_id])->cur_room_num;
+			if (room_id == -1) break;
+			GameRoom* gr = game_room[room_id];
+
+			//보스의 체력을 깍는다.
+			if (gr->boss_id->Hit(500)) {
+				timer_event tev;
+				tev.ev = EVENT_GAME_END;
+				tev.game_room_id = gr->game_room_id;
+				//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+				tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+				timer_queue.push(std::move(tev));
+			}
+			for (const auto pl : gr->player_ids) {
+				if (pl == nullptr) continue;
+				send_attack_player(client_id, gr->boss_id->id, pl->id);
+			}
+		}
 		else {
 			cl.pre_x = cl.x;
 			cl.pre_y = cl.y;
@@ -1579,8 +1634,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		cs_packet_buy* packet = reinterpret_cast<cs_packet_buy*>(p);
 		if (false == is_item(packet->itemType))break;
-		if (cl.money < items[packet->itemType]->itemPrice) { 
-			send_buy_result(client_id, packet->itemType, 0); break; }
+		if (cl.money < items[packet->itemType]->itemPrice) {
+			send_buy_result(client_id, packet->itemType, 0); break;
+		}
 
 		cl.money -= items[packet->itemType]->itemPrice;
 		send_buy_result(client_id, packet->itemType, 1);
@@ -2258,6 +2314,7 @@ void Network::game_start(int room_id)
 {
 	int boss_id = game_room[room_id]->boss_id->id;
 	int map_type = game_room[room_id]->map_type;
+	game_room[room_id]->boss_id->cur_room_num = map_type;
 
 	const std::vector<PatternInfo>& pt = maps[map_type]->GetPatternTime();
 

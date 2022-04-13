@@ -35,6 +35,7 @@ public class FieldGameManager : MonoBehaviour
 
     void Awake()
     {
+
         print("Start");
         data = this;
         isGameStart = false;
@@ -153,6 +154,8 @@ public class FieldGameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_CHANGE_SCENE:
                         {
                             Protocol.sc_packet_change_scene p = Protocol.sc_packet_change_scene.SetByteToVar(data);
+
+
 
                             scene_num = p.scene_num;
                             StartCoroutine(ChangeScene());
