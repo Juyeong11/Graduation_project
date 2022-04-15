@@ -1,0 +1,64 @@
+digraph G {
+node0 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float2 ((1.0, 1.0))
+Count_a
+Count_a
+Count_a"]
+node1 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float2 ((0.0, 0.0))
+Delay_a
+Delay_a
+Delay_a"]
+node2 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float3 ((0.0, 1.0, 0.0))
+bounds_center
+bounds_center
+bounds_center"]
+node3 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float3 ((2.0, 3.0, 2.0))
+bounds_size
+bounds_size
+bounds_size"]
+node4 [shape="box" color="cyan" style="filled" label="VFXMeshValue Mesh (23320)
+mesh"]
+node5 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Uint32 (4294967295)
+subMeshMask
+subMeshMask
+subMeshMask"]
+node6 [shape="box" color="cyan" style="filled" label="VFXMeshValue Mesh (27084)
+mesh"]
+node7 [shape="box" color="cyan" style="filled" label="VFXMeshValue Mesh (27072)
+mesh"]
+node8 [shape="box" color="cyan" style="filled" label="VFXValue`1 Float (0.3)
+Size_a"]
+node9 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float3 ((0.0, 0.0, 1.0))
+Angle_a"]
+node10 [shape="box" color="cyan" style="filled" label="VFXExpressionCombine Float3
+Color_a
+Color_a
+Color_a"]
+node11 [shape="box" label="VFXExpressionExtractComponent Float"]
+node12 [shape="box" label="VFXValue`1 Float4 ((2.6, 2.6, 2.6, 0.0))"]
+node13 [shape="box" label="VFXExpressionExtractComponent Float"]
+node14 [shape="box" label="VFXExpressionExtractComponent Float"]
+node15 [shape="box" color="cyan" style="filled" label="VFXTexture2DValue Texture2D (23318)
+mainTexture"]
+node16 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float (1)
+Size_a"]
+node17 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float3 ((0.0, 0.1, 0.0))
+Position_b"]
+node18 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float3 ((0.0, 90.0, 120.0))
+Angle_c"]
+node19 [shape="box" color="cyan" style="filled" label="VFXTexture2DValue Texture2D (25068)
+mainTexture"]
+node20 [shape="box" color="cyan" style="filled" label="VFXTexture2DValue Texture2D (25068)
+mainTexture"]
+node21 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float (0.7)
+Size_a"]
+node22 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float3 ((0.0, 0.2, 0.2))
+Position_b"]
+node23 [shape="box" color="steelblue" style="filled" label="VFXValue`1 Float3 ((-20.0, 0.0, 90.0))
+Angle_c"]
+node11 -> node10 [headlabel="0"]
+node13 -> node10 [headlabel="1"]
+node14 -> node10 [headlabel="2"]
+node12 -> node11 
+node12 -> node13 
+node12 -> node14 
+}
