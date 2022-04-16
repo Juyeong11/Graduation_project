@@ -83,46 +83,13 @@ MonoBehaviour:
     - model: {fileID: 8926484042661616118}
       id: 0
       isStickyNote: 0
-    - model: {fileID: 8926484042661616157}
-      id: 0
-      isStickyNote: 0
     - model: {fileID: 8926484042661616122}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661616519}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661616133}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661616144}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661616527}
       id: 0
       isStickyNote: 0
     - model: {fileID: 8926484042661616147}
       id: 0
       isStickyNote: 0
-    - model: {fileID: 8926484042661616160}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661616532}
-      id: 0
-      isStickyNote: 0
     - model: {fileID: 8926484042661616149}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661616152}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661616179}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661616153}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661616576}
       id: 0
       isStickyNote: 0
     - model: {fileID: 8926484042661616538}
@@ -206,7 +173,7 @@ MonoBehaviour:
     x: 3985
     y: -2684
     width: 4803
-    height: 2538
+    height: 2502
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -11768,7 +11735,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UIIgnoredErrors: []
-  m_Parent: {fileID: 0}
+  m_Parent: {fileID: 114350483966674976}
   m_Children: []
   m_UIPosition: {x: 0, y: 0}
   m_UICollapsed: 1
@@ -12224,7 +12191,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UIIgnoredErrors: []
-  m_Parent: {fileID: 0}
+  m_Parent: {fileID: 114350483966674976}
   m_Children: []
   m_UIPosition: {x: 0, y: 0}
   m_UICollapsed: 1
@@ -15328,7 +15295,7 @@ MonoBehaviour:
   - {fileID: 8926484042661616705}
   m_ExposedName: New Color
   m_Exposed: 1
-  m_Order: 3
+  m_Order: 4
   m_Category: 
   m_Min:
     m_Type:
