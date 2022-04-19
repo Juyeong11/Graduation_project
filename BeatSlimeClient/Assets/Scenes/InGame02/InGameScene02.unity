@@ -228,7 +228,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 67, y: 180, z: 0}
 --- !u!1001 &32677714
 PrefabInstance:
@@ -1567,7 +1567,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 200464357357826149, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 200464357357826149, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1765,7 +1765,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &663726357 stripped
 MonoBehaviour:
@@ -2357,6 +2357,7 @@ MonoBehaviour:
   BossQuakeEffectPrefab: {fileID: 8687026714411121945, guid: 6182beab0f3de3a4dab83a92495dfc9a, type: 3}
   BossWaterGunEffectPrefab: {fileID: 2880285097022423080, guid: 021d256c85affcb4ea1b4c1b07017b38, type: 3}
   BossTargetingEffectPrefab: {fileID: 2880285097022423080, guid: 23f4da0bfdcf9d541b8f73bf6c87baf7, type: 3}
+  BossRokets: {fileID: 0}
   PlayerQuakeEffectPrefab: {fileID: 9145100225357172896, guid: 2958786283f34f64cbe1ed7ac0049844, type: 3}
   PlayerWaterGunEffectPrefab: {fileID: 9145100225357172896, guid: 694ac830a5d8ccb43b2ed3f1a28069f1, type: 3}
   PlayerHealEffectPrefab: {fileID: 8687026714411121945, guid: 977108ffb1ec96541b340faf71c09c49, type: 3}
@@ -3715,7 +3716,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 40, y: 0, z: 0}
 --- !u!114 &1930881977
 MonoBehaviour:
@@ -3982,7 +3983,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2006923103 stripped
 GameObject:
@@ -4351,7 +4352,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 682205123564150069, guid: ea611a13a1d01114b938abe69053ec7f, type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 682205123564150069, guid: ea611a13a1d01114b938abe69053ec7f, type: 3}
       propertyPath: m_LocalPosition.x

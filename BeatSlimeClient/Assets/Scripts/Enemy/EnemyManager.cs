@@ -19,6 +19,8 @@ public class EnemyManager : MonoBehaviour
     public int enemyMaxHp;
 
     public HexCellPosition selfCoord;
+    public GameObject nearestSlimeCoord;
+    private float spinningLerpFactor = 0f;
     public HexGrid grid;
 
     //Invalid
@@ -53,29 +55,53 @@ public class EnemyManager : MonoBehaviour
 
     public void EnemyRotateToLookAt()
     {
-        switch(selfCoord.direction)
+        if (nearestSlimeCoord == null)
         {
-            case HexDirection.LeftUp:
-                //Vector3 c = Vector3.Cross(transform.rotation.eulerAngles, new Vector3(0, -120, 0));
-                //transform.Rotate(0, c.x * 3f, 0);
+            switch (selfCoord.direction)
+            {
+                case HexDirection.LeftUp:
+                    //Vector3 c = Vector3.Cross(transform.rotation.eulerAngles, new Vector3(0, -120, 0));
+                    //transform.Rotate(0, c.x * 3f, 0);
 
-                transform.rotation = Quaternion.Euler(new Vector3(0, -120 - 90, 0));
-                break;
-            case HexDirection.Up:
-                transform.rotation = Quaternion.Euler(new Vector3(0, -90 - 90, 0));
-                break;
-            case HexDirection.RightUp:
-                transform.rotation = Quaternion.Euler(new Vector3(0, -30 - 90, 0));
-                break;
-            case HexDirection.Down:
-                transform.rotation = Quaternion.Euler(new Vector3(0, 90 - 90, 0));
-                break;
-            case HexDirection.LeftDown:
-                transform.rotation = Quaternion.Euler(new Vector3(0, 120 - 90, 0));
-                break;
-            case HexDirection.RightDown:
-                transform.rotation = Quaternion.Euler(new Vector3(0, 30 - 90, 0));
-                break;
+                    transform.rotation = Quaternion.Euler(new Vector3(0, -120 - 90, 0));
+                    break;
+                case HexDirection.Up:
+                    transform.rotation = Quaternion.Euler(new Vector3(0, -90 - 90, 0));
+                    break;
+                case HexDirection.RightUp:
+                    transform.rotation = Quaternion.Euler(new Vector3(0, -30 - 90, 0));
+                    break;
+                case HexDirection.Down:
+                    transform.rotation = Quaternion.Euler(new Vector3(0, 90 - 90, 0));
+                    break;
+                case HexDirection.LeftDown:
+                    transform.rotation = Quaternion.Euler(new Vector3(0, 120 - 90, 0));
+                    break;
+                case HexDirection.RightDown:
+                    transform.rotation = Quaternion.Euler(new Vector3(0, 30 - 90, 0));
+                    break;
+            }
+        }
+        else
+        {
+            //if (spinningLerpFactor < 1f)
+            {
+                Vector3 selfVector = -transform.forward;
+                selfVector.y = 0;
+                Vector3 targetVector = nearestSlimeCoord.transform.position - transform.position;
+                targetVector.y = 0;
+                if (Vector3.Cross(selfVector, targetVector).y > 0)
+                {   
+                    print("rotate : " + Time.deltaTime * 100f);
+                    transform.Rotate(0, Time.deltaTime * 100f, 0);
+                }
+                else
+                {
+                    print("-rotate : " + Time.deltaTime * 100f);
+                    transform.Rotate(0, -1f * Time.deltaTime * 100f, 0);
+                }
+                spinningLerpFactor += Time.deltaTime * 2f;
+            }
         }
     }
 
@@ -95,7 +121,7 @@ public class EnemyManager : MonoBehaviour
         grid.ePosition = selfCoord.coordinates;
     }
 
-    public void BeatPatternServe(Beat NowBeat,Beat offset,GameObject destination)
+    public void BeatPatternServe(Beat NowBeat, Beat offset, GameObject destination)
     {
         selfAnim.SetTrigger("Attack");
 
@@ -112,5 +138,11 @@ public class EnemyManager : MonoBehaviour
         HP.hpUpdate(Time.deltaTime);
         EnemyHPImage.fillAmount = (float)HP.CurrentHP / (float)HP.MaxHp;
         EnemyPrevHPImage.fillAmount = (float)HP.prevHP / (float)HP.MaxHp;
+    }
+
+    public void SetNearestSlime(GameObject slime)
+    {
+        nearestSlimeCoord = slime;
+        spinningLerpFactor = 0f;
     }
 }
