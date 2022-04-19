@@ -21,6 +21,7 @@ public class EnemyManager : MonoBehaviour
     public HexCellPosition selfCoord;
     public GameObject nearestSlimeCoord;
     private float spinningLerpFactor = 0f;
+    private bool ticker = false;
     public HexGrid grid;
 
     //Invalid
@@ -85,23 +86,33 @@ public class EnemyManager : MonoBehaviour
         else
         {
             //if (spinningLerpFactor < 1f)
+            Vector3 selfVector = -transform.forward;
+            selfVector.y = 0;
+            Vector3 targetVector = nearestSlimeCoord.transform.position - transform.position;
+            targetVector.y = 0;
+            float cross = Vector3.Cross(selfVector, targetVector).y;
+            if (cross > 0.1f)
             {
-                Vector3 selfVector = -transform.forward;
-                selfVector.y = 0;
-                Vector3 targetVector = nearestSlimeCoord.transform.position - transform.position;
-                targetVector.y = 0;
-                if (Vector3.Cross(selfVector, targetVector).y > 0)
-                {   
-                    print("rotate : " + Time.deltaTime * 100f);
-                    transform.Rotate(0, Time.deltaTime * 100f, 0);
-                }
-                else
-                {
-                    print("-rotate : " + Time.deltaTime * 100f);
-                    transform.Rotate(0, -1f * Time.deltaTime * 100f, 0);
-                }
-                spinningLerpFactor += Time.deltaTime * 2f;
+                //print("rotate : " + Time.deltaTime * 100f);
+                transform.Rotate(0, Time.deltaTime * 100f, 0);
+                ticker = false;
             }
+            else if (cross < 0.1f)
+            {
+                //print("-rotate : " + Time.deltaTime * 100f);
+                transform.Rotate(0, -1f * Time.deltaTime * 100f, 0);
+                ticker = false;
+            }
+            else
+            {
+                if (!ticker)
+                {
+                    Vector3 eyesPacker = new Vector3 (nearestSlimeCoord.transform.position.x, transform.position.y, nearestSlimeCoord.transform.position.z);
+                    transform.LookAt(eyesPacker);
+                    ticker = true;
+                }
+            }
+            spinningLerpFactor += Time.deltaTime * 2f;
         }
     }
 

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class GameManager : MonoBehaviour
 {
@@ -99,10 +100,10 @@ public class GameManager : MonoBehaviour
 
 
     public MusicName MN;
+    public PlayableDirector PD;
 
     void Awake()
     {
-
 
         print("Start");
         nowCombo = 0;
@@ -510,6 +511,7 @@ public class GameManager : MonoBehaviour
                             int Delay = System.DateTime.Now.Millisecond;
 
                             PlaySound();
+                            PD.Play();
                             MN.ChangeMusicName(SongName + " - zeroste.");
                             player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
