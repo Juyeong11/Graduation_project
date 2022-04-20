@@ -81,20 +81,19 @@ public:
 
 	Boss2();
 };
-
-class Inventory {
-public:
-	//Item* items[MAX_IN_GAME_PLAYER];
-	//int curPlayerNum;
-	//Inventory();
-
-};
-
-
 struct Item {
 	int itemType;
-	int itemPrice;
+	int cnt;
+	Item() { itemType = -1; cnt = 0; }
 };
+class Inventory {
+public:
+	Item items[15];
+	//Inventory();
+};
+
+
+
 class Skill
 {
 public:
@@ -104,6 +103,7 @@ public:
 	int Damage;
 	int SkillLevel;
 	int SkillType;
+	int SkillPrice;
 	Skill(int sl, int st);
 	Skill();
 
@@ -136,8 +136,23 @@ public:
 	bool is_active;
 	int		prev_recv_size;
 
-	int		money;
+	//...
+	int curSkill;
+	int money;
 
+	char SkillAD;
+	char SkillTa;
+	char SkillHeal;
+
+	//...
+	int ClearMap[2];
+
+	int MMR;
+
+	int MusicScroll;
+	int MusicScrollCount;
+
+	Inventory* inventory;
 	Party* party;
 
 	PathFinder* Astar = nullptr;

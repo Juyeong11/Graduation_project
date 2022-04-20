@@ -56,7 +56,8 @@ struct cs_packet_move {
 	unsigned char size;
 	char	type;
 	char	direction;			// 0 : up,  1: down, 2:left, 3:right
-	int		move_time;
+	//short	near_x, near_y;
+	//int		move_time;
 };
 
 struct cs_packet_read_map {

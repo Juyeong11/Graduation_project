@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class GameManager : MonoBehaviour
 {
@@ -99,10 +100,10 @@ public class GameManager : MonoBehaviour
 
 
     public MusicName MN;
+    public PlayableDirector PD;
 
     void Awake()
     {
-
 
         print("Start");
         nowCombo = 0;
@@ -271,6 +272,7 @@ public class GameManager : MonoBehaviour
         }
         else if (pivotType == "PlayerN")
         {
+
             //Debug.Log("PlayerN : " + FindMinDistanceHpID());
 
             target_pos = Objects[FindMinDistanceHpID()].GetComponent<HexCellPosition>().coordinates;
@@ -509,10 +511,12 @@ public class GameManager : MonoBehaviour
                             int Delay = System.DateTime.Now.Millisecond;
 
                             PlaySound();
+                            PD.Play();
                             MN.ChangeMusicName(SongName + " - zeroste.");
                             player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
 
+                            enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime( Objects[0].gameObject);
                             EffectManager.instance.SetTargetingEffectParent(ref enemy);
                             Debug.Log("Delay : " + offsetTime);
                         }
@@ -552,7 +556,29 @@ public class GameManager : MonoBehaviour
                                 player.GetComponent<PlayerManager>().JumpTrig();
                             }
 
-
+                            //NEAREST Slime
+                            {
+                                int nearestSlime = -1;
+                                float nearestDistance = float.MaxValue;
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    if (Objects[i] != null)
+                                    {
+                                        float distance = enemy.GetComponent<HexCellPosition>().getDistance(Objects[i].GetComponent<HexCellPosition>());
+                                        if (distance < nearestDistance)
+                                        {
+                                            nearestDistance = distance;
+                                            nearestSlime = i;
+                                        }
+                                    }
+                                }
+                                if (nearestSlime != -1)
+                                {
+                                    print("nearest slime : " + nearestSlime);
+                                    enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime( Objects[nearestSlime].gameObject);
+                                    //Objects[nearestSlime].GetComponentInChildren<PlayerManager>().SetNearSlime(Objects[pid]);
+                                }
+                            }
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_ATTACK:
