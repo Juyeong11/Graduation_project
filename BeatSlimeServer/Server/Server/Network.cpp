@@ -22,7 +22,7 @@ Network::Network() {
 	instance = this;
 	accept_ex = new EXP_OVER();
 	for (int i = 0; i < SKILL_CNT; ++i) {
-		skills[i] = new Skill(i % 3 + 1, i / 3 + 1);
+		skills[i] = new Skill();
 	}
 	for (int i = 0; i < MAX_USER / 2; ++i) {
 		PartyPool[i] = new Party();
@@ -33,9 +33,9 @@ Network::Network() {
 	}
 	DB = new DataBase;
 	for (int i = 0; i < 9; ++i) {
-		items[i] = new Item;
+		inventorys[i] = new Inventory;
 	}
-	DB->readItems(items);
+	DB->readSkills(skills);
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
 	//수정
@@ -273,6 +273,7 @@ void Network::send_move_object(int c_id, int mover)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
 }
+
 void Network::send_attack_player(int attacker, int target, int receiver)
 {
 	sc_packet_attack packet;
@@ -596,7 +597,7 @@ int Network::get_npc_id(int monsterType) {
 		return -1;
 		break;
 	}
-
+	return -1;
 }
 int Network::get_game_room_id()
 {
@@ -741,19 +742,33 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		PlayerData player_data;
 		player_data.name = std::wstring(packet->name, &packet->name[strnlen_s(packet->name, MAX_NAME_SIZE)]);
-		//if (player_data.name != L"Happy") {
-		//	if (DB->checkPlayer(player_data)) {
-		//		strcpy_s(cl.name, packet->name);
-		//		//cl.set_staus(MAX_HP * player_data.level, player_data.level, player_data.exp);
-		//		cl.x = player_data.x;
-		//		cl.z = player_data.z;
-		//		cl.y = -cl.x - cl.z;
-		//	}
-		//	else {
-		//		send_login_fail(client_id);
-		//		break;
-		//	}
-		//}
+
+		if (DB->checkPlayer(player_data)) {
+			strcpy_s(cl.name, packet->name);
+			//cl.set_staus(MAX_HP * player_data.level, player_data.level, player_data.exp);
+			cl.x = player_data.x;
+			cl.z = player_data.z;
+			cl.y = -cl.x - cl.z;
+			cl.curSkill = player_data.z;
+
+			cl.SkillAD = player_data.z;
+			cl.SkillTa = player_data.z;
+			cl.SkillHeal = player_data.z;
+
+			cl.MMR = player_data.z;
+			cl.money = player_data.z;
+
+			cl.inventory = inventorys[client_id];
+			DB->readInventory(&cl);
+		}
+		else {
+			if (DB->isConnect == true)
+			{
+				send_login_fail(client_id);
+				break;
+			}
+		}
+
 		strcpy_s(cl.name, packet->name);
 		send_login_ok(client_id);
 
@@ -823,7 +838,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (false == cl.is_active) break;
 
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
-		cl.last_packet_time = packet->move_time;
+		//cl.last_packet_time = packet->move_time;
 		cl.last_move_time = std::chrono::system_clock::now();
 
 		cl.pre_x = cl.x;
@@ -840,7 +855,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
 
-		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
+		//std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -1193,7 +1208,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					Client* p = reinterpret_cast<Client*>(pl);
 					p->cur_room_num = gr->game_room_id;
 
-					
+
 				}
 
 
@@ -1634,11 +1649,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		cs_packet_buy* packet = reinterpret_cast<cs_packet_buy*>(p);
 		if (false == is_item(packet->itemType))break;
-		if (cl.money < items[packet->itemType]->itemPrice) {
+		if (cl.money < skills[packet->itemType]->SkillPrice) {
 			send_buy_result(client_id, packet->itemType, 0); break;
 		}
 
-		cl.money -= items[packet->itemType]->itemPrice;
+		cl.money -= skills[packet->itemType]->SkillPrice;
 		send_buy_result(client_id, packet->itemType, 1);
 	}
 	break;
@@ -2093,6 +2108,8 @@ void Network::worker()
 			}
 			if (isDie) {
 				for (const auto p : game_room[game_room_id]->player_ids) {
+					if (p == nullptr) continue;
+
 					send_game_end(p->id, GAME_OVER);
 				}
 				game_room[game_room_id]->game_end();
@@ -2101,6 +2118,8 @@ void Network::worker()
 			}
 
 			for (const auto p : game_room[game_room_id]->player_ids) {
+				if (p == nullptr) continue;
+
 				send_game_end(p->id, GAME_CLEAR);
 			}
 			game_room[game_room_id]->game_end();

@@ -43,6 +43,7 @@ class EXP_OVER;
 class Skill;
 class Party;
 struct Item;
+class Inventory;
 class Network
 {
 private:
@@ -128,6 +129,6 @@ private:
 
 	std::array<Skill*, SKILL_CNT> skills;
 	std::array<Party*, MAX_USER/2> PartyPool;
-	std::array<Item*, 9> items;
+	std::array<Inventory*, MAX_USER> inventorys;
 };
 
