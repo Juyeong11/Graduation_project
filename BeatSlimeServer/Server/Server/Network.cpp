@@ -503,9 +503,9 @@ void Network::disconnect_client(int c_id)
 		}
 		else target.vl.unlock();
 	}
-	DB->updatePlayer(&client, false);
-	//여기서 end 패킷 보내고 종료 처리를 하자
 
+	//여기서 end 패킷 보내고 종료 처리를 하자
+	input_db_event(c_id, DB_PLAYER_LOGOUT);
 	if (client.cur_room_num != -1) {
 		for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 			send_remove_object(game_room[client.cur_room_num]->player_ids[i]->id, c_id);
@@ -739,97 +739,31 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		cs_packet_login* packet = reinterpret_cast<cs_packet_login*>(p);
 		//strcpy_s(cl.name, packet->name);
+		//로그인 요청이 오면 디비 스레드에 해당 아이디에 대한 정보를 알려달라고 요청하고 종료한다.
+		//그럼 디비 스레드에서 정보를 알려주고 
+		strcpy_s(cl.name, packet->name);
 
-		PlayerData player_data;
-		player_data.name = std::wstring(packet->name, &packet->name[strnlen_s(packet->name, MAX_NAME_SIZE)]);
+		input_db_event(client_id, DB_PLAYER_LOGIN);
+		// 아래부터는 디비 스레드에서 pqcs하면 다시 하기 시작
+		
+		if (DB->isConnect == false) {
+			send_login_ok(client_id);
 
-		if (DB->checkPlayer(player_data)) {
-			strcpy_s(cl.name, packet->name);
-			//cl.set_staus(MAX_HP * player_data.level, player_data.level, player_data.exp);
-			cl.x = player_data.x;
-			cl.z = player_data.z;
-			cl.y = -cl.x - cl.z;
-			cl.curSkill = player_data.z;
+			cl.state_lock.lock();
+			cl.state = ST_INGAME;
+			cl.state_lock.unlock();
 
-			cl.SkillAD = player_data.z;
-			cl.SkillTa = player_data.z;
-			cl.SkillHeal = player_data.z;
+			cl.curSkill =0;
 
-			cl.MMR = player_data.z;
-			cl.money = player_data.z;
+			cl.SkillAD = 0;
+			cl.SkillTa = 0;
+			cl.SkillHeal = 0;
+
+			cl.MMR = 100;
+			cl.money =0;
 
 			cl.inventory = inventorys[client_id];
-			DB->readInventory(&cl);
 		}
-		else {
-			if (DB->isConnect == true)
-			{
-				send_login_fail(client_id);
-				break;
-			}
-		}
-
-		strcpy_s(cl.name, packet->name);
-		send_login_ok(client_id);
-
-		cl.state_lock.lock();
-		cl.state = ST_INGAME;
-		cl.state_lock.unlock();
-
-		//새로 들어온 친구의 위치를 정해주자
-
-
-		//cl.x = maps[FIELD_MAP]->LengthX / 2;
-		//cl.z = maps[FIELD_MAP]->LengthZ / 2;
-		//cl.y = -cl.z - cl.x;
-					// login OK 에서 했던 로직을 가져오자
-			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
-		for (int i = 0; i < MAX_USER; ++i)
-		{
-			Client* other = reinterpret_cast<Client*>(clients[i]);
-			if (i == client_id) continue;
-			other->state_lock.lock();
-			if (ST_INGAME != other->state) {
-				other->state_lock.unlock();
-				continue;
-			}
-			other->state_lock.unlock();
-
-			if (false == is_near(other->id, client_id))
-				continue;
-
-			// 새로 들어온 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
-			other->vl.lock();
-			other->viewlist.insert(client_id);
-			other->vl.unlock();
-
-			send_put_object(other->id, client_id);
-		}
-
-		//새로 접속한 클라이언트에게 현재 객체들의 현황을 알려줌
-		for (auto* other : clients) {
-			//여기서 NPC도 알려줘야지
-
-			if (other->id == client_id) continue;
-			other->state_lock.lock();
-			if (ST_INGAME != other->state) {
-				other->state_lock.unlock();
-				continue;
-			}
-			other->state_lock.unlock();
-
-			if (false == is_near(other->id, client_id))
-				continue;
-
-			// 기존에 있던 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
-			cl.vl.lock();
-			cl.viewlist.insert(other->id);
-			cl.vl.unlock();
-
-			send_put_object(client_id, other->id);
-		}
-		send_move_object(client_id, client_id);
-
 
 	}
 	break;
@@ -2169,6 +2103,67 @@ void Network::worker()
 
 		}
 		break;
+		case OP_DB_PLAYER_LOGIN:
+		{
+			Client& cl = *reinterpret_cast<Client*>(clients[client_id]);
+
+			send_login_ok(client_id);
+
+			cl.state_lock.lock();
+			cl.state = ST_INGAME;
+			cl.state_lock.unlock();
+
+			//새로 들어온 친구의 위치를 정해주자
+
+			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
+			for (int i = 0; i < MAX_USER; ++i)
+			{
+				Client* other = reinterpret_cast<Client*>(clients[i]);
+				if (i == client_id) continue;
+				other->state_lock.lock();
+				if (ST_INGAME != other->state) {
+					other->state_lock.unlock();
+					continue;
+				}
+				other->state_lock.unlock();
+
+				if (false == is_near(other->id, client_id))
+					continue;
+
+				// 새로 들어온 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
+				other->vl.lock();
+				other->viewlist.insert(client_id);
+				other->vl.unlock();
+
+				send_put_object(other->id, client_id);
+			}
+
+			//새로 접속한 클라이언트에게 현재 객체들의 현황을 알려줌
+			for (auto* other : clients) {
+				//여기서 NPC도 알려줘야지
+
+				if (other->id == client_id) continue;
+				other->state_lock.lock();
+				if (ST_INGAME != other->state) {
+					other->state_lock.unlock();
+					continue;
+				}
+				other->state_lock.unlock();
+
+				if (false == is_near(other->id, client_id))
+					continue;
+
+				// 기존에 있던 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
+				cl.vl.lock();
+				cl.viewlist.insert(other->id);
+				cl.vl.unlock();
+
+				send_put_object(client_id, other->id);
+			}
+			send_move_object(client_id, client_id);
+
+		}
+		break;
 		default:
 			break;
 		}
@@ -2251,6 +2246,86 @@ void Network::do_timer() {
 		this_thread::sleep_for(10ms);
 	}
 }
+void Network::do_DBevent()
+{
+	using namespace std;
+	using namespace chrono;
+	while (true) {
+		//worker 스레드에서 디비 이벤트를 큐에 담으면
+		//여기서 빼서 디비 저장프로시저를 사용하고
+		//결과를 worker 스레드에 알려준다.
+		db_event ev;
+		while (!db_event_queue.empty()) {
+
+			while (!db_event_queue.try_pop(ev));
+
+			EXP_OVER* ex_over;// = new EXP_OVER;
+				//ex_over->_comp_op = OP_NPC_MOVE;
+			while (!exp_over_pool.try_pop(ex_over));
+
+			Client& cl = *reinterpret_cast<Client*>(clients[ev.obj_id]);
+			PlayerData player_data;
+			switch (ev.ev)
+			{
+			case DB_PLAYER_LOGIN:
+			{
+				ex_over->_comp_op = OP_DB_PLAYER_LOGIN;
+				player_data.name = std::wstring(cl.name, &cl.name[strnlen_s(cl.name, MAX_NAME_SIZE)]);
+				if (DB->checkPlayer(player_data)) {
+					cl.x = player_data.x;
+					cl.z = player_data.z;
+					cl.y = -cl.x - cl.z;
+					cl.curSkill = player_data.curSkill;
+
+					cl.SkillAD = player_data.SkillAD;
+					cl.SkillTa = player_data.SkillTa;
+					cl.SkillHeal = player_data.SkillHeal;
+
+					cl.MMR = player_data.MMR;
+					cl.money = player_data.money;
+
+					cl.inventory = inventorys[ev.obj_id];
+					DB->readInventory(&cl);
+				}
+				else {
+					//사용 중인 아이디이므로 worker까지 갈 것도 없이 그냥 로그인 실패 패킷을 보낸다.
+					send_login_fail(ev.obj_id);
+					break;
+				}
+
+				//db처리가 완료됐다고 알려주는거임 -> 데이터를 읽어오는 경우만 알려주면 될 것 같다.
+				PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);
+			}
+				break;
+			case DB_PLAYER_LOGOUT: {
+				// player data update
+				DB->updatePlayer(&cl, true);
+			}
+				break;
+			case DB_READ_INVENTORY:
+				// pqcs inventory info -> 메모리에 올려두고 사용해서 이건 로그인 할 때 빼고 쓸 일이 없을 것 같다.
+				break;
+			case DB_READ_CLAER_MAP_INFO:
+				// pqcs clear map info -> 이건 사용하는 방향으로 해보자
+				break;
+			case DB_UPDATE_CLEAR_MAP:
+				
+				break;
+			case DB_UPDATE_PLAYER_DATA:
+				// 게임 중간중간 저장할 때 사용
+				DB->updatePlayer(&cl, false);
+				break;
+			default:
+				break;
+			}
+
+
+		}
+
+		
+		this_thread::sleep_for(1000ms);
+	}
+}
 void Network::set_next_pattern(int room_id)
 {
 	// GetPatternTime을 하던 중 pattern_progress가 -1이 된다면? 안쓰이는 패턴이 등록된거고 만약 게임 방의 player들이 이미 null로 정의된 상태면 프로그램이 터지게됨
@@ -2327,6 +2402,18 @@ void Network::set_next_pattern(int room_id)
 		std::cout << "잘못된 패턴 타입\n";
 		break;
 	}
+}
+
+void Network::input_db_event(int c_id,DB_EVENT_TYPE type)
+{
+#ifdef DEBUG
+	if (DB->isConnect == false) return;
+#endif // DEBUG
+
+	db_event dev;
+	dev.obj_id = c_id;
+	dev.ev = type;
+	db_event_queue.push(dev);
 }
 
 void Network::game_start(int room_id)

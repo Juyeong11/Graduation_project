@@ -19,7 +19,8 @@ void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCod
 		(SQLSMALLINT)(sizeof(wszMessage) / sizeof(WCHAR)), (SQLSMALLINT*)NULL) == SQL_SUCCESS) {
 		// Hide data truncated..
 		if (wcsncmp(wszState, L"01004", 5)) {
-			fwprintf(stderr, L"[%5.5s] %s (%d)\n", wszState, wszMessage, iError);
+			fwprintf(stderr, L"[%5.5s] (%d)\n", wszState, iError);
+			std::wcout << wszMessage << std::endl;
 		}
 	}
 }
@@ -108,6 +109,7 @@ bool DataBase::checkPlayer(PlayerData& data)
 				data.SkillHeal = PlayerDataSchema.p_SkillHeal;
 
 				data.money = PlayerDataSchema.p_Money;
+				data.MMR = PlayerDataSchema.p_MMR;
 
 				int is_using = PlayerDataSchema.p_isUsing;
 				SQLCancel(hstmt);
@@ -129,6 +131,15 @@ bool DataBase::checkPlayer(PlayerData& data)
 		data.money = 0;
 		data.x = 13;
 		data.z = -25;
+
+		data.curSkill = 0;
+
+		data.SkillAD = 0;
+		data.SkillTa = 0;
+		data.SkillHeal =0;
+
+		data.MMR = 100;
+		data.money = 0;
 		insertPlayer(data);
 		return true;
 
@@ -179,24 +190,23 @@ void DataBase::updatePlayer(const Client* const pl, bool isend)
 	// 여기서부터 내일할것
 
 	std::wstring name = std::wstring(pl->name, &pl->name[strlen(pl->name)]);
-	if (name == L"Happy") {
-		return;
-	}
+	if (L"" == name) return;
+
 	int x = pl->x;
 	int z = pl->z;
 	int usingSkill = pl->curSkill;
 	int money = pl->money;
-	int isEnd = isend;
+	int isUsing = !isend;
 	
-	int unlockSkillAD = pl->SkillAD;
-	int unlockSkillTa = pl->SkillTa;
-	int unlockSkillHe = pl->SkillHeal;
+	unsigned char unlockSkillAD = pl->SkillAD;
+	unsigned char unlockSkillTa = pl->SkillTa;
+	unsigned char unlockSkillHe = pl->SkillHeal;
 
 	int mmr = pl->MMR;
 
-	std::wstring command = std::format(L"EXEC updatePlayerData '{}',{},{},{},{}, {},{},{}, {}",
-		name, x, z, usingSkill, money, isEnd,
-		unlockSkillAD, unlockSkillTa, unlockSkillHe,
+	std::wstring command = std::format(L"EXEC updatePlayerData '{}',{},{},{},{},{}, {},{},{}, {}",
+		name, x, z, money,usingSkill, isUsing,
+		static_cast<int>(unlockSkillAD), static_cast<int>(unlockSkillTa), static_cast<int>(unlockSkillHe),
 		mmr
 	);
 

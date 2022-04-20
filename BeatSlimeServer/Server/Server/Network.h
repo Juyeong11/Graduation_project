@@ -30,7 +30,15 @@ struct timer_event {
 		return (start_time > left.start_time);
 	}
 };
-
+enum DB_EVENT_TYPE {
+	DB_PLAYER_LOGIN, DB_PLAYER_LOGOUT,
+	DB_READ_INVENTORY, DB_READ_CLAER_MAP_INFO,
+	DB_UPDATE_CLEAR_MAP,DB_UPDATE_PLAYER_DATA
+};
+struct db_event {
+	int obj_id;
+	DB_EVENT_TYPE ev;
+};
 
 
 class DataBase;
@@ -107,6 +115,7 @@ public:
 	void do_npc_tile_attack(int game_room_id,int x,int y, int z);
 	void do_player_skill(GameRoom* gr, Client* cl);
 	void do_timer();
+	void do_DBevent();
 	void process_packet(int client_id, unsigned char* p);
 
 	void worker();
@@ -114,10 +123,14 @@ public:
 	void game_start(int room_id);
 
 	void set_next_pattern(int room_id);
+
+	void input_db_event(int c_id,DB_EVENT_TYPE type);
+	//수정
 	std::array<MapInfo*, MAP_NUM>& get_map() { return maps; }
 
 private:
 	concurrency::concurrent_priority_queue<timer_event> timer_queue;
+	concurrency::concurrent_queue<db_event> db_event_queue;
 	concurrency::concurrent_queue<EXP_OVER*> exp_over_pool;
 	std::array<GameObject*, MAX_OBJECT> clients;// 200, 200 맵을 존으로 나누어 뷰 리스트 제작할 것
 	EXP_OVER* accept_ex;

@@ -52,7 +52,7 @@ public class Network
 
         ClientSocket.BeginReceive(receiveBytes, pre_buf_size, BUFSIZE, SocketFlags.None, new System.AsyncCallback(receiveComplet), ClientSocket);
 
-       
+
     }
     void sendComplet(System.IAsyncResult ar)
     {
@@ -75,7 +75,8 @@ public class Network
         isOnline = true;
         tempSocket.EndConnect(ar);
         ClientSocket.BeginReceive(receiveBytes, 0, BUFSIZE, SocketFlags.None, new System.AsyncCallback(receiveComplet), ClientSocket);
-        SendLogIn("Happy");
+        var r = new System.Random();
+        SendLogIn("Happy" + r.Next(0, 128));
     }
     public void CreateAndConnect()
     {
@@ -100,19 +101,19 @@ public class Network
     {
         int i = 0;
         int sum = 0;
-        for(;i< ping_data.Length; ++i)
+        for (; i < ping_data.Length; ++i)
         {
             if (ping_data[i] == -1) break;
             sum += ping_data[i];
         }
-        return sum/i;
+        return sum / i;
     }
     public void SendLogIn(string name)
     {
         Protocol.cs_packet_login pk = new Protocol.cs_packet_login();
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_login));
         pk.type = Protocol.CONSTANTS.CS_PACKET_LOGIN;
-        pk.name = System.Text.Encoding.UTF8.GetBytes(name+'\0');
+        pk.name = System.Text.Encoding.UTF8.GetBytes(name + '\0');
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
 
@@ -139,7 +140,7 @@ public class Network
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_parrying));
         pk.type = Protocol.CONSTANTS.CS_PACKET_PARRYING;
 
-       
+
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
@@ -230,7 +231,7 @@ public class Network
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
 
-    public void SendPartyRequestAnwserPacket(byte type,int id)
+    public void SendPartyRequestAnwserPacket(byte type, int id)
     {
         Protocol.cs_packet_party_request_anwser pk = new Protocol.cs_packet_party_request_anwser();
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_party_request_anwser));
@@ -241,7 +242,7 @@ public class Network
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
 
-    public void SendChatMess(string mess,byte sendType,int reciver)
+    public void SendChatMess(string mess, byte sendType, int reciver)
     {
         Protocol.cs_packet_chat pk = new Protocol.cs_packet_chat();
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_chat));
