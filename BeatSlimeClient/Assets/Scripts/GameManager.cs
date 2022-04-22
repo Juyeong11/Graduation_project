@@ -135,7 +135,7 @@ public class GameManager : MonoBehaviour
 
         //여기서 할 수밖에 없음
         player.GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.PlayerHPs[0].HPImage, HPGM.PlayerHPs[0].prevHPImage);
-        HPGM.PlayerHPs[0].Set(PlayerPrefs.GetInt("mySkill"), PlayerPrefs.GetString("myName", "NotHappy"));
+        HPGM.PlayerHPs[0].Set(PlayerPrefs.GetInt("mySkill" + FieldGameManager.myPlayerID), PlayerPrefs.GetString("myName" +FieldGameManager.myPlayerID, "NotHappy"));
     }
     private void OnApplicationQuit()
     {
@@ -513,7 +513,7 @@ public class GameManager : MonoBehaviour
                             PlaySound();
                             PD.Play();
                             MN.ChangeMusicName(SongName + " - zeroste.");
-                            player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
+                            player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"+FieldGameManager.myPlayerID));
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
 
                             enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime( Objects[0].gameObject);
@@ -635,7 +635,7 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].GetComponentInChildren<PlayerManager>().playerLevelofSkill = p.skillLevel;
                                 Debug.Log(pid + ": " + p.skillType + ", " + p.skillLevel);
                     
-                                HPGM.PlayerHPs[0].Set(p.skillType, PlayerPrefs.GetString("myName", "youHappy?"));
+                                HPGM.PlayerHPs[0].Set(p.skillType, PlayerPrefs.GetString("myName"+FieldGameManager.myPlayerID, "youHappy?"));
 
                                 break;
                             }

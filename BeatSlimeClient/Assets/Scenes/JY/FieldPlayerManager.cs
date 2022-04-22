@@ -6,6 +6,9 @@ using System.Collections.Generic;
 public class FieldPlayerManager : MonoBehaviour
 {
     public Animator JumpTrigger;
+    public GameObject OutLineObject;
+    public Animator OutLineTrigger;
+
     bool isReady = false;
 
     public playerState state;
@@ -54,6 +57,8 @@ public class FieldPlayerManager : MonoBehaviour
     public void JumpTrig()
     {
         JumpTrigger.SetTrigger("Jump");
+        OutLineTrigger.SetTrigger("Jump");
+        OutLineObject.layer = LayerMask.NameToLayer("RenderOut");
         //JumpTrigger.ResetTrigger("Jump");
     }
 
@@ -87,6 +92,7 @@ public class FieldPlayerManager : MonoBehaviour
             PlayerWCheck();
             PlayerPortalCheck();
             gameObject.transform.position = new Vector3(PlayerTransform.position.x, HexCellPosition.calculateWPosition(selfCoord.preCoordinates.W), PlayerTransform.position.z);
+
         }
     }
     public void PlayerPortalCheck()
@@ -145,6 +151,7 @@ public class FieldPlayerManager : MonoBehaviour
         if (tick >= 1f)
         {
             selfCoord.preCoordinates = selfCoord.coordinates;
+            OutLineObject.layer = LayerMask.NameToLayer("OutLiner");
         }
 
         return new Vector3(newX, newY, newZ);
@@ -451,8 +458,8 @@ public class FieldPlayerManager : MonoBehaviour
         if (skillNum == 0)
             self_skillnum = 1;
 
-        PlayerPrefs.SetInt("mySkill", self_skillnum);
-        PlayerPrefs.SetInt("mySkillLevel", self_skillLevel);
+        PlayerPrefs.SetInt("mySkill"+ FieldGameManager.myPlayerID, self_skillnum);
+        PlayerPrefs.SetInt("mySkillLevel"+ FieldGameManager.myPlayerID, self_skillLevel);
     }
 
     public void SetSkillLevelContainer(int a, int b, int c)

@@ -33,7 +33,7 @@ public class BillboardUI : MonoBehaviour
         p = pid;
         if (pid == -1)
         {
-            NAME.text = PlayerPrefs.GetString("myName");
+            NAME.text = PlayerPrefs.GetString("myName"+ FieldGameManager.myPlayerID);
             pops.sprite = exit;
         }
         else

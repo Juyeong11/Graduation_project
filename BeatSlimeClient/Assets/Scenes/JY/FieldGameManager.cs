@@ -10,6 +10,8 @@ public class FieldGameManager : MonoBehaviour
     public int mapCellid = 0;
 
     public GameObject player;
+    public Animator playerAnim;
+    public Animator outlineAnim;
     public GameObject tilemap;
     public FieldHexGrid grid;
 
@@ -88,7 +90,7 @@ public class FieldGameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F12))
         {
             Net.SendTeleportPacket(1); // 100골드 획득
-            PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money", 0) + 100);
+            PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID, 0) + 100);
         }
         if (Input.GetKeyDown(KeyCode.F11))
         {
@@ -106,6 +108,10 @@ public class FieldGameManager : MonoBehaviour
             // 10: Tank2       150      40        7
             // 11: Tank3       500      80        6
             Net.SendBuyPacket(0); // 0번 아이템 구매
+        }
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            PlayerPrefs.DeleteAll();
         }
         if (Net.isOnline)
         {
@@ -126,16 +132,17 @@ public class FieldGameManager : MonoBehaviour
 
                             soundManager.PlayBGM("riverside");
                             MN.ChangeMusicName(soundManager.getSongName());
-                            player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
+                            playerAnim.SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed")+ myPlayerID);
+                            outlineAnim.SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed")+ myPlayerID);
                             myPlayerID = p.id;
                             Objects[p.id] = player;
 
-                            PlayerPrefs.SetString("myName", System.Text.Encoding.UTF8.GetString(p.name));
+                            PlayerPrefs.SetString("myName"+ myPlayerID, System.Text.Encoding.UTF8.GetString(p.name));
                             //print(p.cur_skill_type);
                             player.GetComponentInParent<FieldPlayerManager>().ChangeSkill(p.cur_skill_type, p.cur_skill_level);
                             player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(p.skill_progress[0], p.skill_progress[1], p.skill_progress[2]);
 
-                            PlayerPrefs.SetInt("Money", p.money);
+                            PlayerPrefs.SetInt("Money"+ myPlayerID, p.money);
 
                             //PutPlayerObject(p.type, p.id, p.x, p.y);
                         }
@@ -202,7 +209,6 @@ public class FieldGameManager : MonoBehaviour
                                         // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "플레이어 넣음");
                                         Objects[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                         Objects[p.id].SetActive(true);
-                                        Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", 120 / 45.0f);
 
                                         Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
 
@@ -216,6 +222,8 @@ public class FieldGameManager : MonoBehaviour
                                         }
                                         else
                                         {
+                                            Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed"+ myPlayerID, PlayerPrefs.GetFloat("pAnimSpeed"));
+
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().selfCoord.direction = (HexDirection)p.direction;
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_playerName = System.Text.Encoding.UTF8.GetString(p.name);
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillnum = p.skillType;
@@ -365,39 +373,39 @@ public class FieldGameManager : MonoBehaviour
                                 {
                                     case 0:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 1);
-                                        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - shopPrices.Skill1Prices[0]);
+                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill1Prices[0]);
                                         break;
                                     case 1:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 2);
-                                        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - shopPrices.Skill1Prices[1]);
+                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill1Prices[1]);
                                         break;
                                     case 2:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 3);
-                                        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - shopPrices.Skill1Prices[2]);
+                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill1Prices[2]);
                                         break;
                                     case 3:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 1);
-                                        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - shopPrices.Skill2Prices[0]);
+                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill2Prices[0]);
                                         break;
                                     case 4:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 2);
-                                        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - shopPrices.Skill2Prices[1]);
+                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill2Prices[1]);
                                         break;
                                     case 5:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 3);
-                                        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - shopPrices.Skill2Prices[2]);
+                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill2Prices[2]);
                                         break;
                                     case 6:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 1);
-                                        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - shopPrices.Skill3Prices[0]);
+                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill3Prices[0]);
                                         break;
                                     case 7:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 2);
-                                        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - shopPrices.Skill3Prices[1]);
+                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill3Prices[1]);
                                         break;
                                     case 8:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 3);
-                                        PlayerPrefs.SetInt("Money", PlayerPrefs.GetInt("Money") - shopPrices.Skill3Prices[2]);
+                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill3Prices[2]);
                                         break;
                                 }
                             }

@@ -1438,6 +1438,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   JumpTrigger: {fileID: 1736149195}
+  OutLineObject: {fileID: 1729123861}
+  OutLineTrigger: {fileID: 1729123864}
   state: 0
   handle: {fileID: 0}
   selfCoord: {fileID: 1739654813}
@@ -1596,7 +1598,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400982002}
-  m_LocalRotation: {x: 0.33409896, y: 3e-45, z: -1e-45, w: 0.942538}
+  m_LocalRotation: {x: 0.33409896, y: -1e-45, z: 1e-45, w: 0.942538}
   m_LocalPosition: {x: 0, y: 4, z: -3.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -4662,6 +4664,16 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1729123861 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6804174252978818953, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
+  m_PrefabInstance: {fileID: 1739654810}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1729123864 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 9167910721555178702, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
+  m_PrefabInstance: {fileID: 1739654810}
+  m_PrefabAsset: {fileID: 0}
 --- !u!95 &1736149195 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5139615764296778085, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
@@ -4690,10 +4702,22 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6804174252978818953, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8322171590553733044, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
       propertyPath: m_Name
       value: MainFieldSlime
       objectReference: {fileID: 0}
+    - target: {fileID: 8516564980019855440, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8516564980019855440, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6663441b107172f4cbaab3417c1a55f8, type: 2}
     - target: {fileID: 8661999146510441742, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -4740,6 +4764,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1741881430078216452, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
+    - {fileID: 1992610666304812401, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a7a41607d2b4bd540ba96f92edad0772, type: 3}
 --- !u!1 &1739654811 stripped
 GameObject:
@@ -5791,7 +5816,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930881972}
-  m_LocalRotation: {x: 0.33409896, y: 3e-45, z: -1e-45, w: 0.942538}
+  m_LocalRotation: {x: 0.33409896, y: -1e-45, z: 1e-45, w: 0.942538}
   m_LocalPosition: {x: 0, y: 4, z: -3.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -6420,6 +6445,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapCellid: 0
   player: {fileID: 1739654811}
+  playerAnim: {fileID: 1736149195}
+  outlineAnim: {fileID: 1729123864}
   tilemap: {fileID: 1387123429}
   grid: {fileID: 1387123430}
   loader: {fileID: 2121429944}
