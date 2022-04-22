@@ -898,7 +898,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BindingMode: 4
-  m_FollowOffset: {x: 0, y: 1.8, z: -4}
+  m_FollowOffset: {x: 0, y: 3, z: -3.5}
   m_XDamping: 1
   m_YDamping: 4
   m_ZDamping: 1
@@ -1454,7 +1454,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 438602112}
   m_Lens:
-    FieldOfView: 60
+    FieldOfView: 65
     OrthographicSize: 5
     NearClipPlane: 0.3
     FarClipPlane: 1000
@@ -1476,7 +1476,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400982002}
   m_LocalRotation: {x: 0.19080885, y: 0.00089094223, z: -0.00017318156, w: 0.9816268}
-  m_LocalPosition: {x: 0, y: 4.02, z: -3.869}
+  m_LocalPosition: {x: 0, y: 5.2200003, z: -3.369}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 132048414}
@@ -3772,6 +3772,7 @@ MonoBehaviour:
   - name: flower_load
     clip: {fileID: 8300000, guid: 8a76f0a3288031740a3fe1ffb8563148, type: 3}
     bpm: 90
+  ambPlayer: {fileID: 0}
   bgmPlayer: {fileID: 1931281404}
   sfxPlayer:
   - {fileID: 72865752}
@@ -3920,7 +3921,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 65
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -3946,7 +3947,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1930881972}
   m_LocalRotation: {x: 0.19080885, y: 0.00089094223, z: -0.00017318156, w: 0.9816268}
-  m_LocalPosition: {x: 0, y: 4.02, z: -3.869}
+  m_LocalPosition: {x: 0, y: 5.2200003, z: -3.369}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
