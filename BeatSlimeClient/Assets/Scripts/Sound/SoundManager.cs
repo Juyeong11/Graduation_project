@@ -24,6 +24,8 @@ public class SoundManager : MonoBehaviour
     [SerializeField] SfxSound[] sfx = null;
     [SerializeField] BgmSound[] bgm = null;
 
+    public AudioSource ambPlayer = null;
+
     [SerializeField] AudioSource bgmPlayer = null;
     [SerializeField] AudioSource[] sfxPlayer = null;
 
@@ -120,5 +122,17 @@ public class SoundManager : MonoBehaviour
             }
         }
         Debug.Log("해당 이름을 가지는 오디오가 없습니다.");
+    }
+
+    public string getSongName(bool isAmbience = false)
+    {
+        if (isAmbience)
+        {
+            return ambPlayer.clip.name;
+        }
+        else
+        {
+            return bgmPlayer.clip.name;
+        }
     }
 }

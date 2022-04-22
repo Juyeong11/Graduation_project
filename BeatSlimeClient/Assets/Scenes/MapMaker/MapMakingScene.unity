@@ -1094,7 +1094,6 @@ GameObject:
   - component: {fileID: 1308468202}
   - component: {fileID: 1308468201}
   - component: {fileID: 1308468200}
-  - component: {fileID: 1308468203}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -1178,18 +1177,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1308468198}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1308468203
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1308468198}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1387123430 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
@@ -2039,12 +2026,16 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: LandType.Array.size
-      value: 23
+      value: 24
       objectReference: {fileID: 0}
     - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: LandType.Array.data[22]
       value: 
       objectReference: {fileID: 3040140641696765941, guid: 2af11dd78f8fb4a418e7149ca295a9fc, type: 3}
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: LandType.Array.data[23]
+      value: 
+      objectReference: {fileID: 5314152483829048050, guid: 516fc499343dc444d873120e7bf37009, type: 3}
     - target: {fileID: 2181853409825296729, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: m_RootOrder
       value: 10

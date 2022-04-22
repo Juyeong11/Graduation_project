@@ -78,7 +78,7 @@ public class FieldGameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F1))
         {
-            MN.ChangeMusicName("flower load - zeroste.");
+            MN.ChangeMusicName(soundManager.getSongName());
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4))
@@ -125,7 +125,7 @@ public class FieldGameManager : MonoBehaviour
                             Protocol.sc_packet_login_ok p = Protocol.sc_packet_login_ok.SetByteToVar(data);
 
                             soundManager.PlayBGM("riverside");
-                            MN.ChangeMusicName("riverside - zeroste.");
+                            MN.ChangeMusicName(soundManager.getSongName());
                             player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             myPlayerID = p.id;
                             Objects[p.id] = player;

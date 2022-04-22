@@ -69,10 +69,18 @@ public class MapLoader : MonoBehaviour
                 tmpcell.name = "cell" + MapMaker.cellId++;
                 tmpcell.transform.parent = GRID.transform;
 
-                if (t == 10)
+                switch(t)
+                {
+                    case 10:
                     fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Shop);
-                else
+                    break;
+                    case 99:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w, cellState.Orgel);
+                    break;
+                    default:
                     fGrid.cellMaps.Add(tmpcell, x, y, z, w);
+                    break;
+                }
             }
 
             if(LoadByGameManagersSongName)

@@ -409,20 +409,28 @@ public class FieldPlayerManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             var t = FieldGameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
-            if (t.obejct && t.state == cellState.Shop)
+            if (t.obejct)
             {
-                if (shopOpened)
+                switch (t.state)
                 {
-                    SM.ShopClose();
-                    shopOpened = false;
+                    case cellState.Shop:
+                        if (shopOpened)
+                        {
+                            SM.ShopClose();
+                            shopOpened = false;
+                        }
+                        else
+                        {
+                            SM.ShopOpen(this);
+                            shopOpened = true;
+                        }
+                    break;
+
+                    case cellState.Orgel:
+                    // ¿À¸£°ñ Ã³¸®
+                    Orgel.instance.Touch();
+                    break;
                 }
-                else
-                {
-                    SM.ShopOpen(this);
-                    shopOpened = true;
-                }
-                
-                
             }
         }
 

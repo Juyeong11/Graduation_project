@@ -8,6 +8,8 @@ public enum cellState
     Damaged,
     None,
     Shop,
+
+    Orgel,
 }
 
 public class Cell
