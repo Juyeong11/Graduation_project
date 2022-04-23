@@ -76,7 +76,7 @@ int PathFinder::find_path(GameObject* finder, const GameObject* const target) {
 			n->f = 0;
 			if (x < 0 || z < 0) n->f = -1;
 			else if (x > LengthX || z > LengthZ) n->f = -1;
-			else if (p_map_data[z * LengthX + x] != 0)  n->f = -1;
+			else if (p_map_data[z * LengthX + x] < 0)  n->f = -1;
 		}
 	}
 
