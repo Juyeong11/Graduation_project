@@ -2026,7 +2026,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: LandType.Array.size
-      value: 24
+      value: 28
+      objectReference: {fileID: 0}
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: cellType.Array.size
+      value: 16
       objectReference: {fileID: 0}
     - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: LandType.Array.data[22]
@@ -2036,6 +2040,26 @@ PrefabInstance:
       propertyPath: LandType.Array.data[23]
       value: 
       objectReference: {fileID: 5314152483829048050, guid: 516fc499343dc444d873120e7bf37009, type: 3}
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: LandType.Array.data[24]
+      value: 
+      objectReference: {fileID: 4045514859284561704, guid: 25bce374c18d94348833e42775a35c6b, type: 3}
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: LandType.Array.data[25]
+      value: 
+      objectReference: {fileID: 6062387613364066374, guid: 8efb2177b0c176141a23f7003d38f762, type: 3}
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: LandType.Array.data[26]
+      value: 
+      objectReference: {fileID: 2729658564801182546, guid: fe087beee6ae91b40a448a2e6ee4f1ca, type: 3}
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: LandType.Array.data[27]
+      value: 
+      objectReference: {fileID: 8783627151036565946, guid: 2d9a5448aeb7d7546a4dd8b6b427cf9b, type: 3}
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: cellType.Array.data[15]
+      value: 
+      objectReference: {fileID: 8306949539544319289, guid: 7f13d9b3349064c4baf7981db3d061ab, type: 3}
     - target: {fileID: 2181853409825296729, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: m_RootOrder
       value: 10
