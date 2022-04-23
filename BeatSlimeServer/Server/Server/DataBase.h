@@ -62,9 +62,9 @@ public:
 	void insertPlayer(PlayerData& name);
 	void updatePlayer(const Client* const player,bool isend);
 	void updateClearInfo(const Client* const player);
-	void updateInventory(const Client* const player);
+	char updateInventory(const Client* const player,int itemType,int usedCnt);
 	void readSkills(std::array<Skill*, SKILL_CNT>& items);
-	void readInventory(Client* player);
+	void readInventory(const Client* const player, char inven[20]);
 	void readClearMap(Client* player);
 };
 

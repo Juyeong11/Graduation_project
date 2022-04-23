@@ -33,10 +33,11 @@ struct timer_event {
 enum DB_EVENT_TYPE {
 	DB_PLAYER_LOGIN, DB_PLAYER_LOGOUT,
 	DB_READ_INVENTORY, DB_READ_CLAER_MAP_INFO,
-	DB_UPDATE_CLEAR_MAP,DB_UPDATE_PLAYER_DATA
+	DB_UPDATE_CLEAR_MAP, DB_UPDATE_PLAYER_DATA, DB_USE_SCROLL, DB_GET_SCROLL
 };
 struct db_event {
 	int obj_id;
+	int data;
 	DB_EVENT_TYPE ev;
 };
 
@@ -67,7 +68,7 @@ public:
 
 	void start_accept();
 
-	void send_login_ok(int client_id);
+	void send_login_ok(int client_id,char inven[20]);
 	void send_login_fail(int client_id);
 	void send_move_object(int client_id, int mover_id);
 	void send_attack_player(int attacker, int target_id, int receiver);
@@ -85,6 +86,7 @@ public:
 	void send_party_request_anwser(int reciver,int newPlayerid,Party* party,int type);
 	void send_chat_packet(int user_id, int my_id, char* mess);
 	void send_buy_result(int user_id, int itemType, char result);
+	void send_use_item(int user_id, int user, int itemType);
 
 	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z);
 	void disconnect_client(int client_id);
@@ -124,7 +126,8 @@ public:
 
 	void set_next_pattern(int room_id);
 
-	void input_db_event(int c_id,DB_EVENT_TYPE type);
+	void input_db_event(int c_id,DB_EVENT_TYPE type,int data = 0);
+
 	//¼öÁ¤
 	std::array<MapInfo*, MAP_NUM>& get_map() { return maps; }
 
@@ -142,6 +145,6 @@ private:
 
 	std::array<Skill*, SKILL_CNT> skills;
 	std::array<Party*, MAX_USER/2> PartyPool;
-	std::array<Inventory*, MAX_USER> inventorys;
+	//std::array<Inventory*, MAX_USER> inventorys;
 };
 

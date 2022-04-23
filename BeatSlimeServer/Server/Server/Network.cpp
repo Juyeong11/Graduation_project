@@ -32,9 +32,7 @@ Network::Network() {
 		maps[i] = new MapInfo;
 	}
 	DB = new DataBase;
-	for (int i = 0; i < 9; ++i) {
-		inventorys[i] = new Inventory;
-	}
+
 	DB->readSkills(skills);
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
@@ -154,7 +152,7 @@ bool Network::is_near(int a, int b)
 
 	return true;
 }
-void Network::send_login_ok(int c_id)
+void Network::send_login_ok(int c_id,char inven[20])
 {
 	sc_packet_login_ok packet;
 	packet.id = c_id;
@@ -170,6 +168,7 @@ void Network::send_login_ok(int c_id)
 	packet.skill_progress[2] = 0;
 	packet.money = 0;
 	strcpy_s(packet.name, clients[c_id]->name);
+	memcpy_s(packet.inventory,20, inven,20);
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -472,6 +471,20 @@ void Network::send_buy_result(int user_id, int itemType, char result)
 	reinterpret_cast<Client*>(ex_over, clients[user_id])->do_send(ex_over);
 }
 
+void Network::send_use_item(int user_id, int user, int itemType)
+{
+	sc_packet_use_item packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_USE_ITEM;
+	packet.itemType = itemType;
+	packet.user = user;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(ex_over, clients[user_id])->do_send(ex_over);
+}
+
 void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
@@ -747,7 +760,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 		// 아래부터는 디비 스레드에서 pqcs하면 다시 하기 시작
 		
 		if (DB->isConnect == false) {
-			send_login_ok(client_id);
+			char inven[20];
+			for (int i = 0; i < 20; ++i) {
+				inven[i] = 10;
+			}
+			send_login_ok(client_id, inven);
 
 			cl.state_lock.lock();
 			cl.state = ST_INGAME;
@@ -762,7 +779,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.MMR = 100;
 			cl.money =0;
 
-			cl.inventory = inventorys[client_id];
+			//cl.inventory = inventorys[client_id];
 		}
 
 	}
@@ -1554,6 +1571,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 				send_attack_player(client_id, gr->boss_id->id, pl->id);
 			}
 		}
+		else if (packet->pos == 3) {
+			input_db_event(client_id, DB_GET_SCROLL, 1);
+			break;
+		}
 		else {
 			cl.pre_x = cl.x;
 			cl.pre_y = cl.y;
@@ -1591,6 +1612,30 @@ void Network::process_packet(int client_id, unsigned char* p)
 		send_buy_result(client_id, packet->itemType, 1);
 	}
 	break;
+	case CS_PACKET_USE_ITEM:
+		//DB로 아이템을 사용했다고 이벤트를 보낸다.
+	{
+		cs_packet_buy* packet = reinterpret_cast<cs_packet_buy*>(p);
+
+		input_db_event(client_id, DB_USE_SCROLL, packet->itemType);
+		if (DB->isConnect == false) {
+			for (int i = 0; i < MAX_USER; ++i)
+			{
+				Client* other = reinterpret_cast<Client*>(clients[i]);
+				if (i == client_id) continue;
+				other->state_lock.lock();
+				if (ST_INGAME != other->state) {
+					other->state_lock.unlock();
+					continue;
+				}
+				other->state_lock.unlock();
+
+				send_use_item(i, client_id, packet->itemType);
+			}
+		}
+
+	}
+		break;
 	default:
 		std::cout << "wrong packet\n";
 		break;
@@ -2106,8 +2151,10 @@ void Network::worker()
 		case OP_DB_PLAYER_LOGIN:
 		{
 			Client& cl = *reinterpret_cast<Client*>(clients[client_id]);
+			char item[20];
+			memcpy_s(item, 20, reinterpret_cast<char*>(exp_over->_net_buf), 20);
 
-			send_login_ok(client_id);
+			send_login_ok(client_id, item);
 
 			cl.state_lock.lock();
 			cl.state = ST_INGAME;
@@ -2164,6 +2211,29 @@ void Network::worker()
 
 		}
 		break;
+		case OP_DB_USE_ITEM:
+		{
+			char isUsed = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			char itemType = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(char)));
+			if (isUsed == 1)
+			{
+				for (int i = 0; i < MAX_USER; ++i)
+				{
+					Client* other = reinterpret_cast<Client*>(clients[i]);
+					if (i == client_id) continue;
+					other->state_lock.lock();
+					if (ST_INGAME != other->state) {
+						other->state_lock.unlock();
+						continue;
+					}
+					other->state_lock.unlock();
+
+					send_use_item(i, client_id, itemType);
+				}
+			}
+
+		}
+			break;
 		default:
 			break;
 		}
@@ -2283,9 +2353,8 @@ void Network::do_DBevent()
 
 					cl.MMR = player_data.MMR;
 					cl.money = player_data.money;
-
-					cl.inventory = inventorys[ev.obj_id];
-					DB->readInventory(&cl);
+					memset(ex_over->_net_buf, 0, 20);
+					DB->readInventory(&cl,reinterpret_cast<char*>(ex_over->_net_buf));
 				}
 				else {
 					//사용 중인 아이디이므로 worker까지 갈 것도 없이 그냥 로그인 실패 패킷을 보낸다.
@@ -2303,10 +2372,24 @@ void Network::do_DBevent()
 			}
 				break;
 			case DB_READ_INVENTORY:
-				// pqcs inventory info -> 메모리에 올려두고 사용해서 이건 로그인 할 때 빼고 쓸 일이 없을 것 같다.
+				// pqcs inventory info
+				ex_over->_comp_op = OP_DB_INVENTORY;
 				break;
 			case DB_READ_CLAER_MAP_INFO:
 				// pqcs clear map info -> 이건 사용하는 방향으로 해보자
+				break;
+			case DB_USE_SCROLL:
+				// pqcs result info
+				{
+				ex_over->_comp_op = OP_DB_USE_ITEM;
+				*reinterpret_cast<char*>(ex_over->_net_buf) = DB->updateInventory(&cl, ev.data, -1);;
+				*reinterpret_cast<char*>(ex_over->_net_buf + sizeof(char)) = ev.data;
+
+				PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);
+				}
+				break;
+			case DB_GET_SCROLL:
+				DB->updateInventory(&cl, ev.data, 1);
 				break;
 			case DB_UPDATE_CLEAR_MAP:
 				
@@ -2404,7 +2487,7 @@ void Network::set_next_pattern(int room_id)
 	}
 }
 
-void Network::input_db_event(int c_id,DB_EVENT_TYPE type)
+void Network::input_db_event(int c_id,DB_EVENT_TYPE type,int data)
 {
 #ifdef DEBUG
 	if (DB->isConnect == false) return;
@@ -2413,8 +2496,10 @@ void Network::input_db_event(int c_id,DB_EVENT_TYPE type)
 	db_event dev;
 	dev.obj_id = c_id;
 	dev.ev = type;
+	dev.data = data;
 	db_event_queue.push(dev);
 }
+
 
 void Network::game_start(int room_id)
 {
@@ -2462,81 +2547,9 @@ void Network::game_start(int room_id)
 	}
 
 
-
 	set_next_pattern(room_id);
 
 	if (room_id == -1) {
 
-	}
-
-	{
-
-		//for (const auto& t : pt) {
-		//	timer_event tev;
-
-		//	switch (t.type)
-		//	{
-		//	case -1:
-
-		//		tev.ev = EVENT_BOSS_MOVE;
-		//		tev.obj_id = boss_id;
-		//		tev.game_room_id = room_id;
-		//		tev.x = t.x;
-		//		tev.y = t.y;
-		//		tev.z = t.z;
-		//		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		//		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
-		//		tev.charging_time = t.speed;
-		//		tev.pivotType = t.pivotType;
-		//		timer_queue.push(tev);// 여기 move를 사용해도 될까?
-		//		break;
-		//	case 3:// 패턴 3번
-		//	case 4:// 패턴 4번
-		//	case 99:// 단일 장판 공격
-		//	case 5: // 가장 멀리있는 적에게 물줄기 발사
-		//	case 6: // 보스가 보는 방향으로 지진
-		//		tev.ev = EVENT_BOSS_TILE_ATTACK_START;
-		//		tev.obj_id = boss_id;
-		//		tev.type = t.type;
-		//		tev.x = t.x;
-		//		tev.y = t.y;
-		//		tev.z = t.z;
-		//		tev.game_room_id = room_id;
-		//		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		//		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
-		//		tev.charging_time = t.speed;
-		//		tev.pivotType = t.pivotType;
-		//		timer_queue.push(tev);
-		//		break;
-
-		//	case 10: // 유도 공격 -> 패링할 수 있음
-
-
-		//		tev.ev = EVENT_PLAYER_PARRYING;
-		//		tev.obj_id = boss_id;
-		//		tev.type = t.type;
-		//		tev.x = t.x;
-		//		tev.y = t.y;
-		//		tev.z = t.z;
-		//		tev.game_room_id = room_id;
-		//		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		//		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
-		//		tev.charging_time = t.speed;
-		//		tev.pivotType = t.pivotType;
-		//		timer_queue.push(tev);
-		//		break;
-		//	case -600:
-		//		tev.ev = EVENT_GAME_END;
-		//		tev.game_room_id = room_id;
-		//		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		//		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
-
-		//		timer_queue.push(std::move(tev));
-		//		break;
-		//	default:
-		//		std::cout << "잘못된 패턴 타입\n";
-		//		break;
-		//	}
-		//}
 	}
 }

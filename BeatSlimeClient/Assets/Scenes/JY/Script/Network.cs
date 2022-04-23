@@ -324,6 +324,16 @@ public class Network
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
+
+    public void SendUseItemPacket(byte itemType)
+    {
+        Protocol.cs_packet_use_item pk = new Protocol.cs_packet_use_item();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_use_item));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_USE_ITEM;
+        pk.itemType = itemType;
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
     public bool isServerOnline()
     {
         return debugOnline || isOnline;

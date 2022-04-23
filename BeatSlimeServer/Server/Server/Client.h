@@ -152,7 +152,7 @@ public:
 	int MusicScroll;
 	int MusicScrollCount;
 
-	Inventory* inventory;
+	//Inventory* inventory;
 	Party* party;
 
 	PathFinder* Astar = nullptr;

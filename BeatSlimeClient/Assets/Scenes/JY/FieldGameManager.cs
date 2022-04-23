@@ -109,6 +109,17 @@ public class FieldGameManager : MonoBehaviour
             // 11: Tank3       500      80        6
             Net.SendBuyPacket(0); // 0번 아이템 구매
         }
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+            //scrool item을 사용하겠다.
+            //itemType을 인자로 전달 0~9까지 마녀 맵 스크롤 0~9사이 숫자로 스크롤의 등급을 매김 
+            Net.SendUseItemPacket(1);
+        }
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            // 스크롤을 얻겠다. 얻는 스크롤은 서버에서 랜덤하게 부여
+            Net.SendTeleportPacket(3);
+        }
         if (Input.GetKeyDown(KeyCode.F5))
         {
             PlayerPrefs.DeleteAll();
@@ -132,17 +143,21 @@ public class FieldGameManager : MonoBehaviour
 
                             soundManager.PlayBGM("riverside");
                             MN.ChangeMusicName(soundManager.getSongName());
-                            playerAnim.SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed")+ myPlayerID);
-                            outlineAnim.SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed")+ myPlayerID);
+                            playerAnim.SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed") + myPlayerID);
+                            outlineAnim.SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed") + myPlayerID);
                             myPlayerID = p.id;
                             Objects[p.id] = player;
 
-                            PlayerPrefs.SetString("myName"+ myPlayerID, System.Text.Encoding.UTF8.GetString(p.name));
+                            PlayerPrefs.SetString("myName" + myPlayerID, System.Text.Encoding.UTF8.GetString(p.name));
                             //print(p.cur_skill_type);
                             player.GetComponentInParent<FieldPlayerManager>().ChangeSkill(p.cur_skill_type, p.cur_skill_level);
                             player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(p.skill_progress[0], p.skill_progress[1], p.skill_progress[2]);
 
-                            PlayerPrefs.SetInt("Money"+ myPlayerID, p.money);
+                            for (int i = 0; i < 20; ++i)
+                            {
+                                Debug.Log(p.inventory[i]);
+                            }
+                            PlayerPrefs.SetInt("Money" + myPlayerID, p.money);
 
                             //PutPlayerObject(p.type, p.id, p.x, p.y);
                         }
@@ -222,7 +237,7 @@ public class FieldGameManager : MonoBehaviour
                                         }
                                         else
                                         {
-                                            Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed"+ myPlayerID, PlayerPrefs.GetFloat("pAnimSpeed"));
+                                            Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed" + myPlayerID, PlayerPrefs.GetFloat("pAnimSpeed"));
 
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().selfCoord.direction = (HexDirection)p.direction;
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_playerName = System.Text.Encoding.UTF8.GetString(p.name);
@@ -373,44 +388,53 @@ public class FieldGameManager : MonoBehaviour
                                 {
                                     case 0:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 1);
-                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill1Prices[0]);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill1Prices[0]);
                                         break;
                                     case 1:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 2);
-                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill1Prices[1]);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill1Prices[1]);
                                         break;
                                     case 2:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 3);
-                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill1Prices[2]);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill1Prices[2]);
                                         break;
                                     case 3:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 1);
-                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill2Prices[0]);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[0]);
                                         break;
                                     case 4:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 2);
-                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill2Prices[1]);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[1]);
                                         break;
                                     case 5:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 3);
-                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill2Prices[2]);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[2]);
                                         break;
                                     case 6:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 1);
-                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill3Prices[0]);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill3Prices[0]);
                                         break;
                                     case 7:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 2);
-                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill3Prices[1]);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill3Prices[1]);
                                         break;
                                     case 8:
                                         player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 3);
-                                        PlayerPrefs.SetInt("Money"+ myPlayerID, PlayerPrefs.GetInt("Money"+ myPlayerID) - shopPrices.Skill3Prices[2]);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill3Prices[2]);
                                         break;
                                 }
                             }
                             // p->itemType  구매 시도한 아이템
                             // p->result    0 구매 실패 1 구매 성공
+                        }
+                        break;
+                    case Protocol.CONSTANTS.SC_PACKET_USE_ITEM:
+                        // user가 itemType을 사용했습니다.
+                        // 필드에 있는 모든 플레이어에게 전송되는 패킷
+                        {
+                            Protocol.sc_packet_use_item p = Protocol.sc_packet_use_item.SetByteToVar(data);
+
+                            Debug.Log(p.user + "가 " + p.itemType + "을 사용했습니다.");
                         }
                         break;
                     default:

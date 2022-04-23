@@ -22,6 +22,7 @@ const char CS_PACKET_CHAT = 15;
 const char CS_PACKET_SET_PATH = 16;
 const char CS_PACKET_TELEPORT = 17;
 const char CS_PACKET_BUY = 18;
+const char CS_PACKET_USE_ITEM = 19;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -43,6 +44,7 @@ const char SC_PACKET_PARTY_REQUEST_ANSWER = 16;
 const char SC_PACKET_CHAT = 17;
 const char SC_PACKET_LOGIN_FAIL = 18;
 const char SC_PACKET_BUY_RESULT = 19;
+const char SC_PACKET_USE_ITEM = 20;
 
 #pragma pack (push, 1)
 //client -> server
@@ -149,7 +151,11 @@ struct cs_packet_buy {
 	char type;
 	char itemType;
 };
-
+struct cs_packet_use_item {
+	unsigned char size;
+	char type;
+	char itemType;
+};
 //server->client
 struct sc_packet_login_ok {
 	unsigned char size;
@@ -161,6 +167,7 @@ struct sc_packet_login_ok {
 	char cur_skill_level;
 	char skill_progress[3];
 	char name[MAX_NAME_SIZE];
+	char inventory[20]; // -> ∏∂≥‡ ∏ , Ω∫∆¿∆„≈© ∏  2∞≥¿« Ω∫≈©∑— 10∞≥¿« µÓ±ﬁ
 
 };
 struct sc_packet_login_fail {
@@ -303,5 +310,12 @@ struct sc_packet_buy_result {
 	char	type;
 	char	itemType;
 	char	result;
+};
+
+struct sc_packet_use_item {
+	unsigned char size;
+	char	type;
+	char	itemType;
+	int	user;
 };
 #pragma pack(pop)

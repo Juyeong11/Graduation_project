@@ -38,6 +38,7 @@ namespace Protocol
         public const byte CS_PACKET_SET_PATH = 16;
         public const byte CS_PACKET_TELEPORT = 17;
         public const byte CS_PACKET_BUY = 18;
+        public const byte CS_PACKET_USE_ITEM = 19;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -58,6 +59,7 @@ namespace Protocol
         public const byte SC_PACKET_CHAT = 17;
         public const byte SC_PACKET_LOGIN_FAIL = 18;
         public const byte SC_PACKET_BUY_RESULT = 19;
+        public const byte SC_PACKET_USE_ITEM = 20;
 
 
     }
@@ -279,6 +281,15 @@ namespace Protocol
         public byte type;
         public byte itemType;
     }
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_use_item : ISerializeble<cs_packet_use_item>
+    {
+        public byte size;
+        public byte type;
+        public byte itemType;
+    }
+
     //Server -> Client
 
     [Serializable]
@@ -297,6 +308,9 @@ namespace Protocol
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = CONSTANTS.MAX_NAME_SIZE)]
         public byte[] name = new byte[CONSTANTS.MAX_NAME_SIZE];
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
+        public byte[] inventory = new byte[20]; // -> ∏∂≥‡ ∏ , Ω∫∆¿∆„≈© ∏  2∞≥¿« Ω∫≈©∑— 10∞≥¿« µÓ±ﬁ
     }
 
     [Serializable]
@@ -490,5 +504,15 @@ namespace Protocol
         public byte type;
         public byte itemType;
         public byte result;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_use_item : ISerializeble<sc_packet_use_item>
+    {
+        public byte size;
+        public byte type;
+        public byte itemType;
+        public int user;
     }
 }

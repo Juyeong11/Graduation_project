@@ -99,7 +99,7 @@ bool DataBase::checkPlayer(PlayerData& data)
 			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 			{
 				data.name = PlayerDataSchema.p_name;
-
+				
 				data.x = PlayerDataSchema.p_x;
 				data.z = PlayerDataSchema.p_z;
 				data.curSkill = PlayerDataSchema.p_UsingSkill;
@@ -136,7 +136,7 @@ bool DataBase::checkPlayer(PlayerData& data)
 
 		data.SkillAD = 0;
 		data.SkillTa = 0;
-		data.SkillHeal =0;
+		data.SkillHeal = 0;
 
 		data.MMR = 100;
 		data.money = 0;
@@ -197,7 +197,7 @@ void DataBase::updatePlayer(const Client* const pl, bool isend)
 	int usingSkill = pl->curSkill;
 	int money = pl->money;
 	int isUsing = !isend;
-	
+
 	unsigned char unlockSkillAD = pl->SkillAD;
 	unsigned char unlockSkillTa = pl->SkillTa;
 	unsigned char unlockSkillHe = pl->SkillHeal;
@@ -205,7 +205,7 @@ void DataBase::updatePlayer(const Client* const pl, bool isend)
 	int mmr = pl->MMR;
 
 	std::wstring command = std::format(L"EXEC updatePlayerData '{}',{},{},{},{},{}, {},{},{}, {}",
-		name, x, z, money,usingSkill, isUsing,
+		name, x, z, money, usingSkill, isUsing,
 		static_cast<int>(unlockSkillAD), static_cast<int>(unlockSkillTa), static_cast<int>(unlockSkillHe),
 		mmr
 	);
@@ -249,7 +249,7 @@ void DataBase::updateClearInfo(const Client* const pl)
 			HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
 			break;
 		}
-	
+
 		index++;
 	}
 	// Process data  
@@ -259,40 +259,54 @@ void DataBase::updateClearInfo(const Client* const pl)
 	}
 }
 
-void DataBase::updateInventory(const Client* const pl)
+char DataBase::updateInventory(const Client* const pl, int itemType, int usedCnt)
 {
-	if (false == isConnect) return;
-
+	if (false == isConnect) return 0;
+	if (false == (usedCnt == 1 || usedCnt == -1)) { std::cout << "Client can used only one item\n"; return 0;
+	}
 	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 
 
 	std::wstring name = std::wstring(pl->name, &pl->name[strlen(pl->name)]);
 
-	for (const Item& it : pl->inventory->items) {
-		int musicScroll = it.itemType;
-		int musicScrollCount = it.cnt;
-		if (musicScroll == -1)continue;
-		std::wstring command = std::format(L"EXEC updateInventory '{}',{},{}",
-			name, musicScroll, musicScrollCount
-		);
+	int musicScroll = itemType;
 
 
-		retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
-		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+	std::wstring command = std::format(L"EXEC updateInventory '{}',{},{}",
+		name, musicScroll, usedCnt
+	);
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+
+		retcode = SQLBindCol(hstmt, 1, SQL_C_WCHAR, &PlayerDataSchema.p_name, MAX_NAME_SIZE, &PlayerDataSchema.cb_name);
+		retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &PlayerDataSchema.p_MusicScroll, 4, &PlayerDataSchema.cb_MusicScroll);
+		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &PlayerDataSchema.p_MusicScrollCount, 4, &PlayerDataSchema.cb_MusicScrollCount);
+
+		retcode = SQLFetch(hstmt);
+		if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
+		{
+
+			std::wcout << std::wstring{ PlayerDataSchema.p_name } << " have " << (int)PlayerDataSchema.p_MusicScroll << " cnt " << PlayerDataSchema.p_MusicScrollCount << "\n";
+			SQLCancel(hstmt);
+			SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+			return 1;
 		}
-		else {
-			HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
-			break;
-		}
-
-		
 	}
+	else {
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
+		return 0;
+	}
+
+
+
 	// Process data  
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
 		SQLCancel(hstmt);
 		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 	}
-	
+	return 0;
+
 }
 
 void DataBase::readSkills(std::array<Skill*, SKILL_CNT>& items)
@@ -441,7 +455,7 @@ void DataBase::readSkills(std::array<Skill*, SKILL_CNT>& items)
 
 }
 
-void DataBase::readInventory(Client* pl)
+void DataBase::readInventory(const Client* const pl, char inven[20])
 {
 	//인벤토리를 정보를 달라고 클라에서 요청이 오면 보내준다.
 	//요청이 오는 경우 -> 소모품을 사용했을 때
@@ -466,12 +480,13 @@ void DataBase::readInventory(Client* pl)
 		retcode = SQLBindCol(hstmt, 2, SQL_C_LONG, &PlayerDataSchema.p_MusicScroll, 4, &PlayerDataSchema.cb_MusicScroll);
 		retcode = SQLBindCol(hstmt, 3, SQL_C_LONG, &PlayerDataSchema.p_MusicScrollCount, 4, &PlayerDataSchema.cb_MusicScrollCount);
 
-		for (int i = 0; i < 15; i++) {
+		for (int i = 0; i < 20; i++) {
 			retcode = SQLFetch(hstmt);
 			if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO)
 			{
-				pl->inventory->items[i].itemType = PlayerDataSchema.p_MusicScroll;
-				pl->inventory->items[i].cnt = PlayerDataSchema.p_MusicScrollCount;
+				int itemType = PlayerDataSchema.p_MusicScroll;
+				if (itemType >= 20) { std::cout << "DB read : wrong item Type\n"; continue; }
+				inven[itemType] = PlayerDataSchema.p_MusicScrollCount;
 
 			}
 			else {
