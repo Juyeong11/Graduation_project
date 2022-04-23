@@ -810,37 +810,37 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
-			if (maps[cur_map]->GetTileType(x - 1, z + 1) != 0) {
+			if (maps[cur_map]->GetTileType(x - 1, z + 1) < 0) {
 				break;
 			}
 			x--; z++;
 			break;
 		case DIR::UP:
-			if (maps[cur_map]->GetTileType(x, z + 1) != 0) {
+			if (maps[cur_map]->GetTileType(x, z + 1) < 0) {
 				break;
 			}
 			y--; z++;
 			break;
 		case DIR::RIGHTUP:
-			if (maps[cur_map]->GetTileType(x + 1, z) != 0) {
+			if (maps[cur_map]->GetTileType(x + 1, z) < 0) {
 				break;
 			}
 			x++; y--;
 			break;
 		case DIR::LEFTDOWN:
-			if (maps[cur_map]->GetTileType(x - 1, z) != 0) {
+			if (maps[cur_map]->GetTileType(x - 1, z) < 0) {
 				break;
 			}
 			x--; y++;
 			break;
 		case DIR::DOWN:
-			if (maps[cur_map]->GetTileType(x, z - 1) != 0) {
+			if (maps[cur_map]->GetTileType(x, z - 1) < 0) {
 				break;
 			}
 			y++; z--;
 			break;
 		case DIR::RIGHTDOWN:
-			if (maps[cur_map]->GetTileType(x + 1, z - 1) != 0) {
+			if (maps[cur_map]->GetTileType(x + 1, z - 1) < 0) {
 				break;
 			}
 			x++; z--;
