@@ -644,6 +644,7 @@ public class GameManager : MonoBehaviour
                             {
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
+                                        //print("PLAPER");
                                         if (HPGMStaticInt <= 2)
                                         {
                                             // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "�÷��̾� ����");
@@ -652,7 +653,7 @@ public class GameManager : MonoBehaviour
                                             Objects[pid].GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.PlayerHPs[HPGMStaticInt].HPImage, HPGM.PlayerHPs[HPGMStaticInt].prevHPImage);
                                             Objects[pid].GetComponentInChildren<PlayerManager>().playerClassofSkill = p.skillType;
                                             Objects[pid].GetComponentInChildren<PlayerManager>().playerLevelofSkill = p.skillLevel;
-                                            Debug.Log(pid + ": " + p.skillType + ", " + p.skillLevel);
+                                            //Debug.Log(pid + ": " + p.skillType + ", " + p.skillLevel);
                                             HPGM.PlayerHPs[HPGMStaticInt].Set(p.skillType, System.Text.Encoding.UTF8.GetString(p.name));
                                             HPGMStaticInt++;
 

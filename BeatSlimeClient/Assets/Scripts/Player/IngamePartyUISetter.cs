@@ -16,6 +16,7 @@ public class IngamePartyUISetter : MonoBehaviour
     public void Set(int cid, string nameT)
     {
         classImage.sprite = CIO.ClassSprites[cid];
+        //print("player name : " + nameT);
         nameText.text = nameT;
     }
 }

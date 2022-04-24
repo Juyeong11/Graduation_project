@@ -234,10 +234,10 @@ public class FieldGameManager : MonoBehaviour
                                             Objects[p.id].GetComponentInParent<FieldPlayerManager>().selfDirection = (HexDirection)p.direction;
                                             Objects[p.id].GetComponentInParent<FieldPlayerManager>().self_skillnum = p.skillType;
                                             Objects[p.id].GetComponentInParent<FieldPlayerManager>().self_skillLevel = p.skillLevel;
-                                        }
+                                        }   
                                         else
                                         {
-                                            Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed" + myPlayerID, PlayerPrefs.GetFloat("pAnimSpeed"));
+                                            Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"+myPlayerID));
 
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().selfCoord.direction = (HexDirection)p.direction;
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_playerName = System.Text.Encoding.UTF8.GetString(p.name);

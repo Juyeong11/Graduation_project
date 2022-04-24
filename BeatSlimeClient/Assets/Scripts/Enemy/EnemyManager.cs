@@ -20,7 +20,6 @@ public class EnemyManager : MonoBehaviour
 
     public HexCellPosition selfCoord;
     public GameObject nearestSlimeCoord;
-    private float spinningLerpFactor = 0f;
     private bool ticker = false;
     public HexGrid grid;
 
@@ -91,16 +90,10 @@ public class EnemyManager : MonoBehaviour
             Vector3 targetVector = nearestSlimeCoord.transform.position - transform.position;
             targetVector.y = 0;
             float cross = Vector3.Cross(selfVector, targetVector).y;
-            if (cross > 0.1f)
+            if (cross > 0.2f || cross < 0.2f)
             {
                 //print("rotate : " + Time.deltaTime * 100f);
-                transform.Rotate(0, Time.deltaTime * 100f, 0);
-                ticker = false;
-            }
-            else if (cross < 0.1f)
-            {
-                //print("-rotate : " + Time.deltaTime * 100f);
-                transform.Rotate(0, -1f * Time.deltaTime * 100f, 0);
+                transform.Rotate(0, Time.deltaTime * 100f * cross, 0);
                 ticker = false;
             }
             else
@@ -112,7 +105,6 @@ public class EnemyManager : MonoBehaviour
                     ticker = true;
                 }
             }
-            spinningLerpFactor += Time.deltaTime * 2f;
         }
     }
 
@@ -154,6 +146,5 @@ public class EnemyManager : MonoBehaviour
     public void SetNearestSlime(GameObject slime)
     {
         nearestSlimeCoord = slime;
-        spinningLerpFactor = 0f;
     }
 }
