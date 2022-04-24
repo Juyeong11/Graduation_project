@@ -41,7 +41,7 @@ DataBase::DataBase() {
 	ret = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 
 	SQLSetConnectAttr(hdbc, SQL_LOGIN_TIMEOUT, (SQLPOINTER)5, 0);
-	ret = SQLConnect(hdbc, (SQLWCHAR*)L"BeatSlime", SQL_NTS, (SQLWCHAR*)NULL, 0, NULL, 0);
+	ret = SQLConnect(hdbc, (SQLWCHAR*)L"BeatSlim", SQL_NTS, (SQLWCHAR*)NULL, 0, NULL, 0);
 	if (false == (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)) {
 		std::cout << "ODBC 연결 실패\n";
 
@@ -328,6 +328,10 @@ void DataBase::readSkills(std::array<Skill*, SKILL_CNT>& items)
 		items[1]->Damage = 10;
 		items[2]->Damage = 20;
 		items[3]->Damage = 40;
+		items[0]->SkillType = 1;
+		items[1]->SkillType = 1;
+		items[2]->SkillType = 1;
+		items[3]->SkillType = 1;
 
 		items[4]->CoolTime = 10;
 		items[5]->CoolTime = 8;
@@ -345,6 +349,10 @@ void DataBase::readSkills(std::array<Skill*, SKILL_CNT>& items)
 		items[5]->Damage = 20;
 		items[6]->Damage = 40;
 		items[7]->Damage = 80;
+		items[4]->SkillType = 2;
+		items[5]->SkillType = 2;
+		items[6]->SkillType = 2;
+		items[7]->SkillType = 2;
 
 		items[8]->CoolTime = 10;
 		items[9]->CoolTime = 8;
@@ -362,7 +370,10 @@ void DataBase::readSkills(std::array<Skill*, SKILL_CNT>& items)
 		items[9]->Damage = 5;
 		items[10]->Damage = 10;
 		items[11]->Damage = 20;
-
+		items[8]->SkillType = 3;
+		items[9]->SkillType = 3;
+		items[10]->SkillType = 3;
+		items[11]->SkillType = 3;
 		return;
 	}
 	SQLHSTMT hstmt = 0;
@@ -388,28 +399,28 @@ void DataBase::readSkills(std::array<Skill*, SKILL_CNT>& items)
 				std::wstring itemType = ItemDataSchema.p_name;
 				while (itemType.back() == ' ') itemType.pop_back();
 				int index;
-				if (itemType == L"AD0") {
+				if (itemType == L"Tank0") {
 					index = 0;
 				}
-				else if (itemType == L"AD1") {
+				else if (itemType == L"Tank1") {
 					index = 1;
 				}
-				else if (itemType == L"AD2") {
+				else if (itemType == L"Tank2") {
 					index = 2;
 				}
-				else if (itemType == L"AD3") {
+				else if (itemType == L"Tank3") {
 					index = 3;
 				}
-				else if (itemType == L"Tank0") {
+				else if (itemType == L"AD0") {
 					index = 4;
 				}
-				else if (itemType == L"Tank1") {
+				else if (itemType == L"AD1") {
 					index = 5;
 				}
-				else if (itemType == L"Tank2") {
+				else if (itemType == L"AD2") {
 					index = 6;
 				}
-				else if (itemType == L"Tank3") {
+				else if (itemType == L"AD3") {
 					index = 7;
 				}
 				else if (itemType == L"Heal0") {
@@ -432,6 +443,7 @@ void DataBase::readSkills(std::array<Skill*, SKILL_CNT>& items)
 				items[index]->CoolTime = ItemDataSchema.p_CoolTime;
 				items[index]->Damage = ItemDataSchema.p_damage;
 				items[index]->SkillPrice = ItemDataSchema.p_price;
+				items[index]->SkillType = index/4+1;
 			}
 			else {
 				break;

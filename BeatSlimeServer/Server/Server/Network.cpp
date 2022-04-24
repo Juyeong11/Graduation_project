@@ -1329,7 +1329,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 		* 나중에는 db에 접근해 스킬이 풀려있는지 확인하고 해당 레벨의 능력치로 맞춰서 알려주자
 		*/
 		Client* c = reinterpret_cast<Client*>(clients[client_id]);
-		c->skill = skills[packet->skill_type * 3 - 1];
+		int skill_index = ((packet->skill_type - 1) * 4 + packet->skill_level);
+		if (skill_index >= SKILL_CNT) { std::cout << "change skill : wrong skillType or skillLevel\n"; break; }
+		std::cout << (int)packet->skill_type<<", "<< (int)packet->skill_level << std::endl;
+		std::cout << (int)skills[skill_index]->SkillType<<", "<< (int)skills[skill_index]->SkillLevel << std::endl;
+		c->skill = skills[skill_index];
 		c->vl.lock();
 		std::unordered_set<int> my_vl{ c->viewlist };
 		c->vl.unlock();

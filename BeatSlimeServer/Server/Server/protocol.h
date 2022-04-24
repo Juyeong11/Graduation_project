@@ -106,6 +106,7 @@ struct cs_packet_change_skill {
 	unsigned char size;
 	char	type;
 	char	skill_type;
+	char	skill_level;
 };
 
 struct cs_packet_ping_test {
