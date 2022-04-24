@@ -20,6 +20,6 @@ public class BackgroundImager : MonoBehaviour
     {
         gameObject.GetComponent<RectTransform>().anchoredPosition =
        Vector3.Lerp(gameObject.GetComponent<RectTransform>().anchoredPosition,
-        new Vector3(selfX - main.transform.position.x*25f, selfY + main.transform.position.y*100f, 0), Time.deltaTime * 2f);
+        new Vector3(selfX - main.transform.position.x*100f, selfY + main.transform.position.y*100f, 0), Time.deltaTime * 2f);
     }
 }

@@ -10,7 +10,7 @@ public class SpriteExpandMacro : MonoBehaviour
     {
         if (gameObject.activeSelf)
         {
-            if (factor < 1.0f)
+            if (factor < 1f)
             {
                 factor += Time.deltaTime * speed;
                 gameObject.transform.localScale = new Vector3(factor,factor,factor);
