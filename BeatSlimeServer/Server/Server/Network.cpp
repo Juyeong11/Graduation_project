@@ -152,7 +152,7 @@ bool Network::is_near(int a, int b)
 
 	return true;
 }
-void Network::send_login_ok(int c_id,char inven[20])
+void Network::send_login_ok(int c_id, char inven[20])
 {
 	Client& cl = *reinterpret_cast<Client*>(clients[c_id]);
 
@@ -170,7 +170,7 @@ void Network::send_login_ok(int c_id,char inven[20])
 	packet.skill_progress[2] = cl.SkillHeal;
 	packet.money = cl.money;
 	strcpy_s(packet.name, clients[c_id]->name);
-	memcpy_s(packet.inventory,20, inven,20);
+	memcpy_s(packet.inventory, 20, inven, 20);
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
@@ -524,7 +524,7 @@ void Network::disconnect_client(int c_id)
 	input_db_event(c_id, DB_PLAYER_LOGOUT);
 	if (client.cur_room_num != -1) {
 		for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
-			send_remove_object(game_room[client.cur_room_num]->player_ids[i]->id, c_id);
+			//send_remove_object(game_room[client.cur_room_num]->player_ids[i]->id, c_id);
 
 			if (clients[c_id] == game_room[client.cur_room_num]->player_ids[i]) {
 				game_room[client.cur_room_num]->player_ids[i] = nullptr;
@@ -762,7 +762,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		input_db_event(client_id, DB_PLAYER_LOGIN);
 		// 아래부터는 디비 스레드에서 pqcs하면 다시 하기 시작
-		
+
 		if (DB->isConnect == false) {
 			char inven[20];
 			for (int i = 0; i < 20; ++i) {
@@ -775,15 +775,15 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.state_lock.unlock();
 
 			cl.skill = skills[0];
-			
-			cl.curSkill =0;
+
+			cl.curSkill = 0;
 
 			cl.SkillAD = 0;
 			cl.SkillTa = 0;
 			cl.SkillHeal = 0;
 
 			cl.MMR = 100;
-			cl.money =0;
+			cl.money = 0;
 
 			//cl.inventory = inventorys[client_id];
 		}
@@ -1021,19 +1021,18 @@ void Network::process_packet(int client_id, unsigned char* p)
 						if (i > MAX_IN_GAME_PLAYER) break;
 					}
 					//std::cout << "시작" << std::endl;
-
-
-					for (int id : p->player_ids) {
-
-						send_change_scene(id, p->map_type + 2);
-						
-					}
-					// 포탈에서 GameRoom으로 이동
 					int room_id = get_game_room_id();
 					int boss_id = get_npc_id(p->map_type);
 					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players, p);
-					p->player_ids.clear();
 					p->ready_player_cnt = 0;
+					for (int id : p->player_ids) {
+
+						send_change_scene(id, p->map_type + 2);
+
+					}
+					p->player_ids.clear();
+					// 포탈에서 GameRoom으로 이동
+					
 				}
 				p->id_lock.unlock();
 				break;
@@ -1062,6 +1061,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.viewlist.clear();
 			cl.vl.unlock();
 
+			// 내일 수정
 			// login OK 에서 했던 로직을 가져오자
 			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
 			for (int i = 0; i < MAX_USER; ++i)
@@ -1108,36 +1108,44 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 				send_put_object(client_id, other->id);
 			}
+			cl.cur_room_num = -1;
 			send_move_object(client_id, client_id);
 		}
 		break;
 		case WITCH_MAP:
 		{
-			for (auto* gr : game_room) {
-				if (false == gr->isGaming) continue;
-				if (-1 == gr->FindPlayer(client_id)) continue;
+			if (cl.cur_room_num == -1) break;
+			GameRoom* gr = game_room[cl.cur_room_num];
 
-				cl.vl.lock();
-				std::unordered_set <int> my_vl = cl.viewlist;
-				cl.vl.unlock();
-				for (auto other : my_vl) {
-					if (false == is_player(other)) continue;
 
-					Client& target = *reinterpret_cast<Client*>(clients[other]);
-					if (ST_INGAME != target.state)
-						continue;
-					target.vl.lock();
-					if (0 != target.viewlist.count(client_id)) {
-						target.viewlist.erase(client_id);
-						target.vl.unlock();
+			if (-1 == gr->FindPlayer(client_id)) break;
 
-					}
-					else target.vl.unlock();
+			cl.vl.lock();
+			std::unordered_set <int> my_vl = cl.viewlist;
+			cl.viewlist.clear();
+			cl.viewlist.insert(gr->player_ids[0]->id);
+			cl.viewlist.insert(gr->player_ids[1]->id);
+			cl.viewlist.insert(gr->player_ids[2]->id);
+			cl.vl.unlock();
+			for (auto other : my_vl) {
+				if (false == is_player(other)) continue;
+
+				Client& target = *reinterpret_cast<Client*>(clients[other]);
+				if (ST_INGAME != target.state)
+					continue;
+				target.vl.lock();
+				if (0 != target.viewlist.count(client_id)) {
+					target.viewlist.erase(client_id);
+					target.vl.unlock();
+					send_remove_object(other, cl.id);
+
 				}
-
-				send_game_init(client_id, gr->player_ids, gr->boss_id->id);
-				break;
+				else target.vl.unlock();
 			}
+
+			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
+
+
 		}
 		break;
 		default:
@@ -1343,10 +1351,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//std::cout << (int)skills[skill_index]->SkillType<<", "<< (int)skills[skill_index]->SkillLevel << std::endl;
 		if (packet->skill_type == 1)
 			if (c->SkillAD < packet->skill_level) break;
-		else if(packet->skill_type == 2)
-			if (c->SkillAD < packet->skill_level) break;
-		else if(packet->skill_type == 3)
-			if (c->SkillAD < packet->skill_level) break;
+			else if (packet->skill_type == 2)
+				if (c->SkillAD < packet->skill_level) break;
+				else if (packet->skill_type == 3)
+					if (c->SkillAD < packet->skill_level) break;
 
 		c->skill = skills[skill_index];
 		c->vl.lock();
@@ -1654,7 +1662,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		}
 
 	}
-		break;
+	break;
 	default:
 		std::cout << "wrong packet\n";
 		break;
@@ -2252,7 +2260,7 @@ void Network::worker()
 			}
 
 		}
-			break;
+		break;
 		default:
 			break;
 		}
@@ -2373,7 +2381,7 @@ void Network::do_DBevent()
 					cl.MMR = player_data.MMR;
 					cl.money = player_data.money;
 					memset(ex_over->_net_buf, 0, 20);
-					DB->readInventory(&cl,reinterpret_cast<char*>(ex_over->_net_buf));
+					DB->readInventory(&cl, reinterpret_cast<char*>(ex_over->_net_buf));
 				}
 				else {
 					//사용 중인 아이디이므로 worker까지 갈 것도 없이 그냥 로그인 실패 패킷을 보낸다.
@@ -2384,12 +2392,12 @@ void Network::do_DBevent()
 				//db처리가 완료됐다고 알려주는거임 -> 데이터를 읽어오는 경우만 알려주면 될 것 같다.
 				PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);
 			}
-				break;
+			break;
 			case DB_PLAYER_LOGOUT: {
 				// player data update
 				DB->updatePlayer(&cl, true);
 			}
-				break;
+								 break;
 			case DB_READ_INVENTORY:
 				// pqcs inventory info
 				ex_over->_comp_op = OP_DB_INVENTORY;
@@ -2399,19 +2407,19 @@ void Network::do_DBevent()
 				break;
 			case DB_USE_SCROLL:
 				// pqcs result info
-				{
+			{
 				ex_over->_comp_op = OP_DB_USE_ITEM;
 				*reinterpret_cast<char*>(ex_over->_net_buf) = DB->updateInventory(&cl, ev.data, -1);;
 				*reinterpret_cast<char*>(ex_over->_net_buf + sizeof(char)) = ev.data;
 
 				PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);
-				}
-				break;
+			}
+			break;
 			case DB_GET_SCROLL:
 				DB->updateInventory(&cl, ev.data, 1);
 				break;
 			case DB_UPDATE_CLEAR_MAP:
-				
+
 				break;
 			case DB_UPDATE_PLAYER_DATA:
 				// 게임 중간중간 저장할 때 사용
@@ -2424,7 +2432,7 @@ void Network::do_DBevent()
 
 		}
 
-		
+
 		this_thread::sleep_for(1000ms);
 	}
 }
@@ -2506,7 +2514,7 @@ void Network::set_next_pattern(int room_id)
 	}
 }
 
-void Network::input_db_event(int c_id,DB_EVENT_TYPE type,int data)
+void Network::input_db_event(int c_id, DB_EVENT_TYPE type, int data)
 {
 #ifdef DEBUG
 	if (DB->isConnect == false) return;

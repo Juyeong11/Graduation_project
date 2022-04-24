@@ -270,7 +270,9 @@ void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject
 	player_ids[0] = Players[0];
 	player_ids[1] = Players[1];
 	player_ids[2] = Players[2];
-
+	player_ids[0]->cur_room_num = game_room_id;
+	player_ids[1]->cur_room_num = game_room_id;
+	player_ids[2]->cur_room_num = game_room_id;
 	portal = p;
 }
 
@@ -360,7 +362,7 @@ void GameRoom::game_end()
 		p->z = portal->z;
 		Network::GetInstance()->set_new_player_pos(p->id);
 
-		reinterpret_cast<Client*>(p)->cur_room_num = -1;
+		//reinterpret_cast<Client*>(p)->cur_room_num = -1;
 		reinterpret_cast<Client*>(p)->is_active = true;
 
 	}
