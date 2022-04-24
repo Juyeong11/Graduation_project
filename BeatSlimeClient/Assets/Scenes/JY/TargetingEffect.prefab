@@ -43,5 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d68aa2396d33c6d44991af9cc0bd6479, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  start_pos: {x: 0, y: 0, z: 0}
+  Root: {fileID: 0}
   RoketPrefab: {fileID: 4377153183157420261, guid: bebeb6002a8a25344be91f4506817ba3, type: 3}
+  RoketMeshPrefab: {fileID: 4475953024110295695, guid: cc2a9fdea1ed43744a7ca5acadb6782e, type: 3}
+  a: 240

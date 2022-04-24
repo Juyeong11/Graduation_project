@@ -9,7 +9,10 @@ public class TargetingEffect : MonoBehaviour
     public GameObject Root;
 
     public GameObject RoketPrefab;
-    GameObject[] Roket = new GameObject[roketCnt];
+    public GameObject RoketMeshPrefab;
+
+    GameObject[] RoketMesh = new GameObject[roketCnt];
+    GameObject[] RoketEffect = new GameObject[roketCnt];
     GameObject[] targets = new GameObject[roketCnt];
     bool[] launchReady = new bool[roketCnt];
     float[] speed = new float[roketCnt];
@@ -27,13 +30,19 @@ public class TargetingEffect : MonoBehaviour
         for (int i = 0; i < roketCnt; ++i)
         {
 
-            GameObject go = Instantiate(RoketPrefab);
+            GameObject r = Instantiate(RoketPrefab);
+            GameObject rm = Instantiate(RoketMeshPrefab);
 
-            Vector3 scale = go.transform.localScale;
+            Vector3 scale = r.transform.localScale;
             scale = scale * size;
-            go.transform.localScale = scale;
+            r.transform.localScale = scale;
 
-            Roket[i] = go;
+            scale = rm.transform.localScale;
+            scale = scale * size;
+            rm.transform.localScale = scale;
+
+            RoketMesh[i] = rm;
+            RoketEffect[i] = r;
             launchReady[i] = true;
         }
 
@@ -65,10 +74,10 @@ public class TargetingEffect : MonoBehaviour
 
             pos = q * pos;
             pos += origin;
-            Roket[i].transform.position = pos;
+            RoketMesh[i].transform.position = pos;
 
             Vector3 roketForward = Root.transform.forward - Root.transform.up;
-            Roket[i].transform.forward = roketForward;
+            RoketMesh[i].transform.forward = roketForward;
         }
 
     }
@@ -80,7 +89,9 @@ public class TargetingEffect : MonoBehaviour
                 targets[i] = p;
                 launchReady[i] = false;
                 speed[i] = s;
-
+                RoketEffect[i].transform.position = RoketMesh[i].transform.position;
+                RoketMesh[i].SetActive(false);
+                RoketEffect[i].SetActive(true);
                 StartCoroutine(RoketLauncher(i));
                 break;
             }
@@ -94,9 +105,12 @@ public class TargetingEffect : MonoBehaviour
         {
             if (launchReady[i] == true)
             {
-                Roket[i].transform.position = GameManager.data.player.transform.position;
+                RoketEffect[i].transform.position = GameManager.data.player.transform.position;
                 launchReady[i] = false;
+                //RoketEffect[i].transform.position = RoketMesh[i].transform.position;
 
+                RoketMesh[i].SetActive(false);
+                RoketEffect[i].SetActive(true);
                 StartCoroutine(ParryingAni(i));
                 break;
             }
@@ -106,17 +120,19 @@ public class TargetingEffect : MonoBehaviour
     {
         float t = 0.0f;
 
-        Vector3 startPos = Roket[index].transform.position;
+        Vector3 startPos = RoketEffect[index].transform.position;
         while (t <= 1.0f)
         {
 
             t += Time.deltaTime;
             Vector3 cur_pos = Vector3.Lerp(startPos, Root.transform.position, t);
             Vector3 dir = startPos - Root.transform.position;
-            Roket[index].transform.rotation = Quaternion.LookRotation(dir);//z축 뒤집혀있음
-            Roket[index].transform.position = cur_pos;
+            RoketEffect[index].transform.rotation = Quaternion.LookRotation(dir);//z축 뒤집혀있음
+            RoketEffect[index].transform.position = cur_pos;
             yield return null;
         }
+        RoketMesh[index].SetActive(true);
+        RoketEffect[index].SetActive(false);
         targets[index] = null;
         speed[index] = 0;
         launchReady[index] = true;
@@ -124,7 +140,7 @@ public class TargetingEffect : MonoBehaviour
     IEnumerator RoketLauncher(int index)
     {
         float t = 0.0f;
-        Vector3 start_Pos = Roket[index].transform.position;
+        Vector3 start_Pos = RoketEffect[index].transform.position;
         Vector3 p1 = Root.transform.position;
         p1.y += 5.0f;
         p1.x += Random.Range(-5.0f, 5.0f);
@@ -140,11 +156,13 @@ public class TargetingEffect : MonoBehaviour
 
             Vector3 cur_pos = Vector3.Lerp(p01, p02, t);
             Vector3 direction = p02 - p01;
-            Roket[index].transform.rotation = Quaternion.LookRotation(-direction);//z축 뒤집혀있음
+            RoketEffect[index].transform.rotation = Quaternion.LookRotation(-direction);//z축 뒤집혀있음
             //cur_pos.y *= (1 + Mathf.Sin(Mathf.Lerp(0, 3.14f, t)));
-            Roket[index].transform.position = cur_pos;
+            RoketEffect[index].transform.position = cur_pos;
             yield return null;
         }
+        RoketMesh[index].SetActive(true);
+        RoketEffect[index].SetActive(false);
         targets[index] = null;
         speed[index] = 0;
         launchReady[index] = true;
