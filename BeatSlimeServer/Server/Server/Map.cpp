@@ -223,7 +223,7 @@ void MapInfo::SetTileType(int x, int z, int pre_x, int pre_z)
 	if (_x > LengthX || _x < 0) return ;
 	if (_z > LengthZ || _z < 0) return ;
 
-	map[_z * LengthX + _x] = 1;
+	map[_z * LengthX + _x] = -2;
 }
 
 GameRoom::GameRoom() :bpm(0) {

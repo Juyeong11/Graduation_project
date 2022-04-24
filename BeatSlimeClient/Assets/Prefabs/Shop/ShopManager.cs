@@ -45,6 +45,6 @@ public class ShopManager : MonoBehaviour
     
     public void BuySkill(int skillNum)
     {
-        FieldGameManager.Net.SendBuyPacket((byte)((skillNum-1)*3+PM.skillLevelsContainer[skillNum-1]));
+        FieldGameManager.Net.SendBuyPacket((byte)((skillNum-1)*4+PM.skillLevelsContainer[skillNum-1]));
     }
 }

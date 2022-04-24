@@ -154,6 +154,8 @@ bool Network::is_near(int a, int b)
 }
 void Network::send_login_ok(int c_id,char inven[20])
 {
+	Client& cl = *reinterpret_cast<Client*>(clients[c_id]);
+
 	sc_packet_login_ok packet;
 	packet.id = c_id;
 	packet.size = sizeof(packet);
@@ -161,12 +163,12 @@ void Network::send_login_ok(int c_id,char inven[20])
 	packet.x = clients[c_id]->x;
 	packet.y = clients[c_id]->y;
 	packet.z = clients[c_id]->z;
-	packet.cur_skill_type = 0;
-	packet.cur_skill_level = 0;
-	packet.skill_progress[0] = 0;
-	packet.skill_progress[1] = 0;
-	packet.skill_progress[2] = 0;
-	packet.money = 0;
+	packet.cur_skill_type = cl.skill->SkillType;
+	packet.cur_skill_level = cl.skill->SkillLevel;
+	packet.skill_progress[0] = cl.SkillAD;
+	packet.skill_progress[1] = cl.SkillTa;
+	packet.skill_progress[2] = cl.SkillHeal;
+	packet.money = cl.money;
 	strcpy_s(packet.name, clients[c_id]->name);
 	memcpy_s(packet.inventory,20, inven,20);
 
@@ -321,7 +323,7 @@ void Network::send_put_object(int c_id, int target) {
 	if (is_player(target)) {
 		packet.skill_type = reinterpret_cast<Client*>(clients[target])->skill->SkillType;
 		packet.skill_level = reinterpret_cast<Client*>(clients[target])->skill->SkillLevel;
-		strcpy_s(packet.name, "happy");
+		strcpy_s(packet.name, clients[target]->name);
 	}
 
 	EXP_OVER* ex_over;
@@ -770,6 +772,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.state = ST_INGAME;
 			cl.state_lock.unlock();
 
+			cl.skill = skills[0];
+			
 			cl.curSkill =0;
 
 			cl.SkillAD = 0;
@@ -1331,8 +1335,15 @@ void Network::process_packet(int client_id, unsigned char* p)
 		Client* c = reinterpret_cast<Client*>(clients[client_id]);
 		int skill_index = ((packet->skill_type - 1) * 4 + packet->skill_level);
 		if (skill_index >= SKILL_CNT) { std::cout << "change skill : wrong skillType or skillLevel\n"; break; }
-		std::cout << (int)packet->skill_type<<", "<< (int)packet->skill_level << std::endl;
-		std::cout << (int)skills[skill_index]->SkillType<<", "<< (int)skills[skill_index]->SkillLevel << std::endl;
+		//std::cout << (int)packet->skill_type<<", "<< (int)packet->skill_level << std::endl;
+		//std::cout << (int)skills[skill_index]->SkillType<<", "<< (int)skills[skill_index]->SkillLevel << std::endl;
+		if (packet->skill_type == 1)
+			if (c->SkillAD < packet->skill_level) break;
+		else if(packet->skill_type == 2)
+			if (c->SkillAD < packet->skill_level) break;
+		else if(packet->skill_type == 3)
+			if (c->SkillAD < packet->skill_level) break;
+
 		c->skill = skills[skill_index];
 		c->vl.lock();
 		std::unordered_set<int> my_vl{ c->viewlist };
