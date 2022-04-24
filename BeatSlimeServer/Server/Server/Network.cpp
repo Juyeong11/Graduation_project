@@ -501,6 +501,7 @@ void Network::disconnect_client(int c_id)
 		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->z);
 	}
 
+
 	client.vl.lock();
 	std::unordered_set <int> my_vl = client.viewlist;
 	client.vl.unlock();
@@ -537,6 +538,7 @@ void Network::disconnect_client(int c_id)
 				tev.start_time = std::chrono::system_clock::now();
 
 				timer_queue.push(tev);
+				client.cur_room_num = -1;
 				break;
 				//game_room[client.cur_room_num]->pattern_progress = -1;
 				//reinterpret_cast<Client*>(clients[c_id])->cur_room_num = -1;
@@ -1011,7 +1013,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					// 씬 전환
 
 					int i = 0;
-					for (int id : p->player_ids) { // 이미 change 씬
+					for (int id : p->player_ids) {
 						players[i] = clients[id];
 						i++;
 						maps[FIELD_MAP]->SetTileType(-1, -1, clients[id]->x, clients[id]->x);
@@ -1020,9 +1022,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 					}
 					//std::cout << "시작" << std::endl;
 
+
 					for (int id : p->player_ids) {
 
 						send_change_scene(id, p->map_type + 2);
+						
 					}
 					// 포탈에서 GameRoom으로 이동
 					int room_id = get_game_room_id();
@@ -1126,7 +1130,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					if (0 != target.viewlist.count(client_id)) {
 						target.viewlist.erase(client_id);
 						target.vl.unlock();
-						send_remove_object(other, client_id);
+
 					}
 					else target.vl.unlock();
 				}
