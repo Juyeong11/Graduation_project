@@ -1649,7 +1649,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			for (int i = 0; i < MAX_USER; ++i)
 			{
 				Client* other = reinterpret_cast<Client*>(clients[i]);
-				if (i == client_id) continue;
+				//if (i == client_id) continue;
 				other->state_lock.lock();
 				if (ST_INGAME != other->state) {
 					other->state_lock.unlock();
