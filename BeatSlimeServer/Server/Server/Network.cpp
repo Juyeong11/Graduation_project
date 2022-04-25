@@ -1643,7 +1643,22 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//DB로 아이템을 사용했다고 이벤트를 보낸다.
 	{
 		cs_packet_buy* packet = reinterpret_cast<cs_packet_buy*>(p);
+		if (packet->itemType == -1) {
+			for (int i = 0; i < MAX_USER; ++i)
+			{
+				Client* other = reinterpret_cast<Client*>(clients[i]);
+				//if (i == client_id) continue;
+				other->state_lock.lock();
+				if (ST_INGAME != other->state) {
+					other->state_lock.unlock();
+					continue;
+				}
+				other->state_lock.unlock();
 
+				send_use_item(i, client_id, -1);
+			}
+			break;
+		}
 		input_db_event(client_id, DB_USE_SCROLL, packet->itemType);
 		if (DB->isConnect == false) {
 			for (int i = 0; i < MAX_USER; ++i)
