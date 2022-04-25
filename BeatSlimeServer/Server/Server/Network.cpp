@@ -1643,7 +1643,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//DB로 아이템을 사용했다고 이벤트를 보낸다.
 	{
 		cs_packet_buy* packet = reinterpret_cast<cs_packet_buy*>(p);
-		if (packet->itemType == -1) {
+		if (packet->itemType == 99) {
 			for (int i = 0; i < MAX_USER; ++i)
 			{
 				Client* other = reinterpret_cast<Client*>(clients[i]);
@@ -1655,7 +1655,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				}
 				other->state_lock.unlock();
 
-				send_use_item(i, client_id, -1);
+				send_use_item(i, client_id, 99);
 			}
 			break;
 		}
