@@ -435,6 +435,7 @@ public class FieldGameManager : MonoBehaviour
                             Protocol.sc_packet_use_item p = Protocol.sc_packet_use_item.SetByteToVar(data);
 
                             Debug.Log(p.user + "가 " + p.itemType + "을 사용했습니다.");
+                            Orgel.instance.Touch(p.itemType);
                         }
                         break;
                     default:

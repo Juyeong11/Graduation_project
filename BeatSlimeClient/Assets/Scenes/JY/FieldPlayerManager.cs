@@ -435,7 +435,15 @@ public class FieldPlayerManager : MonoBehaviour
 
                     case cellState.Orgel:
                     // ¿À¸£°ñ Ã³¸®
-                    Orgel.instance.Touch();
+                    if (Orgel.instance.isOrgelPlaying)
+                    {
+                        FieldGameManager.Net.SendUseItemPacket(99);
+                    }
+                    else
+                    {
+                        FieldGameManager.Net.SendUseItemPacket(1);
+                    }
+                    
                     break;
                 }
             }
