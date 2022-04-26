@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject player;
     public GameObject enemy;
+    public GameObject enemyParriedTarget;
     Animator enemyAnim;
     public GameObject tilemap;
     public HexGrid grid;
@@ -517,7 +518,7 @@ public class GameManager : MonoBehaviour
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
 
                             enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime( Objects[0].gameObject);
-                            EffectManager.instance.SetTargetingEffectParent(ref enemy);
+                            EffectManager.instance.SetTargetingEffectParent(ref enemyParriedTarget);
                             Debug.Log("Delay : " + offsetTime);
                         }
                         break;
