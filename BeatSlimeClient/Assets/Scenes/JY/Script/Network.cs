@@ -87,13 +87,21 @@ public class Network
     {
         try
         {
-            ClientSocket.BeginConnect("127.0.0.1", 4000, new AsyncCallback(connectComplet), ClientSocket);
+            ClientSocket.BeginConnect("121.190.132.195", 4500, new AsyncCallback(connectComplet), ClientSocket);
         }
-        catch (SocketException ex)
+        catch
         {
+            try
+            {
+                ClientSocket.BeginConnect("127.0.0.1", 4000, new AsyncCallback(connectComplet), ClientSocket);
+            }
+            catch (SocketException ex)
+            {
+                Debug.Log(ex.SocketErrorCode);
+                CreateAndConnect();
+            }
             // if(ex.)
-            Debug.Log(ex.SocketErrorCode);
-            CreateAndConnect();
+
         }
     }
 
