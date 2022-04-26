@@ -387,40 +387,52 @@ public class FieldGameManager : MonoBehaviour
                                 switch (p.itemType)
                                 {
                                     case 0:
-                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 1);
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 0);
                                         PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill1Prices[0]);
                                         break;
                                     case 1:
-                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 2);
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 1);
                                         PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill1Prices[1]);
                                         break;
                                     case 2:
-                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 3);
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 2);
                                         PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill1Prices[2]);
                                         break;
                                     case 3:
-                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 1);
-                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[0]);
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(0, 3);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill1Prices[3]);
                                         break;
                                     case 4:
-                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 2);
-                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[1]);
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 0);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[0]);
                                         break;
                                     case 5:
-                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 3);
-                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[2]);
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 1);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[1]);
                                         break;
                                     case 6:
-                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 1);
-                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill3Prices[0]);
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 2);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[2]);
                                         break;
                                     case 7:
-                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 2);
-                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill3Prices[1]);
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(1, 3);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill2Prices[3]);
                                         break;
                                     case 8:
-                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 3);
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 0);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill3Prices[0]);
+                                        break;
+                                    case 9:
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 1);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill3Prices[1]);
+                                        break;
+                                    case 10:
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 2);
                                         PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill3Prices[2]);
+                                        break;
+                                     case 11:
+                                        player.GetComponentInParent<FieldPlayerManager>().SetSkillLevelContainer(2, 3);
+                                        PlayerPrefs.SetInt("Money" + myPlayerID, PlayerPrefs.GetInt("Money" + myPlayerID) - shopPrices.Skill3Prices[3]);
                                         break;
                                 }
                             }
