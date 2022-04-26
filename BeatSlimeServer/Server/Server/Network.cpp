@@ -495,7 +495,7 @@ void Network::disconnect_client(int c_id)
 	client.dest_x = -1;
 	client.dest_y = -1;
 	client.dest_z = -1;
-	client.money = 0;
+
 	int room_num = reinterpret_cast<Client*>(clients[c_id])->cur_room_num;
 	if (room_num == -1) {
 		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->z);
@@ -568,7 +568,7 @@ void Network::disconnect_client(int c_id)
 
 	clients[c_id]->state_lock.lock();
 	closesocket(reinterpret_cast<Client*>(clients[c_id])->socket);
-	clients[c_id]->state = ST_FREE;
+
 	clients[c_id]->state_lock.unlock();
 }
 
@@ -964,13 +964,13 @@ void Network::process_packet(int client_id, unsigned char* p)
 				cl.vl.lock();
 				cl.viewlist.erase(other);
 				cl.vl.unlock();
-				send_remove_object(cl.id, other);
 
 				//npc는 view리스트를 가지고 있지 않다.
 				if (true == is_npc(other)) {
 					//reinterpret_cast<Npc*>(clients[other])->is_active = false;
 					continue;
 				}
+				send_remove_object(cl.id, other);
 				Client* otherPlayer = reinterpret_cast<Client*>(clients[other]);
 
 				// 상대방도 나를 지운다.
@@ -1576,7 +1576,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		else if (packet->pos == 1) {
 			//  임시로 재화를 획득하는 패킷으로 변경한다.
 			cl.SetMoney(100);
-			std::cout << "id :" << client_id << " get 100 money \ntotal : " << cl.GetMoney();
+			std::cout << "id :" << client_id << " get 100 money \ntotal : " << cl.GetMoney()<<std::endl;
 		}
 		else if (packet->pos == 2) {
 			int room_id = reinterpret_cast<Client*>(clients[client_id])->cur_room_num;
@@ -1631,9 +1631,25 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		cs_packet_buy* packet = reinterpret_cast<cs_packet_buy*>(p);
 		if (false == is_item(packet->itemType))break;
+		std::cout << (int)packet->itemType << std::endl;
 		if (cl.money < skills[packet->itemType]->SkillPrice) {
 			send_buy_result(client_id, packet->itemType, 0); break;
 		}
+		switch (packet->itemType / 4)
+		{
+		case 0:
+			cl.SkillAD = max(cl.SkillAD, packet->itemType%4);
+			break;
+		case 1:
+			cl.SkillTa = max(cl.SkillTa, packet->itemType % 4);
+			break;
+		case 2:
+			cl.SkillHeal = max(cl.SkillHeal, packet->itemType % 4);
+			break;
+		default:
+			break;
+		}
+		
 
 		cl.money -= skills[packet->itemType]->SkillPrice;
 		send_buy_result(client_id, packet->itemType, 1);
@@ -1642,6 +1658,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_USE_ITEM:
 		//DB로 아이템을 사용했다고 이벤트를 보낸다.
 	{
+		//오르골 플레이 중에 플레이어가 들어오면 들어온 플레이어도 음악을 들을 수 있어야 한다.
 		cs_packet_buy* packet = reinterpret_cast<cs_packet_buy*>(p);
 		if (packet->itemType == 99) {
 			for (int i = 0; i < MAX_USER; ++i)
@@ -2262,7 +2279,7 @@ void Network::worker()
 				for (int i = 0; i < MAX_USER; ++i)
 				{
 					Client* other = reinterpret_cast<Client*>(clients[i]);
-					if (i == client_id) continue;
+					//if (i == client_id) continue;
 					other->state_lock.lock();
 					if (ST_INGAME != other->state) {
 						other->state_lock.unlock();
@@ -2411,6 +2428,11 @@ void Network::do_DBevent()
 			case DB_PLAYER_LOGOUT: {
 				// player data update
 				DB->updatePlayer(&cl, true);
+				cl.money = 0;
+				cl.state_lock.lock();
+				cl.state = ST_FREE;
+				cl.state_lock.unlock();
+
 			}
 								 break;
 			case DB_READ_INVENTORY:

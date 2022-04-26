@@ -104,7 +104,7 @@ public:
 	}
 	bool is_item(int id)
 	{
-		return (id >= 0) && (id < 9);
+		return (id >= 0) && (id < SKILL_CNT);
 	}
 	int get_new_id();
 	int get_npc_id(int monsterType);

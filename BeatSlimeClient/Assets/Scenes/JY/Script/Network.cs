@@ -87,6 +87,7 @@ public class Network
     {
         try
         {
+
             ClientSocket.BeginConnect("121.190.132.195", 4500, new AsyncCallback(connectComplet), ClientSocket);
         }
         catch

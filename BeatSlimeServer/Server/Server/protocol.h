@@ -1,6 +1,6 @@
 #pragma once
 
-const short SERVER_PORT = 4000;
+const short SERVER_PORT = 4500;
 const short CHAT_BUF_SIZE = 122;
 
 

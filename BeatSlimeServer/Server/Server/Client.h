@@ -138,6 +138,8 @@ public:
 
 	//...
 	int curSkill;
+	std::mutex money_vl;
+
 	int money;
 
 	char SkillAD;

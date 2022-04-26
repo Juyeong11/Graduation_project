@@ -50,6 +50,7 @@ enum DIR {
 extern void error_display(const char* err_p, int err_no);
 enum SKILL_TYPE { WATERGUN, QUAKE, HEAL };
 #define DEBUG
+
 const int BUFSIZE = 256;
 
 const int MAX_IN_GAME_PLAYER = 3;

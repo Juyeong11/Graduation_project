@@ -41,7 +41,7 @@ DataBase::DataBase() {
 	ret = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
 
 	SQLSetConnectAttr(hdbc, SQL_LOGIN_TIMEOUT, (SQLPOINTER)5, 0);
-	ret = SQLConnect(hdbc, (SQLWCHAR*)L"BeatSlim", SQL_NTS, (SQLWCHAR*)NULL, 0, NULL, 0);
+	ret = SQLConnect(hdbc, (SQLWCHAR*)L"BeatSlime", SQL_NTS, (SQLWCHAR*)NULL, 0, NULL, 0);
 	if (false == (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)) {
 		std::cout << "ODBC 연결 실패\n";
 
