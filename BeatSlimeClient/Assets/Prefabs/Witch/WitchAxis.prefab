@@ -78,6 +78,7 @@ MonoBehaviour:
   enemyHp: 0
   enemyMaxHp: 0
   selfCoord: {fileID: 8094704631446390613}
+  nearestSlimeCoord: {fileID: 0}
   grid: {fileID: 0}
   enemyNoteList:
   - {fileID: 0}
@@ -1117,6 +1118,18 @@ PrefabInstance:
     - target: {fileID: 7257271657929945228, guid: 92ed98eb52b752849aa0e04f523523f2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -23.644024
+      objectReference: {fileID: 0}
+    - target: {fileID: 7360816044060619733, guid: 92ed98eb52b752849aa0e04f523523f2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7360816044060619733, guid: 92ed98eb52b752849aa0e04f523523f2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7360816044060619733, guid: 92ed98eb52b752849aa0e04f523523f2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -180
       objectReference: {fileID: 0}
     - target: {fileID: 7443975671599192816, guid: 92ed98eb52b752849aa0e04f523523f2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

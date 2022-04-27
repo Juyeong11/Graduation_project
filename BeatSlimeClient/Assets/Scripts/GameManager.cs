@@ -827,6 +827,7 @@ public class GameManager : MonoBehaviour
                                 ParticleEffect.ParticleApply(JudgeCases.PERFECT);
                                 ComboEffect.CountApply(ref nowCombo);
                             }
+                            EffectManager.instance.BossRokets.GetComponent<TargetingEffect>().ParryingNearRoket(Objects[pid].transform);
 
                             //Debug.Log("Parrying Success");
                         }

@@ -71,7 +71,7 @@ Network::Network() {
 	for (int i = 0; i < PORTAL_NUM; ++i) {
 		portals[i] = new Portal(17, -21);
 	}
-
+	cur_play_music = 99;
 
 }
 Network::~Network() {
@@ -760,9 +760,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//그럼 디비 스레드에서 정보를 알려주고 
 		strcpy_s(cl.name, packet->name);
 
-		input_db_event(client_id, DB_PLAYER_LOGIN);
 		// 아래부터는 디비 스레드에서 pqcs하면 다시 하기 시작
-
+		input_db_event(client_id, DB_PLAYER_LOGIN);
+		// 로그인 씬 완성되면 옮겨야됨
+		if (cur_play_music != 99)
+			send_use_item(client_id, 0, cur_play_music);
 		if (DB->isConnect == false) {
 			char inven[20];
 			for (int i = 0; i < 20; ++i) {
@@ -1032,7 +1034,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					}
 					p->player_ids.clear();
 					// 포탈에서 GameRoom으로 이동
-					
+
 				}
 				p->id_lock.unlock();
 				break;
@@ -1110,6 +1112,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 			}
 			cl.cur_room_num = -1;
 			send_move_object(client_id, client_id);
+			if (cur_play_music != 99)
+				send_use_item(client_id, 0, cur_play_music);
 		}
 		break;
 		case WITCH_MAP:
@@ -1576,7 +1580,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		else if (packet->pos == 1) {
 			//  임시로 재화를 획득하는 패킷으로 변경한다.
 			cl.SetMoney(100);
-			std::cout << "id :" << client_id << " get 100 money \ntotal : " << cl.GetMoney()<<std::endl;
+			std::cout << "id :" << client_id << " get 100 money \ntotal : " << cl.GetMoney() << std::endl;
 		}
 		else if (packet->pos == 2) {
 			int room_id = reinterpret_cast<Client*>(clients[client_id])->cur_room_num;
@@ -1631,14 +1635,14 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		cs_packet_buy* packet = reinterpret_cast<cs_packet_buy*>(p);
 		if (false == is_item(packet->itemType))break;
-		std::cout << (int)packet->itemType << std::endl;
+		//std::cout << (int)packet->itemType << std::endl;
 		if (cl.money < skills[packet->itemType]->SkillPrice) {
 			send_buy_result(client_id, packet->itemType, 0); break;
 		}
 		switch (packet->itemType / 4)
 		{
 		case 0:
-			cl.SkillAD = max(cl.SkillAD, packet->itemType%4);
+			cl.SkillAD = max(cl.SkillAD, packet->itemType % 4);
 			break;
 		case 1:
 			cl.SkillTa = max(cl.SkillTa, packet->itemType % 4);
@@ -1649,7 +1653,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		default:
 			break;
 		}
-		
+
 
 		cl.money -= skills[packet->itemType]->SkillPrice;
 		send_buy_result(client_id, packet->itemType, 1);
@@ -1674,6 +1678,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 				send_use_item(i, client_id, 99);
 			}
+			cur_play_music = packet->itemType;
 			break;
 		}
 		input_db_event(client_id, DB_USE_SCROLL, packet->itemType);
@@ -2289,6 +2294,7 @@ void Network::worker()
 
 					send_use_item(i, client_id, itemType);
 				}
+				cur_play_music = itemType;
 			}
 
 		}

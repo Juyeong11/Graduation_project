@@ -404,7 +404,7 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Space) && ParryCheck(KeyCode.Space))
         {
-            EffectManager.instance.BossRokets.GetComponent<TargetingEffect>().ParryingNearRoket();
+
             if (FieldGameManager.Net.isOnline)
             {
                 FieldGameManager.Net.SendParryingPacket();
