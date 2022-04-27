@@ -145,6 +145,7 @@ private:
 
 	std::array<Skill*, SKILL_CNT> skills;
 	std::array<Party*, MAX_USER/2> PartyPool;
+	int cur_play_music;
 	//std::array<Inventory*, MAX_USER> inventorys;
 };
 

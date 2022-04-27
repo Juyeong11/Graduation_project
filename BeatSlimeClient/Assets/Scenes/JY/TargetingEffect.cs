@@ -20,7 +20,7 @@ public class TargetingEffect : MonoBehaviour
     float diameter = 0.5f;
     float size = 0.3f;
 
-    float offsetH = 1.44f;
+    float offsetH = 0.0f;
     float offsetZ = 0.8f;
 
     public float a = 240.0f;
@@ -97,7 +97,7 @@ public class TargetingEffect : MonoBehaviour
             }
 
     }
-    public void ParryingNearRoket()
+    public void ParryingNearRoket(Transform player)
     {
         float m = float.MaxValue;
         int index = 0;
@@ -105,7 +105,7 @@ public class TargetingEffect : MonoBehaviour
         {
             if (launchReady[i] == true)
             {
-                RoketEffect[i].transform.position = GameManager.data.player.transform.position;
+                RoketEffect[i].transform.position = player.position;
                 launchReady[i] = false;
                 //RoketEffect[i].transform.position = RoketMesh[i].transform.position;
 
