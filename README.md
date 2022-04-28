@@ -7,9 +7,9 @@
 
 Members.
 - 정내훈 교수님 (zzapuno) / Academic Adviser
-- Riu / Programmer
-- SH-Broar / Sound
-- MINGO / Graphic
+- 남주영(Riu) / Programmer
+- 어수혁(SH-Broar) / Sound
+- 김민규(MINGO) / Graphic
 
 Links.
 - github
