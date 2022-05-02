@@ -146,7 +146,7 @@ public class FieldGameManager : MonoBehaviour
                             myPlayerID = p.id;
                             Objects[p.id] = player;
 
-                            FieldPlayerManager.instance.name = System.Text.Encoding.UTF8.GetString(p.name);
+                            FieldPlayerManager.instance.myName = System.Text.Encoding.UTF8.GetString(p.name);
                             //PlayerPref.SetString("myName" + myPlayerID, System.Text.Encoding.UTF8.GetString(p.name));
 
                             //print(p.cur_skill_type);
