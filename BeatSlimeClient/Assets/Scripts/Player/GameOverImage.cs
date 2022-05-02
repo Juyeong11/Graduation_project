@@ -19,6 +19,9 @@ public class GameOverImage : MonoBehaviour
     public Text M;
     public Text ts;
 
+    public Text money;
+    public Text scroll_grade;
+
 
     void Start()
     {
@@ -48,10 +51,11 @@ public class GameOverImage : MonoBehaviour
         gameEnder = end;
 
     }
-    public void SetResultData(int perfect, int great, int miss, int attack, int damaged, int score)
+    public void SetResultData(int perfect, int great, int miss, int attack, int damaged, int score, int mone, int scroll_grad)
     {
         bt.text = perfect + "\n" + great + "\n" + miss + "\n\n" + attack + "\n" + damaged;
         ts.text = score.ToString();
-
+        money.text = mone.ToString();
+        scroll_grade.text = scroll_grad.ToString();
     }
 }

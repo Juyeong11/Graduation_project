@@ -795,14 +795,14 @@ public class GameManager : MonoBehaviour
                             if (p.end_type == 0)
                             {
                                 gameOverImage.SetGameEnd(GameEndTraits.Lose);
-                                gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack, resultsData.damaged, 0);
+                                gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack, resultsData.damaged, 0, 0, 0);
                                 Debug.Log("Game_Over");
                             }
                             else if (p.end_type == 1)
                             {
                                 gameOverImage.SetGameEnd(GameEndTraits.Win);
                                 gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack, resultsData.damaged,
-                                                            resultsData.perfect * 1000 + resultsData.great * 500 - resultsData.miss * 50 + resultsData.attack * 100 - resultsData.damaged * 20);
+                                                            resultsData.attack * 100 - resultsData.damaged * 20, 0, 0);
                                 Debug.Log("Game_Clear");
                             }
                             else
