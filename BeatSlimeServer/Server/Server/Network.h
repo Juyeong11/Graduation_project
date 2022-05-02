@@ -78,7 +78,7 @@ public:
 	void send_change_scene(int client_id, int map_type);
 	void send_game_start(int client_id,int start_time);
 	void send_game_init(int client_id, GameObject* ids[3], int boss_id);
-	void send_game_end(int client_id,int score,int itemType,char end_type);
+	void send_game_end(int client_id,int score,int itemType,char money,char end_type);
 	void send_parrying(int client_id,int actor_id);
 	void send_change_skill(int client_id,int actor_id);
 	void send_ping(int client_id,int time);

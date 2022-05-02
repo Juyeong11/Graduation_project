@@ -266,6 +266,8 @@ struct sc_packet_game_end
 	char end_type;
 	int score;
 	char item_type;
+	char money;
+
 };
 
 struct sc_packet_parrying {

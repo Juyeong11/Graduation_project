@@ -367,7 +367,7 @@ void Network::send_map_data(int c_id, char* data, int nShell)
 
 }
 
-void Network::send_game_end(int c_id, int score, int itemType, char end_type)
+void Network::send_game_end(int c_id, int score, int itemType, char money, char end_type)
 {
 	sc_packet_game_end packet;
 	packet.size = sizeof(packet);
@@ -375,6 +375,7 @@ void Network::send_game_end(int c_id, int score, int itemType, char end_type)
 	packet.end_type = end_type;
 	packet.score = score;
 	packet.item_type = itemType;
+	packet.money = money;
 
 
 	EXP_OVER* ex_over;
@@ -677,7 +678,7 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
 	const int damage = 1;
-	for (int i = 0; i < MAX_IN_GAME_PLAYER;++i) {
+	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 		GameObject* pl = game_room[game_room_id]->player_ids[i];
 		if (pl == nullptr) continue;
 		if (false == is_attack(pl->id, x, z)) continue;
@@ -1946,6 +1947,7 @@ void Network::worker()
 				std::cout << parrying_end_time << " " << player_parring_time << " player already parrying\n";
 				//패링 했으니 넘어가자
 				//패링 한 뒤 동작은 이미 worker thread에서 수행된 상태이다
+				game_room[game_room_id]->Money[game_room[game_room_id]->FindPlayerID_by_GameRoom(target_id)] += 1;
 			}
 			else {
 				//std::cout << parrying_end_time << " " << player_parring_time << " player parrying failed\n";
@@ -2151,11 +2153,11 @@ void Network::worker()
 				if (p->hp < 0) isDie = true;
 			}
 			if (isabnormal) {
-
+				int i = 0;
 				for (const auto p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 
-					send_game_end(p->id, 0, -1, GAME_OVER);
+					send_game_end(p->id, 0, -1, game_room[game_room_id]->Money[i++], GAME_OVER);
 
 				}
 				game_room[game_room_id]->game_end();
@@ -2163,24 +2165,26 @@ void Network::worker()
 
 			}
 			else if (isDie) {
+				int i = 0;
 				for (const auto p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 
-					send_game_end(p->id, 0, -1, GAME_OVER);
+					send_game_end(p->id, 0, -1, game_room[game_room_id]->Money[i++], GAME_OVER);
 
 				}
 				game_room[game_room_id]->game_end();
 
 			}
 			else {
-				for (int i = 0; i < MAX_IN_GAME_PLAYER;++i){
+				for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 					GameObject* p = game_room[game_room_id]->player_ids[i];
 					if (p == nullptr) continue;
 					std::cout << "clear score : " << game_room[game_room_id]->Score[i] << std::endl;
+					std::cout << "clear money : " << game_room[game_room_id]->Money[i] << std::endl;
 					if (game_room[game_room_id]->Score[i] < 0) game_room[game_room_id]->Score[i] = 0;
-					send_game_end(p->id,game_room[game_room_id]->Score[i],game_room[game_room_id]->get_item_result(), GAME_CLEAR);
+					send_game_end(p->id, game_room[game_room_id]->Score[i], game_room[game_room_id]->get_item_result(), game_room[game_room_id]->Money[i], GAME_CLEAR);
 				}
-			game_room[game_room_id]->game_end();
+				game_room[game_room_id]->game_end();
 			}
 
 

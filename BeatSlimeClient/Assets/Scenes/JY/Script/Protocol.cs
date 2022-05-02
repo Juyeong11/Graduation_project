@@ -434,6 +434,7 @@ namespace Protocol
         public byte end_type;
         public int score;
         public byte item_type;
+        public byte money;
     }
 
     [Serializable]

@@ -134,6 +134,7 @@ public:
 	bool isGaming;
 	std::atomic_int pattern_progress;
 	std::atomic_int Score[MAX_IN_GAME_PLAYER];
+	std::atomic_int Money[MAX_IN_GAME_PLAYER];
 
 	GameObject* player_ids[MAX_IN_GAME_PLAYER];
 	GameObject* boss_id;
