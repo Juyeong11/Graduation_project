@@ -16,5 +16,4 @@ public class ShopPrices : ScriptableObject
     private int[] skill3Prices;
     public int[] Skill3Prices { get { return skill3Prices; } }
 
-
 }

@@ -13,8 +13,8 @@ public class SlimeDataPanel : MonoBehaviour
     void Update()
     {
         //print(PlayerPrefs.GetInt("mySkill",0));
-        skillImage.sprite = CIO.ClassSprites[PlayerPrefs.GetInt("mySkill"+FieldGameManager.myPlayerID,0)]; 
-        Name.text = PlayerPrefs.GetString("myName"+FieldGameManager.myPlayerID,"");
-        Money.text = PlayerPrefs.GetInt("Money"+FieldGameManager.myPlayerID,0).ToString();
+        skillImage.sprite = CIO.ClassSprites[FieldPlayerManager.instance.self_skillnum]; 
+        Name.text = FieldPlayerManager.instance.myName;
+        Money.text = FieldPlayerManager.instance.money.ToString();
     }
 }

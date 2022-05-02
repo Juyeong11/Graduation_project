@@ -136,7 +136,7 @@ public class GameManager : MonoBehaviour
 
         //여기서 할 수밖에 없음
         player.GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.PlayerHPs[0].HPImage, HPGM.PlayerHPs[0].prevHPImage);
-        HPGM.PlayerHPs[0].Set(PlayerPrefs.GetInt("mySkill" + FieldGameManager.myPlayerID), PlayerPrefs.GetString("myName" +FieldGameManager.myPlayerID, "NotHappy"));
+        HPGM.PlayerHPs[0].Set(FieldPlayerManager.instance.self_skillnum, FieldPlayerManager.instance.myName);
     }
     private void OnApplicationQuit()
     {
@@ -636,7 +636,7 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].GetComponentInChildren<PlayerManager>().playerLevelofSkill = p.skillLevel;
                                 Debug.Log(pid + ": " + p.skillType + ", " + p.skillLevel);
                     
-                                HPGM.PlayerHPs[0].Set(p.skillType, PlayerPrefs.GetString("myName"+FieldGameManager.myPlayerID, "youHappy?"));
+                                HPGM.PlayerHPs[0].Set(p.skillType, FieldPlayerManager.instance.myName);
 
                                 break;
                             }

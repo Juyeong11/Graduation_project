@@ -5,6 +5,10 @@ using System.Collections.Generic;
 
 public class FieldPlayerManager : MonoBehaviour
 {
+    public static FieldPlayerManager instance;
+    public int money;
+    public string myName;
+
     public Animator JumpTrigger;
     public GameObject OutLineObject;
     public Animator OutLineTrigger;
@@ -30,6 +34,8 @@ public class FieldPlayerManager : MonoBehaviour
 
     public ShopManager SM;
     bool shopOpened = false;
+
+    public ShopPrices shopPrices;
     
 
     //[System.NonSerialized]
@@ -37,6 +43,10 @@ public class FieldPlayerManager : MonoBehaviour
 
     //List<HexDirection> path = new List<HexDirection>();
 
+    public void Awake()
+    {
+        instance = this;
+    }
 
     public void Start()
     {
@@ -465,9 +475,9 @@ public class FieldPlayerManager : MonoBehaviour
 
         if (skillNum == 0)
             self_skillnum = 1;
-
-        PlayerPrefs.SetInt("mySkill"+ FieldGameManager.myPlayerID, self_skillnum);
-        PlayerPrefs.SetInt("mySkillLevel"+ FieldGameManager.myPlayerID, self_skillLevel);
+        
+        //PlayerPref.SetInt("mySkill"+ FieldGameManager.myPlayerID, self_skillnum);
+        //PlayerPref.SetInt("mySkillLevel"+ FieldGameManager.myPlayerID, self_skillLevel);
     }
 
     public void SetSkillLevelContainer(int a, int b, int c)
@@ -477,9 +487,24 @@ public class FieldPlayerManager : MonoBehaviour
         skillLevelsContainer[2] = c;
     }
 
-    public void SetSkillLevelContainer(int index, int level)
+    public void SetSkillLevelContainer(int itemType)
     {
+        int index = itemType / 4;
+        int level = itemType % 4;
         skillLevelsContainer[index] = level;
+
+        switch (index)
+        {
+            case 0:
+                money -= shopPrices.Skill1Prices[level];
+            break;
+            case 1:
+                money -= shopPrices.Skill2Prices[level];
+            break;
+            case 2:
+                money -= shopPrices.Skill3Prices[level];
+            break;
+        }
     }
 
 }
