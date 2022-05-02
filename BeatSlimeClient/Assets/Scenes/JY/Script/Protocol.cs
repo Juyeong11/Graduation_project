@@ -432,7 +432,8 @@ namespace Protocol
         public byte size;
         public byte type;
         public byte end_type;
-
+        public int score;
+        public byte item_type;
     }
 
     [Serializable]

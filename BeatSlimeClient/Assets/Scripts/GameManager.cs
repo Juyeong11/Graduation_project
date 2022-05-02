@@ -791,7 +791,9 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_game_end p = Protocol.sc_packet_game_end.SetByteToVar(data);
                             isGameStart = false;
-
+                            //p.item_type 0~20 Áß ÇÏ³ª
+                            //¸¶³à¸ÊÀÇ °æ¿ì 0~9
+                            //½ºÆÀÆãÅ© °æ¿ì 10~20
                             if (p.end_type == 0)
                             {
                                 gameOverImage.SetGameEnd(GameEndTraits.Lose);
@@ -802,7 +804,7 @@ public class GameManager : MonoBehaviour
                             {
                                 gameOverImage.SetGameEnd(GameEndTraits.Win);
                                 gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack, resultsData.damaged,
-                                                            resultsData.attack * 100 - resultsData.damaged * 20, 0, 0);
+                                                            p.score, 0, 0);
                                 Debug.Log("Game_Clear");
                             }
                             else

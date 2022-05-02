@@ -264,6 +264,8 @@ struct sc_packet_game_end
 	unsigned char size;
 	char type;
 	char end_type;
+	int score;
+	char item_type;
 };
 
 struct sc_packet_parrying {

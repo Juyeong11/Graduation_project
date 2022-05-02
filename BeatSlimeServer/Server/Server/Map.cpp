@@ -344,6 +344,12 @@ int GameRoom::find_min_distance_player() const {
 	return ret_id;
 }
 
+int GameRoom::get_item_result() const
+{
+	
+	return 10 - boss_id->hp / 100;
+}
+
 void GameRoom::game_end()
 {
 	isGaming = false;

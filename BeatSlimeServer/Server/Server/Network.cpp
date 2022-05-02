@@ -20,6 +20,7 @@ Network::Network() {
 	//인스턴스는 한 개만!!
 	assert(instance == nullptr);
 	instance = this;
+
 	accept_ex = new EXP_OVER();
 	for (int i = 0; i < SKILL_CNT; ++i) {
 		skills[i] = new Skill();
@@ -366,12 +367,14 @@ void Network::send_map_data(int c_id, char* data, int nShell)
 
 }
 
-void Network::send_game_end(int c_id, char end_type)
+void Network::send_game_end(int c_id, int score, int itemType, char end_type)
 {
 	sc_packet_game_end packet;
 	packet.size = sizeof(packet);
 	packet.type = SC_PACKET_GAME_END;
 	packet.end_type = end_type;
+	packet.score = score;
+	packet.item_type = itemType;
 
 
 	EXP_OVER* ex_over;
@@ -674,10 +677,13 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
 	const int damage = 1;
-	for (const auto& pl : game_room[game_room_id]->player_ids) {
+	for (int i = 0; i < MAX_IN_GAME_PLAYER;++i) {
+		GameObject* pl = game_room[game_room_id]->player_ids[i];
 		if (pl == nullptr) continue;
 		if (false == is_attack(pl->id, x, z)) continue;
 		pl->hp -= damage;
+		game_room[game_room_id]->Score[i] -= 20 * damage;
+
 		for (const auto& p : game_room[game_room_id]->player_ids) {
 			if (p == nullptr) continue;
 			send_attack_player(game_room[game_room_id]->boss_id->id, pl->id, p->id);
@@ -709,36 +715,38 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 
 
 	bool attack_flag = false;
-	switch (cl->skill->SkillType - 1)
+	int damage = cl->skill->Damage;
+	damage = 10;
+	int cur_skill_type = cl->skill->SkillType - 1;
+	switch (cur_skill_type)
 	{
-	case WATERGUN:
-		attack_flag = true;
-		gr->boss_id->hp -= 10;//cl->skill->Damage;
-
-		break;
 	case QUAKE:
-		if (is_attack(gr->boss_id->id, cl->id))
-			attack_flag = true;
-		gr->boss_id->hp -= 10; // cl->skill->Damage;
+		if (false == is_attack(gr->boss_id->id, cl->id))
+			break;
+		__fallthrough;
+	case WATERGUN:
+		if (gr->boss_id->Hit(damage)) {
+			timer_event tev;
+			tev.ev = EVENT_GAME_END;
+			tev.game_room_id = gr->game_room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+			timer_queue.push(tev);
+		}
 		break;
 	case HEAL:
-
+		for (auto pl : gr->player_ids) {
+			if (pl == nullptr) continue;
+			pl->Hit(-damage);
+		}
 		break;
 	default:
 		std::cout << "wrong skill type\n";
 		break;
 	}
-	if (false == attack_flag) return;
+	gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] += 100 * damage;
 
-	if (gr->boss_id->hp < 0) {
-		timer_event tev;
-		tev.ev = EVENT_GAME_END;
-		tev.game_room_id = gr->game_room_id;
-		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
-
-		timer_queue.push(std::move(tev));
-	}
 	for (const auto pl : gr->player_ids) {
 		if (pl == nullptr) continue;
 		send_attack_player(cl->id, gr->boss_id->id, pl->id);
@@ -2143,29 +2151,33 @@ void Network::worker()
 
 				for (const auto p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
-					send_game_end(p->id, GAME_OVER);
+
+					send_game_end(p->id, 0, -1, GAME_OVER);
+
 				}
 				game_room[game_room_id]->game_end();
 
-				break;
+
 			}
-			if (isDie) {
+			else if (isDie) {
 				for (const auto p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 
-					send_game_end(p->id, GAME_OVER);
+					send_game_end(p->id, 0, -1, GAME_OVER);
+
 				}
 				game_room[game_room_id]->game_end();
 
-				break;
 			}
-
-			for (const auto p : game_room[game_room_id]->player_ids) {
-				if (p == nullptr) continue;
-
-				send_game_end(p->id, GAME_CLEAR);
-			}
+			else {
+				for (int i = 0; i < MAX_IN_GAME_PLAYER;++i){
+					GameObject* p = game_room[game_room_id]->player_ids[i];
+					if (p == nullptr) continue;
+					std::cout << "clear score : " << game_room[game_room_id]->Score[i] << std::endl;
+					send_game_end(p->id,game_room[game_room_id]->Score[i],game_room[game_room_id]->get_item_result(), GAME_CLEAR);
+				}
 			game_room[game_room_id]->game_end();
+			}
 
 
 			exp_over_pool.push(exp_over);
