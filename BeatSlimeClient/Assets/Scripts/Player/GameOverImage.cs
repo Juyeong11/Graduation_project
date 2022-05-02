@@ -56,6 +56,8 @@ public class GameOverImage : MonoBehaviour
         bt.text = perfect + "\n" + great + "\n" + miss + "\n\n" + attack + "\n" + damaged;
         ts.text = score.ToString();
         money.text = mone.ToString();
+        FieldPlayerManager.money += mone;
+        
         scroll_grade.text = scroll_grad.ToString();
     }
 }
