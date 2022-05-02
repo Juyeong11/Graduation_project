@@ -157,6 +157,6 @@ public:
 	int find_max_distance_player() const;
 	int find_min_distance_player() const;
 
-
+	int get_item_result() const;
 	void game_end();
 };

@@ -45,13 +45,12 @@ GameObject::GameObject() :state(ST_FREE) {
 bool GameObject::Hit(int damage)
 {
 	hp -= damage;
-	if (hp == 0)
+	if (hp <= 0)
 	{
 		hp = 0;
 		return true;
 	}
-	if (hp > 100)
-		hp = 100;
+
 	return false;
 }
 

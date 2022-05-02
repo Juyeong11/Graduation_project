@@ -739,6 +739,8 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 		for (auto pl : gr->player_ids) {
 			if (pl == nullptr) continue;
 			pl->Hit(-damage);
+			if (pl->hp > 100)
+				pl->hp = 100;
 		}
 		break;
 	default:
@@ -2135,6 +2137,7 @@ void Network::worker()
 		break;
 		case OP_GAME_END:
 		{
+			//이건 무조건 한 번만 하도록 보장되야함
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			//보스 체력 확인하고
 			int boss_id = game_room[game_room_id]->boss_id->id;
@@ -2174,6 +2177,7 @@ void Network::worker()
 					GameObject* p = game_room[game_room_id]->player_ids[i];
 					if (p == nullptr) continue;
 					std::cout << "clear score : " << game_room[game_room_id]->Score[i] << std::endl;
+					if (game_room[game_room_id]->Score[i] < 0) game_room[game_room_id]->Score[i] = 0;
 					send_game_end(p->id,game_room[game_room_id]->Score[i],game_room[game_room_id]->get_item_result(), GAME_CLEAR);
 				}
 			game_room[game_room_id]->game_end();
