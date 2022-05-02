@@ -385,7 +385,6 @@ public class FieldGameManager : MonoBehaviour
                             }
                             else
                             {
-                                
                                 FieldPlayerManager.instance.SetSkillLevelContainer(p.itemType);
                             }
                             // p->itemType  구매 시도한 아이템
