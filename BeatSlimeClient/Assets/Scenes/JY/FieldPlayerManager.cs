@@ -6,8 +6,8 @@ using System.Collections.Generic;
 public class FieldPlayerManager : MonoBehaviour
 {
     public static FieldPlayerManager instance;
-    public int money;
-    public string myName;
+    public static int money;
+    public static string myName;
 
     public Animator JumpTrigger;
     public GameObject OutLineObject;
@@ -28,9 +28,9 @@ public class FieldPlayerManager : MonoBehaviour
 
     public ChattingManager CM;
 
-    public int self_skillnum = 1;   //1~3
-    public int self_skillLevel = 1; //0~3
-    public int[] skillLevelsContainer = new int[3]; // only for shop
+    public static int self_skillnum = 1;   //1~3
+    public static int self_skillLevel = 1; //0~3
+    public static int[] skillLevelsContainer = new int[3]; // only for shop
 
     public ShopManager SM;
     bool shopOpened = false;
@@ -438,7 +438,7 @@ public class FieldPlayerManager : MonoBehaviour
                         }
                         else
                         {
-                            SM.ShopOpen(this);
+                            SM.ShopOpen();
                             shopOpened = true;
                         }
                     break;

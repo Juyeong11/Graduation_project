@@ -5,7 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class FieldGameManager : MonoBehaviour
 {
-    public static FieldGameManager data;
+    private static FieldGameManager instance;
+    public static FieldGameManager data {get {if (instance == null){ Debug.LogError("Invalid");} return instance;} set {if (instance == null) instance = value;}}
+
 
     public int mapCellid = 0;
 
@@ -36,7 +38,6 @@ public class FieldGameManager : MonoBehaviour
 
     void Awake()
     {
-
         print("Start");
         data = this;
         isGameStart = false;
@@ -89,6 +90,7 @@ public class FieldGameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F12))
         {
             Net.SendTeleportPacket(1); // 100°ñµå È¹µæ
+            FieldPlayerManager.money += 100;
         }
         if (Input.GetKeyDown(KeyCode.F11))
         {
@@ -146,7 +148,7 @@ public class FieldGameManager : MonoBehaviour
                             myPlayerID = p.id;
                             Objects[p.id] = player;
 
-                            FieldPlayerManager.instance.myName = System.Text.Encoding.UTF8.GetString(p.name);
+                            FieldPlayerManager.myName = System.Text.Encoding.UTF8.GetString(p.name);
                             //PlayerPref.SetString("myName" + myPlayerID, System.Text.Encoding.UTF8.GetString(p.name));
 
                             //print(p.cur_skill_type);
@@ -158,7 +160,7 @@ public class FieldGameManager : MonoBehaviour
                                 Debug.Log(p.inventory[i]);
                             }
                             //PlayerPref
-                            FieldPlayerManager.instance.money = p.money;
+                            FieldPlayerManager.money = p.money;
 
                             //PutPlayerObject(p.type, p.id, p.x, p.y);
                         }
@@ -233,8 +235,8 @@ public class FieldGameManager : MonoBehaviour
                                         if (p.id == myPlayerID)
                                         {
                                             FieldPlayerManager.instance.selfDirection = (HexDirection)p.direction;
-                                            FieldPlayerManager.instance.self_skillnum = p.skillType;
-                                            FieldPlayerManager.instance.self_skillLevel = p.skillLevel;
+                                            FieldPlayerManager.self_skillnum = p.skillType;
+                                            FieldPlayerManager.self_skillLevel = p.skillLevel;
                                         }   
                                         else
                                         {

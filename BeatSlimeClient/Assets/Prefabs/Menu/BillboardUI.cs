@@ -33,7 +33,7 @@ public class BillboardUI : MonoBehaviour
         p = pid;
         if (pid == -1)
         {
-            NAME.text = FieldPlayerManager.instance.myName;
+            NAME.text = FieldPlayerManager.myName;
             pops.sprite = exit;
         }
         else
