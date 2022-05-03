@@ -24,7 +24,7 @@ public class SceneDebugTool : MonoBehaviour
             //게임 시작
             if (Input.GetKeyDown(KeyCode.Return))
             {
-                FieldGameManager.Net.debugOnline = true;
+                Network.debugOnline = true;
 
                 Protocol.sc_packet_game_start game_start_packet = new Protocol.sc_packet_game_start();
                 game_start_packet.type = Protocol.CONSTANTS.SC_PACKET_GAME_START;

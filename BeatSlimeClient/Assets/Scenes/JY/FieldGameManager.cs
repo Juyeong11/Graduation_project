@@ -25,7 +25,7 @@ public class FieldGameManager : MonoBehaviour
     public bool isGameStart;
 
     //
-    public static Network Net = new Network();
+ 
     static GameObject[] Objects = new GameObject[Protocol.CONSTANTS.MAX_OBJECT];
 
     public static int myPlayerID = -1;
@@ -48,7 +48,7 @@ public class FieldGameManager : MonoBehaviour
             loader.LoadMap();
         }
 
-        Net.SendChangeSceneDonePacket(0);
+        Network.SendChangeSceneDonePacket(0);
         if (myPlayerID != -1)
         {
             Objects[myPlayerID] = player;
@@ -56,12 +56,12 @@ public class FieldGameManager : MonoBehaviour
     }
     private void OnApplicationQuit()
     {
-        Net.CloseSocket();
+        Network.CloseSocket();
     }
     void Start()
     {
-        if (false == Net.isOnline)
-            Net.CreateAndConnect();
+        if (false == Network.isOnline)
+            Network.CreateAndConnect();
     }
 
     void Update()
@@ -85,11 +85,11 @@ public class FieldGameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            Net.SendTeleportPacket(0); // 1번 포탈로 이동
+            Network.SendTeleportPacket(0); // 1번 포탈로 이동
         }
         if (Input.GetKeyDown(KeyCode.F12))
         {
-            Net.SendTeleportPacket(1); // 100골드 획득
+            Network.SendTeleportPacket(1); // 100골드 획득
             FieldPlayerManager.money += 100;
         }
         if (Input.GetKeyDown(KeyCode.F11))
@@ -107,24 +107,24 @@ public class FieldGameManager : MonoBehaviour
             // 9 : Tank1       50       20        8
             // 10: Tank2       150      40        7
             // 11: Tank3       500      80        6
-            Net.SendBuyPacket(0); // 0번 아이템 구매
+            Network.SendBuyPacket(0); // 0번 아이템 구매
         }
         if (Input.GetKeyDown(KeyCode.F10))
         {
             //scrool item을 사용하겠다.
             //itemType을 인자로 전달 0~9까지 마녀 맵 스크롤 0~9사이 숫자로 스크롤의 등급을 매김 
-            Net.SendUseItemPacket(1);
+            Network.SendUseItemPacket(1);
         }
         if (Input.GetKeyDown(KeyCode.F9))
         {
             // 스크롤을 얻겠다. 얻는 스크롤은 서버에서 랜덤하게 부여
-            Net.SendTeleportPacket(3);
+            Network.SendTeleportPacket(3);
         }
         if (Input.GetKeyDown(KeyCode.F5))
         {
             PlayerPrefs.DeleteAll();
         }
-        if (Net.isOnline)
+        if (Network.isOnline)
         {
 
             isGameStart = true;

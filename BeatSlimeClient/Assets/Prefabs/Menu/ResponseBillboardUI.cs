@@ -56,13 +56,13 @@ public class ResponseBillboardUI : MonoBehaviour
 
     public void Adapt()
     {
-        FieldGameManager.Net.SendPartyRequestAnwserPacket(1, from);
+        Network.SendPartyRequestAnwserPacket(1, from);
         GetOff();
     }
 
     public void Deny()
     {
-        FieldGameManager.Net.SendPartyRequestAnwserPacket(0, from);
+        Network.SendPartyRequestAnwserPacket(0, from);
         GetOff();
     }
 }

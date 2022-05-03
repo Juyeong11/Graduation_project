@@ -117,13 +117,13 @@ public class FieldPlayerManager : MonoBehaviour
             selfCoord.coordinates.X == 17 && selfCoord.coordinates.Z == -20)
         {
             if (isReady) return;
-            FieldGameManager.Net.SendChangeSceneReadyPacket(1);
+            Network.SendChangeSceneReadyPacket(1);
             isReady = true;
             return;
         }
         else if (isReady)
         {
-            FieldGameManager.Net.SendChangeSceneReadyPacket(0);
+            Network.SendChangeSceneReadyPacket(0);
         }
         isReady = false;
     }
@@ -296,13 +296,13 @@ public class FieldPlayerManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 //Debug.Log("키 전송");
                 // 서버에 이동 전송
                 //FieldGameManager.data.setMoved();
 
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTUP);
+                Network.SendMovePacket((byte)Protocol.DIR.LEFTUP);
             }
             else
             {
@@ -319,11 +319,11 @@ public class FieldPlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.E) && KeyCheck(KeyCode.E))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 //GameManager.data.setMoved();
                 // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.UP);
+                Network.SendMovePacket((byte)Protocol.DIR.UP);
             }
             else
             {
@@ -340,11 +340,11 @@ public class FieldPlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.R) && KeyCheck(KeyCode.R))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 //GameManager.data.setMoved();
                 // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
+                Network.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
             }
             else
             {
@@ -362,11 +362,11 @@ public class FieldPlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.S) && KeyCheck(KeyCode.S))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 //GameManager.data.setMoved();
                 // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
+                Network.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
             }
             else
             {
@@ -383,11 +383,11 @@ public class FieldPlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.D) && KeyCheck(KeyCode.D))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 //GameManager.data.setMoved();
                 // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.DOWN);
+                Network.SendMovePacket((byte)Protocol.DIR.DOWN);
             }
             else
             {
@@ -404,11 +404,11 @@ public class FieldPlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.F) && KeyCheck(KeyCode.F))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 //GameManager.data.setMoved();
                 // 서버에 이동 전송
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
+                Network.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
             }
             else
             {
@@ -447,11 +447,11 @@ public class FieldPlayerManager : MonoBehaviour
                     // 오르골 처리
                     if (Orgel.instance.isOrgelPlaying)
                     {
-                        FieldGameManager.Net.SendUseItemPacket(99);
+                        Network.SendUseItemPacket(99);
                     }
                     else
                     {
-                        FieldGameManager.Net.SendUseItemPacket(1);
+                        Network.SendUseItemPacket(1);
                     }
                     
                     break;

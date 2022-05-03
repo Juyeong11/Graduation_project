@@ -85,13 +85,13 @@ public class FieldOtherPlayerManager : MonoBehaviour
             selfCoord.coordinates.X == 2 && selfCoord.coordinates.Z == -2)
         {
             if (isReady) return;
-            FieldGameManager.Net.SendChangeSceneReadyPacket(1);
+            Network.SendChangeSceneReadyPacket(1);
             isReady = true;
             return;
         }
         else if (isReady)
         {
-            FieldGameManager.Net.SendChangeSceneReadyPacket(0);
+            Network.SendChangeSceneReadyPacket(0);
         }
         isReady = false;
     }

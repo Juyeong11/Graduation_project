@@ -266,12 +266,12 @@ public class PlayerManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.W) && KeyCheck(KeyCode.W))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 
                 GameManager.data.setMoved();
 
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTUP);
+                Network.SendMovePacket((byte)Protocol.DIR.LEFTUP);
             }
             else
             {
@@ -288,11 +288,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.E) && KeyCheck(KeyCode.E))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 GameManager.data.setMoved();
                
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.UP);
+                Network.SendMovePacket((byte)Protocol.DIR.UP);
             }
             else
             {
@@ -309,11 +309,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.R) && KeyCheck(KeyCode.R))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 GameManager.data.setMoved();
                 
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
+                Network.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
             }
             else
             {
@@ -331,11 +331,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.S) && KeyCheck(KeyCode.S))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 GameManager.data.setMoved();
                 
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
+                Network.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
             }
             else
             {
@@ -352,11 +352,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.D) && KeyCheck(KeyCode.D))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 GameManager.data.setMoved();
                 
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.DOWN);
+                Network.SendMovePacket((byte)Protocol.DIR.DOWN);
             }
             else
             {
@@ -373,11 +373,11 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.F) && KeyCheck(KeyCode.F))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 GameManager.data.setMoved();
                 
-                FieldGameManager.Net.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
+                Network.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
             }
             else
             {
@@ -394,20 +394,20 @@ public class PlayerManager : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.J) && KeyCheck(KeyCode.J))
         {
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
                 GameManager.data.setMoved();
 
-                FieldGameManager.Net.SendUseSkillPacket();
+                Network.SendUseSkillPacket();
 
             }
         }
         else if (Input.GetKeyDown(KeyCode.Space) && ParryCheck(KeyCode.Space))
         {
 
-            if (FieldGameManager.Net.isOnline)
+            if (Network.isOnline)
             {
-                FieldGameManager.Net.SendParryingPacket();
+                Network.SendParryingPacket();
             }
         }
     }

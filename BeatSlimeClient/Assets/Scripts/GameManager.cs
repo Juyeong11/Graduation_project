@@ -140,7 +140,7 @@ public class GameManager : MonoBehaviour
     }
     private void OnApplicationQuit()
     {
-        FieldGameManager.Net.CloseSocket();
+        Network.CloseSocket();
     }
     public Animator GetEnemyAnim()
     {
@@ -148,8 +148,8 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
-        if (!FieldGameManager.Net.isServerOnline()) FieldGameManager.Net.CreateAndConnect();
-        FieldGameManager.Net.SendChangeSceneDonePacket(1);
+        if (!Network.isServerOnline()) Network.CreateAndConnect();
+        Network.SendChangeSceneDonePacket(1);
 
         offsetTime = 0;
         prePingTestTime = 5.0f;
@@ -411,19 +411,19 @@ public class GameManager : MonoBehaviour
         //if (Input.GetKeyDown("1"))
         //{
         //if (Mapdata.Count != 0)
-        //FieldGameManager.Net.SendWriteMapPacket(Mapdata);
+        //Network.SendWriteMapPacket(Mapdata);
         //}
         //else if (Input.GetKeyDown(KeyCode.BackQuote))
         //{
-        //    FieldGameManager.Net.SendreadPacket();
+        //    Network.SendreadPacket();
         //}
         if (Input.GetKeyDown(KeyCode.F1))
         {
-            FieldGameManager.Net.SendTeleportPacket(2);
+            Network.SendTeleportPacket(2);
         }
 
 
-    if (isGameStart && FieldGameManager.Net.isServerOnline())
+    if (isGameStart && Network.isServerOnline())
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -462,10 +462,10 @@ public class GameManager : MonoBehaviour
             if (prePingTestTime < 0)
             {
                 prePingTestTime = 5.0f;
-                FieldGameManager.Net.SendPingTestPacket();
+                Network.SendPingTestPacket();
             }
         }
-        if (FieldGameManager.Net.isServerOnline())
+        if (Network.isServerOnline())
         {
             //
             while (Network.MessQueue.Count > 0)
@@ -500,8 +500,8 @@ public class GameManager : MonoBehaviour
 
 
                             PatternManager.data.Load(myPlayerID);
-                            FieldGameManager.Net.SendGameStartReadyPacket();
-                            FieldGameManager.Net.SendPingTestPacket();
+                            Network.SendGameStartReadyPacket();
+                            Network.SendPingTestPacket();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:
