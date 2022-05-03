@@ -30,7 +30,7 @@ public class ScrollButons : MonoBehaviour
 
         if (vs <= 0)
         {
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
     }
 }

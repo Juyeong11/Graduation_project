@@ -137,13 +137,19 @@ public class FieldGameManager : MonoBehaviour
             // 스크롤을 얻겠다. 얻는 스크롤은 서버에서 랜덤하게 부여
             //if (isDebugCharacter)
             Network.SendTeleportPacket(3);
-            PlayerPrefs.SetInt("inventory4", 2);
+            PlayerPrefs.SetInt("inventory1", 1);
         }
         if (Input.GetKeyDown(KeyCode.F5))
         {
             if (isDebugCharacter)
             PlayerPrefs.DeleteAll();
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.Quit(0);
+        }
+
         if (Network.isOnline)
         {
 
