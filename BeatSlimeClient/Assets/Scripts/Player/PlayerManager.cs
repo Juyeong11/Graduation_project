@@ -482,7 +482,7 @@ public class PlayerManager : MonoBehaviour
 
     public float SlimeWLerp(float a, float b, float t)
     {
-        float skyHigh = (a + b) * 0.5f + 2f;
+        float skyHigh = (a + b) * 0.5f + 1.7f;
 
         if (t < 0.5f)
         {

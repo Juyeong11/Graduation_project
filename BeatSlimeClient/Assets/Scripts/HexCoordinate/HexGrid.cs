@@ -10,6 +10,11 @@ public enum cellState
     Shop,
 
     Orgel,
+
+    Stage1Portal,
+    Stage1_2Portal,
+    Stage2Portal,
+    Stage2_2Portal,
 }
 
 public class Cell
