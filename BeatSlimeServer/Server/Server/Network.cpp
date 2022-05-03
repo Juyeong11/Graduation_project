@@ -769,6 +769,14 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//strcpy_s(cl.name, packet->name);
 		//로그인 요청이 오면 디비 스레드에 해당 아이디에 대한 정보를 알려달라고 요청하고 종료한다.
 		//그럼 디비 스레드에서 정보를 알려주고 
+		std::string id = packet->name;
+		std::regex re("[^a-zA-Z0-9]");
+		std::cout << packet->name<<std::endl;
+		if (true == std::regex_match(id, re)) {
+			send_login_fail(client_id);
+			disconnect_client(client_id);
+			break;
+		}
 		strcpy_s(cl.name, packet->name);
 
 		// 아래부터는 디비 스레드에서 pqcs하면 다시 하기 시작
@@ -825,7 +833,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
 
-		//std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
+		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:

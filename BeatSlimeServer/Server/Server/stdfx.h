@@ -10,7 +10,7 @@
 #include<string>
 #include<string_view>
 #include<fstream>
-
+#include <regex>
 #include<thread>
 #include<mutex>
 #include<chrono>

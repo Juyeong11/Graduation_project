@@ -63,7 +63,11 @@ public class FieldGameManager : MonoBehaviour
     void Start()
     {
         if (false == Network.isOnline)
+        {
             Network.CreateAndConnect();
+            var r = new System.Random();
+            Network.SendLogIn("Happy" + r.Next(0, 128));
+        }
     }
 
     void Update()

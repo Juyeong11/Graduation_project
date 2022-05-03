@@ -54,6 +54,7 @@ public static class Network
 
 
     }
+
     static void sendComplet(System.IAsyncResult ar)
     {
         Socket c_s = (Socket)ar.AsyncState;
@@ -75,8 +76,7 @@ public static class Network
         isOnline = true;
         tempSocket.EndConnect(ar);
         ClientSocket.BeginReceive(receiveBytes, 0, BUFSIZE, SocketFlags.None, new System.AsyncCallback(receiveComplet), ClientSocket);
-        var r = new System.Random();
-        SendLogIn("Happy" + r.Next(0, 128));
+        
     }
     public static void CreateAndConnect()
     {
@@ -132,6 +132,7 @@ public static class Network
     {
         if (isOnline)
             ClientSocket.Close();
+        isOnline = true;
     }
     public static void SendMovePacket(byte dir)
     {
