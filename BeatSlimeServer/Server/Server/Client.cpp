@@ -132,6 +132,12 @@ void Client::SetMoney(int m)
 	money += m;
 }
 
+void Client::SetScore(int mapType, int Score)
+{
+	if (mapType >= 2) return;
+	ClearMap[mapType] = max(Score, ClearMap[mapType]);
+}
+
 Party::Party()
 {
 	for (auto& i : partyPlayer)

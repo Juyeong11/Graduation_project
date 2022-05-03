@@ -45,6 +45,7 @@ public:
 	virtual int GetMoney() { return 0; };
 	virtual void SetMoney(int m) {  };
 	virtual bool Hit(int damage);
+	virtual void SetScore(int mapType, int Score) {};
 };
 class Npc : public GameObject {
 public:
@@ -169,5 +170,6 @@ public:
 	void do_send(EXP_OVER* ex_over);
 	virtual int GetMoney();
 	virtual void SetMoney(int money);
+	virtual void SetScore(int mapType, int Score);
 };
 

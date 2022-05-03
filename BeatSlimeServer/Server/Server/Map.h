@@ -88,7 +88,6 @@ public:
 
 class GameObject;
 
-
 class Portal
 {
 public:

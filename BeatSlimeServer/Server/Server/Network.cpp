@@ -2158,7 +2158,7 @@ void Network::worker()
 					if (p == nullptr) continue;
 
 					send_game_end(p->id, 0, -1, game_room[game_room_id]->Money[i++], GAME_OVER);
-
+					//돈만 추가
 				}
 				game_room[game_room_id]->game_end();
 
@@ -2170,7 +2170,7 @@ void Network::worker()
 					if (p == nullptr) continue;
 
 					send_game_end(p->id, 0, -1, game_room[game_room_id]->Money[i++], GAME_OVER);
-
+					//돈만 추가
 				}
 				game_room[game_room_id]->game_end();
 
@@ -2182,7 +2182,13 @@ void Network::worker()
 					std::cout << "clear score : " << game_room[game_room_id]->Score[i] << std::endl;
 					std::cout << "clear money : " << game_room[game_room_id]->Money[i] << std::endl;
 					if (game_room[game_room_id]->Score[i] < 0) game_room[game_room_id]->Score[i] = 0;
-					send_game_end(p->id, game_room[game_room_id]->Score[i], game_room[game_room_id]->get_item_result(), game_room[game_room_id]->Money[i], GAME_CLEAR);
+
+					int get_item_type = game_room[game_room_id]->get_item_result();
+					send_game_end(p->id, game_room[game_room_id]->Score[i], get_item_type, game_room[game_room_id]->Money[i], GAME_CLEAR);
+					p->SetScore(game_room[game_room_id]->map_type - 1,game_room[game_room_id]->Score[i]);
+					p->SetMoney(game_room[game_room_id]->Money[i]);
+					input_db_event(p->id, DB_GET_SCROLL, get_item_type);
+					input_db_event(p->id, DB_UPDATE_CLEAR_MAP);
 				}
 				game_room[game_room_id]->game_end();
 			}
@@ -2440,10 +2446,13 @@ void Network::do_DBevent()
 					cl.money = player_data.money;
 					memset(ex_over->_net_buf, 0, 20);
 					DB->readInventory(&cl, reinterpret_cast<char*>(ex_over->_net_buf));
+					DB->readClearMap(&cl);
 				}
 				else {
 					//사용 중인 아이디이므로 worker까지 갈 것도 없이 그냥 로그인 실패 패킷을 보낸다.
 					send_login_fail(ev.obj_id);
+					cl.ClearMap[0] = 0;
+					cl.ClearMap[1] = 0;
 					break;
 				}
 
@@ -2458,15 +2467,15 @@ void Network::do_DBevent()
 				cl.state_lock.lock();
 				cl.state = ST_FREE;
 				cl.state_lock.unlock();
-
 			}
-								 break;
+			break;
 			case DB_READ_INVENTORY:
 				// pqcs inventory info
 				ex_over->_comp_op = OP_DB_INVENTORY;
 				break;
 			case DB_READ_CLAER_MAP_INFO:
 				// pqcs clear map info -> 이건 사용하는 방향으로 해보자
+
 				break;
 			case DB_USE_SCROLL:
 				// pqcs result info
@@ -2482,6 +2491,7 @@ void Network::do_DBevent()
 				DB->updateInventory(&cl, ev.data, 1);
 				break;
 			case DB_UPDATE_CLEAR_MAP:
+				DB->updateClearInfo(&cl);
 
 				break;
 			case DB_UPDATE_PLAYER_DATA:
