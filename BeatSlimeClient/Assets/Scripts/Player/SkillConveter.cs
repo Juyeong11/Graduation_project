@@ -5,19 +5,18 @@ using UnityEngine;
 public class SkillConveter : MonoBehaviour
 {
     public Animator[] rings;
-    public FieldPlayerManager PM;
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.J))
         {
-            PM.self_skillnum++;
-            if (PM.self_skillnum > 3)
+            FieldPlayerManager.self_skillnum++;
+            if (FieldPlayerManager.self_skillnum > 3)
             {
-                PM.self_skillnum = 1;
+                FieldPlayerManager.self_skillnum = 1;
             }
-            rings[PM.self_skillnum - 1].SetTrigger("Skill");
-            FieldGameManager.Net.SendChangeSkillPacket((byte)PM.self_skillnum);
+            rings[FieldPlayerManager.self_skillnum - 1].SetTrigger("Skill");
+            FieldGameManager.Net.SendChangeSkillPacket((byte)FieldPlayerManager.self_skillnum);
         }
     }
 }
