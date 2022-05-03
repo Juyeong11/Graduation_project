@@ -10,12 +10,15 @@ public class VFXManager : MonoBehaviour
     public AudioMixer masterMixer;
     public float sin;
     public float speeds;
-    float V = 0.8f;
+    float Vv = 1.5f;
     bool collapse = false;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         data = this;
+    }
+    void Start()
+    {
         sin = 0.1f;
         speeds = 0.5f;
     }
@@ -24,11 +27,11 @@ public class VFXManager : MonoBehaviour
     {
         masterMixer.SetFloat("SinDelta", sin);
         masterMixer.SetFloat("Blend", speeds);
-        masterMixer.SetFloat("V", V);
+        //masterMixer.SetFloat("V", V);
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void Update()
     {
         if (!collapse)
         {
@@ -38,7 +41,7 @@ public class VFXManager : MonoBehaviour
             if (sin < 0f)
             {
                 collapse = true;
-                masterMixer.SetFloat("V", 0f);
+                //masterMixer.SetFloat("V", 0f);
             }
         }
 
@@ -48,6 +51,6 @@ public class VFXManager : MonoBehaviour
     {
         collapse = false;
         sin = b;
-        masterMixer.SetFloat("V", V);
+        //masterMixer.SetFloat("V", Vv);
     }
 }

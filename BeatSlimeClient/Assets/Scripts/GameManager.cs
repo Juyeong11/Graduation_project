@@ -421,6 +421,10 @@ public class GameManager : MonoBehaviour
         {
             Network.SendTeleportPacket(2);
         }
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            VFXManager.data.HitSounder(1);
+        }
 
 
     if (isGameStart && Network.isServerOnline())
@@ -605,6 +609,7 @@ public class GameManager : MonoBehaviour
 
                                     ComboEffect.CountApply(ref nowCombo, true);
                                     CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
+                                    //VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 5f);
                                 }
 
                                 hm.Damage(hm.CurrentHP - p.hp);

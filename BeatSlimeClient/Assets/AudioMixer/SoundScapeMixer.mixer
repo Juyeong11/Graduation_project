@@ -51,8 +51,6 @@ AudioMixerController:
   m_ExposedParameters:
   - guid: 9f390b44fa83f8642b421c7e67e0e9b2
     name: Blend
-  - guid: f665c097e9b201e4b85947911650e31b
-    name: V
   - guid: d8c722f6a306dad488387359d8f8039c
     name: SinDelta
   m_AudioMixerGroupViews:
@@ -112,20 +110,21 @@ AudioMixerSnapshotController:
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: 823f9fb58cf2c58478826db7db58dfc0
   m_FloatValues:
-    7133351104274944aa365bb060a6ef97: 0.1
+    7133351104274944aa365bb060a6ef97: 0.093
     2e1f5711a64fa64469af1793d85bf0d6: -0.54210335
     a9d1d8f18e3ada54facf7b67e9e29d00: -4.9356413
-    fa40f403363db3746866c41c4e138245: 1.21
+    fa40f403363db3746866c41c4e138245: 1
+    9f390b44fa83f8642b421c7e67e0e9b2: 0.1
     b1bb3b44674503b46b61df811c48cc89: 0.832
-    b2f938c5d15608b428f801c515c28c8e: 1
+    b2f938c5d15608b428f801c515c28c8e: 0.589
     c21e5846731121a41aadfe500836431a: -0.08374829
     ed1378a6e045493458b4609ee811ac03: 0.231
-    d8c722f6a306dad488387359d8f8039c: 0.25
-    f665c097e9b201e4b85947911650e31b: 0.8
-    89901f4a3fa761e498b0901fd4cb9a7d: 0.2
-    86eda6ba5d817294ca90ac15c35b1a61: 10
+    d8c722f6a306dad488387359d8f8039c: 0.828
+    f665c097e9b201e4b85947911650e31b: 0.816
+    89901f4a3fa761e498b0901fd4cb9a7d: 0.21
+    86eda6ba5d817294ca90ac15c35b1a61: -0.092828095
     a9db32bc5b2b9a249b0affa76953a113: 0.248
-    aaed3adc7bfa1fb45a369136fd5a9903: 0.38
+    aaed3adc7bfa1fb45a369136fd5a9903: 0.252
     1f72fe3d1b7144d4faa0a32b50e67415: 0.28
   m_TransitionOverrides: {}
 --- !u!244 &28571405483591176
@@ -143,7 +142,7 @@ AudioMixerEffectController:
     m_GUID: d8c722f6a306dad488387359d8f8039c
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
-  m_Bypass: 1
+  m_Bypass: 0
 --- !u!243 &264131543118663330
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
@@ -184,7 +183,7 @@ AudioMixerEffectController:
     m_GUID: f665c097e9b201e4b85947911650e31b
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
-  m_Bypass: 1
+  m_Bypass: 0
 --- !u!244 &2487026483745192343
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -216,7 +215,7 @@ AudioMixerEffectController:
     m_GUID: aaed3adc7bfa1fb45a369136fd5a9903
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
-  m_Bypass: 1
+  m_Bypass: 0
 --- !u!244 &5506723045363599833
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
