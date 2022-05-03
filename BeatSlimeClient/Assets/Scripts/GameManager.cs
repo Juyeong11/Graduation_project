@@ -805,6 +805,7 @@ public class GameManager : MonoBehaviour
                                 gameOverImage.SetGameEnd(GameEndTraits.Win);
                                 gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack, resultsData.damaged,
                                                             p.score, p.money, p.item_type);
+
                                 Debug.Log("Game_Clear");
                             }
                             else

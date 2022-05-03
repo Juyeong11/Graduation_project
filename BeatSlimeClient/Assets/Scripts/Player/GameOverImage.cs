@@ -59,5 +59,6 @@ public class GameOverImage : MonoBehaviour
         FieldPlayerManager.money += mone;
         
         scroll_grade.text = scroll_grad.ToString();
+        PlayerPrefs.SetInt("inventory" + scroll_grad, PlayerPrefs.GetInt("inventory" + scroll_grad) + 1);
     }
 }

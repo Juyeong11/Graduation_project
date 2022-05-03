@@ -34,6 +34,9 @@ public class FieldPlayerManager : MonoBehaviour
 
     public ShopManager SM;
     bool shopOpened = false;
+    bool scrollOpened = false;
+
+    public ScrollManager scrollManager;
 
     public ShopPrices shopPrices;
     
@@ -60,6 +63,7 @@ public class FieldPlayerManager : MonoBehaviour
     {
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
+        
         //selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
     }
@@ -445,14 +449,21 @@ public class FieldPlayerManager : MonoBehaviour
 
                     case cellState.Orgel:
                     // ¿À¸£°ñ Ã³¸®
-                    if (Orgel.instance.isOrgelPlaying)
-                    {
-                        Network.SendUseItemPacket(99);
-                    }
-                    else
-                    {
-                        Network.SendUseItemPacket(1);
-                    }
+
+                        if (Orgel.instance.isOrgelPlaying)
+                        {
+                            Network.SendUseItemPacket(99);   
+                        }
+                        else if (scrollOpened == false)
+                        {
+                            scrollManager.hasOpen();
+                            scrollOpened = true;
+                        }
+                        else
+                        {
+                            scrollManager.hasClose();
+                            scrollOpened = false;
+                        }
                     
                     break;
                 }
@@ -504,6 +515,22 @@ public class FieldPlayerManager : MonoBehaviour
             case 2:
                 money -= shopPrices.Skill3Prices[level];
             break;
+        }
+    }
+
+    public void MoveTag()
+    {
+        if (scrollManager.gameObject.activeSelf)
+        {
+            var t = FieldGameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
+            if (t.obejct)
+            {
+                if (t.state != cellState.Orgel)
+                {
+                    scrollManager.hasClose();
+                    scrollOpened = false;
+                }
+            }
         }
     }
 

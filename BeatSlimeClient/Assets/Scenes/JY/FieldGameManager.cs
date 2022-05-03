@@ -36,6 +36,8 @@ public class FieldGameManager : MonoBehaviour
     public GameObject ResponseMenu;
     public MusicName MN;
 
+    private bool isDebugCharacter = false;
+
     void Awake()
     {
         print("Start");
@@ -74,8 +76,11 @@ public class FieldGameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha9))
         {
-            scene_num = 2;
-            StartCoroutine(ChangeScene());
+            if (isDebugCharacter)
+            {
+                scene_num = 2;
+                StartCoroutine(ChangeScene());
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.F1))
@@ -89,8 +94,11 @@ public class FieldGameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F12))
         {
-            Network.SendTeleportPacket(1); // 100골드 획득
-            FieldPlayerManager.money += 100;
+            if (isDebugCharacter)
+            {
+                Network.SendTeleportPacket(1); // 100골드 획득
+                FieldPlayerManager.money += 100;
+            }
         }
         if (Input.GetKeyDown(KeyCode.F11))
         {
@@ -107,21 +115,26 @@ public class FieldGameManager : MonoBehaviour
             // 9 : Tank1       50       20        8
             // 10: Tank2       150      40        7
             // 11: Tank3       500      80        6
+            if (isDebugCharacter)
             Network.SendBuyPacket(0); // 0번 아이템 구매
         }
         if (Input.GetKeyDown(KeyCode.F10))
         {
             //scrool item을 사용하겠다.
             //itemType을 인자로 전달 0~9까지 마녀 맵 스크롤 0~9사이 숫자로 스크롤의 등급을 매김 
+            if (isDebugCharacter)
             Network.SendUseItemPacket(1);
         }
         if (Input.GetKeyDown(KeyCode.F9))
         {
             // 스크롤을 얻겠다. 얻는 스크롤은 서버에서 랜덤하게 부여
+            //if (isDebugCharacter)
             Network.SendTeleportPacket(3);
+            PlayerPrefs.SetInt("inventory4", 2);
         }
         if (Input.GetKeyDown(KeyCode.F5))
         {
+            if (isDebugCharacter)
             PlayerPrefs.DeleteAll();
         }
         if (Network.isOnline)
@@ -149,6 +162,10 @@ public class FieldGameManager : MonoBehaviour
                             Objects[p.id] = player;
 
                             FieldPlayerManager.myName = System.Text.Encoding.UTF8.GetString(p.name);
+                            if (FieldPlayerManager.myName == "ADMIN")
+                            {
+                                isDebugCharacter = true;
+                            }
                             //PlayerPref.SetString("myName" + myPlayerID, System.Text.Encoding.UTF8.GetString(p.name));
 
                             //print(p.cur_skill_type);
@@ -158,6 +175,7 @@ public class FieldGameManager : MonoBehaviour
                             for (int i = 0; i < 20; ++i)
                             {
                                 Debug.Log(p.inventory[i]);
+                                PlayerPrefs.SetInt("inventory" + i, p.inventory[i]);
                             }
                             //PlayerPref
                             FieldPlayerManager.money = p.money;
@@ -204,6 +222,7 @@ public class FieldGameManager : MonoBehaviour
                                 {
                                     FieldPlayerManager.instance.PlayerSpinDirection(p.x, p.y, p.z);
                                     FieldPlayerManager.instance.JumpTrig();
+                                    FieldPlayerManager.instance.MoveTag();
                                     grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponentInChildren<SpriteRenderer>().enabled = false;
                                 }
                                 else
