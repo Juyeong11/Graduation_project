@@ -67,12 +67,12 @@ public class ChattingManager : MonoBehaviour
                 if (sendtype == 2)//±”∏ª¿Ã∏È
                 {
                     string id = inputField.text.Split(' ')[0];
-                    FieldGameManager.Net.SendChatMess(inputField.text, sendtype, int.Parse(id));
+                    Network.SendChatMess(inputField.text, sendtype, int.Parse(id));
 
                 }
                 else
                 {
-                    FieldGameManager.Net.SendChatMess(inputField.text, sendtype, -1);
+                    Network.SendChatMess(inputField.text, sendtype, -1);
                 }
                 //SetMess(inputField.text);
                 inputField.text = "";

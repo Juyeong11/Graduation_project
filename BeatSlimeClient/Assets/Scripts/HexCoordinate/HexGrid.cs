@@ -205,7 +205,7 @@ public class HexGrid : MonoBehaviour
     {
         if (cellMaps.Get(pPosition).state == cellState.Damaged)
         {
-            if(!FieldGameManager.Net.isOnline)
+            if(!Network.isOnline)
             Debug.Log("Player Damaged!");
         }
         foreach(var cell in cellMaps.cellMaps)

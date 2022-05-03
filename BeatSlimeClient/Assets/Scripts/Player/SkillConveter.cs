@@ -16,7 +16,7 @@ public class SkillConveter : MonoBehaviour
                 FieldPlayerManager.self_skillnum = 1;
             }
             rings[FieldPlayerManager.self_skillnum - 1].SetTrigger("Skill");
-            FieldGameManager.Net.SendChangeSkillPacket((byte)FieldPlayerManager.self_skillnum);
+            Network.SendChangeSkillPacket((byte)FieldPlayerManager.self_skillnum);
         }
     }
 }
