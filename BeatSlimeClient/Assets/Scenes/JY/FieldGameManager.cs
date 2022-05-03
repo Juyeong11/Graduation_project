@@ -65,8 +65,7 @@ public class FieldGameManager : MonoBehaviour
         if (false == Network.isOnline)
         {
             Network.CreateAndConnect();
-            var r = new System.Random();
-            Network.SendLogIn("Happy" + r.Next(0, 128));
+           
         }
     }
 
@@ -86,7 +85,11 @@ public class FieldGameManager : MonoBehaviour
                 StartCoroutine(ChangeScene());
             }
         }
-
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            var r = new System.Random();
+            Network.SendLogIn("Happy" + r.Next(0, 128));
+        }
         if (Input.GetKeyDown(KeyCode.F1))
         {
             MN.ChangeMusicName(soundManager.getSongName());
