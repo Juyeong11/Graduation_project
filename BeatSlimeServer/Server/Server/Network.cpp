@@ -817,6 +817,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 		//cl.last_packet_time = packet->move_time;
+		if (cl.last_move_time + std::chrono::milliseconds(100) > std::chrono::system_clock::now()) break;
 		cl.last_move_time = std::chrono::system_clock::now();
 
 		cl.pre_x = cl.x;
@@ -1590,6 +1591,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					cl.x = x[i];
 					cl.y = y[i];
 					cl.z = z[i];
+					maps[FIELD_MAP]->SetTileType(x[i], z[i], cl.pre_x, cl.pre_z);
 					break;
 				}
 			}
