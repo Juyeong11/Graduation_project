@@ -39,6 +39,8 @@ public class FieldPlayerManager : MonoBehaviour
     public ScrollManager scrollManager;
 
     public ShopPrices shopPrices;
+
+    Cell nowOnCellTag;
     
 
     //[System.NonSerialized]
@@ -116,9 +118,7 @@ public class FieldPlayerManager : MonoBehaviour
 
         // 포탈 타일인지 확인 지금은 0,0,0     1,0,-1     0,1,-1로 함 -> 씬 전환 잘되면 Cell에 type 추가해 비교하는 방법으로 바꾸자
         
-        if(selfCoord.coordinates.X == 17 && selfCoord.coordinates.Z == -21 ||
-            selfCoord.coordinates.X == 16 && selfCoord.coordinates.Z == -20 ||
-            selfCoord.coordinates.X == 17 && selfCoord.coordinates.Z == -20)
+        if(nowOnCellTag.state == cellState.Stage1Portal)
         {
             if (isReady) return;
             Network.SendChangeSceneReadyPacket(1);
@@ -185,7 +185,7 @@ public class FieldPlayerManager : MonoBehaviour
 
     public float SlimeWLerp(float a, float b, float t)
     {
-        float skyHigh = (a + b) * 0.5f + 2f;
+        float skyHigh = (a + b) * 0.5f + 1.7f;
 
         if (t < 0.5f)
         {
@@ -429,10 +429,9 @@ public class FieldPlayerManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            var t = FieldGameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
-            if (t.obejct)
+            if (nowOnCellTag.obejct)
             {
-                switch (t.state)
+                switch (nowOnCellTag.state)
                 {
                     case cellState.Shop:
                         if (shopOpened)
@@ -522,10 +521,10 @@ public class FieldPlayerManager : MonoBehaviour
     {
         if (scrollManager.gameObject.activeSelf)
         {
-            var t = FieldGameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
-            if (t.obejct)
+            nowOnCellTag = FieldGameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
+            if (nowOnCellTag.obejct)
             {
-                if (t.state != cellState.Orgel)
+                if (nowOnCellTag.state != cellState.Orgel)
                 {
                     scrollManager.hasClose();
                     scrollOpened = false;
