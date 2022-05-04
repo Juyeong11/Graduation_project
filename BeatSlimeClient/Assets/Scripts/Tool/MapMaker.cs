@@ -25,8 +25,12 @@ public class MapMaker : MonoBehaviour
     public int landOffsetRotate = 0;
     public float landOffsetScale = 0;
 
+    public SANDBOXSoundTestProj soundscape;
+
     static public int cellId = 0;
     static public int landId = 0;
+
+    float purpler = 0f;
 
     public Text witch;
 
@@ -95,6 +99,15 @@ public class MapMaker : MonoBehaviour
             if (Input.GetKeyUp(KeyCode.F1))
             {
                 recipt.SetActive(false);
+            }
+            if (Input.GetKey(KeyCode.F2))
+            {
+                purpler += Time.deltaTime;
+            }
+            if (Input.GetKeyUp(KeyCode.F2))
+            {
+                soundscape.SetSound(purpler);
+                purpler = 0f;
             }
             if (Input.GetKeyDown(KeyCode.Escape))
             {

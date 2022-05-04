@@ -33,22 +33,28 @@ public class SANDBOXSoundTestProj : MonoBehaviour
             if (sin < 0f)
                 collapse = true;
         }
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyUp(KeyCode.F12))
         {
             collapse = false;
-            sin = speeds + 0.3f;
+            SetSound(speeds+0.3f);
         }
-        if (Input.GetKeyUp(KeyCode.UpArrow))
+        if (Input.GetKeyUp(KeyCode.F11))
         {
             speeds += 0.1f;
             if (speeds > 1f)
                 speeds = 1f;
         }
-        if (Input.GetKeyUp(KeyCode.DownArrow))
+        if (Input.GetKeyUp(KeyCode.F10))
         {
             speeds -= 0.1f;
             if (speeds < 0f)
                 speeds = 0f;
         }
+    }
+
+    public void SetSound(float a)
+    {
+        collapse = false;
+        sin = a;
     }
 }
