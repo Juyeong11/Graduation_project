@@ -10,7 +10,7 @@ public class VFXManager : MonoBehaviour
     public AudioMixer masterMixer;
     public float sin;
     public float speeds;
-    float Vv = 1.5f;
+    //float Vv = 1.5f;
     bool collapse = false;
     // Start is called before the first frame update
     void Awake()
@@ -19,7 +19,7 @@ public class VFXManager : MonoBehaviour
     }
     void Start()
     {
-        sin = 0.1f;
+        sin = 0.0f;
         speeds = 0.5f;
     }
 

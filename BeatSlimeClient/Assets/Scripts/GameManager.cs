@@ -609,7 +609,7 @@ public class GameManager : MonoBehaviour
 
                                     ComboEffect.CountApply(ref nowCombo, true);
                                     CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
-                                    //VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 5f);
+                                    VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 30f);
                                 }
 
                                 hm.Damage(hm.CurrentHP - p.hp);

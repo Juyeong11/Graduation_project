@@ -57,6 +57,7 @@ public class FieldPlayerManager : MonoBehaviour
     {
         grid = FieldGameManager.data.grid;
         state = playerState.Idle;
+        nowOnCellTag = null;
         //selfDirection = HexDirection.Up;
         //onPlayerFly.Invoke();
 
@@ -118,18 +119,23 @@ public class FieldPlayerManager : MonoBehaviour
 
         // 포탈 타일인지 확인 지금은 0,0,0     1,0,-1     0,1,-1로 함 -> 씬 전환 잘되면 Cell에 type 추가해 비교하는 방법으로 바꾸자
         
-        if(nowOnCellTag.state == cellState.Stage1Portal)
+        if (nowOnCellTag != null)
         {
-            if (isReady) return;
-            Network.SendChangeSceneReadyPacket(1);
-            isReady = true;
-            return;
+            if(nowOnCellTag.state == cellState.Stage1Portal)
+            {
+                //Debug.Log("ready");
+                if (isReady) return;
+                Network.SendChangeSceneReadyPacket(1);
+                isReady = true;
+                return;
+            }
+        
+            else if (isReady)
+            {
+                Network.SendChangeSceneReadyPacket(0);
+            }
+            isReady = false;
         }
-        else if (isReady)
-        {
-            Network.SendChangeSceneReadyPacket(0);
-        }
-        isReady = false;
     }
 
     public void PlayerWCheck()
@@ -519,12 +525,15 @@ public class FieldPlayerManager : MonoBehaviour
 
     public void MoveTag()
     {
-        if (scrollManager.gameObject.activeSelf)
+        nowOnCellTag = FieldGameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
+
+        // if (nowOnCellTag.state != cellState.None)
+        //     Debug.Log("nowOnCellTag : " + nowOnCellTag);
+        if (nowOnCellTag.obejct)
         {
-            nowOnCellTag = FieldGameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
-            if (nowOnCellTag.obejct)
+            if (nowOnCellTag.state != cellState.Orgel)
             {
-                if (nowOnCellTag.state != cellState.Orgel)
+                if (scrollManager.gameObject.activeSelf)
                 {
                     scrollManager.hasClose();
                     scrollOpened = false;
@@ -532,5 +541,4 @@ public class FieldPlayerManager : MonoBehaviour
             }
         }
     }
-
 }

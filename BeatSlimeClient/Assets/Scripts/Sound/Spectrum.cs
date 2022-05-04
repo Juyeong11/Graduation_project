@@ -39,7 +39,7 @@ public class Spectrum : MonoBehaviour
             FirstScale.y = SpectrumData[i] * 1600;                                            // 막대기 y를 스펙트럼데이터에 맞게 늘림
             if (FirstScale.y > 85f)
                 FirstScale.y = 85f;
-            Sticks[i].transform.localScale = Vector2.MoveTowards(Sticks[i].transform.localScale, FirstScale, 30f);     // 스펙트럼데이터에 맞게 늘어난 스케일을 처음스케일로 0.1의 속도만큼 바꿈
+            Sticks[i].transform.localScale = Vector2.MoveTowards(Sticks[i].transform.localScale, FirstScale, 20f);     // 스펙트럼데이터에 맞게 늘어난 스케일을 처음스케일로 변경
         }
 
     }

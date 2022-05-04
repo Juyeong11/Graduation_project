@@ -96,6 +96,10 @@ public class MapMaker : MonoBehaviour
             {
                 recipt.SetActive(false);
             }
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                SceneManager.LoadScene("LoginScene");
+            }
             if (Input.GetKeyDown(KeyCode.F4))
             {
                 grid.cellMaps.map_Get(playerPosition.coordinates.X, playerPosition.coordinates.Z);

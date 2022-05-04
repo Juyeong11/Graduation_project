@@ -235,7 +235,7 @@ public class FieldGameManager : MonoBehaviour
                                 {
                                     FieldPlayerManager.instance.PlayerSpinDirection(p.x, p.y, p.z);
                                     FieldPlayerManager.instance.JumpTrig();
-                                    FieldPlayerManager.instance.MoveTag();
+                                    
                                     grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponentInChildren<SpriteRenderer>().enabled = false;
                                 }
                                 else
@@ -245,6 +245,10 @@ public class FieldGameManager : MonoBehaviour
                                 }
                             }
                             Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
+                            if (p.id == myPlayerID)
+                            {
+                                FieldPlayerManager.instance.MoveTag();
+                            }
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_PUT_OBJECT:
