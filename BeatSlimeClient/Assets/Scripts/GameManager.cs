@@ -518,7 +518,7 @@ public class GameManager : MonoBehaviour
                             PlaySound();
                             PD.Play();
                             MN.ChangeMusicName(SongName + " - zeroste.");
-                            player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"+FieldGameManager.myPlayerID));
+                            player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
 
                             enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime( Objects[0].gameObject);

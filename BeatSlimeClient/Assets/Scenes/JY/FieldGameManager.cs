@@ -169,8 +169,8 @@ public class FieldGameManager : MonoBehaviour
 
                             soundManager.PlayBGM("riverside");
                             MN.ChangeMusicName(soundManager.getSongName());
-                            playerAnim.SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed") + myPlayerID);
-                            outlineAnim.SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed") + myPlayerID);
+                            playerAnim.SetFloat("Speed", 1);
+                            outlineAnim.SetFloat("Speed", 1);
                             myPlayerID = p.id;
                             Objects[p.id] = player;
 
@@ -276,7 +276,7 @@ public class FieldGameManager : MonoBehaviour
                                         }   
                                         else
                                         {
-                                            Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"+myPlayerID));
+                                            Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
 
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().selfCoord.direction = (HexDirection)p.direction;
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_playerName = System.Text.Encoding.UTF8.GetString(p.name);
