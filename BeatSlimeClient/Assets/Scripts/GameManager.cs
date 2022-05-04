@@ -730,62 +730,8 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_EFFECT:
                         {
                             Protocol.sc_packet_effect p = Protocol.sc_packet_effect.SetByteToVar(data);
-                            int pid = ServerID_To_ClientID(p.id);
-                            int tid = -1;
-                            if (p.target_id != -1)
-                                tid = ServerID_To_ClientID(p.target_id);
+                            
 
-                            // 플레이어 스킬 이펙트만 여기서 출력 번호는 55번
-                            switch (p.effect_type)
-                            {
-                                case 3:
-                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time, 3);
-                                    break;
-                                case 4:
-                                    EffectManager.instance.BossTileEffect(p.x, p.y, p.z, p.charging_time, 4);
-                                    break;
-                                case 99:
-                                    EffectManager.instance.OneTileEffect(p.x, p.y, p.z, p.charging_time);
-                                    break;
-                                case 5:
-                                    EffectManager.instance.BossWaterGunEffect(Objects[pid].transform.localPosition, Objects[tid].transform.localPosition, p.charging_time);
-                                    break;
-                                case 6:
-                                    EffectManager.instance.BossQuakeEffect(p.x, p.y, p.z, p.charging_time, Objects[tid].GetComponent<HexCellPosition>().direction);
-                                    break;
-                                case 10:
-                                    EffectManager.instance.BossTargetingEffect(Objects[pid].transform.localPosition, ref Objects[tid], p.charging_time);
-                                    break;
-
-                                case 55:// skill
-                                    // p->x  == skill Level
-                                    // p->y  == skill type
-                                    switch (p.y)
-                                    {
-                                        case 1:
-                                            EffectManager.instance.PlayerWaterGunEffect(Objects[pid].transform.localPosition, ref Objects[tid], p.charging_time);
-
-                                            break;
-                                        case 2:
-                                            {
-                                                HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
-                                                EffectManager.instance.PlayerQuakeEffect(cell.X, cell.Y, cell.Z, p.charging_time);
-                                                //Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " skill attack");
-
-                                            }
-                                            break;
-                                        case 3:
-                                            {
-                                                HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
-                                                EffectManager.instance.PlayerHealEffect(cell.X, cell.Y, cell.Z, p.charging_time);
-                                                //Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " skill attack");
-
-                                            }
-                                            break;
-                                    }
-                                   // Debug.Log(p.y + " skill type");
-                                    break;
-                            }
                             //StartCoroutine(EffectManager.instance.TileEffect0(0, 0, 0, 0,HexDirection.LeftDown));
 
                             //Debug.Log(start_x+ " " + start_y + " " + start_z + " " + start_w);

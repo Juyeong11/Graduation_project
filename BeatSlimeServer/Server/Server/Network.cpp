@@ -504,7 +504,14 @@ void Network::disconnect_client(int c_id)
 	if (room_num == -1) {
 		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->z);
 	}
+	for (auto* p : portals) {
+		if (false == p->findPlayer(c_id)) continue;
+		p->id_lock.lock();
+		p->player_ids.erase(c_id);
+		p->id_lock.unlock();
 
+		break;
+	}
 
 	client.vl.lock();
 	std::unordered_set <int> my_vl = client.viewlist;
@@ -526,6 +533,7 @@ void Network::disconnect_client(int c_id)
 
 	//여기서 end 패킷 보내고 종료 처리를 하자
 	input_db_event(c_id, DB_PLAYER_LOGOUT);
+
 	if (client.cur_room_num != -1) {
 		for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 			//send_remove_object(game_room[client.cur_room_num]->player_ids[i]->id, c_id);
@@ -677,12 +685,13 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 
 void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
-	const int damage = 1;
+	const int damage = 5;
 	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 		GameObject* pl = game_room[game_room_id]->player_ids[i];
 		if (pl == nullptr) continue;
 		if (false == is_attack(pl->id, x, z)) continue;
 		pl->hp -= damage;
+		std::cout << "id : " << i << " damaged " << damage << std::endl;
 		game_room[game_room_id]->Score[i] -= 20 * damage;
 
 		for (const auto& p : game_room[game_room_id]->player_ids) {
@@ -834,7 +843,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
 
-		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
+		//std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -1805,7 +1814,7 @@ void Network::worker()
 			cl.z = -25;
 			//13, 12, -25
 			//4, 0, -4
-			set_new_player_pos(new_id);
+
 			cl.id = new_id;
 			cl.prev_recv_size = 0;
 			cl.recv_over._comp_op = OP_RECV;
@@ -1999,6 +2008,7 @@ void Network::worker()
 			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 7));
 
 
+
 			// 시작 위치를 중심으로 패턴 공격
 			// 공격 이펙트 보내고
 			// 서버에서 공격 처리할 이벤트 추가
@@ -2110,10 +2120,10 @@ void Network::worker()
 			{
 
 
-				do_npc_tile_attack(game_room_id,
-					pos_x,
-					pos_y,
-					pos_z);
+				//do_npc_tile_attack(game_room_id,
+				//	pos_x,
+				//	pos_y,
+				//	pos_z);
 			}
 			break;
 			case 6:// 패턴파일에 적힌 방향으로 지진
@@ -2152,7 +2162,9 @@ void Network::worker()
 			//이건 무조건 한 번만 하도록 보장되야함
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			//보스 체력 확인하고
+			if (game_room[game_room_id]->boss_id == nullptr) break;// GameEnd는 한 번만 들어와야됨
 			int boss_id = game_room[game_room_id]->boss_id->id;
+
 			//if(clients[boss_id]->hp<10;
 			//체력에 따라 클리어 유무
 
@@ -2253,13 +2265,14 @@ void Network::worker()
 			Client& cl = *reinterpret_cast<Client*>(clients[client_id]);
 			char item[20];
 			memcpy_s(item, 20, reinterpret_cast<char*>(exp_over->_net_buf), 20);
-
+			set_new_player_pos(client_id);
 			send_login_ok(client_id, item);
 
 			cl.state_lock.lock();
 			cl.state = ST_INGAME;
 			cl.state_lock.unlock();
 
+			/*
 			//새로 들어온 친구의 위치를 정해주자
 
 			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
@@ -2308,7 +2321,7 @@ void Network::worker()
 				send_put_object(client_id, other->id);
 			}
 			send_move_object(client_id, client_id);
-
+			*/
 		}
 		break;
 		case OP_DB_USE_ITEM:
@@ -2368,6 +2381,7 @@ void Network::do_timer() {
 
 					break;
 				case EVENT_BOSS_TILE_ATTACK:
+					
 					ex_over->_comp_op = OP_BOSS_TILE_ATTACK;
 					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.type;
@@ -2461,6 +2475,7 @@ void Network::do_DBevent()
 				else {
 					//사용 중인 아이디이므로 worker까지 갈 것도 없이 그냥 로그인 실패 패킷을 보낸다.
 					send_login_fail(ev.obj_id);
+					disconnect_client(ev.obj_id);
 					cl.ClearMap[0] = 0;
 					cl.ClearMap[1] = 0;
 					break;
