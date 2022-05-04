@@ -501,9 +501,9 @@ void Network::disconnect_client(int c_id)
 	client.dest_z = -1;
 
 	int room_num = reinterpret_cast<Client*>(clients[c_id])->cur_room_num;
-	if (room_num == -1) {
-		maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->z);
-	}
+
+	maps[FIELD_MAP]->SetTileType(-1, -1, clients[c_id]->x, clients[c_id]->z);
+
 	for (auto* p : portals) {
 		if (false == p->findPlayer(c_id)) continue;
 		p->id_lock.lock();
@@ -557,6 +557,7 @@ void Network::disconnect_client(int c_id)
 
 			}
 		}
+		client.cur_room_num = -1;
 	}
 
 	if (client.party != nullptr) {
@@ -778,7 +779,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//그럼 디비 스레드에서 정보를 알려주고 
 		std::string id = packet->name;
 		std::regex re("[^a-zA-Z0-9]");
-		std::cout << packet->name<<std::endl;
+		std::cout << packet->name << std::endl;
 		if (true == std::regex_match(id, re)) {
 			send_login_fail(client_id);
 			disconnect_client(client_id);
@@ -1137,6 +1138,13 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 				send_put_object(client_id, other->id);
 			}
+			if (cl.cur_room_num != -1) {
+			 	cl.x = game_room[cl.cur_room_num]->portal->x;
+				cl.z = game_room[cl.cur_room_num]->portal->z;
+				cl.y = -cl.x - cl.z;
+				set_new_player_pos(client_id);
+			}
+
 			cl.cur_room_num = -1;
 			send_move_object(client_id, client_id);
 			if (cur_play_music != 99)
@@ -2202,7 +2210,7 @@ void Network::worker()
 
 					int get_item_type = game_room[game_room_id]->get_item_result();
 					send_game_end(p->id, game_room[game_room_id]->Score[i], get_item_type, game_room[game_room_id]->Money[i], GAME_CLEAR);
-					p->SetScore(game_room[game_room_id]->map_type - 1,game_room[game_room_id]->Score[i]);
+					p->SetScore(game_room[game_room_id]->map_type - 1, game_room[game_room_id]->Score[i]);
 					p->SetMoney(game_room[game_room_id]->Money[i]);
 					input_db_event(p->id, DB_GET_SCROLL, get_item_type);
 					input_db_event(p->id, DB_UPDATE_CLEAR_MAP);
@@ -2376,7 +2384,7 @@ void Network::do_timer() {
 
 					break;
 				case EVENT_BOSS_TILE_ATTACK:
-					
+
 					ex_over->_comp_op = OP_BOSS_TILE_ATTACK;
 					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.type;
@@ -2488,7 +2496,7 @@ void Network::do_DBevent()
 				cl.state = ST_FREE;
 				cl.state_lock.unlock();
 			}
-			break;
+								 break;
 			case DB_READ_INVENTORY:
 				// pqcs inventory info
 				ex_over->_comp_op = OP_DB_INVENTORY;

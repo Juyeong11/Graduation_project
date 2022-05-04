@@ -158,5 +158,6 @@ public:
 	int find_min_distance_player() const;
 
 	int get_item_result() const;
+	void set_player_portal_pos(int c_id);
 	void game_end();
 };

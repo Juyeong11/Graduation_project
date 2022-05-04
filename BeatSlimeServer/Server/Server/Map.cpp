@@ -250,6 +250,7 @@ int GameRoom::FindPlayer(int id) const
 {
 	int room_id=0;
 	for (const auto p : player_ids) {
+		if (p == nullptr) continue;
 		if (p->id == id) return room_id;
 
 	}
@@ -259,6 +260,8 @@ int GameRoom::FindPlayerID_by_GameRoom(int id) const
 {
 	int room_id = 0;
 	for (int i = 0; i < MAX_IN_GAME_PLAYER;++i) {
+		if (player_ids[i] == nullptr) continue;
+
 		if (player_ids[i]->id == id) return i;
 
 	}
@@ -357,7 +360,10 @@ int GameRoom::get_item_result() const
 	
 	return 10 - boss_id->hp / 100;
 }
+void GameRoom::set_player_portal_pos(int c_id) 
+{
 
+}
 void GameRoom::game_end()
 {
 	isGaming = false;
@@ -371,16 +377,16 @@ void GameRoom::game_end()
 	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
 	for (auto p : player_ids) {
 		if (p == nullptr) continue;
-		p->x = portal->x;
-		p->y = portal->y;
-		p->z = portal->z;
-		Network::GetInstance()->set_new_player_pos(p->id);
+		//p->x = portal->x;
+		//p->y = portal->y;
+		//p->z = portal->z;
+		//Network::GetInstance()->set_new_player_pos(p->id);
 
 		//reinterpret_cast<Client*>(p)->cur_room_num = -1;
 		reinterpret_cast<Client*>(p)->is_active = true;
 
 	}
-	portal = nullptr;
+	//portal = nullptr;
 	player_ids[0] = nullptr;
 	player_ids[1] = nullptr;
 	player_ids[2] = nullptr;
