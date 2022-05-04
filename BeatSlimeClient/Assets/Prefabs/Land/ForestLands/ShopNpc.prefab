@@ -143,9 +143,17 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -4268549521053294436, guid: 479d7aa3f371dbe46820f8215a919be3, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -4268549521053294436, guid: 479d7aa3f371dbe46820f8215a919be3, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: b735292a214cd9c4d90b07b7fa57e182, type: 2}
+    - target: {fileID: -2933139716659438605, guid: 479d7aa3f371dbe46820f8215a919be3, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -2933139716659438605, guid: 479d7aa3f371dbe46820f8215a919be3, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -153,6 +161,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 479d7aa3f371dbe46820f8215a919be3, type: 3}
       propertyPath: m_Name
       value: Shop 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5241284212654878085, guid: 479d7aa3f371dbe46820f8215a919be3, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5241284212654878085, guid: 479d7aa3f371dbe46820f8215a919be3, type: 3}
       propertyPath: m_Materials.Array.data[0]
