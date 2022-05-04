@@ -35,14 +35,13 @@ public class TileEffect : MonoBehaviour
 
         scale = 0.0f;
         
-        vf.Play();
-
+       vf.Play();
         while (scale <= 2.0f)
         {
             scale += Time.deltaTime;
             yield return null;
         }
-
+        
         Destroy(gameObject);
     }
 }
