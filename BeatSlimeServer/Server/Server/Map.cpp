@@ -199,7 +199,6 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 	}
 
 	std::sort(pattern_time.begin(), pattern_time.end());
-
 }
 
 int MapInfo::GetTileType(int x, int z)

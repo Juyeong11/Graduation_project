@@ -714,9 +714,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 				reinterpret_cast<Client*>(p)->is_active = false;
 			}
 		}
-
 	}
-
 
 
 }
@@ -1207,8 +1205,6 @@ void Network::process_packet(int client_id, unsigned char* p)
 					send_game_start(pl->id, game_start_time);
 					Client* p = reinterpret_cast<Client*>(pl);
 					p->cur_room_num = gr->game_room_id;
-
-
 				}
 
 
@@ -2060,7 +2056,6 @@ void Network::worker()
 				break;
 			case PlayerN:
 				target_id = game_room[game_room_id]->find_min_distance_player();
-
 				break;
 			}
 			if (pivotType == World) {
