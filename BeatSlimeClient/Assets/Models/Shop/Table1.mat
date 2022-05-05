@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - Texture2D_52cf47bd6fb345189129abfdbc1c7593:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: bd5125f30d20e4d4290d9a1e42ce589f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_826ffeab11d94f6ea5f4e5dc1039d644:
@@ -42,12 +42,12 @@ Material:
     m_Floats:
     - Vector1_439f4192612540408d182d81359cefd0: 0.26
     - Vector1_5f9d4ffde00e44699e1a12e862ea3c60: 0.5
-    - Vector1_72202bbf446e410f830a054160141f93: 0.52
+    - Vector1_72202bbf446e410f830a054160141f93: 1
     - Vector1_9ac32e8ade8c4b1cb19d19cc9554c0f6: 0
     - Vector1_c19d6514ed374c20a0c13156acde8e3d: 0
     - Vector1_db11a31a0d214bcc9c4870f1be071767: 0
-    - Vector1_fedc7aafb8d541e5ac25fe3f2baa587f: 0.12
+    - Vector1_fedc7aafb8d541e5ac25fe3f2baa587f: 2
     m_Colors:
-    - Color_658ca3492a0d4c5294b395208005e893: {r: 0.9607844, g: 0.57254905, b: 0.38431376, a: 0}
-    - Toon_Ramp_Tint: {r: 1, g: 0, b: 0, a: 0}
+    - Color_658ca3492a0d4c5294b395208005e893: {r: 0.8113208, g: 0.7042381, b: 0.63834107, a: 0}
+    - Toon_Ramp_Tint: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []
