@@ -91,6 +91,7 @@ Client::Client(Skill* sk, MapInfo* mapdata) : skill(sk)
 	cur_room_num = -1;
 	party = nullptr;
 	Astar = new PathFinder(mapdata);
+	last_skill_time = std::chrono::system_clock::now();
 }
 Client::~Client()
 {

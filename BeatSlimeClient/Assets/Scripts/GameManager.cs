@@ -21,7 +21,6 @@ public class GameManager : MonoBehaviour
     public MapLoader loader;
 
     public SoundManager soundManager;
-    public SoundEffectManager soundEffectManager;
 
 
     public bool isGameStart;
@@ -425,9 +424,12 @@ public class GameManager : MonoBehaviour
         {
             VFXManager.data.HitSounder(1);
         }
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            Network.SendTeleportPacket(4);
+        }
 
-
-    if (isGameStart && Network.isServerOnline())
+        if (isGameStart && Network.isServerOnline())
         {
             int prevBeats = nowBeat.addBeat;
 
@@ -455,7 +457,6 @@ public class GameManager : MonoBehaviour
                     Objects[myPlayerID].GetComponentInChildren<PlayerManager>().Beat();
                     enemy.GetComponent<EnemyManager>().Beat();
                     grid.Beat();
-                    soundEffectManager.BeatEffect();
                     beatCounter = timeByBeat;
                 }
             }
@@ -829,7 +830,6 @@ public class GameManager : MonoBehaviour
         if (!isGameStart)
         {
             soundManager.PlayBGM(SongName);
-            soundEffectManager.BeatEffect();
             beatCounter = timeByBeat;
             isGameStart = true;
             debugStart = false;

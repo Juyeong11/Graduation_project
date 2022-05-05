@@ -104,6 +104,7 @@ public class PatternManager : MonoBehaviour
 
                 case 6:
                     EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].direction);
+
                     break;
 
                 case 10:
@@ -119,19 +120,19 @@ public class PatternManager : MonoBehaviour
 
                 //보스 애니메이션
                 case 1000:
-                    //GameManager.data.GetEnemyAnim().SetTrigger("Move");
+                    GameManager.data.GetEnemyAnim().SetTrigger("Move");
                     break;
                 case 1001:
-                   // GameManager.data.GetEnemyAnim().SetTrigger("Attack");
+                    GameManager.data.GetEnemyAnim().SetTrigger("Attack");
                     break;
                 case 1002:
-                   // GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
+                    GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
                     break;
                 case 1003:
-                    //GameManager.data.GetEnemyAnim().SetTrigger("Attack3");
+                    GameManager.data.GetEnemyAnim().SetTrigger("Attack3");
                     break;
                 case 1004:
-                   // GameManager.data.GetEnemyAnim().SetTrigger("Attack4");
+                    GameManager.data.GetEnemyAnim().SetTrigger("Attack4");
                     break;
             }
             //Debug.Log("patternType : " + pattern[0].noteType);

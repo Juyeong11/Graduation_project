@@ -686,7 +686,7 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 
 void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
-	const int damage = 5;
+	int damage = 20 * damamge_bug;
 	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 		GameObject* pl = game_room[game_room_id]->player_ids[i];
 		if (pl == nullptr) continue;
@@ -725,7 +725,7 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 
 	bool attack_flag = false;
 	int damage = cl->skill->Damage;
-	damage = 10;
+	//damage = 10;
 	int cur_skill_type = cl->skill->SkillType - 1;
 	switch (cur_skill_type)
 	{
@@ -1055,11 +1055,34 @@ void Network::process_packet(int client_id, unsigned char* p)
 					int boss_id = get_npc_id(p->map_type);
 					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players, p);
 					p->ready_player_cnt = 0;
+					
+					cl.vl.lock();
+					std::unordered_set <int> my_vl = cl.viewlist;
+					cl.vl.unlock();
+
+					for (auto other : my_vl) {
+						if (false == is_player(other)) continue;
+
+						Client& target = *reinterpret_cast<Client*>(clients[other]);
+						if (-1 != target.cur_room_num) continue;
+						if (ST_INGAME != target.state)
+							continue;
+						target.vl.lock();
+						if (0 != target.viewlist.count(client_id)) {
+							target.viewlist.erase(client_id);
+							target.vl.unlock();
+							send_remove_object(other, cl.id);
+
+						}
+						else target.vl.unlock();
+					}
 					for (int id : p->player_ids) {
 
 						send_change_scene(id, p->map_type + 2);
 
 					}
+
+					
 					p->player_ids.clear();
 					// 포탈에서 GameRoom으로 이동
 
@@ -1166,21 +1189,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.viewlist.insert(gr->player_ids[1]->id);
 			cl.viewlist.insert(gr->player_ids[2]->id);
 			cl.vl.unlock();
-			for (auto other : my_vl) {
-				if (false == is_player(other)) continue;
 
-				Client& target = *reinterpret_cast<Client*>(clients[other]);
-				if (ST_INGAME != target.state)
-					continue;
-				target.vl.lock();
-				if (0 != target.viewlist.count(client_id)) {
-					target.viewlist.erase(client_id);
-					target.vl.unlock();
-					send_remove_object(other, cl.id);
-
-				}
-				else target.vl.unlock();
-			}
 
 			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
 
@@ -1293,7 +1302,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			= std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
 
 		//수정
-		gr->boss_id->hp -= 10;
+		gr->boss_id->hp -= 14;
 		if (gr->boss_id->hp < 0) {
 			timer_event tev;
 			tev.ev = EVENT_GAME_END;
@@ -1331,6 +1340,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 		cs_packet_use_skill* packet = reinterpret_cast<cs_packet_use_skill*>(p);
 		Client* cl = reinterpret_cast<Client*>(clients[client_id]);
 		GameRoom* gr = game_room[cl->cur_room_num];
+
+
+		if ((cl->last_skill_time + std::chrono::milliseconds(maps[gr->map_type]->timeByBeat * cl->skill->CoolTime)) > std::chrono::system_clock::now()) break;
+		cl->last_skill_time = std::chrono::system_clock::now();
+		std::cout << maps[gr->map_type]->timeByBeat * cl->skill->CoolTime << std::endl;
 
 
 		/*
@@ -1639,6 +1653,16 @@ void Network::process_packet(int client_id, unsigned char* p)
 		else if (packet->pos == 3) {
 			input_db_event(client_id, DB_GET_SCROLL, 1);
 			break;
+		}
+		else if (packet->pos == 4) { // 데미지 치트
+			std::cout << "damage cheat\n";
+			if (damamge_bug >= 0.9f) {
+
+				damamge_bug = 0.1f;
+			}
+			else
+				damamge_bug = 1.0f;
+
 		}
 		else {
 			cl.pre_x = cl.x;
@@ -1949,7 +1973,6 @@ void Network::worker()
 			case Player1:
 				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
-
 				break;
 			case Player2:
 				if (game_room[game_room_id]->player_ids[1] != nullptr)
@@ -1975,7 +1998,7 @@ void Network::worker()
 			else {
 				//std::cout << parrying_end_time << " " << player_parring_time << " player parrying failed\n";
 				//패링 못했으니 플레이어를 때리자
-				clients[target_id]->hp -= 1;
+				clients[target_id]->hp -= 10* damamge_bug;
 				for (const auto& p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 					send_attack_player(game_room[game_room_id]->boss_id->id, target_id, p->id);

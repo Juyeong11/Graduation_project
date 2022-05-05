@@ -146,6 +146,8 @@ public:
 	char SkillAD;
 	char SkillTa;
 	char SkillHeal;
+	std::chrono::system_clock::time_point last_skill_time;
+
 
 	//...
 	int ClearMap[2];
