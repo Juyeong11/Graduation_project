@@ -1055,27 +1055,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					int boss_id = get_npc_id(p->map_type);
 					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players, p);
 					p->ready_player_cnt = 0;
-					
-					cl.vl.lock();
-					std::unordered_set <int> my_vl = cl.viewlist;
-					cl.vl.unlock();
-
-					for (auto other : my_vl) {
-						if (false == is_player(other)) continue;
-
-						Client& target = *reinterpret_cast<Client*>(clients[other]);
-						if (-1 != target.cur_room_num) continue;
-						if (ST_INGAME != target.state)
-							continue;
-						target.vl.lock();
-						if (0 != target.viewlist.count(client_id)) {
-							target.viewlist.erase(client_id);
-							target.vl.unlock();
-							send_remove_object(other, cl.id);
-
-						}
-						else target.vl.unlock();
-					}
+				
 					for (int id : p->player_ids) {
 
 						send_change_scene(id, p->map_type + 2);
@@ -1113,7 +1093,14 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.vl.lock();
 			cl.viewlist.clear();
 			cl.vl.unlock();
+			if (cl.cur_room_num != -1) {
+				cl.x = game_room[cl.cur_room_num]->portal->x;
+				cl.z = game_room[cl.cur_room_num]->portal->z;
+				cl.y = -cl.x - cl.z;
+				set_new_player_pos(client_id);
+			}
 
+			cl.cur_room_num = -1;
 			// 내일 수정
 			// login OK 에서 했던 로직을 가져오자
 			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
@@ -1161,14 +1148,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 				send_put_object(client_id, other->id);
 			}
-			if (cl.cur_room_num != -1) {
-			 	cl.x = game_room[cl.cur_room_num]->portal->x;
-				cl.z = game_room[cl.cur_room_num]->portal->z;
-				cl.y = -cl.x - cl.z;
-				set_new_player_pos(client_id);
-			}
 
-			cl.cur_room_num = -1;
 			send_move_object(client_id, client_id);
 			if (cur_play_music != 99)
 				send_use_item(client_id, 0, cur_play_music);
@@ -1191,6 +1171,23 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.vl.unlock();
 
 
+
+			for (auto other : my_vl) {
+				if (false == is_player(other)) continue;
+
+				Client& target = *reinterpret_cast<Client*>(clients[other]);
+				if (-1 != target.cur_room_num) continue;
+				if (ST_INGAME != target.state)
+					continue;
+				target.vl.lock();
+				if (0 != target.viewlist.count(client_id)) {
+					target.viewlist.erase(client_id);
+					target.vl.unlock();
+					send_remove_object(other, cl.id);
+
+				}
+				else target.vl.unlock();
+			}
 			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
 
 

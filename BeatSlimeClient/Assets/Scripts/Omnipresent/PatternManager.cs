@@ -80,7 +80,7 @@ public class PatternManager : MonoBehaviour
             HexCoordinates BossPos = GameManager.data.GetBossPos();
             TargetPos.plus(pattern[0].pivot.X, pattern[0].pivot.Z);
             int charging_time = pattern[0].warningBeatOffset.GetBeatTime();
-            Debug.Log(charging_time);
+            
             switch (pattern[0].noteType)
             {
                 case -1:
