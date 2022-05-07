@@ -20,7 +20,7 @@ public class WaterGunEffect : MonoBehaviour
     {
         float scale = 0.0f;
         VisualEffect vf = GetComponentInChildren<VisualEffect>();
-        start_pos.y += 1.0f;
+        start_pos.y += 1.8f;
         transform.position = start_pos;
         //vf.SetFloat("Lifetime", 0.1f);
         Debug.Log("Length" + vf.GetFloat("Length"));

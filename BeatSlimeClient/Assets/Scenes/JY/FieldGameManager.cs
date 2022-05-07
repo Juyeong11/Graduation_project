@@ -174,7 +174,9 @@ public class FieldGameManager : MonoBehaviour
                             myPlayerID = p.id;
                             Objects[p.id] = player;
 
-                            FieldPlayerManager.myName = System.Text.Encoding.UTF8.GetString(p.name);
+                            FieldPlayerManager.myName = System.Text.Encoding.UTF8.GetString(p.name).Split('\0')[0];
+                            Debug.Log(FieldPlayerManager.myName.Length);
+                            Debug.Log(FieldPlayerManager.myName);
                             if (FieldPlayerManager.myName == "ADMIN")
                             {
                                 isDebugCharacter = true;

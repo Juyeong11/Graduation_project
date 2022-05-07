@@ -18,9 +18,9 @@ public class TargetingEffect : MonoBehaviour
     float[] speed = new float[roketCnt];
 
     float diameter = 0.5f;
-    float size = 0.3f;
+    float size = 0.5f;
 
-    float offsetH = 0.0f;
+    float offsetH = 0.5f;
     float offsetZ = 0.8f;
 
     public float a = 240.0f;
