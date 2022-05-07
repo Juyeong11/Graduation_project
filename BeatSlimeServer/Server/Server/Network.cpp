@@ -825,7 +825,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 		//cl.last_packet_time = packet->move_time;
-		if (cl.last_move_time + std::chrono::milliseconds(100) > std::chrono::system_clock::now()) break;
+		if (cl.last_move_time + std::chrono::milliseconds(200) > std::chrono::system_clock::now()) break;
 		cl.last_move_time = std::chrono::system_clock::now();
 
 		cl.pre_x = cl.x;
