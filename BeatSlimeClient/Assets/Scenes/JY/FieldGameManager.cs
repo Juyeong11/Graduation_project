@@ -281,7 +281,7 @@ public class FieldGameManager : MonoBehaviour
                                             Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
 
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().selfCoord.direction = (HexDirection)p.direction;
-                                            Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_playerName = System.Text.Encoding.UTF8.GetString(p.name);
+                                            Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_playerName = System.Text.Encoding.UTF8.GetString(p.name).Split('\0')[0];
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillnum = p.skillType;
                                             Objects[p.id].GetComponent<FieldOtherPlayerManager>().other_skillLevel = p.skillLevel;
                                             //Debug.Log(p.id + " 플레이어 넣음");
@@ -340,7 +340,7 @@ public class FieldGameManager : MonoBehaviour
 
 
                             ResponseMenu.transform.position = player.transform.position;
-                            ResponseMenu.GetComponent<ResponseBillboardUI>().GetOn(player.transform, p.requester_id);
+                            ResponseMenu.GetComponent<ResponseBillboardUI>().GetOn(player.transform, p.requester_id, Objects[p.requester_id].GetComponent<FieldOtherPlayerManager>().other_playerName);
 
                             //수락
 
@@ -366,6 +366,17 @@ public class FieldGameManager : MonoBehaviour
                              * 5 내가 이미 파티가 있는대 파티 신청을 보낸경우
                              *  - CS_PACKET_PARTY_REQUEST_ANWSER패킷을 서버에 보낼 때  requester id가 -1이면 파티에 탈퇴하려고 하는 걸로 알고 서버에서 처리함
                              */
+
+                            string reqName;
+                            if (p.p_id == myPlayerID)
+                            {
+                                reqName = FieldPlayerManager.myName;
+                            }
+                            else
+                            {
+                                reqName = Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_playerName;
+                            }
+
                             switch (p.anwser)
                             {
                                 case 0:
@@ -373,22 +384,22 @@ public class FieldGameManager : MonoBehaviour
                                     break;
 
                                 case 1:
-                                    chattingManager.SetMess("<color=red>" + p.p_id + "님이 새로운 파티원이 되었습니다!</color>");
+                                    chattingManager.SetMess("<color=red>" + reqName + "님이 새로운 파티원이 되었습니다!</color>");
                                     foreach (var i in p.ids)
                                     {
                                         if (i == myPlayerID || i == -1)
                                             continue;
                                         //print(i + " of skill : " + Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
-                                        PartyManager.instance.SetParty(i, Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
+                                        PartyManager.instance.SetParty(i, Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum,  Objects[i].GetComponent<FieldOtherPlayerManager>().other_playerName);
                                     }
                                     break;
 
                                 case 2:
                                     chattingManager.SetMess("<color=red>상대의 파티에 남은 자리가 없습니다!</color>");
-                                    break;
+                                    break;  
 
                                 case 3:
-                                    chattingManager.SetMess("<color=red>" + p.p_id + "님이 파티에서 탈퇴하셨습니다.</color>");
+                                    chattingManager.SetMess("<color=red>" + reqName + "님이 파티에서 탈퇴하셨습니다.</color>");
                                     PartyManager.instance.DelParty(p.p_id);
                                     if (p.p_id == myPlayerID)
                                     {

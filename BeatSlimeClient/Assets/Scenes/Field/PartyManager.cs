@@ -6,25 +6,38 @@ using TMPro;
 
 public class PartyManager : MonoBehaviour
 {
-    static public PartyManager instance;
+    public static PartyManager instance;
     public List<GameObject> partyObjects;
     public ClassImageObject CIO;
-    Dictionary<int,GameObject> party;
+    public Dictionary<int, GameObject> party = new Dictionary<int, GameObject>();
+    public static List<(int, int, string)> partyDatas = new List<(int, int, string)>();
 
     void Awake()
     {
         instance = this;
-        party = new Dictionary<int,GameObject>();
     }
 
-    public void SetParty(int pid, int cid)
+    void Start()
+    {
+        if (party.Count == 0)
+        {
+            foreach (var d in partyDatas)
+            {
+                SetParty(d.Item1, d.Item2, d.Item3);
+            }
+        }
+    }
+
+    public void SetParty(int pid, int cid, string pName)
     {
         if (!party.ContainsKey(pid))
         {
+            partyDatas.Add((pid, cid, pName));
+
             party.Add(pid, partyObjects[party.Count]);
 
             party[pid].GetComponent<Image>().sprite = CIO.ClassSprites[cid];
-            party[pid].GetComponentInChildren<TMPro.TMP_Text>().text = pid.ToString();
+            party[pid].GetComponentInChildren<TMPro.TMP_Text>().text = pName;
             party[pid].SetActive(true);
         }
 
@@ -33,6 +46,7 @@ public class PartyManager : MonoBehaviour
     {
         if (party.ContainsKey(pid))
         {
+            partyDatas.Remove(partyDatas.Find(x => x.Item1 == pid));
             party[pid].SetActive(false);
             //Debug.LogError("!A " + party.Count);
             party.Remove(pid);
@@ -45,6 +59,7 @@ public class PartyManager : MonoBehaviour
         {
             item.Value.SetActive(false);
         }
+        partyDatas.Clear();
         party.Clear();
     }
 
@@ -52,6 +67,8 @@ public class PartyManager : MonoBehaviour
     {
         if (party.ContainsKey(pid))
         {
+            partyDatas.Add((pid, cid, partyDatas.Find(x => x.Item1 == pid).Item3));
+            partyDatas.Remove(partyDatas.Find(x => x.Item1 == pid && x.Item2 != cid));
             party[pid].GetComponent<Image>().sprite = CIO.ClassSprites[cid];
         }
     }

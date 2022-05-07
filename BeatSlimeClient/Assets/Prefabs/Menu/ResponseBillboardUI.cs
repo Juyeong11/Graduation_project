@@ -22,12 +22,12 @@ public class ResponseBillboardUI : MonoBehaviour
         StartCoroutine(BlinkOff());
     }
 
-    public void GetOn(Transform t, int pid = -1)
+    public void GetOn(Transform t, int pid = -1, string pname = null)
     {
         gameObject.SetActive(true);
         Target = t;
         from = pid;
-        from_text.text = pid.ToString();
+        from_text.text = pname;
         StartCoroutine(BlinkOn());
     }
 
