@@ -2201,7 +2201,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: LandType.Array.size
-      value: 31
+      value: 32
       objectReference: {fileID: 0}
     - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: cellType.Array.size
@@ -2243,6 +2243,10 @@ PrefabInstance:
       propertyPath: LandType.Array.data[30]
       value: 
       objectReference: {fileID: 144268500293088200, guid: 50c7b974b573e4a4e9328dac19b5d301, type: 3}
+    - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
+      propertyPath: LandType.Array.data[31]
+      value: 
+      objectReference: {fileID: 1021489469267483211, guid: 2236ab3885dbc1648b9bed6f267bc5af, type: 3}
     - target: {fileID: 2181853409825296728, guid: a67cdf2a490d53d43aac04fc45257a67, type: 3}
       propertyPath: cellType.Array.data[15]
       value: 
