@@ -423,7 +423,15 @@ public class FieldGameManager : MonoBehaviour
 
                             string mess = System.Text.Encoding.UTF8.GetString(p.mess).Split('\0')[0];
                             //Debug.Log(System.Text.Encoding.UTF8.GetString(p.mess));
-                            chattingManager.SetMess(p.p_id + ": " + mess);
+                            if (p.p_id == myPlayerID)
+                            {
+                                chattingManager.SetMess(FieldPlayerManager.myName + ": " + mess);
+                            }
+                            else
+                            {
+                                chattingManager.SetMess(Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_playerName + ": " + mess);
+                            }
+                            
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_BUY_RESULT:
