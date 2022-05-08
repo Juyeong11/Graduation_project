@@ -64,7 +64,7 @@ public class FieldGameManager : MonoBehaviour
     {
         if (false == Network.isOnline)
         {
-            Network.CreateAndConnect();
+            //Network.CreateAndConnect();
            
         }
     }
@@ -87,8 +87,8 @@ public class FieldGameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            var r = new System.Random();
-            Network.SendLogIn("Happy" + r.Next(0, 128));
+            //var r = new System.Random();
+            //Network.SendLogIn("Happy" + r.Next(0, 128));
         }
         if (Input.GetKeyDown(KeyCode.F1))
         {
