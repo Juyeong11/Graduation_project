@@ -27,6 +27,7 @@ public class FieldPlayerManager : MonoBehaviour
     public GameObject PortalPlane;
 
     public ChattingManager CM;
+    public SkillConveter SC;
 
     public static int self_skillnum = 1;   //1~3
     public static int self_skillLevel = 1; //0~3
@@ -475,6 +476,10 @@ public class FieldPlayerManager : MonoBehaviour
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            SC.SkillConvet();
+        }
     }
 
     public void EnterPortal()
