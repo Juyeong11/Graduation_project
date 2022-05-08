@@ -64,7 +64,7 @@ public class FieldGameManager : MonoBehaviour
     {
         if (false == Network.isOnline)
         {
-            Network.CreateAndConnect();
+            //Network.CreateAndConnect();
            
         }
     }

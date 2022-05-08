@@ -743,6 +743,12 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 
 			timer_queue.push(tev);
 		}
+		gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] += 100 * damage;
+
+		for (const auto pl : gr->player_ids) {
+			if (pl == nullptr) continue;
+			send_attack_player(cl->id, gr->boss_id->id, pl->id);
+		}
 		break;
 	case HEAL:
 		for (auto pl : gr->player_ids) {
@@ -750,18 +756,17 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 			pl->Hit(-damage);
 			if (pl->hp > 100)
 				pl->hp = 100;
+			send_attack_player(cl->id, pl->id, pl->id);
+
 		}
+		gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] += 100 * damage;
+
 		break;
 	default:
 		std::cout << "wrong skill type\n";
 		break;
 	}
-	gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] += 100 * damage;
-
-	for (const auto pl : gr->player_ids) {
-		if (pl == nullptr) continue;
-		send_attack_player(cl->id, gr->boss_id->id, pl->id);
-	}
+	
 }
 
 void Network::process_packet(int client_id, unsigned char* p)
@@ -2288,9 +2293,7 @@ void Network::worker()
 			memcpy_s(item, 20, reinterpret_cast<char*>(exp_over->_net_buf), 20);
 			//set_new_player_pos(client_id);
 
-			cl.x = 13;
-			cl.y = 12;
-			cl.z = -25;
+
 			cl.state_lock.lock();
 			cl.state = ST_INGAME;
 			cl.state_lock.unlock();
