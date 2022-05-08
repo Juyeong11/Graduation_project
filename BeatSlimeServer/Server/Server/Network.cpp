@@ -1834,9 +1834,7 @@ void Network::worker()
 			if (-1 == new_id) continue;
 
 			Client& cl = *(reinterpret_cast<Client*>(clients[new_id]));
-			cl.x = 13;
-			cl.y = 12;
-			cl.z = -25;
+
 			//13, 12, -25
 			//4, 0, -4
 
@@ -2288,12 +2286,15 @@ void Network::worker()
 			Client& cl = *reinterpret_cast<Client*>(clients[client_id]);
 			char item[20];
 			memcpy_s(item, 20, reinterpret_cast<char*>(exp_over->_net_buf), 20);
-			set_new_player_pos(client_id);
-			send_login_ok(client_id, item);
+			//set_new_player_pos(client_id);
 
+			cl.x = 13;
+			cl.y = 12;
+			cl.z = -25;
 			cl.state_lock.lock();
 			cl.state = ST_INGAME;
 			cl.state_lock.unlock();
+			send_login_ok(client_id, item);
 
 			/*
 			//새로 들어온 친구의 위치를 정해주자
