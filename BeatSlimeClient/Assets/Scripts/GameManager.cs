@@ -599,18 +599,19 @@ public class GameManager : MonoBehaviour
                             if (target_id != 3) // is not boss
                             {
                                 HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
-
-                                Objects[target_id].GetComponentInChildren<PlayerManager>().StunTrig();
                                 //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                                 //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
                                 if (target_id == myPlayerID)
                                 {
-                                    resultsData.damaged += (hm.CurrentHP - p.hp);
-
-                                    ComboEffect.CountApply(ref nowCombo, true);
-                                    CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
-                                    VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 30f);
+                                    if (hm.CurrentHP - p.hp > 0)
+                                    {
+                                        resultsData.damaged += (hm.CurrentHP - p.hp);
+                                        Objects[target_id].GetComponentInChildren<PlayerManager>().StunTrig();
+                                        ComboEffect.CountApply(ref nowCombo, true);
+                                        CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
+                                        VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 30f);
+                                    }
                                 }
 
                                 hm.Damage(hm.CurrentHP - p.hp);
@@ -620,11 +621,15 @@ public class GameManager : MonoBehaviour
                             else
                             {
                                 //Objects[ServerID_To_ClientID(p.id)].GetComponentInChildren<PlayerManager>().AttackTrig();
+
                                 HPManager hm = Objects[target_id].GetComponentInChildren<EnemyManager>().HP;
-                                resultsData.attack += (hm.CurrentHP - p.hp);
 
-                                hm.Damage(hm.CurrentHP - p.hp);
+                                if (hm.CurrentHP - p.hp > 0)
+                                {
+                                    resultsData.attack += (hm.CurrentHP - p.hp);
 
+                                    hm.Damage(hm.CurrentHP - p.hp);
+                                }
 
                                 //Objects[target_id].GetComponentInChildren<EnemyManager>().StunTrig();
                             }
