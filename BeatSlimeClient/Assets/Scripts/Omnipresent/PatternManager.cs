@@ -110,7 +110,12 @@ public class PatternManager : MonoBehaviour
                 case 10:
                     EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
                     break;
-
+                case 100:
+                    EffectManager.instance.TileWaveEffect(TargetPos.X,  TargetPos.Z,charging_time);
+                    break;
+                case 101:
+                    EffectManager.instance.TileRailWaveEffect(TargetPos.X, TargetPos.Z, charging_time, pattern[0].direction);
+                    break;
                 case 600:   //게임 시작 패널
                     StartCoroutine(LogoLoad(true));
                     break;

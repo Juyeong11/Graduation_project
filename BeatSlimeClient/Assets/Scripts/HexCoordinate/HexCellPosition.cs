@@ -13,6 +13,8 @@ public class HexCellPosition : MonoBehaviour
     public float landOffsetX = 0;
     public float landOffsetY = 0;
     public float landOffsetZ = 0;
+    public float landOffsetW = 0;
+
     public float landOffsetRotate = 0;
     public float landOffsetScale = 0;
     public float landType = 0;
@@ -44,7 +46,18 @@ public class HexCellPosition : MonoBehaviour
         gameObject.transform.localPosition = getRealPosition();
 
     }
+    public void plusHeightoffset(float height)
+    {
+        landOffsetW += height;
+        
+        gameObject.transform.position = getRealPosition();
+    }
+    public void setHeightoffset(float height)
+    {
+        landOffsetW = height;
 
+        gameObject.transform.position = getRealPosition();
+    }
     static public Vector3 getRealPosition(float x, float z, int w)
     {
         return new Vector3(x * 0.866f, calculateWPosition(w), x * 0.5f + z * 1f);
@@ -52,7 +65,7 @@ public class HexCellPosition : MonoBehaviour
     public Vector3 getRealPosition()
     {
         return new Vector3(coordinates.X * 0.866f + landOffsetX,
-            calculateWPosition(coordinates.W) + landOffsetY,
+            calculateWPosition(coordinates.W) + landOffsetY + landOffsetW,
             coordinates.X * 0.5f + coordinates.Z * 1f + landOffsetZ);
     }
 

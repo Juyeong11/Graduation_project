@@ -91,6 +91,11 @@ public class Cell
             duration--;
         }
     }
+
+    public void SetW(int wPos)
+    {
+
+    }
 }
 
 public class CellMap
@@ -116,7 +121,40 @@ public class CellMap
 
         return true;
     }
+    public bool SetW(int x, int z,float offset)
+    {
+        foreach (var v in cellMaps)
+        {
+            if (v.getCoordinate().Item1 == x &&
+                v.getCoordinate().Item3 == z)
+            {
+                v.obejct.GetComponent<HexCellPosition>().setHeightoffset(offset);
+                
+                return true;
+            }
+        }
 
+        Debug.LogError(x + ">Invalid coordinate<" + z);
+
+        return false;
+    }
+    public bool plusW(int x, int z, float offset)
+    {
+        foreach (var v in cellMaps)
+        {
+            if (v.getCoordinate().Item1 == x &&
+                v.getCoordinate().Item3 == z)
+            {
+                v.obejct.GetComponent<HexCellPosition>().plusHeightoffset(offset);
+
+                return true;
+            }
+        }
+
+        Debug.LogError(x + ">Invalid coordinate<" + z);
+
+        return false;
+    }
     public Cell Get(int x,int y,int z)
     {
         foreach(var v in cellMaps)

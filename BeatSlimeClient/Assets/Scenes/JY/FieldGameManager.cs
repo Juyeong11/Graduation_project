@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class FieldGameManager : MonoBehaviour
 {
     private static FieldGameManager instance;
-    public static FieldGameManager data {get {if (instance == null){ Debug.LogError("Invalid");} return instance;} set {if (instance == null) instance = value;}}
+    public static FieldGameManager data { get { if (instance == null) { Debug.LogError("Invalid"); } return instance; } set { if (instance == null) instance = value; } }
 
 
     public int mapCellid = 0;
@@ -25,7 +25,7 @@ public class FieldGameManager : MonoBehaviour
     public bool isGameStart;
 
     //
- 
+
     static GameObject[] Objects = new GameObject[Protocol.CONSTANTS.MAX_OBJECT];
 
     public static int myPlayerID = -1;
@@ -65,7 +65,7 @@ public class FieldGameManager : MonoBehaviour
         if (false == Network.isOnline)
         {
             //Network.CreateAndConnect();
-           
+
         }
     }
 
@@ -123,14 +123,14 @@ public class FieldGameManager : MonoBehaviour
             // 10: Tank2       150      40        7
             // 11: Tank3       500      80        6
             if (isDebugCharacter)
-            Network.SendBuyPacket(0); // 0번 아이템 구매
+                Network.SendBuyPacket(0); // 0번 아이템 구매
         }
         if (Input.GetKeyDown(KeyCode.F10))
         {
             //scrool item을 사용하겠다.
             //itemType을 인자로 전달 0~9까지 마녀 맵 스크롤 0~9사이 숫자로 스크롤의 등급을 매김 
             if (isDebugCharacter)
-            Network.SendUseItemPacket(1);
+                Network.SendUseItemPacket(1);
         }
         if (Input.GetKeyDown(KeyCode.F9))
         {
@@ -142,12 +142,16 @@ public class FieldGameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F5))
         {
             if (isDebugCharacter)
-            PlayerPrefs.DeleteAll();
+                PlayerPrefs.DeleteAll();
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit(0);
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            StartCoroutine(TileRailWaveEffect(0, 0, 5,1));
         }
 
         if (Network.isOnline)
@@ -237,7 +241,7 @@ public class FieldGameManager : MonoBehaviour
                                 {
                                     FieldPlayerManager.instance.PlayerSpinDirection(p.x, p.y, p.z);
                                     FieldPlayerManager.instance.JumpTrig();
-                                    
+
                                     grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponentInChildren<SpriteRenderer>().enabled = false;
                                 }
                                 else
@@ -275,7 +279,7 @@ public class FieldGameManager : MonoBehaviour
                                             FieldPlayerManager.instance.selfDirection = (HexDirection)p.direction;
                                             FieldPlayerManager.self_skillnum = p.skillType;
                                             FieldPlayerManager.self_skillLevel = p.skillLevel;
-                                        }   
+                                        }
                                         else
                                         {
                                             Objects[p.id].GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
@@ -321,7 +325,7 @@ public class FieldGameManager : MonoBehaviour
 
                             if (p.id == myPlayerID)
                             {
-                               FieldPlayerManager.instance.ChangeSkill(p.skill_type, p.skill_level);
+                                FieldPlayerManager.instance.ChangeSkill(p.skill_type, p.skill_level);
                             }
                             else
                             {
@@ -390,13 +394,13 @@ public class FieldGameManager : MonoBehaviour
                                         if (i == myPlayerID || i == -1)
                                             continue;
                                         //print(i + " of skill : " + Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum);
-                                        PartyManager.instance.SetParty(i, Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum,  Objects[i].GetComponent<FieldOtherPlayerManager>().other_playerName);
+                                        PartyManager.instance.SetParty(i, Objects[i].GetComponent<FieldOtherPlayerManager>().other_skillnum, Objects[i].GetComponent<FieldOtherPlayerManager>().other_playerName);
                                     }
                                     break;
 
                                 case 2:
                                     chattingManager.SetMess("<color=red>상대의 파티에 남은 자리가 없습니다!</color>");
-                                    break;  
+                                    break;
 
                                 case 3:
                                     chattingManager.SetMess("<color=red>" + reqName + "님이 파티에서 탈퇴하셨습니다.</color>");
@@ -431,7 +435,7 @@ public class FieldGameManager : MonoBehaviour
                             {
                                 chattingManager.SetMess(Objects[p.p_id].GetComponent<FieldOtherPlayerManager>().other_playerName + ": " + mess);
                             }
-                            
+
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_BUY_RESULT:

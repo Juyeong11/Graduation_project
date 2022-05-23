@@ -6,27 +6,27 @@ public class Test : MonoBehaviour
 {
     
 
-    GameObject Target;
-    public GameObject Prefeb;
-    public GameObject rf;
+   
     // Start is called before the first frame update
     void Start()
     {
-        Prefeb.GetComponent<WaterGunEffect>().start_pos = new Vector3(0, 0, 0);
-        Prefeb.GetComponent<WaterGunEffect>().end_pos = new Vector3(10, 10, 10);
-        Prefeb.GetComponent<WaterGunEffect>().speed = 1000;
+        StartCoroutine(OneTileWaveEffect(0,0,1));
+    }
+    IEnumerator OneTileWaveEffect(int x, int z, int power)
+    {
+        float t = 0.0f;
+        // power가 쌔지면 파동크기와 주기가 커지게? 이건 너무 심심하다
+        //일단 그냥 진행ㄱ
+        while (t <= 1.0f)
+        {
 
-        rf = Instantiate(Prefeb);
-        SetTarget(ref rf);
-    }
-    public void SetTarget(ref GameObject target)
-    {
-        Target = target;
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        if(Target)
-            Debug.Log(Target.transform.position.x + " " + Target.transform.position.y + " " + Target.transform.position.z);
+            t += Time.deltaTime;
+
+
+            GameManager.data.grid.cellMaps.SetW(x, z, Mathf.Sin(t));
+
+            yield return null;
+        }
+
     }
 }
