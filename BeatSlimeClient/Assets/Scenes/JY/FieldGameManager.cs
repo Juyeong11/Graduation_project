@@ -69,6 +69,7 @@ public class FieldGameManager : MonoBehaviour
         }
     }
 
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Delete))
@@ -149,10 +150,7 @@ public class FieldGameManager : MonoBehaviour
         {
             Application.Quit(0);
         }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            StartCoroutine(TileRailWaveEffect(0, 0, 5,1));
-        }
+
 
         if (Network.isOnline)
         {
