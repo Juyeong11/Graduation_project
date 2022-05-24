@@ -134,7 +134,7 @@ public class CellMap
             }
         }
 
-        Debug.LogError(x + ">Invalid coordinate<" + z);
+        //Debug.LogError(x + ">Invalid coordinate<" + z);
 
         return false;
     }
@@ -151,7 +151,7 @@ public class CellMap
             }
         }
 
-        Debug.LogError(x + ">Invalid coordinate<" + z);
+        //Debug.LogError(x + ">Invalid coordinate<" + z);
 
         return false;
     }

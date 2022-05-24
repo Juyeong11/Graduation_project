@@ -68,6 +68,97 @@ public class FieldGameManager : MonoBehaviour
 
         }
     }
+    // Test용 추후에 삭제할 것
+    IEnumerator TestOneTileWaveEffect(int x, int z, int power)
+    {
+        float t = 0f;
+        float pret = 0f;
+        int period = power / 2;
+        while (pret <= 1)
+        {
+            pret = t;
+            t += Time.deltaTime;
+            float width = (period - t) * 0.2f;
+            float displacement = width * Mathf.Sin(t * period * Mathf.PI) - width * Mathf.Sin(pret * period * Mathf.PI);
+            //Debug.Log(Mathf.Sin(t*2));
+            if (grid.cellMaps.plusW(x, z, displacement) == false) yield break;
+
+            yield return null;
+        }
+
+        grid.cellMaps.SetW(x, z, 0);
+    }
+    IEnumerator TestTileRailWaveEffect(int startX, int startZ, int power, int dir)
+    {
+        float t = 1 / (float)power;
+
+        int[,] around = new int[6, 3] {
+        {0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
+        { 0, 1, -1 },{ -1, 1, 0 }, { -1, 0, 1 } };
+        int step = 0;
+        while (step < power)
+        {
+            step++;
+
+            int nextX = startX + step * around[dir, 0];
+            int nextZ = startZ + step * around[dir, 2];
+            StartCoroutine(TestOneTileWaveEffect(nextX, nextZ, power));
+            yield return new WaitForSecondsRealtime(t);
+        }
+
+
+    }
+    IEnumerator TestTileWaveEffect(int startX, int startZ, int power)
+    {
+        float t = 1 / (float)power;
+        int step = 0;
+        int maxStep = power * 2 + 1;
+
+        int[,] around = new int[6, 3] {
+        {0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
+        { 0, 1, -1 },{ -1, 1, 0 }, { -1, 0, 1 } };
+
+        int[,] range = new int[maxStep, maxStep];
+
+        range[startX + power, startZ + power] = 2;
+
+
+        while (step < power)
+        {
+
+            step++;
+            int state = step % 2 + 1;
+
+            for (int i = power - step; i < maxStep; ++i)
+            {
+                for (int j = power - step; j < maxStep; ++j)
+                {
+                    if (range[i, j] == state)
+                    {
+
+                        //주변으로 파장 이동
+                        for (int k = 0; k < 6; ++k)
+                        {
+                            int nextX = i + around[k, 0];
+                            int nextZ = j + around[k, 2];
+                            if (range[nextX, nextZ] == 0)
+                            {
+                                range[nextX, nextZ] = state % 2 + 1;
+                                //위 아래 운동 코루틴 시작
+                                StartCoroutine(TestOneTileWaveEffect(nextX - power, nextZ - power, power));
+                            }
+                        }
+                        range[i, j] = 3;
+                    }
+
+
+                }
+            }
+
+            yield return new WaitForSecondsRealtime(t);
+        }
+
+    }
 
 
     void Update()
@@ -150,8 +241,16 @@ public class FieldGameManager : MonoBehaviour
         {
             Application.Quit(0);
         }
-
-
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            StartCoroutine(TestTileWaveEffect(0, 0, 6));
+        }
+        if (Input.GetKeyDown(KeyCode.A))
+        {
+            StartCoroutine(TestTileRailWaveEffect(0, 0, 2,0));
+            StartCoroutine(TestTileRailWaveEffect(0, 0, 4, 2));
+            StartCoroutine(TestTileRailWaveEffect(0, 0, 6, 4));
+        }
         if (Network.isOnline)
         {
 
