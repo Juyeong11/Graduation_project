@@ -198,7 +198,8 @@ public class MapMaker : MonoBehaviour
                     if (type >= 1)
                     {
                         type--;
-                        GameObject tmpcell = Instantiate(grid.cellType[type]);
+                        //GameObject tmpcell = Instantiate(grid.cellType[type]);
+                        GameObject tmpcell = Instantiate(grid.cellMapOBJ.Cell[type]);
                         tmpcell.name = "tmpTile";// + GameManager.data.mapCellid;
                         tmpcell.transform.parent = grid.transform;
                         tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z, w);
@@ -212,7 +213,9 @@ public class MapMaker : MonoBehaviour
                     if (landType >= 1)
                     {
                         landType--;
-                        GameObject tmpland = Instantiate(grid.LandType[landType]);
+                        //GameObject tmpland = Instantiate(grid.LandType[landType]);
+                        GameObject tmpland = Instantiate(grid.cellMapOBJ.Land[landType]);
+                        
                         tmpland.name = "tmpTile";// + GameManager.data.mapCellid;
                         tmpland.transform.parent = grid.transform;
                         tmpland.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z, w);
@@ -226,11 +229,13 @@ public class MapMaker : MonoBehaviour
             {
                 if (cellMode)
                 {
-                    if (type < grid.cellType.Count - 1)
+                    //if (type < grid.cellType.Count - 1)
+                    if (type < grid.cellMapOBJ.Cell.Count - 1)
                     {
                         type++;
 
-                        GameObject tmpcell = Instantiate(grid.cellType[type]);
+                        //GameObject tmpcell = Instantiate(grid.cellType[type]);
+                        GameObject tmpcell = Instantiate(grid.cellMapOBJ.Cell[type]);
                         tmpcell.name = "tmpTile";// + GameManager.data.mapCellid;
                         tmpcell.transform.parent = grid.transform;
                         tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z, w);
@@ -241,10 +246,11 @@ public class MapMaker : MonoBehaviour
                 }
                 else
                 {
-                    if (landType < grid.LandType.Count - 1)
+                    if (landType < grid.cellMapOBJ.Land.Count - 1)
                     {
                         landType++;
-                        GameObject tmpland = Instantiate(grid.LandType[landType]);
+                        //GameObject tmpland = Instantiate(grid.LandType[landType]);
+                        GameObject tmpland = Instantiate(grid.cellMapOBJ.Land[landType]);
                         tmpland.name = "tmpTile";// + GameManager.data.mapCellid;
                         tmpland.transform.parent = grid.transform;
                         tmpland.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z, w);
@@ -263,7 +269,8 @@ public class MapMaker : MonoBehaviour
                         {
                             if (grid.cellMaps.map_Get(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1) == null)
                             {
-                                GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                //GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                GameObject tmpcell = Instantiate(grid.cellMapOBJ.Cell[type]);
                                 tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1, w);
                                 tmpcell.name = "cell";// + GameManager.data.mapCellid;
                                 tmpcell.transform.parent = grid.transform;
@@ -290,7 +297,8 @@ public class MapMaker : MonoBehaviour
                         }
                         else
                         {
-                            GameObject tmpland = Instantiate(grid.LandType[landType]);
+                            //GameObject tmpland = Instantiate(grid.LandType[landType]);
+                            GameObject tmpland = Instantiate(grid.cellMapOBJ.Land[landType]);
                             tmpland.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate,landOffsetScale, 0);
                             tmpland.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z + 1, w);
                             tmpland.name = "land";// + GameManager.data.mapCellid;
@@ -322,7 +330,8 @@ public class MapMaker : MonoBehaviour
                         {
                             if (grid.cellMaps.map_Get(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1) == null)
                             {
-                                GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                //GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                GameObject tmpcell = Instantiate(grid.cellMapOBJ.Cell[type]);
                                 tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1, w);
                                 tmpcell.name = "cell";// + GameManager.data.mapCellid;
                                 tmpcell.transform.parent = grid.transform;
@@ -349,7 +358,8 @@ public class MapMaker : MonoBehaviour
                         }
                         else
                         {
-                            GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            //GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            GameObject tmpcell = Instantiate(grid.cellMapOBJ.Land[landType]);
                             tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale,0);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z + 1, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
@@ -381,7 +391,8 @@ public class MapMaker : MonoBehaviour
                         {
                             if (grid.cellMaps.map_Get(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z) == null)
                             {
-                                GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                //GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                GameObject tmpcell = Instantiate(grid.cellMapOBJ.Cell[type]);
                                 tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z, w);
                                 tmpcell.name = "cell";// + GameManager.data.mapCellid;
                                 tmpcell.transform.parent = grid.transform;
@@ -408,7 +419,8 @@ public class MapMaker : MonoBehaviour
                         }
                         else
                         {
-                            GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            //GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            GameObject tmpcell = Instantiate(grid.cellMapOBJ.Land[landType]);
                             tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale,0);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
@@ -440,7 +452,8 @@ public class MapMaker : MonoBehaviour
                         {
                             if (grid.cellMaps.map_Get(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z) == null)
                             {
-                                GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                //GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                GameObject tmpcell = Instantiate(grid.cellMapOBJ.Cell[type]);
                                 tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z, w);
                                 tmpcell.name = "cell";// + GameManager.data.mapCellid;
                                 tmpcell.transform.parent = grid.transform;
@@ -467,7 +480,8 @@ public class MapMaker : MonoBehaviour
                         }
                         else
                         {
-                            GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            //GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            GameObject tmpcell = Instantiate(grid.cellMapOBJ.Land[landType]);
                             tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale,0);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X - 1, playerPosition.coordinates.Z, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
@@ -499,7 +513,8 @@ public class MapMaker : MonoBehaviour
                         {
                             if (grid.cellMaps.map_Get(playerPosition.coordinates.X, playerPosition.coordinates.Z - 1) == null)
                             {
-                                GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                //GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                GameObject tmpcell = Instantiate(grid.cellMapOBJ.Cell[type]);
                                 tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z - 1, w);
                                 tmpcell.name = "cell";// + GameManager.data.mapCellid;
                                 tmpcell.transform.parent = grid.transform;
@@ -526,7 +541,8 @@ public class MapMaker : MonoBehaviour
                         }
                         else
                         {
-                            GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            //GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            GameObject tmpcell = Instantiate(grid.cellMapOBJ.Land[landType]);
                             tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale,0);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X, playerPosition.coordinates.Z - 1, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;
@@ -558,7 +574,8 @@ public class MapMaker : MonoBehaviour
                         {
                             if (grid.cellMaps.map_Get(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z - 1) == null)
                             {
-                                GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                //GameObject tmpcell = Instantiate(grid.cellType[type]);
+                                GameObject tmpcell = Instantiate(grid.cellMapOBJ.Cell[type]);
                                 tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z - 1, w);
                                 tmpcell.name = "cell";// + GameManager.data.mapCellid;
                                 tmpcell.transform.parent = grid.transform;
@@ -585,7 +602,8 @@ public class MapMaker : MonoBehaviour
                         }
                         else
                         {
-                            GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            //GameObject tmpcell = Instantiate(grid.LandType[landType]);
+                            GameObject tmpcell = Instantiate(grid.cellMapOBJ.Land[landType]);
                             tmpcell.GetComponent<HexCellPosition>().landOffSetter(landOffsetX, landOffsetY, landOffsetZ, landOffsetRotate, landOffsetScale,0);
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(playerPosition.coordinates.X + 1, playerPosition.coordinates.Z - 1, w);
                             tmpcell.name = "land";// + GameManager.data.mapCellid;

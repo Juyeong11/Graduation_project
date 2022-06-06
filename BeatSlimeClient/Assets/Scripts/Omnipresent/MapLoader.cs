@@ -56,7 +56,8 @@ public class MapLoader : MonoBehaviour
 
             if (LoadByGameManagersSongName)
             {
-                GameObject tmpcell = Instantiate(grid.cellType[c]);
+                //GameObject tmpcell = Instantiate(grid.cellType[c]);
+                GameObject tmpcell = Instantiate(grid.cellMapOBJ.Cell[c]);
                 tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
                 tmpcell.name = "cell" + MapMaker.cellId++;
                 tmpcell.transform.parent = GRID.transform;
@@ -128,7 +129,8 @@ public class MapLoader : MonoBehaviour
             p_templand.color = c;
             p_templand.id = MapMaker.landId;
 
-            GameObject tmpcell = Instantiate(LoadByGameManagersSongName?GameManager.data.grid.LandType[c]:FieldGameManager.data.grid.LandType[c]);
+            //GameObject tmpcell = Instantiate(LoadByGameManagersSongName?GameManager.data.grid.LandType[c]:FieldGameManager.data.grid.LandType[c]);
+            GameObject tmpcell = Instantiate(LoadByGameManagersSongName?GameManager.data.grid.cellMapOBJ.Land[c]:FieldGameManager.data.grid.LandType[c]);
             tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or, os,t);
             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
             tmpcell.name = "land" + MapMaker.landId++;

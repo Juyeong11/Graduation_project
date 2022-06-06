@@ -219,9 +219,11 @@ public class HexGrid : MonoBehaviour
     private int zMinLength;
 
     //Cell 종류
-    public List<GameObject> cellType;
+    public CellMapOBJ cellMapOBJ;
+
+    //public List<GameObject> cellType;
     //장식 종류
-    public List<GameObject> LandType;
+    //public List<GameObject> LandType;
 
     public CellMap cellMaps;
 
@@ -278,7 +280,8 @@ public class HexGrid : MonoBehaviour
                         if (x + y + z == 0)
                         {
                             //print(cellType[0]);
-                            GameObject tmpcell = Instantiate(cellType[color]); // <- 나중에 string name으로 바꿔야?
+                            //GameObject tmpcell = Instantiate(cellType[color]); // <- 나중에 string name으로 바꿔야?
+                            GameObject tmpcell = Instantiate(cellMapOBJ.Cell[color]);
                             //int w = Random.Range(0, 3);
                             int w = 0;
                             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
@@ -313,7 +316,8 @@ public class HexGrid : MonoBehaviour
             if (map.x + map.y + map.z == 0)
             {
                 //print(cellType[0]);
-                GameObject tmpcell = Instantiate(cellType[map.color]); // <- 나중에 string name으로 바꿔야?
+                //GameObject tmpcell = Instantiate(cellType[map.color]); // <- 나중에 string name으로 바꿔야?
+                GameObject tmpcell = Instantiate(cellMapOBJ.Cell[map.color]);
                 tmpcell.GetComponent<HexCellPosition>().setInitPosition(map.x, map.z,map.w);
                 tmpcell.name = "cell" + map.id;
                 GameManager.data.mapCellid = map.id+1;

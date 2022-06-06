@@ -1,52 +1,18 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2181853409825296731
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2181853409825296729}
-  - component: {fileID: 2181853409825296728}
-  m_Layer: 0
-  m_Name: TileMaps
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2181853409825296729
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2181853409825296731}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2181853409825296728
+--- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2181853409825296731}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7bb0d87920b3ec24eacb460dc23ca478, type: 3}
-  m_Name: 
+  m_Script: {fileID: 11500000, guid: 2aa83846e2c50ce45a92aefbae577ee7, type: 3}
+  m_Name: CommonCellMap
   m_EditorClassIdentifier: 
-  MakeMapWithoutMapPacket: 1
-  TMP: 1
-  cellMapOBJ: {fileID: 11400000, guid: e9cc3c3b4ca0d844a90f0c62705e10e5, type: 2}
-  cellType:
+  cellTypes:
   - {fileID: 8864755350029415982, guid: 00c6f4877d7de614894e3e07d0b510a5, type: 3}
   - {fileID: 927659849777097055, guid: 08b61a5fa236ac54aa3b3b570677e417, type: 3}
   - {fileID: 2831977089246616509, guid: cbdb8f6e694f0f6489767b8363b4db14, type: 3}
@@ -78,7 +44,7 @@ MonoBehaviour:
   - {fileID: 5764934146148132284, guid: 91118514a1a671441bf1db1f88111869, type: 3}
   - {fileID: 8786582543097278462, guid: e240acfe78240364398b658c5231c7fc, type: 3}
   - {fileID: 8090362099504403779, guid: 3ba15972065f0534d8f3ca6e251e66f1, type: 3}
-  LandType:
+  landTypes:
   - {fileID: 6598793805110850364, guid: 17c52b98441153b45a8a88b6893b38bc, type: 3}
   - {fileID: 4895485883867222765, guid: 3856a8ab055180f4f8a815c0d43dd90d, type: 3}
   - {fileID: 6287653694194805695, guid: 26e3b672a77f9d74d829056d8d15d240, type: 3}
@@ -111,11 +77,3 @@ MonoBehaviour:
   - {fileID: 1318654365872472061, guid: db579bada610f8248844fdd08d382f78, type: 3}
   - {fileID: 144268500293088200, guid: 50c7b974b573e4a4e9328dac19b5d301, type: 3}
   - {fileID: 1021489469267483211, guid: 2236ab3885dbc1648b9bed6f267bc5af, type: 3}
-  pPosition:
-    x: 0
-    z: 0
-    w: 0
-  ePosition:
-    x: 0
-    z: 0
-    w: 0

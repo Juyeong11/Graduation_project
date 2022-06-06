@@ -32,7 +32,8 @@ public class CSVMapper : MonoBehaviour
             p_tempcell.color = c;
             p_tempcell.id = MapMaker.cellId;
 
-            GameObject tmpcell = Instantiate(MM.grid.cellType[c]);
+            //GameObject tmpcell = Instantiate(MM.grid.cellType[c]);
+            GameObject tmpcell = Instantiate(MM.grid.cellMapOBJ.Cell[c]);
             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
             tmpcell.name = "cell" + MapMaker.cellId++;
             tmpcell.transform.parent = gameObject.transform;
@@ -69,7 +70,8 @@ public class CSVMapper : MonoBehaviour
             p_templand.color = c;
             p_templand.id = MapMaker.landId;
 
-            GameObject tmpcell = Instantiate(MM.grid.LandType[c]);
+            //GameObject tmpcell = Instantiate(MM.grid.LandType[c]);
+            GameObject tmpcell = Instantiate(MM.grid.cellMapOBJ.Land[c]);
             tmpcell.GetComponent<HexCellPosition>().landOffSetter(ox, oy, oz, or, os, t);
             tmpcell.GetComponent<HexCellPosition>().setInitPosition(x, z, w);
             tmpcell.name = "land" + MapMaker.landId++;
