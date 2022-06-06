@@ -130,7 +130,15 @@ public class FieldPlayerManager : MonoBehaviour
                 isReady = true;
                 return;
             }
-        
+            else if(nowOnCellTag.state == cellState.Stage2Portal)
+            {
+                //Debug.Log("ready");
+                if (isReady) return;
+                Network.SendChangeSceneReadyPacket(1);
+                isReady = true;
+                return;
+            }
+            
             else if (isReady)
             {
                 Network.SendChangeSceneReadyPacket(0);
