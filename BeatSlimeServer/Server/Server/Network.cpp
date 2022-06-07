@@ -37,6 +37,7 @@ Network::Network() {
 	DB->readSkills(skills);
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
+	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\flower_load.csv");
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
 	for (int i = 0; i < MAX_USER; ++i) {
@@ -71,7 +72,7 @@ Network::Network() {
 	// 포탈의 위치를 나타내는 자료필요
 
 		portals[0] = new Portal(17, -21,WITCH_MAP);
-		portals[1] = new Portal(14, -15, ROBOT_MAP);
+		portals[1] = new Portal(14, 1, ROBOT_MAP);
 
 
 	cur_play_music = 99;
@@ -619,6 +620,16 @@ int Network::get_npc_id(int monsterType) {
 
 		break;
 	case BOSS2:
+		for (int i = BOSS2_ID_START; i < BOSS2_ID_END; ++i) {
+			clients[i]->state_lock.lock();
+			if (ST_ACCEPT == clients[i]->state) {
+				clients[i]->state = ST_INGAME;
+				clients[i]->state_lock.unlock();
+				return i;
+			}
+			clients[i]->state_lock.unlock();
+		}
+		std::cout << "2 : Maximum Number of Monster Overflow!!\n";
 		break;
 	case SKILL_TRADER:
 		break;
@@ -1060,6 +1071,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					//std::cout << "시작" << std::endl;
 					int room_id = get_game_room_id();
 					int boss_id = get_npc_id(p->map_type);
+					if(boss_id != -1)
 					game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players, p);
 					p->ready_player_cnt = 0;
 				
@@ -1628,6 +1640,27 @@ void Network::process_packet(int client_id, unsigned char* p)
 			}
 
 
+		}
+		else if (packet->pos == 5) {
+			//14 - 15	1
+			//15 - 15	0
+			//15	-16	1
+
+			int x[3] = { 14,15,15 };
+			int y[3] = { -15,-15,-16 };
+			int z[3] = { 1,0,1 };
+			cl.pre_x = cl.x;
+			cl.pre_y = cl.y;
+			cl.pre_z = cl.z;
+			for (int i = 0; i < 3; ++i) {
+				if (maps[FIELD_MAP]->GetTileType(x[i], z[i]) == 0) {
+					cl.x = x[i];
+					cl.y = y[i];
+					cl.z = z[i];
+					maps[FIELD_MAP]->SetTileType(x[i], z[i], cl.pre_x, cl.pre_z);
+					break;
+				}
+			}
 		}
 		else if (packet->pos == 1) {
 			//  임시로 재화를 획득하는 패킷으로 변경한다.

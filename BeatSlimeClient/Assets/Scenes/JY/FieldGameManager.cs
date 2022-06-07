@@ -191,6 +191,10 @@ public class FieldGameManager : MonoBehaviour
         {
             Network.SendTeleportPacket(0); // 1번 포탈로 이동
         }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            Network.SendTeleportPacket(5); // 2번 포탈로 이동
+        }
         if (Input.GetKeyDown(KeyCode.F12))
         {
             if (isDebugCharacter)
