@@ -278,12 +278,12 @@ void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject
 	boss_id = Boss;
 	pattern_progress = 0;
 	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
-	player_ids[0] = Players[0];
-	player_ids[1] = Players[1];
-	player_ids[2] = Players[2];
-	player_ids[0]->cur_room_num = game_room_id;
-	player_ids[1]->cur_room_num = game_room_id;
-	player_ids[2]->cur_room_num = game_room_id;
+	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
+		player_ids[i] = Players[i];
+
+		player_ids[0]->cur_room_num = game_room_id;
+
+	}
 	portal = p;
 }
 
