@@ -2114,7 +2114,7 @@ MonoBehaviour:
   - {fileID: 287104329}
   - {fileID: 832504407}
   attackNotesBeats: []
-  scrollSpeed: 0.4
+  scrollSpeed: 0.55
 --- !u!1 &762402955
 GameObject:
   m_ObjectHideFlags: 0
@@ -4339,7 +4339,7 @@ MonoBehaviour:
   grid: {fileID: 422432065}
   loader: {fileID: 2121429946}
   soundManager: {fileID: 1756485883}
-  isGameStart: 1
+  isGameStart: 0
   SongName: Aviform Skyliner
   barCounts: 4
   offsetMusicFrontTime: 0
@@ -4369,7 +4369,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BPM: 150
   musicTime: 155000
-  offsetTime: 156
+  offsetTime: 290
   warningBeat: 1
   onMusicBeat: {fileID: 11400000, guid: e53d8608e0de84945a1b68967a261591, type: 2}
 --- !u!114 &2121429945
