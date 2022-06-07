@@ -441,9 +441,9 @@ void Network::send_party_request_anwser(int reciver, int newPlayerid, Party* par
 		party->partyLock.unlock();
 	}
 	else {
-		packet.p[0] = -1;
-		packet.p[1] = -1;
-		packet.p[2] = -1;
+		for(auto& p: packet.p)
+		p = -1;
+
 	}
 
 	EXP_OVER* ex_over;
