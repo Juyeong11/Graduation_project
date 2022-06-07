@@ -316,8 +316,9 @@ public class FieldGameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_change_scene p = Protocol.sc_packet_change_scene.SetByteToVar(data);
 
-
-
+                            //scene_num
+                            //WIHCH -> 3
+                            //ROBOT -> 4
                             scene_num = p.scene_num;
                             StartCoroutine(ChangeScene());
 

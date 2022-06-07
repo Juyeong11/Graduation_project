@@ -97,8 +97,8 @@ public:
 	std::unordered_set<int> player_ids;
 	std::mutex id_lock;
 	std::atomic_int ready_player_cnt;
-	Portal(int _x, int _z) :x(_x), z(_z) {
-		y = -z - x; map_type = WITCH_MAP;
+	Portal(int _x, int _z, MAP_TYPE _map_type) :x(_x), z(_z) {
+		y = -z - x; map_type = _map_type;
 		ready_player_cnt = 0;
 	};
 

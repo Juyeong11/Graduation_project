@@ -20,7 +20,7 @@ Network::Network() {
 	//인스턴스는 한 개만!!
 	assert(instance == nullptr);
 	instance = this;
-
+	
 	accept_ex = new EXP_OVER();
 	for (int i = 0; i < SKILL_CNT; ++i) {
 		skills[i] = new Skill();
@@ -69,9 +69,11 @@ Network::Network() {
 
 
 	// 포탈의 위치를 나타내는 자료필요
-	for (int i = 0; i < PORTAL_NUM; ++i) {
-		portals[i] = new Portal(17, -21);
-	}
+
+		portals[0] = new Portal(17, -21,WITCH_MAP);
+		portals[1] = new Portal(14, -15, ROBOT_MAP);
+
+
 	cur_play_music = 99;
 
 }
