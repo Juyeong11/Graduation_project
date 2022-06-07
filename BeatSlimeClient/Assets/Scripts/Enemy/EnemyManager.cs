@@ -20,6 +20,7 @@ public class EnemyManager : MonoBehaviour
 
     public HexCellPosition selfCoord;
     public GameObject nearestSlimeCoord;
+    public bool doseNotConsiderSlime;
     private bool ticker = false;
     public HexGrid grid;
 
@@ -55,7 +56,7 @@ public class EnemyManager : MonoBehaviour
 
     public void EnemyRotateToLookAt()
     {
-        if (nearestSlimeCoord == null)
+        if (nearestSlimeCoord == null || doseNotConsiderSlime)
         {
             switch (selfCoord.direction)
             {
