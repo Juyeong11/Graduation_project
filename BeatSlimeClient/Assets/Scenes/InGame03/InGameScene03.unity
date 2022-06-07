@@ -4605,6 +4605,10 @@ PrefabInstance:
       propertyPath: enemyNoteList.Array.data[0]
       value: 
       objectReference: {fileID: 1379459421}
+    - target: {fileID: 6973697988104019297, guid: f5a42c2c9b70c744382052d6fa0eaa23, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 6a1e5ec886c560b47a534a8d6d9196f7, type: 2}
     - target: {fileID: 7758464169946690507, guid: f5a42c2c9b70c744382052d6fa0eaa23, type: 3}
       propertyPath: direction
       value: 5
