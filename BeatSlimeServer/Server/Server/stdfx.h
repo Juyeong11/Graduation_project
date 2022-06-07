@@ -30,7 +30,7 @@
 #pragma comment (lib, "WS2_32.LIB")
 #pragma comment (lib, "MSWSock.LIB")
 
-enum MAP_TYPE { FIELD_MAP, WITCH_MAP };
+enum MAP_TYPE { FIELD_MAP, WITCH_MAP, ROBOT_MAP };
 enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_BOSS_MOVE, OP_PLAYER_PARRYING,
 	OP_BOSS_TILE_ATTACK,
 	OP_GAME_END,
@@ -83,7 +83,7 @@ constexpr int BOSS2_ID_END = BOSS2_ID_START + MAX_BOSS2;
 
 const int MAP_NUM = 2;
 const int SKILL_CNT = 4*3;
-const int PORTAL_NUM = 1;
+const int PORTAL_NUM = 2;
 const int MAX_GAME_ROOM_NUM = 5;
 
 enum GAME_END_TYPE{GAME_OVER,GAME_CLEAR};
