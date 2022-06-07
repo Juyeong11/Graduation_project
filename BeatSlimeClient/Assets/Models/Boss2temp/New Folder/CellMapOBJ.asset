@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2aa83846e2c50ce45a92aefbae577ee7, type: 3}
+  m_Name: CellMapOBJ
+  m_EditorClassIdentifier: 
+  cellTypes:
+  - {fileID: 5134561267730370690, guid: 297a60b5fff08794a8c69b55823a7aee, type: 3}
+  - {fileID: 4688652492484625222, guid: d8ab0df432e93e345a06e4032d4dc04a, type: 3}
+  landTypes: []
