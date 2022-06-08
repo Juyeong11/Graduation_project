@@ -281,7 +281,7 @@ void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject
 	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 		player_ids[i] = Players[i];
 
-		player_ids[i]->cur_room_num = game_room_id;
+		player_ids[0]->cur_room_num = game_room_id;
 
 	}
 	portal = p;
