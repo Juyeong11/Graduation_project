@@ -7,7 +7,7 @@ namespace Protocol
 
     public class CONSTANTS
     {
-
+        public const int MAX_IN_GAME_PLAYER = 1;
         public const short SERVER_PORT = 4000;
 
         public const int WORLD_HEIGHT = 2000;

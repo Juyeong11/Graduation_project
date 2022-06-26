@@ -1944,26 +1944,28 @@ void Network::worker()
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player1:
+			case Player2:
+			case Player3:
 				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
 				break;
-			case Player2:
-				if (game_room[game_room_id]->player_ids[1] != nullptr)
-					target_id = game_room[game_room_id]->player_ids[1]->id;
-				pivot_x = clients[target_id]->x;
-				pivot_z = clients[target_id]->z;
-				pivot_y = -pivot_x - pivot_z;
-				break;
-			case Player3:
-				if (game_room[game_room_id]->player_ids[2] != nullptr)
-					target_id = game_room[game_room_id]->player_ids[2]->id;
-				pivot_x = clients[target_id]->x;
-				pivot_z = clients[target_id]->z;
-				pivot_y = -pivot_x - pivot_z;
-				break;
+			//case Player2:
+			//	if (game_room[game_room_id]->player_ids[1] != nullptr)
+			//		target_id = game_room[game_room_id]->player_ids[1]->id;
+			//	pivot_x = clients[target_id]->x;
+			//	pivot_z = clients[target_id]->z;
+			//	pivot_y = -pivot_x - pivot_z;
+			//	break;
+			//case Player3:
+			//	if (game_room[game_room_id]->player_ids[2] != nullptr)
+			//		target_id = game_room[game_room_id]->player_ids[2]->id;
+			//	pivot_x = clients[target_id]->x;
+			//	pivot_z = clients[target_id]->z;
+			//	pivot_y = -pivot_x - pivot_z;
+			//	break;
 			default:
 				std::cout << "wrong pivotType" << std::endl;
 				pivot_x = 0;
@@ -2009,19 +2011,21 @@ void Network::worker()
 				std::cout << "Boss can not Parrying self\n";
 				break;
 			case Player1:
+			case Player2:
+			case Player3:
 				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
 				break;
-			case Player2:
-				if (game_room[game_room_id]->player_ids[1] != nullptr)
-					target_id = game_room[game_room_id]->player_ids[1]->id;
-
-				break;
-			case Player3:
-				if (game_room[game_room_id]->player_ids[2] != nullptr)
-					target_id = game_room[game_room_id]->player_ids[2]->id;
-
-				break;
+			//case Player2:
+			//	if (game_room[game_room_id]->player_ids[1] != nullptr)
+			//		target_id = game_room[game_room_id]->player_ids[1]->id;
+			//
+			//	break;
+			//case Player3:
+			//	if (game_room[game_room_id]->player_ids[2] != nullptr)
+			//		target_id = game_room[game_room_id]->player_ids[2]->id;
+			//
+			//	break;
 			}
 
 			//패링을 했는지 안했는지 확인
@@ -2106,20 +2110,22 @@ void Network::worker()
 
 				break;
 			case Player1:
+			case Player2:
+			case Player3:
 				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
 
 				break;
-			case Player2:
-				if (game_room[game_room_id]->player_ids[1] != nullptr)
-					target_id = game_room[game_room_id]->player_ids[1]->id;
-
-				break;
-			case Player3:
-				if (game_room[game_room_id]->player_ids[2] != nullptr)
-					target_id = game_room[game_room_id]->player_ids[2]->id;
-
-				break;
+			//case Player2:
+			//	if (game_room[game_room_id]->player_ids[1] != nullptr)
+			//		target_id = game_room[game_room_id]->player_ids[1]->id;
+			//
+			//	break;
+			//case Player3:
+			//	if (game_room[game_room_id]->player_ids[2] != nullptr)
+			//		target_id = game_room[game_room_id]->player_ids[2]->id;
+			//
+			//	break;
 			case PlayerF:
 				target_id = game_room[game_room_id]->find_max_distance_player();
 

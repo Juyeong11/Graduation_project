@@ -169,7 +169,7 @@ public class GameManager : MonoBehaviour
     {
         int min = 0xfffff;
         int ret = -1;
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < Protocol.CONSTANTS.MAX_IN_GAME_PLAYER; ++i)
         {
             if (false == Objects[i].activeSelf) continue;
             int hp = Objects[i].GetComponentInChildren<PlayerManager>().HP.CurrentHP;
@@ -185,7 +185,7 @@ public class GameManager : MonoBehaviour
     {
         int max = 0;
         int ret = -1;
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < Protocol.CONSTANTS.MAX_IN_GAME_PLAYER; ++i)
         {
             if (false == Objects[i].activeSelf) continue;
 
@@ -203,7 +203,7 @@ public class GameManager : MonoBehaviour
     {
         float min = 99999;
         int ret = -1;
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < Protocol.CONSTANTS.MAX_IN_GAME_PLAYER; ++i)
         {
             if (false == Objects[i].activeSelf) continue;
 
@@ -220,7 +220,7 @@ public class GameManager : MonoBehaviour
     {
         float max = 0;
         int ret = -1;
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < Protocol.CONSTANTS.MAX_IN_GAME_PLAYER; ++i)
         {
             if (false == Objects[i].activeSelf) continue;
 
@@ -236,7 +236,7 @@ public class GameManager : MonoBehaviour
     }
     int FindOnlineID()
     {
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < Protocol.CONSTANTS.MAX_IN_GAME_PLAYER; ++i)
         {
             if (false == Objects[i].activeSelf) continue;
             return i;
@@ -284,8 +284,8 @@ public class GameManager : MonoBehaviour
         else if (pivotType == "Boss")
         {
             target_pos = Objects[3].GetComponent<HexCellPosition>().coordinates;
-        }
-        else if (pivotType == "Player1")
+        }// ¼öÁ¤
+        else if (pivotType == "Player1" || pivotType == "Player2"|| pivotType == "Player3")
         {
             if (Objects[0].activeSelf)
             {
@@ -296,28 +296,28 @@ public class GameManager : MonoBehaviour
                 target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
             }
         }
-        else if (pivotType == "Player2")
-        {
-            if (Objects[1].activeSelf)
-            {
-                target_pos = Objects[1].GetComponent<HexCellPosition>().coordinates;
-            }
-            else
-            {
-                target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
-            }
-        }
-        else if (pivotType == "Player3")
-        {
-            if (Objects[2].activeSelf)
-            {
-                target_pos = Objects[2].GetComponent<HexCellPosition>().coordinates;
-            }
-            else
-            {
-                target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
-            }
-        }
+       // else if (pivotType == "Player2")
+       // {
+       //     if (Objects[1].activeSelf)
+       //     {
+       //         target_pos = Objects[1].GetComponent<HexCellPosition>().coordinates;
+       //     }
+       //     else
+       //     {
+       //         target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
+       //     }
+       // }
+       // else if (pivotType == "Player3")
+       // {
+       //     if (Objects[2].activeSelf)
+       //     {
+       //         target_pos = Objects[2].GetComponent<HexCellPosition>().coordinates;
+       //     }
+       //     else
+       //     {
+       //         target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
+       //     }
+       // }
         else if (pivotType == "END")
             Debug.Log("Pattern End");
         else
@@ -347,7 +347,7 @@ public class GameManager : MonoBehaviour
         {
             target = ref Objects[3];
         }
-        else if (pivotType == "Player1")
+        else if (pivotType == "Player1" || pivotType == "Player2"|| pivotType == "Player3")
         {
             if (Objects[0].activeSelf)
             {
@@ -358,28 +358,28 @@ public class GameManager : MonoBehaviour
                 target = ref Objects [OnlinePlayerID];
             }
         }
-        else if (pivotType == "Player2")
-        {
-            if (Objects[1].activeSelf)
-            {
-                target = ref Objects[1];
-            }
-            else
-            {
-                target = ref Objects[OnlinePlayerID];
-            }
-        }
-        else if (pivotType == "Player3")
-        {
-            if (Objects[2].activeSelf)
-            {
-                target = ref Objects[2];
-            }
-            else
-            {
-                target = ref Objects[OnlinePlayerID];
-            }
-        }
+        //else if (pivotType == "Player2")
+        //{
+        //    if (Objects[1].activeSelf)
+        //    {
+        //        target = ref Objects[1];
+        //    }
+        //    else
+        //    {
+        //        target = ref Objects[OnlinePlayerID];
+        //    }
+        //}
+        //else if (pivotType == "Player3")
+        //{
+        //    if (Objects[2].activeSelf)
+        //    {
+        //        target = ref Objects[2];
+        //    }
+        //    else
+        //    {
+        //        target = ref Objects[OnlinePlayerID];
+        //    }
+        //}
         return ref target;
     }
 
