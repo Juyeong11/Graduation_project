@@ -860,7 +860,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
 
-		//std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
+		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -1184,9 +1184,12 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.vl.lock();
 			std::unordered_set <int> my_vl = cl.viewlist;
 			cl.viewlist.clear();
-			cl.viewlist.insert(gr->player_ids[0]->id);
-			cl.viewlist.insert(gr->player_ids[1]->id);
-			cl.viewlist.insert(gr->player_ids[2]->id);
+			for (auto p : gr->player_ids) {
+				if (p == nullptr) continue;
+
+			cl.viewlist.insert(p->id);
+			}
+			
 			cl.vl.unlock();
 
 
@@ -2036,6 +2039,7 @@ void Network::worker()
 				clients[target_id]->hp -= 10* damamge_bug;
 				for (const auto& p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
+					if (game_room[game_room_id]->boss_id == nullptr) continue;
 					send_attack_player(game_room[game_room_id]->boss_id->id, target_id, p->id);
 				}
 				if (clients[target_id]->hp < 0) {
@@ -2245,7 +2249,7 @@ void Network::worker()
 				}
 				game_room[game_room_id]->game_end();
 
-
+				//std::cout << "game end\n";
 			}
 			else if (isDie) {
 				int i = 0;
@@ -2706,6 +2710,7 @@ void Network::game_start(int room_id)
 
 	int i = 0;
 	for (auto p : game_room[room_id]->player_ids) {
+		if (p == nullptr)continue;
 		p->hp = 100;
 		Client* cl = reinterpret_cast<Client*>(p);
 
@@ -2727,6 +2732,7 @@ void Network::game_start(int room_id)
 
 
 		for (auto id : game_room[room_id]->player_ids) {
+			if (id == nullptr)continue;
 
 			send_move_object(id->id, p->id);
 		}

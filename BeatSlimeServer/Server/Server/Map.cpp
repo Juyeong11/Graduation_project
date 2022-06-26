@@ -277,6 +277,7 @@ void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject
 
 	boss_id = Boss;
 	pattern_progress = 0;
+
 	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
 	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 		player_ids[i] = Players[i];
@@ -384,10 +385,8 @@ void GameRoom::game_end()
 
 		//reinterpret_cast<Client*>(p)->cur_room_num = -1;
 		reinterpret_cast<Client*>(p)->is_active = true;
-
+		p = nullptr;
 	}
 	//portal = nullptr;
-	player_ids[0] = nullptr;
-	player_ids[1] = nullptr;
-	player_ids[2] = nullptr;
+
 }
