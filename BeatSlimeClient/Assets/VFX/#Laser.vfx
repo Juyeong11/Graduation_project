@@ -16,8 +16,8 @@ MonoBehaviour:
   - title: Before
     position:
       serializedVersion: 2
-      x: 45
-      y: -413
+      x: 46
+      y: -412
       width: 1819
       height: 2554
     contents:
@@ -115,27 +115,6 @@ MonoBehaviour:
     - model: {fileID: 8926484042661616083}
       id: 0
       isStickyNote: 0
-    - model: {fileID: 8926484042661615038}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615492}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615046}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615051}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615064}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615066}
-      id: 0
-      isStickyNote: 0
-    - model: {fileID: 8926484042661615598}
-      id: 0
-      isStickyNote: 0
   - title: New Group Node
     position:
       serializedVersion: 2
@@ -181,7 +160,7 @@ MonoBehaviour:
     x: 0
     y: -426
     width: 7790
-    height: 5469
+    height: 5470
 --- !u!114 &114350483966674976
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3660,7 +3639,7 @@ MonoBehaviour:
   m_UIIgnoredErrors: []
   m_Parent: {fileID: 114350483966674976}
   m_Children: []
-  m_UIPosition: {x: 74, y: 288}
+  m_UIPosition: {x: 71, y: 288}
   m_UICollapsed: 0
   m_UISuperCollapsed: 0
   m_InputSlots: []
@@ -15903,7 +15882,7 @@ MonoBehaviour:
       inputSlot: {fileID: 8926484042661614811}
     - outputSlot: {fileID: 8926484042661616078}
       inputSlot: {fileID: 8926484042661614833}
-    position: {x: 1037, y: 2064}
+    position: {x: 1037.6, y: 2064}
     expandedSlots: []
     expanded: 0
   - m_Id: 1
@@ -18911,7 +18890,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UIIgnoredErrors: []
-  m_Parent: {fileID: 0}
+  m_Parent: {fileID: 114350483966674976}
   m_Children: []
   m_UIPosition: {x: 0, y: 0}
   m_UICollapsed: 1
@@ -21474,7 +21453,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UIIgnoredErrors: []
-  m_Parent: {fileID: 0}
+  m_Parent: {fileID: 114350483966674976}
   m_Children: []
   m_UIPosition: {x: 0, y: 0}
   m_UICollapsed: 1
@@ -21872,7 +21851,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UIIgnoredErrors: []
-  m_Parent: {fileID: 0}
+  m_Parent: {fileID: 114350483966674976}
   m_Children: []
   m_UIPosition: {x: 0, y: 0}
   m_UICollapsed: 1
