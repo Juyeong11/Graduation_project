@@ -395,7 +395,11 @@ public class GameManager : MonoBehaviour
         //     enemyAnim.SetTrigger("Move");
         //     //player.GetComponent<PlayerManager>().JumpTrigger.SetTrigger("Dead");
         // }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            EffectManager.instance.TileWaveEffect(0, 0, 2);
 
+        }
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             PM.Factory.scrollSpeed += 0.05f;

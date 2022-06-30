@@ -162,7 +162,7 @@ public class EffectManager : MonoBehaviour
         {
             pret = t;
             t += Time.deltaTime;
-            float width = (period - t) * 0.5f;
+            float width = (period - t) * 0.2f;
             float displacement = width * Mathf.Sin(t * period * Mathf.PI) - width * Mathf.Sin(pret * period * Mathf.PI);
             //Debug.Log(Mathf.Sin(t*2));
             if (GameManager.data.grid.cellMaps.plusW(x, z, displacement) == false) yield break;

@@ -159,7 +159,12 @@ public class FieldGameManager : MonoBehaviour
         }
 
     }
+    public void TestTileEffect1()
+    {
+        HexCoordinates pos = player.GetComponentInChildren<HexCellPosition>().coordinates;
 
+        StartCoroutine(TestTileWaveEffect(pos.X, pos.Z, 6));
+    }
 
     void Update()
     {
@@ -247,14 +252,9 @@ public class FieldGameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            StartCoroutine(TestTileWaveEffect(0, 0, 6));
+            TestTileEffect1();
         }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            StartCoroutine(TestTileRailWaveEffect(0, 0, 2,0));
-            StartCoroutine(TestTileRailWaveEffect(0, 0, 4, 2));
-            StartCoroutine(TestTileRailWaveEffect(0, 0, 6, 4));
-        }
+
         if (Network.isOnline)
         {
 
