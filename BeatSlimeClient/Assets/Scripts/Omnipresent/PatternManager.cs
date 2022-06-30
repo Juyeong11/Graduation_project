@@ -60,6 +60,10 @@ public class PatternManager : MonoBehaviour
                 //Debug.Log(tmpP.id + " " + tmpP.noteType + " " + tmpP.pivotType);
                 Factory.attackNotesBeats.Add(tmpP.rhythmBeat.GetBeatTime());
             }
+            if (tmpP.noteType.ToString() == "700")
+            {
+                Factory.moveStartTime = tmpP.rhythmBeat.GetBeatTime();
+            }
             //DEBUG : 장판 공격도 작은 노트 보여주고싶음 (비트 알려주기 위해)
         }
         yield return null;

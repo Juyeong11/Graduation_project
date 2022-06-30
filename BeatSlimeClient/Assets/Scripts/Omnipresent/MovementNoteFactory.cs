@@ -16,6 +16,9 @@ public class MovementNoteFactory : MonoBehaviour
     List<RectTransform> rightANote;
     int ANoteIndex = 0;
 
+    public float moveStartTime;
+    bool movingStarted;
+
     List<float> moveNotesBeats;
     public List<float> attackNotesBeats = new List<float>();
 
@@ -27,6 +30,9 @@ public class MovementNoteFactory : MonoBehaviour
 
     private void Start()
     {
+        moveStartTime = 0;
+        movingStarted = false;
+
         leftNote = new List<RectTransform>();
         rightNote = new List<RectTransform>();
         leftANote = new List<RectTransform>();
@@ -59,6 +65,8 @@ public class MovementNoteFactory : MonoBehaviour
 
             leftNote[i].anchoredPosition = -translator * (i + 1) + Zero;
             rightNote[i].anchoredPosition = translator * (i + 1) + Zero;
+            leftNote[i].gameObject.SetActive(false);
+            rightNote[i].gameObject.SetActive(false);
         }
 
         for (int i = 0; i < LeftANote.Count; ++i)
@@ -89,6 +97,7 @@ public class MovementNoteFactory : MonoBehaviour
                 //Debug.Log(GameManager.data.nowSongTime);
                 //Debug.Log(moveNotesBeats.Count);
                 //Debug.Log(attackNotesBeats.Count);
+                
                 if (moveNotesBeats.Count > 0)
                 {
                     for (int i = 0; i < leftNote.Count; ++i)
@@ -101,6 +110,17 @@ public class MovementNoteFactory : MonoBehaviour
 
                         if (rightNote[i].anchoredPosition.x <= 0)
                             rightNote[i].anchoredPosition = new Vector3(-1000f, 0f);
+                        
+                        if (!movingStarted)
+                        {
+                            if (moveNotesBeats[i] >= moveStartTime)
+                            {
+                                leftNote[i].gameObject.SetActive(true);
+                                rightNote[i].gameObject.SetActive(true);
+                            }
+                            if (beatPercentage > moveStartTime)
+                                movingStarted = true;
+                        }
                     }
 
                     if (beatPercentage >= moveNotesBeats[0] + GameManager.data.JudgementTiming + GameManager.data.MusicStartOffset)
