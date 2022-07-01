@@ -72,6 +72,19 @@ public class MapLoader : MonoBehaviour
 
                 switch(t)
                 {
+                    case 1: // start point
+                    break;
+                    case 2:
+                    break;
+                    case 3:
+                    break;
+                    case 5: // Item
+                        
+                    break;
+                    case 6: // Special
+                    break;
+                    case 7:
+                    break;
                     case 10:
                     fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Shop);
                     break;
