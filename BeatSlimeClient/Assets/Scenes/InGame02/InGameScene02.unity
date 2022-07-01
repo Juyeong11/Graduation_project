@@ -1832,6 +1832,10 @@ PrefabInstance:
       propertyPath: isDebug
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 379015093369558915, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
+      propertyPath: EnemyTransform
+      value: 
+      objectReference: {fileID: 682205125140970151}
     - target: {fileID: 685639962367945439, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_Name
       value: MainPlayerSlime
@@ -4929,6 +4933,11 @@ PrefabInstance:
 --- !u!1 &682205125140970150 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8396330205775858513, guid: ea611a13a1d01114b938abe69053ec7f, type: 3}
+  m_PrefabInstance: {fileID: 682205125140970149}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &682205125140970151 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 682205123564150069, guid: ea611a13a1d01114b938abe69053ec7f, type: 3}
   m_PrefabInstance: {fileID: 682205125140970149}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2224594054131023561

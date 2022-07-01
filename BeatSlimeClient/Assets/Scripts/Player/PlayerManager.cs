@@ -23,6 +23,7 @@ public class PlayerManager : MonoBehaviour
     public HexGrid grid;
 
     public Transform PlayerTransform;
+    public Transform EnemyTransform;
 
     Image PlayerHPImage;
     Image PlayerPrevHPImage;
@@ -396,9 +397,12 @@ public class PlayerManager : MonoBehaviour
         {
             if (Network.isOnline)
             {
-                GameManager.data.setMoved();
+                if (playerClassofSkill != 0 || Vector3.Distance(EnemyTransform.position, PlayerTransform.position) < 5f)   
+                {
+                    GameManager.data.setMoved();
 
-                Network.SendUseSkillPacket();
+                    Network.SendUseSkillPacket();
+                }
 
             }
         }

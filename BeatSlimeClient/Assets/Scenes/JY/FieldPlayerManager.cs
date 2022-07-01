@@ -138,7 +138,6 @@ public class FieldPlayerManager : MonoBehaviour
                 isReady = true;
                 return;
             }
-            
             else if (isReady)
             {
                 Network.SendChangeSceneReadyPacket(0);

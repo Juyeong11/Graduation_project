@@ -1742,6 +1742,10 @@ PrefabInstance:
       propertyPath: isDebug
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 379015093369558915, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
+      propertyPath: EnemyTransform
+      value: 
+      objectReference: {fileID: 1335912149208043068}
     - target: {fileID: 685639962367945439, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: m_Name
       value: MainPlayerSlime
@@ -2117,8 +2121,9 @@ MonoBehaviour:
   - {fileID: 1135127788}
   - {fileID: 287104329}
   - {fileID: 832504407}
+  moveStartTime: 0
   attackNotesBeats: []
-  scrollSpeed: 0.55
+  scrollSpeed: 0.4
 --- !u!1 &762402955
 GameObject:
   m_ObjectHideFlags: 0
@@ -4371,7 +4376,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5b90600307784c84f854e24be39ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BPM: 150
+  BPM: 75
   musicTime: 155000
   offsetTime: 290
   warningBeat: 1
@@ -4615,6 +4620,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f5a42c2c9b70c744382052d6fa0eaa23, type: 3}
+--- !u!4 &1335912149208043068 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1335912150919080363, guid: f5a42c2c9b70c744382052d6fa0eaa23, type: 3}
+  m_PrefabInstance: {fileID: 1335912149208043067}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &2224594054131023561
 PrefabInstance:
   m_ObjectHideFlags: 0
