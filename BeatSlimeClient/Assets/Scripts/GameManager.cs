@@ -528,7 +528,7 @@ public class GameManager : MonoBehaviour
 
                             enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime( Objects[0].gameObject);
                             EffectManager.instance.SetTargetingEffectParent(ref enemyParriedTarget);
-                            Debug.Log("Delay : " + offsetTime);
+                            
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
@@ -542,15 +542,8 @@ public class GameManager : MonoBehaviour
                             if (!debugStart)
                             {
 
-                                //Debug.Log(p.id+" : pid");
                                 
-                                if (pid == myPlayerID)// 
-                                {
-                                    Objects[pid].GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
-                                    Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
-
-                                }
-                                else if (pid < 3)   //
+                                if (pid < 3)   // 플레이어이면
                                 {
                                     Objects[pid].GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
@@ -839,7 +832,7 @@ public class GameManager : MonoBehaviour
                             Network.ping_data[Network.ping_index++] = ping;
                             Network.ping_index = Network.ping_index % Network.ping_data.Length;
                             avgPing = Network.GetPingAvg();
-                            Debug.Log("avgPing : " + avgPing);
+                            //Debug.Log("avgPing : " + avgPing);
                             //Debug.Log(ping);
                         }
                         break;

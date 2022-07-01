@@ -27,7 +27,7 @@ public class Pattern
 
         if (int.Parse(datas["pivotX"].ToString()) + int.Parse(datas["pivotY"].ToString()) + int.Parse(datas["pivotZ"].ToString()) != 0)
         {
-            Debug.LogError("PatternPivotLoad : None-ZeroSum Error!!");
+            Debug.Log("PatternPivotLoad : None-ZeroSum Error!!");
         }
         pivot.setCoordinates(int.Parse(datas["pivotX"].ToString()), int.Parse(datas["pivotZ"].ToString()));
 

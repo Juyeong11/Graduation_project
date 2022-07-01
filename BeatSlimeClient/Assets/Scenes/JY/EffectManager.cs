@@ -228,7 +228,7 @@ public class EffectManager : MonoBehaviour
                             {
                                 range[nextX, nextZ] = state % 2 + 1;
                                 //위 아래 운동 코루틴 시작
-                                StartCoroutine(CoOneTileWaveEffect(nextX - power, nextZ - power, power));
+                                //StartCoroutine(CoOneTileWaveEffect(nextX - power, nextZ - power, power));
                             }
                         }
                         range[i, j] = 3;
@@ -246,6 +246,7 @@ public class EffectManager : MonoBehaviour
 
     public void TileWaveEffect(int startX, int startZ, int power)
     {
+        //Debug.Log(startX + ", " + startZ+", "+power);
         StartCoroutine(CoTileWaveEffect(startX, startZ, power));
     }
 

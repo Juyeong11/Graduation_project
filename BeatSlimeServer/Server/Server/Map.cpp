@@ -108,7 +108,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			stoi(pattern["24th"][i]);
 
 		int noteType = stoi(pattern["noteType"][i]);
-		if (noteType > 500) continue;
+		if (noteType > 500 || noteType == 0 || noteType == 100 || noteType == 101) continue;
 
 		int speed = 0;
 		if (pattern["speed"][i] == "0") // 0

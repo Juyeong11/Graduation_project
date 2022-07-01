@@ -116,10 +116,10 @@ public class PatternManager : MonoBehaviour
                     break;
                 case 100:
                     
-                    EffectManager.instance.TileWaveEffect(TargetPos.X,  TargetPos.Z,charging_time/1000 * 3);
+                    EffectManager.instance.TileWaveEffect(TargetPos.X,  TargetPos.Z,5);
                     break;
                 case 101:
-                    EffectManager.instance.TileRailWaveEffect(TargetPos.X, TargetPos.Z, charging_time / 1000*3, pattern[0].direction);
+                    EffectManager.instance.TileRailWaveEffect(TargetPos.X, TargetPos.Z, 5, pattern[0].direction);
                     break;
                 case 600:   //게임 시작 패널
                     StartCoroutine(LogoLoad(true));
