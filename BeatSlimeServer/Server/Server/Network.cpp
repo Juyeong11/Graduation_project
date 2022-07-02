@@ -707,6 +707,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		if (false == is_attack(pl->id, x, z)) continue;
 		pl->hp -= damage;
 		std::cout << "id : " << i << " damaged " << damage << std::endl;
+
 		game_room[game_room_id]->Score[i] -= 20 * damage;
 		for (const auto& p : game_room[game_room_id]->player_ids) {
 			if (p == nullptr) continue;
@@ -861,7 +862,6 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (cl.cur_room_num != -1)
 			cur_map = game_room[cl.cur_room_num]->map_type;
 
-		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -904,6 +904,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 			std::cout << "Invalid move in client " << client_id << std::endl;
 			exit(-1);
 		}
+
+		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
+
 		if (cur_map != 0) {
 
 			for (auto pl : game_room[cl.cur_room_num]->player_ids) {
@@ -911,6 +914,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 			}
 			break;
 		}
+
+
 		maps[cur_map]->SetTileType(x, z, cl.pre_x, cl.pre_z);
 		// 이동한 클라이언트에 대한 nearlist 생성
 		// 꼭 unordered_set이여야 할까?
@@ -1364,7 +1369,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		if ((cl->last_skill_time + std::chrono::milliseconds(maps[gr->map_type]->timeByBeat * cl->skill->CoolTime)) > std::chrono::system_clock::now()) break;
 		cl->last_skill_time = std::chrono::system_clock::now();
-		std::cout << maps[gr->map_type]->timeByBeat * cl->skill->CoolTime << std::endl;
+		//std::cout << maps[gr->map_type]->timeByBeat * cl->skill->CoolTime << std::endl;
 
 
 		/*
@@ -2067,7 +2072,7 @@ void Network::worker()
 
 		}
 		break;
-		case OP_BOSS_TILE_ATTACK:
+		case OP_BOSS_TILE_ATTACK_START:
 		{
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			int pattern_type = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
@@ -2079,10 +2084,6 @@ void Network::worker()
 			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 7));
 
 
-
-			// 시작 위치를 중심으로 패턴 공격
-			// 공격 이펙트 보내고
-			// 서버에서 공격 처리할 이벤트 추가
 			int target_id = game_room[game_room_id]->find_online_player();
 
 			if (game_room[game_room_id]->isGaming == false) break;
@@ -2091,6 +2092,7 @@ void Network::worker()
 				game_room[game_room_id]->pattern_progress = -1;
 				break;
 			}
+
 			int pos_x, pos_z, pos_y;
 
 			//printf("%d %d %d\n", pivot_x, pivot_y, pivot_z);
@@ -2136,6 +2138,7 @@ void Network::worker()
 				target_id = game_room[game_room_id]->find_min_distance_player();
 				break;
 			}
+
 			if (pivotType == World) {
 				pos_x = pivot_x;
 				pos_y = pivot_y;
@@ -2143,19 +2146,41 @@ void Network::worker()
 			}
 			else {
 
-				//std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clients[target_id]->last_move_time).count() << std::endl;
-				//std::cout << charging_time << std::endl;
-				if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clients[target_id]->last_move_time).count() > charging_time)
-				{
-					pos_x = clients[target_id]->x + pivot_x;
-					pos_z = clients[target_id]->z + pivot_z;
-				}
-				else {
-					pos_x = clients[target_id]->pre_x + pivot_x;
-					pos_z = clients[target_id]->pre_z + pivot_z;
-				}
+				pos_x = clients[target_id]->x + pivot_x;
+				pos_z = clients[target_id]->z + pivot_z;
+
 				pos_y = -pos_x - pos_z;
 			}
+
+			set_next_pattern(game_room_id);
+
+			//이벤트 등록
+			timer_event tev;
+			tev.ev = EVENT_BOSS_TILE_ATTACK;
+
+			tev.type = pattern_type;
+			tev.x = pos_x;
+			tev.y = pos_y;
+			tev.z = pos_z;
+			tev.game_room_id = game_room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time);
+			tev.charging_time = charging_time;
+			tev.dir = dir;
+			timer_queue.push(tev);
+		}
+		break;
+
+		case OP_BOSS_TILE_ATTACK:
+		{
+			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			int pattern_type = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int)));
+
+			int pos_x = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 2));
+			int pos_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
+			int pos_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
+			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
+			std::cout << "Target Pos -> " << "x : " << pos_x << "y : " << pos_y << "z : " << pos_z << std::endl;
 
 
 			switch (pattern_type)
@@ -2191,12 +2216,10 @@ void Network::worker()
 			break;
 			case 5:
 			{
-
-
-				//do_npc_tile_attack(game_room_id,
-				//	pos_x,
-				//	pos_y,
-				//	pos_z);
+				do_npc_tile_attack(game_room_id,
+					pos_x,
+					pos_y,
+					pos_z);
 			}
 			break;
 			case 6:// 패턴파일에 적힌 방향으로 지진
@@ -2225,7 +2248,7 @@ void Network::worker()
 				std::cout << "wrong pattern type\n";
 				break;
 			}
-			set_next_pattern(game_room_id);
+
 
 			exp_over_pool.push(exp_over);
 		}
@@ -2454,9 +2477,8 @@ void Network::do_timer() {
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.pivotType;// 타겟 id가 패턴 종류 구분
 
 					break;
-				case EVENT_BOSS_TILE_ATTACK:
-
-					ex_over->_comp_op = OP_BOSS_TILE_ATTACK;
+				case EVENT_BOSS_TILE_ATTACK_START:
+					ex_over->_comp_op = OP_BOSS_TILE_ATTACK_START;
 					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.type;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.pivotType;
@@ -2465,6 +2487,16 @@ void Network::do_timer() {
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.z;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.charging_time;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 7) = ev.dir;
+					break;
+				case EVENT_BOSS_TILE_ATTACK:
+
+					ex_over->_comp_op = OP_BOSS_TILE_ATTACK;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int)) = ev.type;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 2) = ev.x;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.y;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.z;
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.dir;
 					break;
 
 				case EVENT_PLAYER_PARRYING:
@@ -2620,6 +2652,7 @@ void Network::set_next_pattern(int room_id)
 
 	timer_event tev;
 
+
 	switch (t.type)
 	{
 	case -1:
@@ -2641,7 +2674,7 @@ void Network::set_next_pattern(int room_id)
 	case 99:// 단일 장판 공격
 	case 5: // 가장 멀리있는 적에게 물줄기 발사
 	case 6: // 보스가 보는 방향으로 지진
-		tev.ev = EVENT_BOSS_TILE_ATTACK;
+		tev.ev = EVENT_BOSS_TILE_ATTACK_START;
 		tev.obj_id = boss_id;
 		tev.type = t.type;
 		tev.x = t.x;
@@ -2649,7 +2682,7 @@ void Network::set_next_pattern(int room_id)
 		tev.z = t.z;
 		tev.game_room_id = room_id;
 		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
 		tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
 		tev.dir = t.dir;

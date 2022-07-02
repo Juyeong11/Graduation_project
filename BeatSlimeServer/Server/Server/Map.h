@@ -16,6 +16,16 @@ struct PatternInfo {
 	bool operator <(const PatternInfo& rhs) const {
 		return time < rhs.time;
 	}
+	void operator =(const PatternInfo& rhs) {
+		type = rhs.type;
+		pivotType = rhs.pivotType;
+		time = rhs.time;
+		dir = rhs.dir;
+		speed = rhs.speed;
+		x = rhs.x;
+		y = rhs.y;
+		z = rhs.z;
+	}
 	static constexpr int HexCellAround[6][3] = {
 	{0, -1, 1 },{ 1, -1, 0 }, { 1, 0, -1 },
 	{ 0, 1, -1 },{ -1, 1, 0 }, { -1, 0, 1 }
