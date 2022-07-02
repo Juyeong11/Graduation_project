@@ -53,6 +53,9 @@ public:
 	int LengthX;
 	int LengthZ;
 
+	int startX[3] ={0,0,0};
+	int startZ[3] = {0,0,0};
+
 	std::vector<std::string> menu;
 	std::map<std::string, std::vector<std::string>> pattern;
 

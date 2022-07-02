@@ -2745,9 +2745,7 @@ void Network::game_start(int room_id)
 
 	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
 	//수정
-	int x[3] = { 0,1,0 };
-	int y[3] = { 0,0,1 };
-	int z[3] = { 0,-1,-1 };
+
 	boss->hp = 1000;
 
 	int i = 0;
@@ -2766,9 +2764,10 @@ void Network::game_start(int room_id)
 		p->pre_y = 0;
 		p->pre_z = 0;
 
-		p->x = x[i];
-		p->y = y[i];
-		p->z = z[i];
+		p->x = maps[game_room[room_id]->map_type]->startX[i];
+		p->z = maps[game_room[room_id]->map_type]->startZ[i];
+
+		p->y = -p->x - p->z;
 		i++;
 
 
