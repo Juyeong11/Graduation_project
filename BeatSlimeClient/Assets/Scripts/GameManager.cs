@@ -279,7 +279,7 @@ public class GameManager : MonoBehaviour
         }
         else if (pivotType == "World")
         {
-            target_pos = PatternManager.data.pattern[0].pivot;
+            target_pos = new HexCoordinates(0, 0, 0);
         }
         else if (pivotType == "Boss")
         {
@@ -551,12 +551,17 @@ public class GameManager : MonoBehaviour
 
                                 
                                 Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                if (pid < 3)   // 플레이어이면
+                                {
+                                    Objects[pid].GetComponentInChildren<PlayerManager>().cellTag();
+                                }
                             }
                             else    //debug time
                             {
                                 player.GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                 player.GetComponent<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                 player.GetComponent<PlayerManager>().JumpTrig();
+                                Objects[pid].GetComponentInChildren<PlayerManager>().cellTag();
                             }
 
                             //NEAREST Slime

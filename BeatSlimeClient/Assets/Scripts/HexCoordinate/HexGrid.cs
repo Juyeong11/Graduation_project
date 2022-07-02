@@ -15,6 +15,13 @@ public enum cellState
     Stage1_2Portal,
     Stage2Portal,
     Stage2_2Portal,
+
+    Item1,
+    Item2,
+    Item3,
+    Item4,
+    Item5,
+    Item6,
 }
 
 public class Cell
@@ -81,10 +88,12 @@ public class Cell
 
     public void Beat()
     {
-
         if (duration <= 0)
         {
-            state = cellState.Normal;
+            if (state == cellState.Damaged)
+            {
+                state = cellState.Normal;
+            }
         }
         else
         {
@@ -95,6 +104,19 @@ public class Cell
     public void SetW(int wPos)
     {
 
+    }
+
+    public void GetItemFromThisCell()
+    {
+        state = cellState.Normal;
+        obejct.transform.Find("#VFX_item").gameObject.SetActive(false);
+        // Item ²ô±â
+    }
+    public void SetItemToThisCell(cellState item)
+    {
+        state = item;
+        obejct.transform.Find("#VFX_item").gameObject.SetActive(true);
+        // Item ÄÑ±â
     }
 }
 

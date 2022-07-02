@@ -114,13 +114,42 @@ public class PatternManager : MonoBehaviour
                 case 10:
                     EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
                     break;
-                case 100:
+
                     
+                case 100: //장판 이펙트
                     EffectManager.instance.TileWaveEffect(TargetPos.X,  TargetPos.Z,5);
                     break;
                 case 101:
                     EffectManager.instance.TileRailWaveEffect(TargetPos.X, TargetPos.Z, 5, pattern[0].direction);
                     break;
+
+                case 200:   //아이템
+                    //print($"{TargetPos.X}, {TargetPos.Y}, {TargetPos.Z}");
+                    switch (pattern[0].direction)
+                    {
+                        case HexDirection.Up:
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item1);
+                        break;
+                        case HexDirection.Down:
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item2);
+                        break;
+                        case HexDirection.LeftDown:
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item3);
+                        break;
+                        case HexDirection.RightDown:
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item4);
+                        break;
+                        case HexDirection.LeftUp:
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item5);
+                        break;
+                        case HexDirection.RightUp:
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item6);
+                        break;
+                    }
+
+                    
+                break;
+
                 case 600:   //게임 시작 패널
                     StartCoroutine(LogoLoad(true));
                     break;

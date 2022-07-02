@@ -2,6 +2,7 @@
 using UnityEngine.Events;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System;
 
 public enum playerState
 {
@@ -38,6 +39,8 @@ public class PlayerManager : MonoBehaviour
     public int playerClassofSkill;
     public int playerLevelofSkill;
 
+    Cell nowOnCellTag;
+
     public void Start()
     {
         HP = new HPManager();
@@ -47,6 +50,7 @@ public class PlayerManager : MonoBehaviour
         selfCoord.direction = HexDirection.Up;
         SettledBallBeats = new List<(Beat,float)>();
         playerDieAnimTriggered = false;
+        nowOnCellTag = null;
 
         //DEBUG :
         //playerClassofSkill = 2;
@@ -113,6 +117,12 @@ public class PlayerManager : MonoBehaviour
             }
             PlayerRotateToLookAt();
             PlayerWCheck();
+
+            if (nowOnCellTag.obejct)
+            {
+                //print($"{nowOnCellTag.x}, {nowOnCellTag.y}, {nowOnCellTag.z}");
+                PlayerItemCheck();
+            }
 
         }
         CalcHPSlider();
@@ -509,6 +519,42 @@ public class PlayerManager : MonoBehaviour
             //슬라임 죽는 모션
             JumpTrigger.SetTrigger("Dead");
             playerDieAnimTriggered = true;
+        }
+    }
+
+    public void cellTag()
+    {
+        nowOnCellTag = GameManager.data.grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y, selfCoord.coordinates.Z);
+    }
+
+    private void PlayerItemCheck()
+    {
+        //print(nowOnCellTag.state);
+        switch (nowOnCellTag.state)
+        {
+            case cellState.Item1:
+                nowOnCellTag.GetItemFromThisCell();
+                Debug.Log("Item1");
+            break;
+            case cellState.Item2:
+            nowOnCellTag.GetItemFromThisCell();
+
+            break;
+            case cellState.Item3:
+            nowOnCellTag.GetItemFromThisCell();
+
+            break;
+            case cellState.Item4:
+            nowOnCellTag.GetItemFromThisCell();
+            
+            break;
+            case cellState.Item5:
+            nowOnCellTag.GetItemFromThisCell();
+
+            break;
+            case cellState.Item6:
+            nowOnCellTag.GetItemFromThisCell();
+            break;
         }
     }
 }
