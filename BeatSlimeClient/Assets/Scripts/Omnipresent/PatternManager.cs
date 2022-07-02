@@ -46,6 +46,23 @@ public class PatternManager : MonoBehaviour
             if (datas[i]["noteType"].ToString() == "0")
                 continue;
 
+            if (datas[i]["noteType"].ToString() == "999")
+            {
+                BeatTime.beatManager.BPM = float.Parse(datas[i]["pivotType"].ToString());
+                SoundManager.instance.SetBPM(datas[i]["pivotZ"].ToString(), int.Parse(datas[i]["pivotType"].ToString()));
+                GameManager.data.JudgementTiming = int.Parse(datas[i]["pivotY"].ToString());
+                PatternManager.data.Factory.scrollSpeed = float.Parse(datas[i]["pivotX"].ToString());
+
+                GameManager.data.bpm = SoundManager.instance.GetBGMBpm(GameManager.data.SongName);
+                GameManager.data.totalSongTime = (int)(SoundManager.instance.GetMusicLength(GameManager.data.SongName) * 1000f);
+                GameManager.data.nowSongTime = 0;
+                GameManager.data.timeByBeat = (int)(1000f * 60f / GameManager.data.bpm);
+                GameManager.data.timeByBar = GameManager.data.timeByBeat * GameManager.data.barCounts;
+                GameManager.data.timeBy24Beat = GameManager.data.timeByBeat / 6;
+                GameManager.data.timeBy16Beat = GameManager.data.timeByBeat / 4;
+                continue;
+            }
+
             if (int.Parse(datas[i]["bar"].ToString()) != 0)
                 preBar = int.Parse(datas[i]["bar"].ToString());
 
@@ -66,6 +83,8 @@ public class PatternManager : MonoBehaviour
             }
             //DEBUG : 장판 공격도 작은 노트 보여주고싶음 (비트 알려주기 위해)
         }
+
+        Factory.initiation();
         yield return null;
     }
 

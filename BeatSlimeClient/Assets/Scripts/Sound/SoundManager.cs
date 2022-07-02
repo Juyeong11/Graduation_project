@@ -58,6 +58,17 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    public void SetBPM(string p_bgmName, int bpm)
+    {
+        for (int i = 0; i < bgm.Length; ++i)
+        {
+            if (p_bgmName == bgm[i].name)
+            {
+                bgm[i].bpm = bpm;
+            }
+        }
+    }
+
     public int GetBGMBpm(string p_bgmName)
     {
         for (int i = 0; i < bgm.Length; ++i)

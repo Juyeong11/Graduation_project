@@ -509,6 +509,7 @@ public class GameManager : MonoBehaviour
 
 
                             PatternManager.data.Load(myPlayerID);
+
                             Network.SendGameStartReadyPacket();
                             Network.SendPingTestPacket();
                         }

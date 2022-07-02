@@ -28,9 +28,8 @@ public class MovementNoteFactory : MonoBehaviour
     Vector3 translator;
     Vector3 Zero;
 
-    private void Start()
+    public void initiation()
     {
-        moveStartTime = 0;
         movingStarted = false;
 
         leftNote = new List<RectTransform>();
