@@ -2145,12 +2145,21 @@ void Network::worker()
 				pos_z = pivot_z;
 			}
 			else {
-
+				if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clients[target_id]->last_move_time).count() > 100)
+				{
+					pos_x = clients[target_id]->x + pivot_x;
+					pos_z = clients[target_id]->z + pivot_z;
+				}
+				else {
+					pos_x = clients[target_id]->pre_x + pivot_x;
+					pos_z = clients[target_id]->pre_z + pivot_z;
+				}
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 
 				pos_y = -pos_x - pos_z;
 			}
+			std::cout << "Target Pos -> " << "x : " << pos_x << "y : " << pos_y << "z : " << pos_z << std::endl;
 
 			set_next_pattern(game_room_id);
 
@@ -2180,7 +2189,6 @@ void Network::worker()
 			int pos_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
 			int pos_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
 			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
-			std::cout << "Target Pos -> " << "x : " << pos_x << "y : " << pos_y << "z : " << pos_z << std::endl;
 
 
 			switch (pattern_type)
@@ -2760,16 +2768,16 @@ void Network::game_start(int room_id)
 		p->dest_y = -1;
 		p->dest_z = -1;
 
-		p->pre_x = 0;
-		p->pre_y = 0;
-		p->pre_z = 0;
+		
 
 		p->x = maps[game_room[room_id]->map_type]->startX[i];
 		p->z = maps[game_room[room_id]->map_type]->startZ[i];
 
 		p->y = -p->x - p->z;
 		i++;
-
+		p->pre_x = p->x;
+		p->pre_y = p->y;
+		p->pre_z = p->z;
 
 
 		for (auto id : game_room[room_id]->player_ids) {

@@ -51,6 +51,7 @@ public class FieldGameManager : MonoBehaviour
         }
 
 
+       
         if (myPlayerID != -1)
         {
             Network.SendChangeSceneDonePacket(0);
@@ -264,14 +265,14 @@ public class FieldGameManager : MonoBehaviour
             if (Network.MessQueue.Count > 0)
             {
                 byte[] data = Network.MessQueue.Dequeue();
-                
+
                 byte type = data[1];
 
                 switch (type)
                 {
                     case Protocol.CONSTANTS.SC_PACKET_LOGIN_OK:
                         {
-                            
+
                             Protocol.sc_packet_login_ok p = Protocol.sc_packet_login_ok.SetByteToVar(data);
 
                             soundManager.PlayBGM("riverside");
@@ -301,7 +302,7 @@ public class FieldGameManager : MonoBehaviour
                             }
                             //PlayerPref
                             FieldPlayerManager.money = p.money;
-
+                            Network.SendChangeSceneDonePacket(0);
                             //PutPlayerObject(p.type, p.id, p.x, p.y);
                         }
                         break;
@@ -350,7 +351,7 @@ public class FieldGameManager : MonoBehaviour
                                 }
                                 else
                                 {
-                                    Debug.Log(p.id+", "+myPlayerID);
+                                    Debug.Log(p.id + ", " + myPlayerID);
                                     Objects[p.id].GetComponent<FieldOtherPlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[p.id].GetComponent<FieldOtherPlayerManager>().JumpTrig();
                                 }
