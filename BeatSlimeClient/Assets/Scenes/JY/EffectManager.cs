@@ -203,7 +203,7 @@ public class EffectManager : MonoBehaviour
 
         int[,] range = new int[maxStep, maxStep];
 
-        range[startX + power, startZ + power] = 2;
+        range[power,power] = 2;
 
 
         while (step < power)
@@ -228,7 +228,7 @@ public class EffectManager : MonoBehaviour
                             {
                                 range[nextX, nextZ] = state % 2 + 1;
                                 //위 아래 운동 코루틴 시작
-                                //StartCoroutine(CoOneTileWaveEffect(nextX - power, nextZ - power, power));
+                                StartCoroutine(CoOneTileWaveEffect(nextX - power + startX, nextZ - power + startZ, power));
                             }
                         }
                         range[i, j] = 3;

@@ -577,7 +577,7 @@ public class GameManager : MonoBehaviour
                                 }
                                 if (nearestSlime != -1)
                                 {
-                                    print("nearest slime : " + nearestSlime);
+                                    //print("nearest slime : " + nearestSlime);
                                     enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime( Objects[nearestSlime].gameObject);
                                     //Objects[nearestSlime].GetComponentInChildren<PlayerManager>().SetNearSlime(Objects[pid]);
                                 }

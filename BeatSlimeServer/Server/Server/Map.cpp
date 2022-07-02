@@ -373,6 +373,7 @@ void GameRoom::game_end()
 	//game_room_id = -1;
 
 	boss_id->cur_room_num = -1;
+	boss_id->state = ST_ACCEPT;
 	boss_id = nullptr;
 	pattern_progress = -1;
 	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));

@@ -264,7 +264,7 @@ public class FieldGameManager : MonoBehaviour
             if (Network.MessQueue.Count > 0)
             {
                 byte[] data = Network.MessQueue.Dequeue();
-                Debug.Log("pop");
+                
                 byte type = data[1];
 
                 switch (type)

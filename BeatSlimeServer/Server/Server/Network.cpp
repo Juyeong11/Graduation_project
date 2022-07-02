@@ -615,7 +615,7 @@ int Network::get_npc_id(int monsterType) {
 			}
 			clients[i]->state_lock.unlock();
 		}
-		std::cout << "2 : Maximum Number of Monster Overflow!!\n";
+		std::cout << "2-0 : Maximum Number of Monster Overflow!!\n";
 		return -1;
 
 		break;
@@ -629,7 +629,7 @@ int Network::get_npc_id(int monsterType) {
 			}
 			clients[i]->state_lock.unlock();
 		}
-		std::cout << "2 : Maximum Number of Monster Overflow!!\n";
+		std::cout << "2-1 : Maximum Number of Monster Overflow!!\n";
 		break;
 	case SKILL_TRADER:
 		break;

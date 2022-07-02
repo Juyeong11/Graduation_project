@@ -131,7 +131,7 @@ public class HexCellPosition : MonoBehaviour
 
         if (x + y + z != 0)
         {
-            Debug.LogError("HexSetting Error (x+y+z != 0)");
+            Debug.LogError("HexSetting Error (x+y+z != 0) "+x+" "+y+" "+z);
         }
         preCoordinates = coordinates;
         coordinates.setCoordinates(x, z, w);
