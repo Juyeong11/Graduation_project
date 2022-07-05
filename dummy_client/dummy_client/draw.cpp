@@ -140,6 +140,8 @@ int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 	glPrint("STRESS TEST [%d]", (int)active_clients);	// Print GL Text To The Screen
 	glRasterPos2f(0.0f, 0.05f);
 	glPrint("Delay : %dms", global_delay);
+	glRasterPos2f(0.0f, 0.10f);
+	//glPrint("player : %d", (int)num_connections);
 
 	glColor3f(1, 1, 1);
 
@@ -149,8 +151,8 @@ int DrawGLScene(GLvoid)									// Here's Where We Do All The Drawing
 	{
 		float x, y, z;
 
-		x = points[i * 2] / 200.0f - 1.25f;
-		y = 1.25f - points[i * 2 + 1] / 200.0f;
+		x = points[i * 2] / 40.f - 1.25f;
+		y = 1.25f - points[i * 2 + 1] / 40.f;
 		z = -1.0f;
 		glVertex3f(x, y, z);
 	}

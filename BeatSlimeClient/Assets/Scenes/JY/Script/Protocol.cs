@@ -172,6 +172,7 @@ namespace Protocol
         public byte size;
         public byte type;
         public byte direction;
+        public int move_time;
     }
 
     [Serializable]
@@ -331,6 +332,7 @@ namespace Protocol
         public int id;
         public int dir;
         public short x, y, z;
+        int move_time;
     }
     [Serializable]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

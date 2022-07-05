@@ -124,6 +124,8 @@ bool DataBase::checkPlayer(PlayerData& data)
 				break;
 			}
 		}
+
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
 		SQLCancel(hstmt);
 		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
 
@@ -165,6 +167,29 @@ void DataBase::insertPlayer(PlayerData& name)
 
 
 	std::wstring command = std::format(L"EXEC insertPlayer '{}'", name.name);
+
+	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+	}
+	else
+		HandleDiagnosticRecord(hstmt, SQL_HANDLE_STMT, retcode);
+
+	// Process data  
+	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+		SQLCancel(hstmt);
+		SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+	}
+
+
+}
+void DataBase::endServer()
+{
+	if (false == isConnect) return;
+
+	SQLRETURN retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+
+
+	std::wstring command = std::format(L"update PlayerData set isUsing = 0");
 
 	retcode = SQLExecDirect(hstmt, (SQLWCHAR*)command.c_str(), command.length());
 	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {

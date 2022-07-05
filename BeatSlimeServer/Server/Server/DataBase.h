@@ -1,5 +1,6 @@
 #pragma once
 
+#include"protocol.h"	
 
 void HandleDiagnosticRecord(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE RetCode);
 
@@ -58,6 +59,7 @@ public:
 	~DataBase();
 
 	void read_map_data();
+	void endServer();
 	bool checkPlayer(PlayerData& name);
 	void insertPlayer(PlayerData& name);
 	void updatePlayer(const Client* const player,bool isend);
