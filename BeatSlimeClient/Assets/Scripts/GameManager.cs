@@ -285,7 +285,7 @@ public class GameManager : MonoBehaviour
         {
             target_pos = Objects[3].GetComponent<HexCellPosition>().coordinates;
         }// ¼öÁ¤
-        else if (pivotType == "Player1" || pivotType == "Player2"|| pivotType == "Player3")
+        else if (pivotType == "Player1")// || pivotType == "Player2"|| pivotType == "Player3")
         {
             if (Objects[0].activeSelf)
             {
@@ -296,28 +296,28 @@ public class GameManager : MonoBehaviour
                 target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
             }
         }
-       // else if (pivotType == "Player2")
-       // {
-       //     if (Objects[1].activeSelf)
-       //     {
-       //         target_pos = Objects[1].GetComponent<HexCellPosition>().coordinates;
-       //     }
-       //     else
-       //     {
-       //         target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
-       //     }
-       // }
-       // else if (pivotType == "Player3")
-       // {
-       //     if (Objects[2].activeSelf)
-       //     {
-       //         target_pos = Objects[2].GetComponent<HexCellPosition>().coordinates;
-       //     }
-       //     else
-       //     {
-       //         target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
-       //     }
-       // }
+        else if (pivotType == "Player2")
+        {
+            if (Objects[1].activeSelf)
+            {
+                target_pos = Objects[1].GetComponent<HexCellPosition>().coordinates;
+            }
+            else
+            {
+                target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
+            }
+        }
+        else if (pivotType == "Player3")
+        {
+            if (Objects[2].activeSelf)
+            {
+                target_pos = Objects[2].GetComponent<HexCellPosition>().coordinates;
+            }
+            else
+            {
+                target_pos = Objects[OnlinePlayerID].GetComponent<HexCellPosition>().coordinates;
+            }
+        }
         else if (pivotType == "END")
             Debug.Log("Pattern End");
         else
@@ -347,7 +347,7 @@ public class GameManager : MonoBehaviour
         {
             target = ref Objects[3];
         }
-        else if (pivotType == "Player1" || pivotType == "Player2"|| pivotType == "Player3")
+        else if (pivotType == "Player1")// || pivotType == "Player2"|| pivotType == "Player3")
         {
             if (Objects[0].activeSelf)
             {
@@ -358,28 +358,28 @@ public class GameManager : MonoBehaviour
                 target = ref Objects [OnlinePlayerID];
             }
         }
-        //else if (pivotType == "Player2")
-        //{
-        //    if (Objects[1].activeSelf)
-        //    {
-        //        target = ref Objects[1];
-        //    }
-        //    else
-        //    {
-        //        target = ref Objects[OnlinePlayerID];
-        //    }
-        //}
-        //else if (pivotType == "Player3")
-        //{
-        //    if (Objects[2].activeSelf)
-        //    {
-        //        target = ref Objects[2];
-        //    }
-        //    else
-        //    {
-        //        target = ref Objects[OnlinePlayerID];
-        //    }
-        //}
+        else if (pivotType == "Player2")
+        {
+            if (Objects[1].activeSelf)
+            {
+                target = ref Objects[1];
+            }
+            else
+            {
+                target = ref Objects[OnlinePlayerID];
+            }
+        }
+        else if (pivotType == "Player3")
+        {
+            if (Objects[2].activeSelf)
+            {
+                target = ref Objects[2];
+            }
+            else
+            {
+                target = ref Objects[OnlinePlayerID];
+            }
+        }
         return ref target;
     }
 

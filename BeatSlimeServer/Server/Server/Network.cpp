@@ -58,7 +58,7 @@ Network::Network() {
 	for (int i = 0; i < MAX_OBJECT; ++i) {
 		clients[i]->id = i;
 	}
-	for (int i = 0; i < MAX_OBJECT*50; ++i) {
+	for (int i = 0; i < MAX_OBJECT * 50; ++i) {
 		exp_over_pool.push(new EXP_OVER);
 	}
 	Initialize_NPC();
@@ -226,8 +226,11 @@ void Network::send_game_init(int c_id, GameObject* ids[3], int boss_id)
 	packet.size = sizeof(packet);
 	packet.player_id = c_id;
 	packet.id1 = ids[0]->id;
-	packet.id2 = -1;// ids[1]->id;
-	packet.id3 = -1;// ids[2]->id;
+	//
+	//packet.id2 =-1;
+	//packet.id3 =-1;
+	packet.id2 =  ids[1]->id;
+	packet.id3 =  ids[2]->id;
 	packet.boss_id = boss_id;
 
 	EXP_OVER* ex_over;
@@ -714,7 +717,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		game_room[game_room_id]->Score[i] -= 20 * damage;
 		for (const auto& p : game_room[game_room_id]->player_ids) {
 			if (p == nullptr) continue;
-			
+
 			send_attack_player(game_room[game_room_id]->boss_id->id, pl->id, p->id);
 		}
 
@@ -865,7 +868,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		int cur_map = 0;
 		if (cl.cur_room_num != -1) {
 			cur_map = game_room[cl.cur_room_num]->map_type;
-			
+
 		}
 
 
@@ -1057,7 +1060,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		// 올바른 위치에서 ready했는지 확인
 		cs_packet_change_scene_ready* packet = reinterpret_cast<cs_packet_change_scene_ready*>(p);
 
-		
+
 		if (packet->is_ready) {
 			for (auto* p : portals) {
 				if (false == p->isPortal(cl.x, cl.z)) continue;
@@ -1080,7 +1083,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 						if (i > MAX_IN_GAME_PLAYER) break;
 					}
-					//std::cout << "시작" << std::endl;
+					std::cout << "시작" << std::endl;
 					int room_id = get_game_room_id();
 					int boss_id = get_npc_id(p->map_type);
 					if (boss_id != -1)
@@ -1124,7 +1127,19 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.vl.lock();
 			cl.viewlist.clear();
 			cl.vl.unlock();
+			if (cl.cur_room_num != -1) {
+				cl.x = game_room[cl.cur_room_num]->portal->x + 1;
+				cl.z = game_room[cl.cur_room_num]->portal->z + 1;
+				cl.y = -cl.x - cl.z;
+				if (set_new_player_pos(client_id) == -1) {
+					cl.x = game_room[cl.cur_room_num]->portal->x ;
+					cl.z = game_room[cl.cur_room_num]->portal->z ;
+					cl.y = -cl.x - cl.z;
+					// 빈자리가 없어서 다시 인게임으로 들어감
+				}
+			}
 
+			cl.cur_room_num = -1;
 			// 내일 수정
 			// login OK 에서 했던 로직을 가져오자
 			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
@@ -1958,28 +1973,28 @@ void Network::worker()
 				pivot_y = -pivot_x - pivot_z;
 				break;
 			case Player1:
-			case Player2:
-			case Player3:
+				//case Player2:
+				//case Player3:
 				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
 				pivot_x = clients[target_id]->x;
 				pivot_z = clients[target_id]->z;
 				pivot_y = -pivot_x - pivot_z;
 				break;
-				//case Player2:
-				//	if (game_room[game_room_id]->player_ids[1] != nullptr)
-				//		target_id = game_room[game_room_id]->player_ids[1]->id;
-				//	pivot_x = clients[target_id]->x;
-				//	pivot_z = clients[target_id]->z;
-				//	pivot_y = -pivot_x - pivot_z;
-				//	break;
-				//case Player3:
-				//	if (game_room[game_room_id]->player_ids[2] != nullptr)
-				//		target_id = game_room[game_room_id]->player_ids[2]->id;
-				//	pivot_x = clients[target_id]->x;
-				//	pivot_z = clients[target_id]->z;
-				//	pivot_y = -pivot_x - pivot_z;
-				//	break;
+			case Player2:
+				if (game_room[game_room_id]->player_ids[1] != nullptr)
+					target_id = game_room[game_room_id]->player_ids[1]->id;
+				pivot_x = clients[target_id]->x;
+				pivot_z = clients[target_id]->z;
+				pivot_y = -pivot_x - pivot_z;
+				break;
+			case Player3:
+				if (game_room[game_room_id]->player_ids[2] != nullptr)
+					target_id = game_room[game_room_id]->player_ids[2]->id;
+				pivot_x = clients[target_id]->x;
+				pivot_z = clients[target_id]->z;
+				pivot_y = -pivot_x - pivot_z;
+				break;
 			default:
 				std::cout << "wrong pivotType" << std::endl;
 				pivot_x = 0;
@@ -2123,22 +2138,22 @@ void Network::worker()
 
 				break;
 			case Player1:
-			case Player2:
-			case Player3:
+				//case Player2:
+				//case Player3:
 				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
 
 				break;
-				//case Player2:
-				//	if (game_room[game_room_id]->player_ids[1] != nullptr)
-				//		target_id = game_room[game_room_id]->player_ids[1]->id;
-				//
-				//	break;
-				//case Player3:
-				//	if (game_room[game_room_id]->player_ids[2] != nullptr)
-				//		target_id = game_room[game_room_id]->player_ids[2]->id;
-				//
-				//	break;
+			case Player2:
+				if (game_room[game_room_id]->player_ids[1] != nullptr)
+					target_id = game_room[game_room_id]->player_ids[1]->id;
+
+				break;
+			case Player3:
+				if (game_room[game_room_id]->player_ids[2] != nullptr)
+					target_id = game_room[game_room_id]->player_ids[2]->id;
+
+				break;
 			case PlayerF:
 				target_id = game_room[game_room_id]->find_max_distance_player();
 
@@ -2279,7 +2294,7 @@ void Network::worker()
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
 			game_room[game_room_id]->state_lock.lock();
 			//보스 체력 확인하고
-			if (game_room[game_room_id]->isGaming == false){ 
+			if (game_room[game_room_id]->isGaming == false) {
 				game_room[game_room_id]->state_lock.unlock();
 				break;// GameEnd는 한 번만 들어와야됨
 			}
@@ -2287,7 +2302,7 @@ void Network::worker()
 
 			//if(clients[boss_id]->hp<10;
 			//체력에 따라 클리어 유무
-			std::cout << boss_id <<  " -> Game Over\n";
+			std::cout << boss_id << " -> Game Over\n";
 			bool isabnormal = false;
 			bool isDie = false;
 			for (const auto p : game_room[game_room_id]->player_ids) {
@@ -2394,7 +2409,7 @@ void Network::worker()
 			cl.state_lock.unlock();
 			send_login_ok(client_id, item);
 
-			
+
 			exp_over_pool.push(exp_over);
 		}
 		break;
@@ -2528,7 +2543,7 @@ void Network::do_DBevent()
 
 			while (!db_event_queue.try_pop(ev));
 
-			
+
 
 			Client& cl = *reinterpret_cast<Client*>(clients[ev.obj_id]);
 			PlayerData player_data;
@@ -2588,7 +2603,7 @@ void Network::do_DBevent()
 								 break;
 			case DB_READ_INVENTORY:
 				// pqcs inventory info
-				
+
 				//ex_over->_comp_op = OP_DB_INVENTORY;
 				break;
 			case DB_READ_CLAER_MAP_INFO:
@@ -2749,7 +2764,7 @@ void Network::game_start(int room_id)
 		p->dest_y = -1;
 		p->dest_z = -1;
 
-		
+
 
 		p->x = maps[game_room[room_id]->map_type]->startX[i];
 		p->z = maps[game_room[room_id]->map_type]->startZ[i];

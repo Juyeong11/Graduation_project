@@ -399,19 +399,7 @@ void GameRoom::game_end()
 	
 	for (auto p : player_ids) {
 		if (p == nullptr) continue;
-		p->cur_room_num = -1;
-		if (p->cur_room_num != -1) {
-			p->x = portal->x + 1;
-			p->z = portal->z + 1;
-			p->y = -p->x - p->z;
-			if (Network::GetInstance()->set_new_player_pos(p->id) == -1) {
-				p->x = portal->x;
-				p->z = portal->z;
-				p->y = -p->x - p->z;
-				// 빈자리가 없어서 다시 인게임으로 들어감
 
-			}
-		}
 
 		//reinterpret_cast<Client*>(p)->cur_room_num = -1;
 		reinterpret_cast<Client*>(p)->is_active = true;

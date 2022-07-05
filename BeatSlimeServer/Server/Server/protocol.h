@@ -2,7 +2,7 @@
 
 const short SERVER_PORT = 4500;
 const short CHAT_BUF_SIZE = 122;
-const int MAX_IN_GAME_PLAYER = 1;
+const int MAX_IN_GAME_PLAYER = 3;
 const int MAX_NAME_SIZE = 20;
 
 const char CS_PACKET_LOGIN = 1;
