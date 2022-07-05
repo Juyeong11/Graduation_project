@@ -1,5 +1,6 @@
 #pragma once
 
+#include"protocol.h"	
 
 
 class EXP_OVER {
@@ -35,7 +36,7 @@ public:
 	//volatile해줘야 한다.
 	volatile STATE state;
 	std::mutex state_lock;
-	int cur_room_num;
+	std::atomic_int cur_room_num;
 
 
 	int		last_packet_time;
@@ -119,7 +120,7 @@ public:
 	bool DelPartyPlayer(int id);
 	int DelParty();
 };
-const int VIEW_RANGE = 20;// test를 위한 거리
+const int VIEW_RANGE = 5;// test를 위한 거리
 const int ATTACK_RANGE = 1;// test를 위한 거리
 
 class PathFinder;

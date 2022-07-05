@@ -54,16 +54,16 @@ enum SKILL_TYPE { WATERGUN, QUAKE, HEAL };
 
 const int BUFSIZE = 256;
 
-const int MAX_IN_GAME_PLAYER = 1;
+
 
 const int WORLD_HEIGHT = 8;
 const int WORLD_WIDTH = 8;
-const int MAX_NAME_SIZE = 20;
+
 const int MAX_USER = 5000;
 const int MAX_SKILL_TRADER = 0;
 const int MAX_CURATOR = 0;
-const int MAX_WITCH = 5;
-const int MAX_BOSS2 = 5;
+const int MAX_WITCH = 5000;
+const int MAX_BOSS2 = 1000;
 const int MAX_NPC = MAX_SKILL_TRADER + MAX_CURATOR + MAX_WITCH + MAX_BOSS2;
 
 constexpr int NPC_ID_START = MAX_USER;
@@ -85,7 +85,7 @@ constexpr int BOSS2_ID_END = BOSS2_ID_START + MAX_BOSS2;
 const int MAP_NUM = 3;
 const int SKILL_CNT = 4*3;
 const int PORTAL_NUM = 2;
-const int MAX_GAME_ROOM_NUM = 5;
+const int MAX_GAME_ROOM_NUM = 5000;
 
 enum GAME_END_TYPE{GAME_OVER,GAME_CLEAR};
 

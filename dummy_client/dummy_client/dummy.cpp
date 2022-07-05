@@ -47,6 +47,7 @@ struct CLIENT {
 	int id;
 	int x;
 	int y;
+	atomic_int game_state = 0;
 	atomic_bool connected;
 
 	SOCKET client_socket;
@@ -91,7 +92,7 @@ void error_display(const char* msg, int err_no)
 
 	MessageBox(hWnd, lpMsgBuf, L"ERROR", 0);
 	LocalFree(lpMsgBuf);
-	// while (true);
+	while (true);
 }
 
 void DisconnectClient(int ci)
@@ -123,6 +124,13 @@ void SendPacket(int cl, void* packet)
 	}
 	// std::cout << "Send Packet [" << ptype << "] To Client : " << cl << std::endl;
 }
+bool isPortal(int _x, int _z)
+{
+	if (1 < abs(_x - 17)) return false;
+	if (1 < abs(_z - (-21))) return false;
+
+	return true;
+}
 
 void ProcessPacket(int ci, unsigned char packet[])
 {
@@ -153,8 +161,20 @@ void ProcessPacket(int ci, unsigned char packet[])
 			if (-1 != my_id) {
 				g_clients[my_id].x = move_packet->x;
 				g_clients[my_id].y = move_packet->y;
+
 			}
 			if (ci == my_id) {
+				if (isPortal(move_packet->x, -move_packet->x - move_packet->y)) {
+					//Change Scene Ready -> Change Scene -> Change Scene done -> Game Start Ready -> Game Start 
+					//이 순서로 게임이 시작된다. 이 패킷 ㄷ4ㅏ 처리해주자
+					cs_packet_change_scene_ready my_packet;
+					my_packet.size = sizeof(my_packet);
+					my_packet.type = CS_PACKET_CHANGE_SCENE_READY;
+					my_packet.is_ready = true;
+					SendPacket(ci, &my_packet);
+
+					
+				}
 				if (0 != move_packet->move_time) {
 					auto d_ms = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count() - move_packet->move_time;
 
@@ -165,21 +185,53 @@ void ProcessPacket(int ci, unsigned char packet[])
 		}
 	}
 					   break;
+	case SC_PACKET_CHANGE_SCENE: {
+
+		cs_packet_change_scene_done my_packet;
+		my_packet.size = sizeof(my_packet);
+		my_packet.type = CS_PACKET_CHANGE_SCENE_DONE;
+		my_packet.scene_num = 1; // 무조건 마녀맵으로
+		SendPacket(ci, &my_packet);
+
+		cs_packet_game_start_ready my_packet1;
+		my_packet1.size = sizeof(my_packet1);
+		my_packet1.type = CS_PACKET_GAME_START_READY;
+
+		SendPacket(ci, &my_packet1);
+	}
+	break;
+	case SC_PACKET_GAME_START: 
+	{
+		// draw point 좌표를 옮겨서 옆에 다 그리자
+		g_clients[ci].game_state = 1;
+	}break;
+	case SC_PACKET_GAME_END:
+	{
+		// draw point 좌표를 다시 복구
+		cs_packet_change_scene_done my_packet;
+		my_packet.size = sizeof(my_packet);
+		my_packet.type = CS_PACKET_CHANGE_SCENE_DONE;
+		my_packet.scene_num = 0; // 필드맵으로 복귀
+		SendPacket(ci, &my_packet);
+		g_clients[ci].game_state = 0;
+		
+	}break;
+
 	case SC_PACKET_PUT_OBJECT: break;
 	case SC_PACKET_REMOVE_OBJECT: break;
 
-	case SC_PACKET_GAME_START: break;
+
 	case SC_PACKET_ATTACK: break;
 	case SC_PACKET_MAP_DATA: break;
-	case SC_PACKET_CHANGE_SCENE: break;
 	case SC_PACKET_EFFECT: break;
-	case SC_PACKET_GAME_END: break;
+	
 	case SC_PACKET_PARRYING: break;
 	case SC_PACKET_GAME_INIT: break;
 	case SC_PACKET_CHANGE_SKILL: break;
 
-	default: MessageBox(hWnd, L"Unknown Packet Type", L"ERROR", 0);
-		while (true);
+
+		/*default: MessageBox(hWnd, L"Unknown Packet Type", L"ERROR", 0);
+			while (true);*/
 	}
 }
 
@@ -329,7 +381,7 @@ void Adjust_Number_Of_Client()
 	cs_packet_login l_packet;
 
 	int temp = num_connections;
-	//sprintf_s(l_packet.name, "%d", temp);
+	sprintf_s(l_packet.name, "%d", temp);
 	l_packet.size = sizeof(l_packet);
 	l_packet.type = CS_PACKET_LOGIN;
 	SendPacket(num_connections, &l_packet);
@@ -363,11 +415,13 @@ void Test_Thread()
 			cs_packet_move my_packet;
 			my_packet.size = sizeof(my_packet);
 			my_packet.type = CS_PACKET_MOVE;
-			switch (rand() % 4) {
+			switch (rand() % 6) {
 			case 0: my_packet.direction = 0; break;
 			case 1: my_packet.direction = 1; break;
 			case 2: my_packet.direction = 2; break;
 			case 3: my_packet.direction = 3; break;
+			case 4: my_packet.direction = 4; break;
+			case 5: my_packet.direction = 5; break;
 			}
 			my_packet.move_time = static_cast<unsigned>(duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count());
 			SendPacket(i, &my_packet);

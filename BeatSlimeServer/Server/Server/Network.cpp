@@ -58,7 +58,7 @@ Network::Network() {
 	for (int i = 0; i < MAX_OBJECT; ++i) {
 		clients[i]->id = i;
 	}
-	for (int i = 0; i < MAX_OBJECT; ++i) {
+	for (int i = 0; i < MAX_OBJECT*50; ++i) {
 		exp_over_pool.push(new EXP_OVER);
 	}
 	Initialize_NPC();
@@ -94,7 +94,7 @@ Network::~Network() {
 		exp_over_pool.try_pop(ex);
 		delete ex;
 	}
-
+	DB->endServer();
 	delete DB;
 	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
 		delete game_room[i];
@@ -179,7 +179,7 @@ void Network::send_login_ok(int c_id, char inven[20])
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 }
 void Network::send_login_fail(int client_id)
 {
@@ -191,7 +191,7 @@ void Network::send_login_fail(int client_id)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[client_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[client_id])->do_send(ex_over);
 }
 void Network::send_change_scene(int c_id, int map_type)
 {
@@ -216,7 +216,7 @@ void Network::send_game_start(int c_id, int start_time)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 }
 
 void Network::send_game_init(int c_id, GameObject* ids[3], int boss_id)
@@ -233,7 +233,7 @@ void Network::send_game_init(int c_id, GameObject* ids[3], int boss_id)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 
 	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 		send_put_object(c_id, ids[i]->id);
@@ -257,7 +257,7 @@ void Network::send_effect(int client_id, int actor_id, int target_id, int effect
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[client_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[client_id])->do_send(ex_over);
 }
 void Network::send_move_object(int c_id, int mover)
 {
@@ -271,12 +271,12 @@ void Network::send_move_object(int c_id, int mover)
 
 	packet.dir = clients[mover]->direction;
 
-	//packet.move_time = clients[mover]->last_packet_time;
+	packet.move_time = clients[mover]->last_packet_time;
 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 }
 
 void Network::send_attack_player(int attacker, int target, int receiver)
@@ -293,7 +293,7 @@ void Network::send_attack_player(int attacker, int target, int receiver)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[receiver])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[receiver])->do_send(ex_over);
 }
 void Network::send_change_skill(int c_id, int target) {
 	sc_packet_change_skill packet;
@@ -308,7 +308,7 @@ void Network::send_change_skill(int c_id, int target) {
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 }
 
 void Network::send_put_object(int c_id, int target) {
@@ -331,9 +331,11 @@ void Network::send_put_object(int c_id, int target) {
 	}
 
 	EXP_OVER* ex_over;
+	//std::cout << exp_over_pool.unsafe_size() << std::endl;
+
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 }
 
 void Network::send_remove_object(int c_id, int victim)
@@ -346,7 +348,7 @@ void Network::send_remove_object(int c_id, int victim)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 
 
 
@@ -366,7 +368,7 @@ void Network::send_map_data(int c_id, char* data, int nShell)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, packet.size, &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 
 }
 
@@ -384,7 +386,7 @@ void Network::send_game_end(int c_id, int score, int itemType, char money, char 
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 }
 
 void Network::send_parrying(int c_id, int actor_id)
@@ -397,7 +399,7 @@ void Network::send_parrying(int c_id, int actor_id)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 }
 
 void Network::send_ping(int c_id, int time)
@@ -410,7 +412,7 @@ void Network::send_ping(int c_id, int time)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[c_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 }
 
 
@@ -424,7 +426,7 @@ void Network::send_party_request(int reciver, int sender)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[reciver])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[reciver])->do_send(ex_over);
 }
 
 void Network::send_party_request_anwser(int reciver, int newPlayerid, Party* party, int type)
@@ -449,7 +451,7 @@ void Network::send_party_request_anwser(int reciver, int newPlayerid, Party* par
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[reciver])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[reciver])->do_send(ex_over);
 }
 void Network::send_chat_packet(int user_id, int my_id, char* mess)
 {
@@ -463,7 +465,7 @@ void Network::send_chat_packet(int user_id, int my_id, char* mess)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[user_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[user_id])->do_send(ex_over);
 }
 
 void Network::send_buy_result(int user_id, int itemType, char result)
@@ -477,7 +479,7 @@ void Network::send_buy_result(int user_id, int itemType, char result)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[user_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[user_id])->do_send(ex_over);
 }
 
 void Network::send_use_item(int user_id, int user, int itemType)
@@ -491,7 +493,8 @@ void Network::send_use_item(int user_id, int user, int itemType)
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
-	reinterpret_cast<Client*>(ex_over, clients[user_id])->do_send(ex_over);
+	reinterpret_cast<Client*>(clients[user_id])->do_send(ex_over);
+
 }
 
 void Network::disconnect_client(int c_id)
@@ -678,7 +681,7 @@ int Network::set_new_player_pos(int client_id)
 			step++;
 			i = 0;
 		}
-		if (step > 6) {
+		if (step > 20) {
 			std::cout << "Can not find empty pos\n";
 			return -1;
 		}
@@ -707,10 +710,11 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		if (false == is_attack(pl->id, x, z)) continue;
 		pl->hp -= damage;
 		std::cout << "id : " << i << " damaged " << damage << std::endl;
-
+		if (game_room[game_room_id]->boss_id == nullptr) return;
 		game_room[game_room_id]->Score[i] -= 20 * damage;
 		for (const auto& p : game_room[game_room_id]->player_ids) {
 			if (p == nullptr) continue;
+			
 			send_attack_player(game_room[game_room_id]->boss_id->id, pl->id, p->id);
 		}
 
@@ -844,7 +848,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (false == cl.is_active) break;
 
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
-		//cl.last_packet_time = packet->move_time;
+		cl.last_packet_time = packet->move_time;
 		if (cl.last_move_time + std::chrono::milliseconds(200) > std::chrono::system_clock::now()) break;
 		cl.last_move_time = std::chrono::system_clock::now();
 
@@ -859,8 +863,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 		short& z = cl.z;
 		cl.direction = packet->direction;
 		int cur_map = 0;
-		if (cl.cur_room_num != -1)
+		if (cl.cur_room_num != -1) {
 			cur_map = game_room[cl.cur_room_num]->map_type;
+			
+		}
 
 
 		switch (packet->direction) {
@@ -905,7 +911,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			exit(-1);
 		}
 
-		std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
+		//std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
 		if (cur_map != 0) {
 
@@ -1051,7 +1057,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		// 올바른 위치에서 ready했는지 확인
 		cs_packet_change_scene_ready* packet = reinterpret_cast<cs_packet_change_scene_ready*>(p);
 
-
+		
 		if (packet->is_ready) {
 			for (auto* p : portals) {
 				if (false == p->isPortal(cl.x, cl.z)) continue;
@@ -1118,14 +1124,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.vl.lock();
 			cl.viewlist.clear();
 			cl.vl.unlock();
-			if (cl.cur_room_num != -1) {
-				cl.x = game_room[cl.cur_room_num]->portal->x + 1;
-				cl.z = game_room[cl.cur_room_num]->portal->z + 1;
-				cl.y = -cl.x - cl.z;
-				set_new_player_pos(client_id);
-			}
 
-			cl.cur_room_num = -1;
 			// 내일 수정
 			// login OK 에서 했던 로직을 가져오자
 			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
@@ -1826,7 +1825,15 @@ void Network::worker()
 			error_display("GQCS", WSAGetLastError());
 
 			disconnect_client(client_id);
-			if (exp_over->_comp_op == OP_SEND)
+			if (exp_over->_comp_op == OP_SEND ||
+				exp_over->_comp_op == OP_BOSS_MOVE ||
+				exp_over->_comp_op == OP_PLAYER_PARRYING ||
+				exp_over->_comp_op == OP_BOSS_TILE_ATTACK_START ||
+				exp_over->_comp_op == OP_BOSS_TILE_ATTACK ||
+				exp_over->_comp_op == OP_GAME_END ||
+				exp_over->_comp_op == OP_DB_PLAYER_LOGIN ||
+				exp_over->_comp_op == OP_DB_USE_ITEM
+				)
 				exp_over_pool.push(exp_over);
 			continue;
 		}
@@ -1872,6 +1879,7 @@ void Network::worker()
 				std::cout << "클라이언트 연결 끊음\n";
 				disconnect_client(client_id);
 			}
+
 			exp_over_pool.push(exp_over);
 		}
 		break;
@@ -1880,7 +1888,7 @@ void Network::worker()
 			std::cout << "Accept Completed.\n";
 			SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->_net_buf)); // 확장 overlapped구조체에 넣어 두었던 소캣을 꺼낸다
 			int new_id = get_new_id();
-			if (-1 == new_id) continue;
+			if (-1 == new_id) { std::cout << "need more ID\n"; continue; }
 
 			Client& cl = *(reinterpret_cast<Client*>(clients[new_id]));
 
@@ -1990,6 +1998,7 @@ void Network::worker()
 				send_move_object(pl->id, client_id);
 			}
 			set_next_pattern(game_room_id);
+
 			exp_over_pool.push(exp_over);
 		}
 		break;
@@ -2159,7 +2168,7 @@ void Network::worker()
 
 				pos_y = -pos_x - pos_z;
 			}
-			std::cout << "Target Pos -> " << "x : " << pos_x << "y : " << pos_y << "z : " << pos_z << std::endl;
+			//std::cout << "Target Pos -> " << "x : " << pos_x << "y : " << pos_y << "z : " << pos_z << std::endl;
 
 			set_next_pattern(game_room_id);
 
@@ -2177,6 +2186,8 @@ void Network::worker()
 			tev.charging_time = charging_time;
 			tev.dir = dir;
 			timer_queue.push(tev);
+
+			exp_over_pool.push(exp_over);
 		}
 		break;
 
@@ -2264,14 +2275,19 @@ void Network::worker()
 		case OP_GAME_END:
 		{
 			//이건 무조건 한 번만 하도록 보장되야함
+			//
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			game_room[game_room_id]->state_lock.lock();
 			//보스 체력 확인하고
-			if (game_room[game_room_id]->boss_id == nullptr) break;// GameEnd는 한 번만 들어와야됨
+			if (game_room[game_room_id]->isGaming == false){ 
+				game_room[game_room_id]->state_lock.unlock();
+				break;// GameEnd는 한 번만 들어와야됨
+			}
 			int boss_id = game_room[game_room_id]->boss_id->id;
 
 			//if(clients[boss_id]->hp<10;
 			//체력에 따라 클리어 유무
-
+			std::cout << boss_id <<  " -> Game Over\n";
 			bool isabnormal = false;
 			bool isDie = false;
 			for (const auto p : game_room[game_room_id]->player_ids) {
@@ -2318,6 +2334,7 @@ void Network::worker()
 				}
 				game_room[game_room_id]->game_end();
 			}
+			game_room[game_room_id]->state_lock.unlock();
 
 
 			exp_over_pool.push(exp_over);
@@ -2361,7 +2378,7 @@ void Network::worker()
 
 
 
-
+			exp_over_pool.push(exp_over);
 		}
 		break;
 		case OP_DB_PLAYER_LOGIN:
@@ -2377,56 +2394,8 @@ void Network::worker()
 			cl.state_lock.unlock();
 			send_login_ok(client_id, item);
 
-			/*
-			//새로 들어온 친구의 위치를 정해주자
-
-			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
-			for (int i = 0; i < MAX_USER; ++i)
-			{
-				Client* other = reinterpret_cast<Client*>(clients[i]);
-				if (i == client_id) continue;
-				other->state_lock.lock();
-				if (ST_INGAME != other->state) {
-					other->state_lock.unlock();
-					continue;
-				}
-				other->state_lock.unlock();
-
-				if (false == is_near(other->id, client_id))
-					continue;
-
-				// 새로 들어온 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
-				other->vl.lock();
-				other->viewlist.insert(client_id);
-				other->vl.unlock();
-
-				send_put_object(other->id, client_id);
-			}
-
-			//새로 접속한 클라이언트에게 현재 객체들의 현황을 알려줌
-			for (auto* other : clients) {
-				//여기서 NPC도 알려줘야지
-
-				if (other->id == client_id) continue;
-				other->state_lock.lock();
-				if (ST_INGAME != other->state) {
-					other->state_lock.unlock();
-					continue;
-				}
-				other->state_lock.unlock();
-
-				if (false == is_near(other->id, client_id))
-					continue;
-
-				// 기존에 있던 클라이언트가 가까이 있다면 뷰 리스트에 넣고 put packet을 보낸다.
-				cl.vl.lock();
-				cl.viewlist.insert(other->id);
-				cl.vl.unlock();
-
-				send_put_object(client_id, other->id);
-			}
-			send_move_object(client_id, client_id);
-			*/
+			
+			exp_over_pool.push(exp_over);
 		}
 		break;
 		case OP_DB_USE_ITEM:
@@ -2450,10 +2419,11 @@ void Network::worker()
 				}
 				cur_play_music = itemType;
 			}
-
+			exp_over_pool.push(exp_over);
 		}
 		break;
 		default:
+			std::cout << "Undefine work type\n";
 			break;
 		}
 	}
@@ -2530,7 +2500,7 @@ void Network::do_timer() {
 				default:
 					break;
 				}
-
+				if (ev.ev != EVENT_PALYER_MOVE && game_room[ev.game_room_id]->isGaming == false) break;
 				PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);// 두번째 인자가 0이 되면 소캣 종료로 취급이 된다. 1로해주자
 			}
 			else {
@@ -2558,9 +2528,7 @@ void Network::do_DBevent()
 
 			while (!db_event_queue.try_pop(ev));
 
-			EXP_OVER* ex_over;// = new EXP_OVER;
-				//ex_over->_comp_op = OP_NPC_MOVE;
-			while (!exp_over_pool.try_pop(ex_over));
+			
 
 			Client& cl = *reinterpret_cast<Client*>(clients[ev.obj_id]);
 			PlayerData player_data;
@@ -2568,12 +2536,21 @@ void Network::do_DBevent()
 			{
 			case DB_PLAYER_LOGIN:
 			{
+				EXP_OVER* ex_over;
+				while (!exp_over_pool.try_pop(ex_over));
 				ex_over->_comp_op = OP_DB_PLAYER_LOGIN;
 				player_data.name = std::wstring(cl.name, &cl.name[strnlen_s(cl.name, MAX_NAME_SIZE)]);
+				std::cout << cl.name << std::endl;
 				if (DB->checkPlayer(player_data)) {
+
 					cl.x = player_data.x;
 					cl.z = player_data.z;
 					cl.y = -cl.x - cl.z;
+					if (set_new_player_pos(cl.id) == -1) {
+						cl.x = 17;
+						cl.z = -21;
+						cl.y = -cl.x - cl.z;
+					}
 					cl.curSkill = player_data.curSkill;
 
 					cl.SkillAD = player_data.SkillAD;
@@ -2590,6 +2567,7 @@ void Network::do_DBevent()
 					//사용 중인 아이디이므로 worker까지 갈 것도 없이 그냥 로그인 실패 패킷을 보낸다.
 					send_login_fail(ev.obj_id);
 					disconnect_client(ev.obj_id);
+					exp_over_pool.push(ex_over);
 					cl.ClearMap[0] = 0;
 					cl.ClearMap[1] = 0;
 					break;
@@ -2610,7 +2588,8 @@ void Network::do_DBevent()
 								 break;
 			case DB_READ_INVENTORY:
 				// pqcs inventory info
-				ex_over->_comp_op = OP_DB_INVENTORY;
+				
+				//ex_over->_comp_op = OP_DB_INVENTORY;
 				break;
 			case DB_READ_CLAER_MAP_INFO:
 				// pqcs clear map info -> 이건 사용하는 방향으로 해보자
@@ -2619,6 +2598,8 @@ void Network::do_DBevent()
 			case DB_USE_SCROLL:
 				// pqcs result info
 			{
+				EXP_OVER* ex_over;
+				while (!exp_over_pool.try_pop(ex_over));
 				ex_over->_comp_op = OP_DB_USE_ITEM;
 				*reinterpret_cast<char*>(ex_over->_net_buf) = DB->updateInventory(&cl, ev.data, -1);;
 				*reinterpret_cast<char*>(ex_over->_net_buf + sizeof(char)) = ev.data;

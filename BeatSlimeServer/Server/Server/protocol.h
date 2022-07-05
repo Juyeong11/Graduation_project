@@ -2,7 +2,8 @@
 
 const short SERVER_PORT = 4500;
 const short CHAT_BUF_SIZE = 122;
-
+const int MAX_IN_GAME_PLAYER = 1;
+const int MAX_NAME_SIZE = 20;
 
 const char CS_PACKET_LOGIN = 1;
 const char CS_PACKET_MOVE = 2;
@@ -59,7 +60,7 @@ struct cs_packet_move {
 	char	type;
 	char	direction;			// 0 : up,  1: down, 2:left, 3:right
 	//short	near_x, near_y;
-	//int		move_time;
+	int		move_time;
 };
 
 struct cs_packet_read_map {
@@ -184,7 +185,7 @@ struct sc_packet_move {
 	int		id;
 	int dir;
 	short  x, y, z;
-	//int		move_time;
+	int		move_time;
 };
 
 struct sc_packet_attack {
