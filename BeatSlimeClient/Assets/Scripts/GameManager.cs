@@ -613,7 +613,7 @@ public class GameManager : MonoBehaviour
                                         Objects[target_id].GetComponentInChildren<PlayerManager>().StunTrig();
                                         ComboEffect.CountApply(ref nowCombo, true);
                                         CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
-                                        VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 30f);
+                                        //VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 30f);
                                     }
                                 }
 

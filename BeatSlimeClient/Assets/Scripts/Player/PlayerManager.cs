@@ -118,7 +118,7 @@ public class PlayerManager : MonoBehaviour
             PlayerRotateToLookAt();
             PlayerWCheck();
 
-            if (nowOnCellTag.obejct)
+            if (isThisCurrentPlayingPlayerObject&&nowOnCellTag.obejct)
             {
                 //print($"{nowOnCellTag.x}, {nowOnCellTag.y}, {nowOnCellTag.z}");
                 PlayerItemCheck();
