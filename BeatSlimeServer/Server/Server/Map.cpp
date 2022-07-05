@@ -102,10 +102,22 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			i++;
 		}
 	}
+	num_totalPattern = pattern["noteType"].size();
 
 
 	barCounts = 4;
-	bpm = 45;
+	for (int i = 0; i < num_totalPattern; ++i) {
+		if (999 == stoi(pattern["noteType"][i])) {
+			bpm = stoi(pattern["pivotType"][i]);
+			break;
+		}
+
+	}
+	if (bpm == 0) {
+		std::cout << "wrong bpm check pattern csv file \n";
+
+	}
+	
 	totalSongTime = 0; //(* 1000);
 	nowSongTime = 0;
 	timeByBeat = (int)(1000 * 60 / (float)bpm);
@@ -113,7 +125,6 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 	timeBy24Beat = timeByBeat / 6;
 	timeBy16Beat = timeByBeat / 4;
 
-	num_totalPattern = pattern["noteType"].size();
 	pattern_time.reserve(num_totalPattern);
 	int num_parrying=0;
 	for (int i = 0; i < num_totalPattern; ++i) {
@@ -127,8 +138,8 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			stoi(pattern["24th"][i]);
 
 		int noteType = stoi(pattern["noteType"][i]);
-		if (noteType > 500 || noteType == 0 || noteType == 100 || noteType == 101) continue;
-
+		if (noteType > 500 || noteType == 0 || noteType == 100 || noteType == 101 || noteType == 200) continue;
+		
 		int speed = 0;
 		if (pattern["speed"][i] == "0") // 0
 			speed = 0;

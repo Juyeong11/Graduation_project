@@ -37,6 +37,7 @@ Network::Network() {
 	DB->readSkills(skills);
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
+	maps[WITCH_MAP_HARD]->SetMap("Map\\Witch_map", "Music\\flower_load2.csv");
 	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\flower_load.csv");
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
@@ -73,6 +74,7 @@ Network::Network() {
 
 	portals[0] = new Portal(17, -21, WITCH_MAP);
 	portals[1] = new Portal(14, 1, ROBOT_MAP);
+	portals[2] = new Portal(19, -24, WITCH_MAP_HARD);
 
 
 	cur_play_music = 99;
@@ -806,7 +808,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//그럼 디비 스레드에서 정보를 알려주고 
 		std::string id = packet->name;
 		std::regex re("[^a-zA-Z0-9]");
-		std::cout << packet->name << std::endl;
+		//std::cout << packet->name << std::endl;
 		if (true == std::regex_match(id, re)) {
 			send_login_fail(client_id);
 			disconnect_client(client_id);
@@ -1079,11 +1081,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 					for (int id : p->player_ids) {
 						players[i] = clients[id];
 						i++;
-						maps[FIELD_MAP]->SetTileType(-1, -1, clients[id]->x, clients[id]->x);
+						maps[FIELD_MAP]->SetTileType(-1, -1, clients[id]->x, clients[id]->z);
 
 						if (i > MAX_IN_GAME_PLAYER) break;
 					}
-					std::cout << "시작" << std::endl;
+					//std::cout << "시작" << std::endl;
 					int room_id = get_game_room_id();
 					int boss_id = get_npc_id(p->map_type);
 					if (boss_id != -1)
@@ -1120,7 +1122,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_CHANGE_SCENE_DONE:
 	{
 		cs_packet_change_scene_done* packet = reinterpret_cast<cs_packet_change_scene_done*>(p);
-		switch (packet->scene_num)// 1 == in game map num
+		switch (packet->scene_num)
 		{
 		case FIELD_MAP:
 		{
@@ -1193,7 +1195,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				send_use_item(client_id, 0, cur_play_music);
 		}
 		break;
-		case WITCH_MAP:
+		case 1:// 1 == in game map num
 		{
 			if (cl.cur_room_num == -1) break;
 			GameRoom* gr = game_room[cl.cur_room_num];
@@ -1653,7 +1655,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.pre_y = cl.y;
 			cl.pre_z = cl.z;
 			for (int i = 0; i < 3; ++i) {
-				if (maps[FIELD_MAP]->GetTileType(x[i], z[i]) == 0) {
+				if (maps[FIELD_MAP]->GetTileType(x[i], z[i]) >= 0) {
 					cl.x = x[i];
 					cl.y = y[i];
 					cl.z = z[i];
@@ -1676,7 +1678,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.pre_y = cl.y;
 			cl.pre_z = cl.z;
 			for (int i = 0; i < 3; ++i) {
-				if (maps[FIELD_MAP]->GetTileType(x[i], z[i]) == 0) {
+				if (maps[FIELD_MAP]->GetTileType(x[i], z[i]) >= 0) {
 					cl.x = x[i];
 					cl.y = y[i];
 					cl.z = z[i];
@@ -2555,7 +2557,7 @@ void Network::do_DBevent()
 				while (!exp_over_pool.try_pop(ex_over));
 				ex_over->_comp_op = OP_DB_PLAYER_LOGIN;
 				player_data.name = std::wstring(cl.name, &cl.name[strnlen_s(cl.name, MAX_NAME_SIZE)]);
-				std::cout << cl.name << std::endl;
+				//std::cout << cl.name << std::endl;
 				if (DB->checkPlayer(player_data)) {
 
 					cl.x = player_data.x;
@@ -2720,6 +2722,7 @@ void Network::set_next_pattern(int room_id)
 	default:
 
 		std::cout << t.type << " : 잘못된 패턴 타입\n";
+		set_next_pattern(room_id);
 		break;
 	}
 }

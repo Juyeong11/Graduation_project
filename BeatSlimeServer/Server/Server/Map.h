@@ -73,7 +73,7 @@ public:
 	int timeByBeat;
 	int timeBy16Beat;
 	int timeBy24Beat;
-	int bpm;
+	int bpm = 0;
 	int totalSongTime;
 	int nowSongTime;
 	int barCounts;
