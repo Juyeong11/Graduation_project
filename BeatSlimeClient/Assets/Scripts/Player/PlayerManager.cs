@@ -534,11 +534,12 @@ public class PlayerManager : MonoBehaviour
         {
             case cellState.Item1:
                 nowOnCellTag.GetItemFromThisCell();
+                changeColor(Color.red);
                 Debug.Log("Item1");
             break;
             case cellState.Item2:
             nowOnCellTag.GetItemFromThisCell();
-
+                changeColor(Color.yellow);
             break;
             case cellState.Item3:
             nowOnCellTag.GetItemFromThisCell();
@@ -556,5 +557,14 @@ public class PlayerManager : MonoBehaviour
             nowOnCellTag.GetItemFromThisCell();
             break;
         }
+    }
+
+    private SkinnedMeshRenderer mesh;
+
+    public void changeColor(Color c)
+    {
+        mesh = GetComponentInChildren<SkinnedMeshRenderer>();
+        mesh.material = Instantiate(mesh.material);
+        mesh.material.SetColor("Color_658ca3492a0d4c5294b395208005e893", c);
     }
 }

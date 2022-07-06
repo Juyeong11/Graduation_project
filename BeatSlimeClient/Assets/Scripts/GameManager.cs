@@ -432,6 +432,10 @@ public class GameManager : MonoBehaviour
         {
             Network.SendTeleportPacket(4);
         }
+        if (Input.GetKeyDown(KeyCode.F4))
+        {
+            player.GetComponentInChildren<PlayerManager>().changeColor(Color.red);
+        }
 
         if (isGameStart && Network.isServerOnline())
         {
@@ -605,18 +609,20 @@ public class GameManager : MonoBehaviour
                                 //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                                 //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
+                                Debug.Log("Target : " + target_id);
                                 if (target_id == myPlayerID)
                                 {
                                     if (hm.CurrentHP - p.hp > 0)
                                     {
                                         resultsData.damaged += (hm.CurrentHP - p.hp);
-                                        Objects[target_id].GetComponentInChildren<PlayerManager>().StunTrig();
+                                        
                                         ComboEffect.CountApply(ref nowCombo, true);
                                         CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
                                         //VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 30f);
                                     }
                                 }
 
+                                Objects[target_id].GetComponentInChildren<PlayerManager>().StunTrig();
                                 hm.Damage(hm.CurrentHP - p.hp);
 
 
@@ -746,8 +752,6 @@ public class GameManager : MonoBehaviour
 
                             switch (p.effect_type)
                             {
-
-
                                 case 55:// skill
                                     // p->x  == skill Level
                                     // p->y  == skill type
