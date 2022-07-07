@@ -51,10 +51,10 @@ public class FieldGameManager : MonoBehaviour
         }
 
 
-       
+        Network.SendChangeSceneDonePacket(0);
         if (myPlayerID != -1)
         {
-            Network.SendChangeSceneDonePacket(0);
+
             Objects[myPlayerID] = player;
         }
     }
@@ -302,7 +302,7 @@ public class FieldGameManager : MonoBehaviour
                             }
                             //PlayerPref
                             FieldPlayerManager.money = p.money;
-                            Network.SendChangeSceneDonePacket(0);
+                            //Network.SendChangeSceneDonePacket(0);
                             //PutPlayerObject(p.type, p.id, p.x, p.y);
                         }
                         break;

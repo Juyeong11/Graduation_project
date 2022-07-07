@@ -121,7 +121,7 @@ public:
 	int DelParty();
 };
 const int VIEW_RANGE = 5;// test를 위한 거리
-const int ATTACK_RANGE = 1;// test를 위한 거리
+const int ATTACK_RANGE = 1;
 
 class PathFinder;
 class MapInfo;
