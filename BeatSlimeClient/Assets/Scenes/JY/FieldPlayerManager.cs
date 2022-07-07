@@ -158,6 +158,12 @@ public class FieldPlayerManager : MonoBehaviour
             {
                 Network.SendChangeSceneReadyPacket(0);
             }
+
+            if (nowOnCellTag.state != cellState.Shop)
+            {
+                SM.ShopClose();
+                shopOpened = false;
+            }
             isReady = false;
         }
     }
