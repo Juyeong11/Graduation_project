@@ -43,6 +43,10 @@ public class FieldPlayerManager : MonoBehaviour
 
     Cell nowOnCellTag;
     
+    public GameObject AlertPressKey;
+    public GameObject AlertPanel;
+    public UnityEngine.UI.Text AlertText;
+    public AlertOBJ alertOBJ;
 
     //[System.NonSerialized]
     //public HexCoordinates Destination;
@@ -108,12 +112,12 @@ public class FieldPlayerManager : MonoBehaviour
                 KeyHandler();
             PlayerRotateToLookAt();
             PlayerWCheck();
-            PlayerPortalCheck();
+            PlayerOnCellCheck();
             gameObject.transform.position = new Vector3(PlayerTransform.position.x, HexCellPosition.calculateWPosition(selfCoord.preCoordinates.W), PlayerTransform.position.z);
 
         }
     }
-    public void PlayerPortalCheck()
+    public void PlayerOnCellCheck()
     {
         // 클라에서 플레이어가 포탈에 있는지 위치 검사 후 맞다면 -> 서버에 패킷 전송 -> 서버에서 해당 좌표가 포탈이 맞는지 확인
         // -> 맞다면 ready상태 이펙트 패킷 전송 -> 3명이 다 준비되면 씬 전환
@@ -164,6 +168,23 @@ public class FieldPlayerManager : MonoBehaviour
                 SM.ShopClose();
                 shopOpened = false;
             }
+
+            if (nowOnCellTag.state == cellState.Shop)
+            {
+                AlertPressKey.GetComponent<UnityEngine.UI.Text>().text = "스페이스 바를 눌러서 상점 열기";
+                AlertPressKey.SetActive(true);
+            }
+            else if (nowOnCellTag.state >= cellState.Panel11 && nowOnCellTag.state <= cellState.Panel19)
+            {
+                AlertPressKey.GetComponent<UnityEngine.UI.Text>().text = "스페이스 바를 눌러서 표지판 내용 확인";
+                AlertPressKey.SetActive(true);
+            }
+            else
+            {
+                AlertPressKey.SetActive(false);
+            }
+
+
             isReady = false;
         }
     }
@@ -501,6 +522,21 @@ public class FieldPlayerManager : MonoBehaviour
                         }
                     
                     break;
+                }
+                if (nowOnCellTag.state >= cellState.Panel11 && nowOnCellTag.state <= cellState.Panel19)
+                {
+                    AlertText.text = alertOBJ.Data[nowOnCellTag.state - cellState.Panel11];
+                    AlertPanel.SetActive(true);
+                }
+            }
+        }
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            if (nowOnCellTag.obejct)
+            {
+                if (AlertPanel.activeSelf)
+                {
+                    AlertPanel.SetActive(false);
                 }
             }
         }

@@ -8,6 +8,15 @@ public enum cellState
     Damaged,
     None,
     Shop,
+    Panel11,
+    Panel12,
+    Panel13,
+    Panel14,
+    Panel15,
+    Panel16,
+    Panel17,
+    Panel18,
+    Panel19,
 
     Orgel,
 

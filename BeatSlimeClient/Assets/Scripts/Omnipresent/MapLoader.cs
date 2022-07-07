@@ -88,6 +88,33 @@ public class MapLoader : MonoBehaviour
                     case 10:
                     fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Shop);
                     break;
+                    case 11:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Panel11);
+                    break;
+                    case 12:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Panel12);
+                    break;
+                    case 13:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Panel13);
+                    break;
+                    case 14:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Panel14);
+                    break;
+                    case 15:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Panel15);
+                    break;
+                    case 16:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Panel16);
+                    break;
+                    case 17:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Panel17);
+                    break;
+                    case 18:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Panel18);
+                    break;
+                    case 19:
+                    fGrid.cellMaps.Add(tmpcell, x, y, z, w,cellState.Panel19);
+                    break;
                     case 99:
                     fGrid.cellMaps.Add(tmpcell, x, y, z, w, cellState.Orgel);
                     break;
