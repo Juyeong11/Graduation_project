@@ -36,8 +36,8 @@ Network::Network() {
 
 	DB->readSkills(skills);
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
-	maps[WITCH_MAP]->SetMap("Map\\Witch_map", "Music\\flower_load.csv");
-	maps[WITCH_MAP_HARD]->SetMap("Map\\Witch_map", "Music\\flower_load2.csv");
+	maps[WITCH_MAP]->SetMap("Map\\flower_load", "Music\\flower_load.csv");
+	maps[WITCH_MAP_HARD]->SetMap("Map\\flower_load", "Music\\flower_load2.csv");
 	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\flower_load.csv");
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
@@ -183,6 +183,7 @@ void Network::send_login_ok(int c_id, char inven[20])
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 }
+
 void Network::send_login_fail(int client_id)
 {
 	sc_packet_login_fail packet;
@@ -195,6 +196,7 @@ void Network::send_login_fail(int client_id)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(clients[client_id])->do_send(ex_over);
 }
+
 void Network::send_change_scene(int c_id, int map_type)
 {
 	sc_packet_change_scene packet;
@@ -264,6 +266,7 @@ void Network::send_effect(int client_id, int actor_id, int target_id, int effect
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(clients[client_id])->do_send(ex_over);
 }
+
 void Network::send_move_object(int c_id, int mover)
 {
 	sc_packet_move packet;
@@ -300,6 +303,7 @@ void Network::send_attack_player(int attacker, int target, int receiver)
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
 	reinterpret_cast<Client*>(clients[receiver])->do_send(ex_over);
 }
+
 void Network::send_change_skill(int c_id, int target) {
 	sc_packet_change_skill packet;
 
@@ -714,7 +718,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		if (pl == nullptr) continue;
 		if (false == is_attack(pl->id, x, z)) continue;
 		pl->hp -= damage;
-		std::cout << "id : " << i << " damaged " << damage << std::endl;
+		//std::cout << "id : " << i << " damaged " << damage << std::endl;
 		if (game_room[game_room_id]->boss_id == nullptr) return;
 		game_room[game_room_id]->Score[i] -= 20 * damage;
 		for (const auto& p : game_room[game_room_id]->player_ids) {
@@ -1142,7 +1146,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			}
 
 			cl.cur_room_num = -1;
-			// 내일 수정
+
 			// login OK 에서 했던 로직을 가져오자
 			//다른 클라이언트에게 새로운 클라이언트가 들어옴을 알림
 			for (int i = 0; i < MAX_USER; ++i)
@@ -2106,8 +2110,8 @@ void Network::worker()
 			int pivot_x = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
 			int pivot_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
 			int pivot_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
-			int charging_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
-			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 7));
+			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
+			std::chrono::system_clock::time_point charging_time = *(reinterpret_cast<std::chrono::system_clock::time_point*>(exp_over->_net_buf + sizeof(int) * 7));
 
 
 			int target_id = game_room[game_room_id]->find_online_player();
@@ -2199,8 +2203,15 @@ void Network::worker()
 			tev.z = pos_z;
 			tev.game_room_id = game_room_id;
 			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-			tev.start_time = std::chrono::system_clock::now() + std::chrono::milliseconds(charging_time);
-			tev.charging_time = charging_time;
+
+			//tev.start_time = std::chrono::time_point<std::chrono::system_clock>(std::chrono::milliseconds(start_time + charging_time));
+			tev.start_time = charging_time;
+			//std::cout << "go " << start_time + charging_time << std::endl;
+			static int i = 1;
+			game_room[game_room_id]->ready_lock.lock();
+			std::cout << i++<< " go " << tev.start_time << std::endl;
+			game_room[game_room_id]->ready_lock.unlock();
+			//tev.charging_time = charging_time;
 			tev.dir = dir;
 			timer_queue.push(tev);
 
@@ -2217,6 +2228,12 @@ void Network::worker()
 			int pos_y = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 3));
 			int pos_z = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 4));
 			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
+			//int start_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
+			//std::cout << "to " << start_time << std::endl;
+			static int i = 1;
+			game_room[game_room_id]->ready_lock.lock();
+			std::cout << i++ <<" real " << std::chrono::system_clock::now() << std::endl;
+			game_room[game_room_id]->ready_lock.unlock();
 
 
 			switch (pattern_type)
@@ -2454,7 +2471,7 @@ void Network::do_timer() {
 		timer_event ev;
 		while (!timer_queue.empty()) {
 
-			timer_queue.try_pop(ev);
+			if (timer_queue.try_pop(ev) == false) break;
 
 			if (ev.start_time <= system_clock::now()) {
 				//이벤트 시작
@@ -2480,8 +2497,9 @@ void Network::do_timer() {
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.x;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.y;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.z;
-					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.charging_time;
-					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 7) = ev.dir;
+					//*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = time_point_cast<milliseconds>(ev.start_time).time_since_epoch().count();
+					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.dir;
+					*reinterpret_cast<system_clock::time_point*>(ex_over->_net_buf + sizeof(int) * 7) = ev.start_time + milliseconds(ev.charging_time+100);
 					break;
 				case EVENT_BOSS_TILE_ATTACK:
 
@@ -2492,6 +2510,7 @@ void Network::do_timer() {
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 3) = ev.y;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 4) = ev.z;
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.dir;
+					//*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = time_point_cast<milliseconds>(ev.start_time).time_since_epoch().count();
 					break;
 
 				case EVENT_PLAYER_PARRYING:
@@ -2532,6 +2551,7 @@ void Network::do_timer() {
 		this_thread::sleep_for(10ms);
 	}
 }
+
 void Network::do_DBevent()
 {
 	using namespace std;
@@ -2543,7 +2563,7 @@ void Network::do_DBevent()
 		db_event ev;
 		while (!db_event_queue.empty()) {
 
-			while (!db_event_queue.try_pop(ev));
+			db_event_queue.try_pop(ev);
 
 
 
@@ -2688,11 +2708,13 @@ void Network::set_next_pattern(int room_id)
 		tev.z = t.z;
 		tev.game_room_id = room_id;
 		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed-100);
 		tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
 		tev.dir = t.dir;
 		timer_queue.push(tev);
+
+
 		break;
 
 	case 10: // 유도 공격 -> 패링할 수 있음

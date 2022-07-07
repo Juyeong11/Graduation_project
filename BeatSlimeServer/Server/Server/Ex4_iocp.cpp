@@ -32,12 +32,14 @@ int main()
 		net->start_accept();
 
 		vector<thread> worker_threads;
-		thread ai_thread{ &Network::do_timer,net };
+		thread ai_thread1{ &Network::do_timer,net };
+		thread ai_thread2{ &Network::do_timer,net };
 		thread db_thread{ &Network::do_DBevent,net };
 		for (int i = 0; i < 6; ++i)
 			worker_threads.emplace_back(&Network::worker, net);
 
-		ai_thread.join();
+		ai_thread1.join();
+		ai_thread2.join();
 		db_thread.join();
 		for (auto& th : worker_threads)
 			th.join();

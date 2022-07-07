@@ -247,11 +247,13 @@ public class GameManager : MonoBehaviour
     {
         return Objects[3].GetComponent<HexCellPosition>().coordinates;
     }
-    
+
     public HexCoordinates GetTargetPos(string pivotType)
     {
         HexCoordinates target_pos = new HexCoordinates();
         int OnlinePlayerID = FindOnlineID();
+       
+
         // All die
         if (OnlinePlayerID == -1)
         {

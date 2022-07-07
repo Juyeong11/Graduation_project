@@ -126,8 +126,8 @@ void SendPacket(int cl, void* packet)
 }
 bool isPortal(int _x, int _z)
 {
-	if (1 < abs(_x - 17)) return false;
-	if (1 < abs(_z - (-21))) return false;
+	if (1 < abs(_x - 19)) return false;
+	if (1 < abs(_z - (-25))) return false;
 
 	return true;
 }
@@ -317,7 +317,7 @@ void Worker_Thread()
 
 constexpr int DELAY_LIMIT = 100;
 constexpr int DELAY_LIMIT2 = 150;
-constexpr int ACCEPT_DELY = 50;
+constexpr int ACCEPT_DELY = 500;
 
 void Adjust_Number_Of_Client()
 {

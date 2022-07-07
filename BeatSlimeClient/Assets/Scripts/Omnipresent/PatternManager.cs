@@ -88,7 +88,7 @@ public class PatternManager : MonoBehaviour
         yield return null;
     }
 
-
+    
     public int PeekPattern(Beat b)
     {
         int patNums = 0;
@@ -103,7 +103,7 @@ public class PatternManager : MonoBehaviour
             HexCoordinates BossPos = GameManager.data.GetBossPos();
             TargetPos.plus(pattern[0].pivot.X, pattern[0].pivot.Z);
             int charging_time = pattern[0].warningBeatOffset.GetBeatTime();
-            
+
             switch (pattern[0].noteType)
             {
                 case -1:
