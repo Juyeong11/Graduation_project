@@ -233,8 +233,8 @@ void Network::send_game_init(int c_id, GameObject* ids[3], int boss_id)
 	//
 	//packet.id2 =-1;
 	//packet.id3 =-1;
-	packet.id2 =  ids[1]->id;
-	packet.id3 =  ids[2]->id;
+	packet.id2 = ids[1]->id;
+	packet.id3 = ids[2]->id;
 	packet.boss_id = boss_id;
 
 	EXP_OVER* ex_over;
@@ -1138,8 +1138,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 				cl.z = game_room[cl.cur_room_num]->portal->z + 1;
 				cl.y = -cl.x - cl.z;
 				if (set_new_player_pos(client_id) == -1) {
-					cl.x = game_room[cl.cur_room_num]->portal->x ;
-					cl.z = game_room[cl.cur_room_num]->portal->z ;
+					cl.x = game_room[cl.cur_room_num]->portal->x;
+					cl.z = game_room[cl.cur_room_num]->portal->z;
 					cl.y = -cl.x - cl.z;
 					// 빈자리가 없어서 다시 인게임으로 들어감
 				}
@@ -2175,15 +2175,12 @@ void Network::worker()
 				pos_z = pivot_z;
 			}
 			else {
-				if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - clients[target_id]->last_move_time).count() > 100)
-				{
-					pos_x = clients[target_id]->x + pivot_x;
-					pos_z = clients[target_id]->z + pivot_z;
-				}
-				else {
-					pos_x = clients[target_id]->pre_x + pivot_x;
-					pos_z = clients[target_id]->pre_z + pivot_z;
-				}
+
+				pos_x = clients[target_id]->x + pivot_x;
+				pos_z = clients[target_id]->z + pivot_z;
+
+
+
 				pos_x = clients[target_id]->x + pivot_x;
 				pos_z = clients[target_id]->z + pivot_z;
 
@@ -2207,10 +2204,10 @@ void Network::worker()
 			//tev.start_time = std::chrono::time_point<std::chrono::system_clock>(std::chrono::milliseconds(start_time + charging_time));
 			tev.start_time = charging_time;
 			//std::cout << "go " << start_time + charging_time << std::endl;
-			static int i = 1;
-			game_room[game_room_id]->ready_lock.lock();
-			std::cout << i++<< " go " << tev.start_time << std::endl;
-			game_room[game_room_id]->ready_lock.unlock();
+			//static int i = 1;
+			//game_room[game_room_id]->ready_lock.lock();
+			//std::cout << i++<< " go " << tev.start_time << std::endl;
+			//game_room[game_room_id]->ready_lock.unlock();
 			//tev.charging_time = charging_time;
 			tev.dir = dir;
 			timer_queue.push(tev);
@@ -2230,10 +2227,10 @@ void Network::worker()
 			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 5));
 			//int start_time = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
 			//std::cout << "to " << start_time << std::endl;
-			static int i = 1;
-			game_room[game_room_id]->ready_lock.lock();
-			std::cout << i++ <<" real " << std::chrono::system_clock::now() << std::endl;
-			game_room[game_room_id]->ready_lock.unlock();
+			//static int i = 1;
+			//game_room[game_room_id]->ready_lock.lock();
+			//std::cout << i++ <<" real " << std::chrono::system_clock::now() << std::endl;
+			//game_room[game_room_id]->ready_lock.unlock();
 
 
 			switch (pattern_type)
@@ -2499,7 +2496,7 @@ void Network::do_timer() {
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 5) = ev.z;
 					//*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = time_point_cast<milliseconds>(ev.start_time).time_since_epoch().count();
 					*reinterpret_cast<int*>(ex_over->_net_buf + sizeof(int) * 6) = ev.dir;
-					*reinterpret_cast<system_clock::time_point*>(ex_over->_net_buf + sizeof(int) * 7) = ev.start_time + milliseconds(ev.charging_time+100);
+					*reinterpret_cast<system_clock::time_point*>(ex_over->_net_buf + sizeof(int) * 7) = ev.start_time + milliseconds(ev.charging_time + 100);
 					break;
 				case EVENT_BOSS_TILE_ATTACK:
 
@@ -2708,7 +2705,7 @@ void Network::set_next_pattern(int room_id)
 		tev.z = t.z;
 		tev.game_room_id = room_id;
 		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed-100);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed - 100);
 		tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
 		tev.dir = t.dir;
