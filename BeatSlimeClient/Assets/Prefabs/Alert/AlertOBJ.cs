@@ -6,6 +6,7 @@ using UnityEngine;
 public class AlertOBJ : ScriptableObject
 {
     [SerializeField]
+    [TextArea]
     private List<string> al;
 
     public List<string> Data { get { return al; } }
