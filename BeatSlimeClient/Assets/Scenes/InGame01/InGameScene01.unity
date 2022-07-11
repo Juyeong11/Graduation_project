@@ -1717,7 +1717,7 @@ PrefabInstance:
       objectReference: {fileID: 422432065}
     - target: {fileID: 379015093369558915, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: isDebug
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 379015093369558915, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: EnemyTransform
@@ -4445,7 +4445,7 @@ MonoBehaviour:
   grid: {fileID: 422432065}
   loader: {fileID: 2121429946}
   soundManager: {fileID: 1756485883}
-  isGameStart: 1
+  isGameStart: 0
   SongName: Tutorial
   barCounts: 4
   offsetMusicFrontTime: 0
@@ -4473,7 +4473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1e5b90600307784c84f854e24be39ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BPM: 45
+  BPM: 65
   musicTime: 627800
   offsetTime: 156
   warningBeat: 1

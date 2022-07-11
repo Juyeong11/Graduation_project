@@ -122,7 +122,7 @@ public class Cell
         itemTrans.gameObject.SetActive(false);
         // Item ²ô±â
     }
-    public void SetItemToThisCell(cellState item,GameObject g)
+    public void SetItemToThisCell(cellState item,ref GameObject g)
     {
         state = item;
         
@@ -202,7 +202,7 @@ public class CellMap
             }
         }
 
-        Debug.LogError(">Invalid coordinate<");
+        Debug.LogError(">Invalid coordinate< : " + x + "," + y + "," + z);
         return new Cell();
     }
 
