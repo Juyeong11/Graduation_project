@@ -1259,13 +1259,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
 
 
-			//game start
-			gr->start_time = std::chrono::system_clock::now();
-			int game_start_time = static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(gr->start_time).time_since_epoch().count());
-			game_start(gr->game_room_id);
-
-			send_game_start(client_id, game_start_time);
-			Client* p = reinterpret_cast<Client*>(players[0]);
+			
 		}
 			break;
 		case 2:// 1 == in game map num
@@ -1920,9 +1914,14 @@ void Network::process_packet(int client_id, unsigned char* p)
 		send_game_start(client_id, game_start_time);
 		Client* p = reinterpret_cast<Client*>(players[0]);
 
+		GameRoom* gr = game_room[cl.cur_room_num];
+		//game start
+		gr->start_time = std::chrono::system_clock::now();
+		int game_start_time = static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(gr->start_time).time_since_epoch().count());
+		game_start(gr->game_room_id);
 
-
-
+		send_game_start(client_id, game_start_time);
+		
 
 		std::cout << "Tutorial Start\n";
 	}
