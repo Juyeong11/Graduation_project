@@ -149,7 +149,7 @@ public class GameManager : MonoBehaviour
     {
         if (!Network.isServerOnline()) Network.CreateAndConnect();
         Network.SendChangeSceneDonePacket(1);
-
+        //UnityEngine.SceneManagement.SceneManager.GetActiveScene();
         offsetTime = 0;
         prePingTestTime = 5.0f;
         //DEBUG

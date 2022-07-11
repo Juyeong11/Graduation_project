@@ -88,7 +88,7 @@ public static class Network
         try
         {
 
-            ClientSocket.BeginConnect("121.190.132.195", 4500, new AsyncCallback(connectComplet), ClientSocket)
+            ClientSocket.BeginConnect("121.190.132.195", 4500, new AsyncCallback(connectComplet), ClientSocket);
             //ClientSocket.BeginConnect("127.0.0.1", 4500, new AsyncCallback(connectComplet), ClientSocket);
         }
         catch
@@ -342,6 +342,16 @@ public static class Network
         pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_use_item));
         pk.type = Protocol.CONSTANTS.CS_PACKET_USE_ITEM;
         pk.itemType = itemType;
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
+
+    public static void SendPlayTutorialPacket()
+    {
+        Protocol.cs_packet_play_tutorial pk = new Protocol.cs_packet_play_tutorial();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_play_tutorial));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_PLAY_TUTORIAL;
+
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }

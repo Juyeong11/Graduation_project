@@ -39,6 +39,7 @@ Network::Network() {
 	maps[WITCH_MAP]->SetMap("Map\\flower_load", "Music\\flower_load.csv");
 	maps[WITCH_MAP_HARD]->SetMap("Map\\flower_load", "Music\\flower_load2.csv");
 	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\flower_load.csv");
+	maps[TUTORI_MAP]->SetMap("Map\\Tutorial", "Music\\Tutorial.csv");
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
 	for (int i = 0; i < MAX_USER; ++i) {
@@ -233,8 +234,15 @@ void Network::send_game_init(int c_id, GameObject* ids[3], int boss_id)
 	//
 	//packet.id2 =-1;
 	//packet.id3 =-1;
-	packet.id2 = ids[1]->id;
-	packet.id3 = ids[2]->id;
+	if (ids[1] != nullptr) 
+		packet.id2 = ids[1]->id;
+	else
+		packet.id2 = -1;
+	if (ids[2] != nullptr)
+		packet.id3 = ids[2]->id;
+	else
+		packet.id3 = -1;
+
 	packet.boss_id = boss_id;
 
 	EXP_OVER* ex_over;
@@ -1241,6 +1249,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		}
 		break;
+
 		default:
 			break;
 		}
@@ -1824,6 +1833,39 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 	}
 	break;
+	case CS_PACKET_PLAY_TUTORIAL:
+	{
+		//cs_packet_play_tutorial* packet = reinterpret_cast<cs_packet_play_tutorial*>(p);
+		// 게임방 준비 시키고 game_room_init -> game_start 까지 하자
+		GameObject* players[MAX_IN_GAME_PLAYER];
+		int i = 0;
+
+		maps[FIELD_MAP]->SetTileType(-1, -1, cl.x, cl.z);
+		players[0] = clients[client_id];
+		players[1] = nullptr;
+		players[2] = nullptr;
+		
+		int room_id = get_game_room_id();
+		int boss_id = get_npc_id(TUTORI_MAP);
+		if (boss_id != -1)
+			game_room[room_id]->GameRoomInit(TUTORI_MAP, maps[TUTORI_MAP]->bpm, clients[boss_id], players, nullptr);
+
+		GameRoom* gr = game_room[cl.cur_room_num];
+
+		gr->start_time = std::chrono::system_clock::now();
+		int game_start_time = static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(gr->start_time).time_since_epoch().count());
+		game_start(gr->game_room_id);
+
+		send_game_start(client_id, game_start_time);
+		Client* p = reinterpret_cast<Client*>(players[0]);
+
+
+
+
+
+		std::cout << "Tutorial Start\n";
+	}
+		break;
 	default:
 		std::cout << "wrong packet\n";
 		break;

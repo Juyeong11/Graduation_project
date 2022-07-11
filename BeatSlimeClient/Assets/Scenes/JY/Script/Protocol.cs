@@ -39,6 +39,7 @@ namespace Protocol
         public const byte CS_PACKET_TELEPORT = 17;
         public const byte CS_PACKET_BUY = 18;
         public const byte CS_PACKET_USE_ITEM = 19;
+        public const byte CS_PACKET_PLAY_TUTORIAL = 20;
 
         public const byte SC_PACKET_LOGIN_OK = 1;
         public const byte SC_PACKET_MOVE = 2;
@@ -291,6 +292,13 @@ namespace Protocol
         public byte itemType;
     }
 
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class cs_packet_play_tutorial : ISerializeble<cs_packet_play_tutorial>
+    {
+        public byte size;
+        public byte type;
+    }
     //Server -> Client
 
     [Serializable]
