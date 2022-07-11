@@ -536,7 +536,8 @@ public class GameManager : MonoBehaviour
                             int Delay = System.DateTime.Now.Millisecond;
 
                             PlaySound();
-                            PD.Play();
+                            if (PD)
+                                PD.Play();
                             MN.ChangeMusicName(SongName + " - zeroste.");
                             player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
@@ -610,6 +611,8 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_attack p = Protocol.sc_packet_attack.SetByteToVar(data);
 
                             int target_id = ServerID_To_ClientID(p.target_id);
+                            if (target_id == -1)
+                                break;
                             //int randomTickForTest = 4;//Random.Range(1, 6);
                             //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
@@ -760,7 +763,8 @@ public class GameManager : MonoBehaviour
                             int tid = -1;
                             if (p.target_id != -1)
                                 tid = ServerID_To_ClientID(p.target_id);
-
+                            else
+                                break;
                             switch (p.effect_type)
                             {
                                 case 55:// skill
