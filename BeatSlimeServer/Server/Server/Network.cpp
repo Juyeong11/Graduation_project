@@ -251,6 +251,7 @@ void Network::send_game_init(int c_id, GameObject* ids[3], int boss_id)
 	reinterpret_cast<Client*>(clients[c_id])->do_send(ex_over);
 
 	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
+		if (ids[i] == nullptr) continue;
 		send_put_object(c_id, ids[i]->id);
 	}
 
@@ -933,6 +934,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		if (cur_map != 0) {
 
 			for (auto pl : game_room[cl.cur_room_num]->player_ids) {
+				if (pl == nullptr) continue;
 				send_move_object(pl->id, cl.id);
 			}
 			break;
