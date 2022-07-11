@@ -1144,16 +1144,25 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cl.viewlist.clear();
 			cl.vl.unlock();
 			if (cl.cur_room_num != -1) {
-				cl.x = game_room[cl.cur_room_num]->portal->x + 1;
-				cl.z = game_room[cl.cur_room_num]->portal->z + 1;
-				cl.y = -cl.x - cl.z;
-				if (set_new_player_pos(client_id) == -1) {
-					cl.x = game_room[cl.cur_room_num]->portal->x;
-					cl.z = game_room[cl.cur_room_num]->portal->z;
+				if (game_room[cl.cur_room_num]->portal != nullptr) {
+					cl.x = game_room[cl.cur_room_num]->portal->x + 1;
+					cl.z = game_room[cl.cur_room_num]->portal->z + 1;
 					cl.y = -cl.x - cl.z;
-					// 빈자리가 없어서 다시 인게임으로 들어감
+					if (set_new_player_pos(client_id) == -1) {
+						cl.x = game_room[cl.cur_room_num]->portal->x;
+						cl.z = game_room[cl.cur_room_num]->portal->z;
+						cl.y = -cl.x - cl.z;
+						// 빈자리가 없어서 다시 인게임으로 들어감
+					}
+				}
+				else {
+					cl.x = 13;
+					cl.z = -25;
+					cl.y = -cl.x - cl.z;
+					set_new_player_pos(client_id);
 				}
 			}
+
 
 			cl.cur_room_num = -1;
 
@@ -1218,6 +1227,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			players[1] = nullptr;
 			players[2] = nullptr;
 
+			std::cout << "set room\n";
 			int room_id = get_game_room_id();
 			int boss_id = get_npc_id(TUTORI_MAP);
 			if (boss_id != -1)
@@ -1898,18 +1908,6 @@ void Network::process_packet(int client_id, unsigned char* p)
 	{
 		//cs_packet_play_tutorial* packet = reinterpret_cast<cs_packet_play_tutorial*>(p);
 		// 게임방 준비 시키고 game_room_init -> game_start 까지 하자
-		GameObject* players[MAX_IN_GAME_PLAYER];
-		int i = 0;
-
-		maps[FIELD_MAP]->SetTileType(-1, -1, cl.x, cl.z);
-		players[0] = clients[client_id];
-		players[1] = nullptr;
-		players[2] = nullptr;
-
-		int room_id = get_game_room_id();
-		int boss_id = get_npc_id(TUTORI_MAP);
-		if (boss_id != -1)
-			game_room[room_id]->GameRoomInit(TUTORI_MAP, maps[TUTORI_MAP]->bpm, clients[boss_id], players, nullptr);
 
 		GameRoom* gr = game_room[cl.cur_room_num];
 
@@ -1918,10 +1916,6 @@ void Network::process_packet(int client_id, unsigned char* p)
 		game_start(gr->game_room_id);
 
 		send_game_start(client_id, game_start_time);
-		Client* p = reinterpret_cast<Client*>(players[0]);
-
-
-
 
 
 		std::cout << "Tutorial Start\n";
@@ -2150,21 +2144,21 @@ void Network::worker()
 				std::cout << "Boss can not Parrying self\n";
 				break;
 			case Player1:
-			case Player2:
-			case Player3:
+				//case Player2:
+				//case Player3:
 				if (game_room[game_room_id]->player_ids[0] != nullptr)
 					target_id = game_room[game_room_id]->player_ids[0]->id;
 				break;
-				//case Player2:
-				//	if (game_room[game_room_id]->player_ids[1] != nullptr)
-				//		target_id = game_room[game_room_id]->player_ids[1]->id;
-				//
-				//	break;
-				//case Player3:
-				//	if (game_room[game_room_id]->player_ids[2] != nullptr)
-				//		target_id = game_room[game_room_id]->player_ids[2]->id;
-				//
-				//	break;
+			case Player2:
+				if (game_room[game_room_id]->player_ids[1] != nullptr)
+					target_id = game_room[game_room_id]->player_ids[1]->id;
+
+				break;
+			case Player3:
+				if (game_room[game_room_id]->player_ids[2] != nullptr)
+					target_id = game_room[game_room_id]->player_ids[2]->id;
+
+				break;
 			}
 
 			//패링을 했는지 안했는지 확인
@@ -2422,6 +2416,7 @@ void Network::worker()
 			//if(clients[boss_id]->hp<10;
 			//체력에 따라 클리어 유무
 			std::cout << boss_id << " -> Game Over\n";
+			//std::cout << game_room_id << " -> Game Over\n";
 			bool isabnormal = false;
 			bool isDie = false;
 			for (const auto p : game_room[game_room_id]->player_ids) {
@@ -2772,6 +2767,7 @@ void Network::set_next_pattern(int room_id)
 	//const PattenrInfo... 바로 전에 한다해도 중간 시간을 줄이는 거지 원인을 제거한게 아니잖아
 	if (game_room[room_id]->pattern_progress == -1) return;
 	const std::vector<PatternInfo>& pt = maps[game_room[room_id]->map_type]->GetPatternTime();
+	if (pt.size() <= game_room[room_id]->pattern_progress) return;
 	const PatternInfo& t = pt[game_room[room_id]->pattern_progress++];
 
 	int boss_id = game_room[room_id]->boss_id->id;

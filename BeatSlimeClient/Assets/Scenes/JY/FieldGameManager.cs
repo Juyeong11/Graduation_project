@@ -255,7 +255,9 @@ public class FieldGameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            TestTileEffect1();
+            SceneManager.LoadScene("InGameScene01");
+
+            //TestTileEffect1();
         }
 
         if (Network.isOnline)
@@ -336,7 +338,7 @@ public class FieldGameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
-
+                            if (myPlayerID == -1) break;
                             //Debug.Log(p.id+"¿Ãµø");
                             //Debug.Log((byte)p.dir);
 

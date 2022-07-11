@@ -19,6 +19,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 	map = new int[(LengthX ) * LengthZ];
 
 	in.read(reinterpret_cast<char*>(map), (LengthX ) * LengthZ * sizeof(int));
+	/*
 	for (int i = 0; i < LengthX * LengthZ; ++i) {
 		if (map[i] == 1) {
 			int _z = i / LengthX + offsetZ;
@@ -39,7 +40,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			startZ[2] = _z;
 		}
 	}
-	
+	*/
 	// ¸Ê È®ÀÎ¿ë
 	/*
 	std::cout << LengthX << std::endl;
@@ -269,11 +270,14 @@ GameRoom::GameRoom() :bpm(0) {
 	map_type = 0;
 	ready_player_cnt = 0;
 	game_room_id = -1;
+	pattern_progress = -1;
 }
 GameRoom::GameRoom(int id) : game_room_id(id) {
 	isGaming = false;
 	map_type = 0;
 	ready_player_cnt = 0;
+	pattern_progress = -1;
+
 }
 
 int GameRoom::FindPlayer(int id) const

@@ -83,11 +83,10 @@ public class LoginManager : MonoBehaviour
 
         Network.SendLogIn(id);
 
-        SceneManager.LoadScene("InGameScene01");
-        Network.SendPlayTutorialPacket();
-        
+       // SceneManager.LoadScene("InGameScene01");
+
         //SceneManager.LoadScene("FieldScene");
-        
+
         //
     }
 }
