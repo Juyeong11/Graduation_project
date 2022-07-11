@@ -996,7 +996,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &156540632
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1717,7 +1717,7 @@ PrefabInstance:
       objectReference: {fileID: 422432065}
     - target: {fileID: 379015093369558915, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: isDebug
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 379015093369558915, guid: 6cc64967bac5cfa41b443e0e6b5d4d1b, type: 3}
       propertyPath: EnemyTransform
@@ -4454,6 +4454,7 @@ MonoBehaviour:
   gameOverImage: {fileID: 2224594054131023562}
   MN: {fileID: 783668092}
   PD: {fileID: 1264016706}
+  isTutorialScene: 1
 --- !u!114 &2121429944
 MonoBehaviour:
   m_ObjectHideFlags: 0
