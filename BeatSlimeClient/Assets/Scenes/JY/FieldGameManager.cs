@@ -192,7 +192,7 @@ public class FieldGameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F1))
         {
             //MN.ChangeMusicName(soundManager.getSongName());
-            
+            SceneManager.LoadScene("InGameScene01");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4))
