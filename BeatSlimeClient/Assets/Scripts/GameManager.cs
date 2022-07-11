@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
     //public int now24Beats;
     //public int now32Beats;
     public Beat nowBeat;
-    
+
     [System.NonSerialized]
     public int beatCounter = 0;
 
@@ -148,8 +148,11 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         if (!Network.isServerOnline()) Network.CreateAndConnect();
-        Network.SendChangeSceneDonePacket(1);
-        //UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene01")
+            Network.SendChangeSceneDonePacket(1);
+        else
+            Network.SendChangeSceneDonePacket(2);
+
         offsetTime = 0;
         prePingTestTime = 5.0f;
         //DEBUG
@@ -252,7 +255,7 @@ public class GameManager : MonoBehaviour
     {
         HexCoordinates target_pos = new HexCoordinates();
         int OnlinePlayerID = FindOnlineID();
-       
+
 
         // All die
         if (OnlinePlayerID == -1)
@@ -269,7 +272,7 @@ public class GameManager : MonoBehaviour
         }
         else if (pivotType == "PlayerF")
         {
-           // Debug.Log("PlayerF : " + FindMaxDistanceHpID());
+            // Debug.Log("PlayerF : " + FindMaxDistanceHpID());
             target_pos = Objects[FindMaxDistanceHpID()].GetComponent<HexCellPosition>().coordinates;
         }
         else if (pivotType == "PlayerN")
@@ -331,7 +334,7 @@ public class GameManager : MonoBehaviour
     {
         ref GameObject target = ref Objects[0];
         int OnlinePlayerID = FindOnlineID();
-        if(OnlinePlayerID == -1)
+        if (OnlinePlayerID == -1)
         {
             Debug.Log("All die");
             return ref target;
@@ -353,11 +356,11 @@ public class GameManager : MonoBehaviour
         {
             if (Objects[0].activeSelf)
             {
-                target = ref Objects [0];
+                target = ref Objects[0];
             }
             else
             {
-                target = ref Objects [OnlinePlayerID];
+                target = ref Objects[OnlinePlayerID];
             }
         }
         else if (pivotType == "Player2")
@@ -443,13 +446,13 @@ public class GameManager : MonoBehaviour
         {
             int prevBeats = nowBeat.addBeat;
 
-            if (!___cord) 
+            if (!___cord)
             {
                 ___cord = true;
-                Debug.Log("LAPSED TIME : " +  SoundManager.instance.GetMusicLapsedTime());
+                Debug.Log("LAPSED TIME : " + SoundManager.instance.GetMusicLapsedTime());
                 MusicStartOffset = SoundManager.instance.GetMusicLapsedTime() + offsetPatternSinker;
             }
-            
+
             nowSongTime = SoundManager.instance.GetMusicLapsedTime() + offsetTime - (int)MusicStartOffset - offsetMusicFrontTime - offsetMusicSinker;
             if (nowSongTime > 0)
             {
@@ -502,6 +505,9 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_game_init p = Protocol.sc_packet_game_init.SetByteToVar(data);
                             Debug.Log("game init");
+                            Debug.Log(p.id1);
+                            Debug.Log(p.id2);
+                            Debug.Log(p.id3);
                             ids[0] = p.id1;
                             ids[1] = p.id2;
                             ids[2] = p.id3;
@@ -515,7 +521,8 @@ public class GameManager : MonoBehaviour
 
 
                             PatternManager.data.Load(myPlayerID);
-
+                            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene01")
+                                Network.SendPlayTutorialPacket();
                             Network.SendGameStartReadyPacket();
                             Network.SendPingTestPacket();
                         }
@@ -533,30 +540,30 @@ public class GameManager : MonoBehaviour
                             player.GetComponentInChildren<Animator>().SetFloat("Speed", PlayerPrefs.GetFloat("pAnimSpeed"));
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
 
-                            enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime( Objects[0].gameObject);
+                            enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime(Objects[0].gameObject);
                             EffectManager.instance.SetTargetingEffectParent(ref enemyParriedTarget);
-                            
+
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_MOVE:
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
-                            //Debug.Log("MOVE PACKET x : " + p.x);
+                            Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
 
                             if (!debugStart)
                             {
 
-                                
+
                                 if (pid < 3)   // 플레이어이면
                                 {
                                     Objects[pid].GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
                                 }
 
-                                
+
                                 Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                 if (pid < 3)   // 플레이어이면
                                 {
@@ -590,7 +597,7 @@ public class GameManager : MonoBehaviour
                                 if (nearestSlime != -1)
                                 {
                                     //print("nearest slime : " + nearestSlime);
-                                    enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime( Objects[nearestSlime].gameObject);
+                                    enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime(Objects[nearestSlime].gameObject);
                                     //Objects[nearestSlime].GetComponentInChildren<PlayerManager>().SetNearSlime(Objects[pid]);
                                 }
                             }
@@ -617,7 +624,7 @@ public class GameManager : MonoBehaviour
                                     if (hm.CurrentHP - p.hp > 0)
                                     {
                                         resultsData.damaged += (hm.CurrentHP - p.hp);
-                                        
+
                                         ComboEffect.CountApply(ref nowCombo, true);
                                         CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
                                         //VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 30f);
@@ -657,7 +664,7 @@ public class GameManager : MonoBehaviour
                                 Objects[pid].GetComponentInChildren<PlayerManager>().playerClassofSkill = p.skillType;
                                 Objects[pid].GetComponentInChildren<PlayerManager>().playerLevelofSkill = p.skillLevel;
                                 Debug.Log(pid + ": " + p.skillType + ", " + p.skillLevel);
-                    
+
                                 HPGM.PlayerHPs[0].Set(p.skillType, FieldPlayerManager.myName);
 
                                 break;
@@ -848,7 +855,7 @@ public class GameManager : MonoBehaviour
                             //Debug.Log(ping);
                         }
                         break;
-                        
+
                     default:
                         Debug.Log("wrong + type");
 
@@ -941,7 +948,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 //MidNote.noteEnd();
-               // Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
+                // Debug.Log("Error Beside : -" + beatCounter + ", +" + (timeByBeat - beatCounter));
                 resultsData.miss++;
                 JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.BAD);
                 //ParticleEffect.ParticleApply(JudgeCases.BAD);

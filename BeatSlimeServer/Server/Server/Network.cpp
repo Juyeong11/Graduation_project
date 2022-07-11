@@ -1209,7 +1209,66 @@ void Network::process_packet(int client_id, unsigned char* p)
 				send_use_item(client_id, 0, cur_play_music);
 		}
 		break;
-		case 1:// 1 == in game map num
+		case TUTORI_MAP:
+		{
+			GameObject* players[MAX_IN_GAME_PLAYER];
+
+			maps[FIELD_MAP]->SetTileType(-1, -1, cl.x, cl.z);
+			players[0] = clients[client_id];
+			players[1] = nullptr;
+			players[2] = nullptr;
+
+			int room_id = get_game_room_id();
+			int boss_id = get_npc_id(TUTORI_MAP);
+			if (boss_id != -1)
+				game_room[room_id]->GameRoomInit(TUTORI_MAP, maps[TUTORI_MAP]->bpm, clients[boss_id], players, nullptr);
+
+			//game init
+			if (cl.cur_room_num == -1) break;
+			GameRoom* gr = game_room[cl.cur_room_num];
+
+			if (-1 == gr->FindPlayer(client_id)) break;
+
+			cl.vl.lock();
+			std::unordered_set <int> my_vl = cl.viewlist;
+			cl.viewlist.clear();
+			for (auto p : gr->player_ids) {
+				if (p == nullptr) continue;
+
+				cl.viewlist.insert(p->id);
+			}
+
+			cl.vl.unlock();
+
+			for (auto other : my_vl) {
+				if (false == is_player(other)) continue;
+
+				Client& target = *reinterpret_cast<Client*>(clients[other]);
+				if (-1 != target.cur_room_num) continue;
+				if (ST_INGAME != target.state)
+					continue;
+				target.vl.lock();
+				if (0 != target.viewlist.count(client_id)) {
+					target.viewlist.erase(client_id);
+					target.vl.unlock();
+					send_remove_object(other, cl.id);
+
+				}
+				else target.vl.unlock();
+			}
+			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
+
+
+			//game start
+			gr->start_time = std::chrono::system_clock::now();
+			int game_start_time = static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(gr->start_time).time_since_epoch().count());
+			game_start(gr->game_room_id);
+
+			send_game_start(client_id, game_start_time);
+			Client* p = reinterpret_cast<Client*>(players[0]);
+		}
+			break;
+		case 2:// 1 == in game map num
 		{
 			if (cl.cur_room_num == -1) break;
 			GameRoom* gr = game_room[cl.cur_room_num];
@@ -2847,7 +2906,7 @@ void Network::game_start(int room_id)
 
 			send_move_object(id->id, p->id);
 		}
-		send_move_object(p->id, p->id);
+		//send_move_object(p->id, p->id);
 	}
 
 
