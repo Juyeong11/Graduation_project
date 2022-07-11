@@ -37,7 +37,7 @@ Network::Network() {
 	DB->readSkills(skills);
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 	maps[WITCH_MAP]->SetMap("Map\\flower_load", "Music\\flower_load.csv");
-	maps[WITCH_MAP_HARD]->SetMap("Map\\flower_load", "Music\\flower_load2.csv");
+	//maps[WITCH_MAP_HARD]->SetMap("Map\\flower_load", "Music\\flower_load2.csv");
 	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\flower_load.csv");
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
