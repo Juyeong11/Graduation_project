@@ -118,13 +118,17 @@ public class Cell
     public void GetItemFromThisCell()
     {
         state = cellState.Normal;
-        obejct.transform.Find("#VFX_item").gameObject.SetActive(false);
+        var itemTrans = obejct.transform.Find("#VFX_item");
+        itemTrans.gameObject.SetActive(false);
         // Item ²ô±â
     }
-    public void SetItemToThisCell(cellState item)
+    public void SetItemToThisCell(cellState item,GameObject g)
     {
         state = item;
-        obejct.transform.Find("#VFX_item").gameObject.SetActive(true);
+        
+        var itemTrans = obejct.transform.Find("#VFX_item");
+        g.transform.SetParent(itemTrans);
+        itemTrans.gameObject.SetActive(true);
         // Item ÄÑ±â
     }
 }

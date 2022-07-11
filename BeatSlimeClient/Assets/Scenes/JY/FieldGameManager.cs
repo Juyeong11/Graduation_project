@@ -191,7 +191,8 @@ public class FieldGameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F1))
         {
-            MN.ChangeMusicName(soundManager.getSongName());
+            //MN.ChangeMusicName(soundManager.getSongName());
+            
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4))

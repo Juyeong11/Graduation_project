@@ -533,27 +533,37 @@ public class PlayerManager : MonoBehaviour
         switch (nowOnCellTag.state)
         {
             case cellState.Item1:
-                nowOnCellTag.GetItemFromThisCell();
+            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
+            nowOnCellTag.GetItemFromThisCell();
                 changeColor(Color.red);
                 Debug.Log("Item1");
             break;
             case cellState.Item2:
+            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
             nowOnCellTag.GetItemFromThisCell();
                 changeColor(Color.yellow);
             break;
             case cellState.Item3:
+            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
+                changeColor(Color.red);
             nowOnCellTag.GetItemFromThisCell();
 
             break;
             case cellState.Item4:
+            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
+                changeColor(Color.red);
             nowOnCellTag.GetItemFromThisCell();
             
             break;
             case cellState.Item5:
+            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
+                changeColor(Color.red);
             nowOnCellTag.GetItemFromThisCell();
 
             break;
             case cellState.Item6:
+            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
+                changeColor(Color.red);
             nowOnCellTag.GetItemFromThisCell();
             break;
         }

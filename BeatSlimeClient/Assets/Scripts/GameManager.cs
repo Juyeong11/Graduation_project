@@ -514,6 +514,7 @@ public class GameManager : MonoBehaviour
                             ids[3] = p.boss_id;
                             int pid = ServerID_To_ClientID(p.player_id);
 
+                            print("init pid : " +pid);
                             Objects[pid] = player;
                             myPlayerID = pid;
                             Objects[3] = enemy;
@@ -552,11 +553,12 @@ public class GameManager : MonoBehaviour
                             Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
-
+                            if (pid == -1)
+                                break;
                             if (!debugStart)
                             {
 
-
+                                print("pid : " +pid);
                                 if (pid < 3)   // 플레이어이면
                                 {
                                     Objects[pid].GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
