@@ -147,22 +147,58 @@ public class PatternManager : MonoBehaviour
                     switch (pattern[0].direction)
                     {
                         case HexDirection.Up:
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item1);
+                        {
+                        var m = Instantiate(itemModels[0]);
+                            m.name = "coloring";
+                            
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item1,ref m);
+                        m.transform.localPosition = new Vector3(0,2,0);
+                        }
                         break;
                         case HexDirection.Down:
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item2);
+                        {
+                        var m = Instantiate(itemModels[1]);
+                            m.name = "coloring";
+
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item2,ref m);
+                        m.transform.localPosition = new Vector3(0,2,0);
+                        }
                         break;
                         case HexDirection.LeftDown:
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item3);
+                        {
+                        var m = Instantiate(itemModels[2]);
+                            m.name = "coloring";
+
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item3,ref m);
+                        m.transform.localPosition = new Vector3(0,2,0);
+                        }
                         break;
                         case HexDirection.RightDown:
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item4);
+                        {
+                        var m = Instantiate(itemModels[3]);
+                            m.name = "coloring";
+                            
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item4,ref m);
+                        m.transform.localPosition = new Vector3(0,2,0);
+                        }
                         break;
                         case HexDirection.LeftUp:
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item5);
+                        {
+                        var m = Instantiate(itemModels[4]);
+                            m.name = "coloring";
+                            
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item5,ref m);
+                        m.transform.localPosition = new Vector3(0,2,0);
+                        }
                         break;
                         case HexDirection.RightUp:
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item6);
+                        {
+                        var m = Instantiate(itemModels[5]);
+                            m.name = "coloring";
+                            
+                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item6,ref m);
+                        m.transform.localPosition = new Vector3(0,2,0);
+                        }
                         break;
                     }
 
