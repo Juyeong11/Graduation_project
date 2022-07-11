@@ -41,7 +41,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 	}
 	
 	// ¸Ê È®ÀÎ¿ë
-	
+	/*
 	std::cout << LengthX << std::endl;
 	std::cout << LengthZ << std::endl;
 	std::cout << offsetX << std::endl;
@@ -56,7 +56,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 				std::cout << " " ;
 		}
 	}
-	
+	*/
 
 	std::ifstream in_m{ music_name, std::ios::binary };
 	if (!in_m) return;
@@ -311,6 +311,7 @@ void GameRoom::GameRoomInit(int mapType, float BPM, GameObject* Boss, GameObject
 	//memcpy_s(player_ids, MAX_IN_GAME_PLAYER * sizeof(int), Players, MAX_IN_GAME_PLAYER * sizeof(int));
 	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 		player_ids[i] = Players[i];
+		if (player_ids[i] == nullptr) continue;
 
 		player_ids[i]->cur_room_num = game_room_id;
 

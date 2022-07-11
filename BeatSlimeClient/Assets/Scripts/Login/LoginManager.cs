@@ -81,12 +81,13 @@ public class LoginManager : MonoBehaviour
             return; 
         }
 
-        
-       
+        Network.SendLogIn(id);
+
         SceneManager.LoadScene("InGameScene01");
+
         
         //SceneManager.LoadScene("FieldScene");
         
-        //Network.SendLogIn(id);
+        //
     }
 }
