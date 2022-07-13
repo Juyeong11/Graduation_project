@@ -38,6 +38,7 @@ public class PlayerWaterGun : MonoBehaviour
 
         StartCoroutine(Animation());
     }
+
     IEnumerator Animation()
     {
         float scale = 0.0f;

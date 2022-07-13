@@ -1988,6 +1988,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &663990843 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4426036946787524001, guid: f5a42c2c9b70c744382052d6fa0eaa23, type: 3}
+  m_PrefabInstance: {fileID: 1335912149208043067}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &663990844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 663990843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4869e0169b86ff84c9da6c4c9c6049a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 0
 --- !u!1 &697994748 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5085428334873218887, guid: f231ab97c39217f4591707671f32053e, type: 3}
@@ -2570,10 +2588,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3342d1ce7a5a9b84095224bf41569f55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TileEffectPrefab: {fileID: 8687026714411121945, guid: b214000e22c615b408de57b3b3a67e04, type: 3}
+  TileEffectPrefab: {fileID: 8311453363040717455, guid: 5ff5bca8c6bc5554393fd5c1f37b375c, type: 3}
   BossQuakeEffectPrefab: {fileID: 8687026714411121945, guid: 6182beab0f3de3a4dab83a92495dfc9a, type: 3}
-  BossWaterGunEffectPrefab: {fileID: 2880285097022423080, guid: 021d256c85affcb4ea1b4c1b07017b38, type: 3}
-  BossTargetingEffectPrefab: {fileID: 2880285097022423080, guid: 23f4da0bfdcf9d541b8f73bf6c87baf7, type: 3}
+  BossWaterGunEffectPrefab: {fileID: 8311453363040717455, guid: a29fb67795503e1489a2aa8bbf70aee1, type: 3}
+  BossTargetingEffectPrefab: {fileID: 2366065740675528797, guid: b0f57219d46631946954a3c8e6736dc0, type: 3}
   BossRokets: {fileID: 0}
   PlayerQuakeEffectPrefab: {fileID: 9145100225357172896, guid: 2958786283f34f64cbe1ed7ac0049844, type: 3}
   PlayerWaterGunEffectPrefab: {fileID: 9145100225357172896, guid: 694ac830a5d8ccb43b2ed3f1a28069f1, type: 3}

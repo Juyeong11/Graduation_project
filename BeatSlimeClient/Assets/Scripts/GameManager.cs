@@ -404,10 +404,10 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Q))
         {
             
-            HexCoordinates h = new HexCoordinates(5* zxcv, -5* zxcv);
+            HexCoordinates h = new HexCoordinates(5* zxcv, -5* zxcv,1);
             zxcv *= -1;
-            EffectManager.instance.JumpAttack(2, h);
-
+            
+            EffectManager.instance.GunAttack(2000,h);
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
@@ -555,7 +555,7 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_move p = Protocol.sc_packet_move.SetByteToVar(data);
 
-                            Debug.Log("MOVE PACKET x : " + p.x);
+                           // Debug.Log("MOVE PACKET x : " + p.x);
 
                             int pid = ServerID_To_ClientID(p.id);
                             if (pid == -1)
@@ -563,15 +563,17 @@ public class GameManager : MonoBehaviour
                             if (!debugStart)
                             {
 
-                                print("pid : " +pid);
+                                //print("pid : " +pid);
                                 if (pid < 3)   // 플레이어이면
                                 {
                                     Objects[pid].GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
                                 }
 
-
-                                Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
+                                    EffectManager.instance.JumpAttack(3, new HexCoordinates(p.x, p.z), false);
+                                else
+                                    Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                 if (pid < 3)   // 플레이어이면
                                 {
                                     Objects[pid].GetComponentInChildren<PlayerManager>().cellTag();

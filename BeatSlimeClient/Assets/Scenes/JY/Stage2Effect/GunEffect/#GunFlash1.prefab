@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5256630389524606994}
   - component: {fileID: 4175450908359496583}
   m_Layer: 0
-  m_Name: '#GunFlash2'
+  m_Name: '#GunFlash1'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25,13 +25,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2151745138595677958}
-  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 1.5269077, y: 2.2364666, z: -0.08614057}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!2083052967 &5256630389524606994
 VisualEffect:
   m_ObjectHideFlags: 0
@@ -40,11 +40,11 @@ VisualEffect:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2151745138595677958}
   m_Enabled: 1
-  m_Asset: {fileID: 8926484042661614526, guid: 6ae75d3b0af742a45aa03e82f8b5470e, type: 3}
+  m_Asset: {fileID: 8926484042661614526, guid: 5180edb1825e4f74c9c513bd73f0a91c, type: 3}
   m_InitialEventName: OnPlay
   m_InitialEventNameOverriden: 0
   m_StartSeed: 0
-  m_ResetSeedOnPlay: 1
+  m_ResetSeedOnPlay: 0
   m_ResourceVersion: 1
   m_PropertySheet:
     m_Float:
@@ -88,6 +88,7 @@ VFXRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
+  - {fileID: 0}
   - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0

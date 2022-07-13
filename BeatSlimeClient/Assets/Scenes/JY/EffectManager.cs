@@ -42,7 +42,10 @@ public class EffectManager : MonoBehaviour
         GameObject go = Instantiate(TileEffectPrefab, GameManager.data.grid.cellMaps.Get(startX, startY, startZ).getCellRealPosition(), Quaternion.identity);
         float s = speed * 1 / 1000f;
         //Debug.Log("effect t" + Time.time);
-        go.GetComponent<TileEffect>().speed = s;
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
+            go.GetComponent<TileEffect2>().speed = s;
+        else
+            go.GetComponent<TileEffect>().speed = s;
     }
 
     public void BossTileEffect(int startX, int startY, int startZ, int speed, int EffectType)
@@ -255,12 +258,30 @@ public class EffectManager : MonoBehaviour
         StartCoroutine(CoTileRailWaveEffect(startX, startZ, power, (int)dir));
     }
 
-    public void JumpAttack(float speed, HexCoordinates end_pos)
+    IEnumerable CoRobotLookAt(float speed, HexCoordinates end_pos)
+    {
+        float t = 0;
+        while (t < speed)
+        {
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        // GameManager.data.enemy.GetComponent<HexCellPosition>().setDirection();
+
+    }
+
+    //Robot
+    public void ikTest(HexCoordinates end_pos)
+    {
+        //GameManager.data.GetEnemyAnim().SetIKPosition();
+    }
+    public void JumpAttack(float speed, HexCoordinates end_pos, bool bAttack)
     {
         float s = speed * 1 / 1000f;
-        StartCoroutine(CoJumpAttack(speed, end_pos));
+        StartCoroutine(CoJumpAttack(s, end_pos, bAttack));
     }
-    IEnumerator CoJumpAttack(float speed, HexCoordinates end_pos)
+    IEnumerator CoJumpAttack(float speed, HexCoordinates end_pos, bool bAttack)
     {
         const float totalAnimTime = 3.0f;
         const float JumpAnimTime = 1.2f;
@@ -268,7 +289,7 @@ public class EffectManager : MonoBehaviour
 
         float s = 1 / ((1 / totalAnimTime) * speed);
         Debug.Log(s);
-        GameManager.data.GetEnemyAnim().SetFloat("AttackSpeed",s);
+        GameManager.data.GetEnemyAnim().SetFloat("AttackSpeed", s);
         // moveSpeed
         float arrivalTime = JumpAnimTime * (1 / s);
         Debug.Log(arrivalTime);
@@ -276,30 +297,65 @@ public class EffectManager : MonoBehaviour
         Vector3 startPos = GameManager.data.enemy.transform.position;
         Vector3 endPos = end_pos.getRealPosition();
         float t = 0;
-        while (t < arrivalTime * 0.4) {
+        while (t < arrivalTime * 0.4)
+        {
             t += Time.deltaTime;
+
             yield return null;
 
         }
         t = 0;
-        while (t< arrivalTime*0.6)
+        while (t < arrivalTime * 0.6)
         {
             //내가 원하는 방향으로 이동..
             t += Time.deltaTime;
-            
-            GameManager.data.enemy.transform.position =  Vector3.Slerp(startPos, endPos, t/(arrivalTime*0.6f));
+
+            GameManager.data.enemy.transform.position = Vector3.Slerp(startPos, endPos, t / (arrivalTime * 0.6f));
             yield return null;
         }
-        int type = Random.Range(1, 3);
-        if (type == 1)
-            GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 1);
-        else if (type == 2)
-            GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 2);
-
         GameManager.data.enemy.GetComponent<HexCellPosition>().SetPosition(end_pos.X, end_pos.Y, end_pos.Z);
         GameManager.data.enemy.GetComponent<HexCellPosition>().reflectPosition();
+
+        if (bAttack == false)
+        {
+            GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 3);
+        }
+        else
+        {
+            int type = Random.Range(1, 3);
+            if (type == 1)
+                GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 1);
+            else if (type == 2)
+                GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 2);
+
+        }
+
 
         // GameManager.data.GetEnemyAnim().SetBool("Jumping", false);
 
     }
+
+    public void GunAttack(float speed, HexCoordinates target_pos)
+    {
+        //타겟방향으로 돌아보는건 ik랑 애니메이션 활용해서 만드는걸로하고 일단 이펙트만 출력하자
+
+        GameObject go = Instantiate(BossWaterGunEffectPrefab, target_pos.getRealPosition(), Quaternion.identity);
+        float s = speed * 1 / 1000f;
+        //Debug.Log("effect w" + Time.time);
+        go.GetComponent<GunEffect>().speed = s;
+      
+
+
+    }
+
+    public void ElectricBallEffect(Vector3 start_pos, ref GameObject target, int speed)
+    {
+
+        GameObject go = Instantiate(BossTargetingEffectPrefab, start_pos, Quaternion.identity);
+        float s = speed * 1 / 1000f;
+
+        go.GetComponent<TargetingEffect2>().Init(go.transform, target.transform, s, 2);
+
+    }
+
 }
