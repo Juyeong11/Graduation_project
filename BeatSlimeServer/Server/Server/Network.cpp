@@ -2282,6 +2282,20 @@ void Network::worker()
 				}
 			}
 			break;
+			case 7:
+				for (int i = 0; i < 6; ++i) {
+					do_npc_tile_attack(game_room_id,
+						PatternInfo::HexCellAround[i][0] + pos_x,
+						PatternInfo::HexCellAround[i][1] + pos_y,
+						PatternInfo::HexCellAround[i][2] + pos_z);
+				}
+				break;
+			case 8:
+				do_npc_tile_attack(game_room_id,
+					pos_x,
+					pos_y,
+					pos_z);
+				break;
 			default:
 				std::cout << "wrong pattern type\n";
 				break;
@@ -2685,6 +2699,8 @@ void Network::set_next_pattern(int room_id)
 	case 99:// 단일 장판 공격
 	case 5: // 가장 멀리있는 적에게 물줄기 발사
 	case 6: // 보스가 보는 방향으로 지진
+	case 7:
+	case 8:
 		tev.ev = EVENT_BOSS_TILE_ATTACK_START;
 		tev.obj_id = boss_id;
 		tev.type = t.type;
