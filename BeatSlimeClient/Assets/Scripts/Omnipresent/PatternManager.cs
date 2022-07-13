@@ -108,7 +108,8 @@ public class PatternManager : MonoBehaviour
             {
                 case -1:
                     //이동만 이례적으로 애니메이션 바인드
-                    GameManager.data.GetEnemyAnim().SetTrigger("Move");
+
+                        GameManager.data.GetEnemyAnim().SetTrigger("Move");
                     //GameManager.data.enemy
                     break;
 
@@ -130,11 +131,17 @@ public class PatternManager : MonoBehaviour
 
                     break;
                 case 7: // robot 보스 점프
-                    EffectManager.instance.JumpAttack(charging_time, TargetPos);
+                    EffectManager.instance.JumpAttack(charging_time, TargetPos,true);
                     break;
-                
+                case 8: // robot 보스 총발사
+                    EffectManager.instance.GunAttack(charging_time, TargetPos);
+                    break;
                 case 10:
-                    EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
+                    if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
+                        EffectManager.instance.ElectricBallEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
+
+                    else
+                        EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
                     break;
 
                     

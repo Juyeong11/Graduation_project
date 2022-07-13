@@ -24,7 +24,7 @@ public class TileEffect2 : MonoBehaviour
     IEnumerator Animation()
     {
         vfWarning.Play();
-        vfWarning.playRate = 1/(0.5f * speed);
+        vfWarning.playRate = 1/((1/lifeTime) * speed);
   
 
         //playRate == 1 => playTime == 2
