@@ -203,7 +203,7 @@ public class EffectManager : MonoBehaviour
 
         int[,] range = new int[maxStep, maxStep];
 
-        range[power,power] = 2;
+        range[power, power] = 2;
 
 
         while (step < power)
@@ -250,8 +250,56 @@ public class EffectManager : MonoBehaviour
         StartCoroutine(CoTileWaveEffect(startX, startZ, power));
     }
 
-    public void TileRailWaveEffect(int startX, int startZ, int power,HexDirection dir)
+    public void TileRailWaveEffect(int startX, int startZ, int power, HexDirection dir)
     {
         StartCoroutine(CoTileRailWaveEffect(startX, startZ, power, (int)dir));
+    }
+
+    public void JumpAttack(float speed, HexCoordinates end_pos)
+    {
+        float s = speed * 1 / 1000f;
+        StartCoroutine(CoJumpAttack(speed, end_pos));
+    }
+    IEnumerator CoJumpAttack(float speed, HexCoordinates end_pos)
+    {
+        const float totalAnimTime = 3.0f;
+        const float JumpAnimTime = 1.2f;
+        GameManager.data.GetEnemyAnim().SetTrigger("StartJump");
+
+        float s = 1 / ((1 / totalAnimTime) * speed);
+        Debug.Log(s);
+        GameManager.data.GetEnemyAnim().SetFloat("AttackSpeed",s);
+        // moveSpeed
+        float arrivalTime = JumpAnimTime * (1 / s);
+        Debug.Log(arrivalTime);
+
+        Vector3 startPos = GameManager.data.enemy.transform.position;
+        Vector3 endPos = end_pos.getRealPosition();
+        float t = 0;
+        while (t < arrivalTime * 0.4) {
+            t += Time.deltaTime;
+            yield return null;
+
+        }
+        t = 0;
+        while (t< arrivalTime*0.6)
+        {
+            //내가 원하는 방향으로 이동..
+            t += Time.deltaTime;
+            
+            GameManager.data.enemy.transform.position =  Vector3.Slerp(startPos, endPos, t/(arrivalTime*0.6f));
+            yield return null;
+        }
+        int type = Random.Range(1, 3);
+        if (type == 1)
+            GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 1);
+        else if (type == 2)
+            GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 2);
+
+        GameManager.data.enemy.GetComponent<HexCellPosition>().SetPosition(end_pos.X, end_pos.Y, end_pos.Z);
+        GameManager.data.enemy.GetComponent<HexCellPosition>().reflectPosition();
+
+        // GameManager.data.GetEnemyAnim().SetBool("Jumping", false);
+
     }
 }

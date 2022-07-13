@@ -130,7 +130,10 @@ public class PatternManager : MonoBehaviour
                     EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].direction);
 
                     break;
-
+                case 7: // robot 보스 점프
+                    EffectManager.instance.JumpAttack(charging_time, TargetPos);
+                    break;
+                
                 case 10:
                     EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
                     break;
