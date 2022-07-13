@@ -389,6 +389,7 @@ public class GameManager : MonoBehaviour
     }
 
     bool ___cord = false;
+    int zxcv = 1;
     void Update()
     {
         // if (Input.GetKeyDown("9"))
@@ -402,7 +403,10 @@ public class GameManager : MonoBehaviour
         // }
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            EffectManager.instance.TileWaveEffect(0, 0, 2);
+            
+            HexCoordinates h = new HexCoordinates(5* zxcv, -5* zxcv);
+            zxcv *= -1;
+            EffectManager.instance.JumpAttack(2, h);
 
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
