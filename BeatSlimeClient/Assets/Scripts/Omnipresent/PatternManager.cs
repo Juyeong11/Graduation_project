@@ -99,152 +99,308 @@ public class PatternManager : MonoBehaviour
             //SetSkill.Invoke();
             //여기서 이펙트 출력하면 되겠군
             //
-
-            HexCoordinates TargetPos = GameManager.data.GetTargetPos(pattern[0].pivotType);
-            HexCoordinates BossPos = GameManager.data.GetBossPos();
-            TargetPos.plus(pattern[0].pivot.X, pattern[0].pivot.Z);
-            int charging_time = pattern[0].warningBeatOffset.GetBeatTime();
-
-            switch (pattern[0].noteType)
+            if (pattern[0].pivotType == "PlayerA")
             {
-                case -1:
-                    //이동만 이례적으로 애니메이션 바인드
+                for(int i = 0; i < Protocol.CONSTANTS.MAX_IN_GAME_PLAYER; ++i)
+                {
+                    HexCoordinates TargetPos = GameManager.data.GetTargetPos("Player"+i+1);
+
+                    HexCoordinates BossPos = GameManager.data.GetBossPos();
+                    TargetPos.plus(pattern[0].pivot.X, pattern[0].pivot.Z);
+                    int charging_time = pattern[0].warningBeatOffset.GetBeatTime();
+
+                    switch (pattern[0].noteType)
+                    {
+                        case -1:
+                            //이동만 이례적으로 애니메이션 바인드
+
+                            GameManager.data.GetEnemyAnim().SetTrigger("Move");
+                            //GameManager.data.enemy
+                            break;
+
+                        case 3:
+                        case 4:
+                            EffectManager.instance.BossTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].noteType);
+                            break;
+
+                        case 99:
+                            EffectManager.instance.OneTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time);
+                            break;
+
+                        case 5:
+                            EffectManager.instance.BossWaterGunEffect(BossPos.getRealPosition(), TargetPos.getRealPosition(), charging_time);
+                            break;
+
+                        case 6:
+                            EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].direction);
+
+                            break;
+                        case 7: // robot 보스 점프
+                            EffectManager.instance.JumpAttack(charging_time, TargetPos, true);
+                            break;
+                        case 8: // robot 보스 총발사
+                            EffectManager.instance.GunAttack(charging_time, TargetPos);
+                            break;
+                        case 10:
+                            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
+                                EffectManager.instance.ElectricBallEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
+
+                            else
+                                EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
+                            break;
+
+
+                        case 100: //장판 이펙트
+                            EffectManager.instance.TileWaveEffect(TargetPos.X, TargetPos.Z, 5);
+                            break;
+                        case 101:
+                            EffectManager.instance.TileRailWaveEffect(TargetPos.X, TargetPos.Z, 5, pattern[0].direction);
+                            break;
+
+                        case 200:   //아이템
+                                    //print($"{TargetPos.X}, {TargetPos.Y}, {TargetPos.Z}");
+                            switch (pattern[0].direction)
+                            {
+                                case HexDirection.Up:
+                                    {
+                                        var m = Instantiate(itemModels[0]);
+                                        m.name = "coloring";
+
+                                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item1, ref m);
+                                        m.transform.localPosition = new Vector3(0, 2, 0);
+                                    }
+                                    break;
+                                case HexDirection.Down:
+                                    {
+                                        var m = Instantiate(itemModels[1]);
+                                        m.name = "coloring";
+
+                                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item2, ref m);
+                                        m.transform.localPosition = new Vector3(0, 2, 0);
+                                    }
+                                    break;
+                                case HexDirection.LeftDown:
+                                    {
+                                        var m = Instantiate(itemModels[2]);
+                                        m.name = "coloring";
+
+                                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item3, ref m);
+                                        m.transform.localPosition = new Vector3(0, 2, 0);
+                                    }
+                                    break;
+                                case HexDirection.RightDown:
+                                    {
+                                        var m = Instantiate(itemModels[3]);
+                                        m.name = "coloring";
+
+                                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item4, ref m);
+                                        m.transform.localPosition = new Vector3(0, 2, 0);
+                                    }
+                                    break;
+                                case HexDirection.LeftUp:
+                                    {
+                                        var m = Instantiate(itemModels[4]);
+                                        m.name = "coloring";
+
+                                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item5, ref m);
+                                        m.transform.localPosition = new Vector3(0, 2, 0);
+                                    }
+                                    break;
+                                case HexDirection.RightUp:
+                                    {
+                                        var m = Instantiate(itemModels[5]);
+                                        m.name = "coloring";
+
+                                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item6, ref m);
+                                        m.transform.localPosition = new Vector3(0, 2, 0);
+                                    }
+                                    break;
+                            }
+
+
+                            break;
+
+                        case 600:   //게임 시작 패널
+                            StartCoroutine(LogoLoad(true));
+                            break;
+                        case 601:   //게임 시작 패널
+                            StartCoroutine(LogoLoad(false));
+                            break;
+
+                        //보스 애니메이션
+                        case 1000:
+                            GameManager.data.GetEnemyAnim().SetTrigger("Move");
+                            break;
+                        case 1001:
+                            GameManager.data.GetEnemyAnim().SetTrigger("Attack");
+                            break;
+                        case 1002:
+                            GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
+                            break;
+                        case 1003:
+                            GameManager.data.GetEnemyAnim().SetTrigger("Attack3");
+                            break;
+                        case 1004:
+                            GameManager.data.GetEnemyAnim().SetTrigger("Attack4");
+                            break;
+                    }
+                    //Debug.Log("patternType : " + pattern[0].noteType);
+
+                    settedPattern.Add(pattern[0]);
+                    pattern.RemoveAt(0);
+                    patNums++;
+                }
+            }
+            else
+            {
+                HexCoordinates TargetPos = GameManager.data.GetTargetPos(pattern[0].pivotType);
+
+                HexCoordinates BossPos = GameManager.data.GetBossPos();
+                TargetPos.plus(pattern[0].pivot.X, pattern[0].pivot.Z);
+                int charging_time = pattern[0].warningBeatOffset.GetBeatTime();
+
+                switch (pattern[0].noteType)
+                {
+                    case -1:
+                        //이동만 이례적으로 애니메이션 바인드
 
                         GameManager.data.GetEnemyAnim().SetTrigger("Move");
-                    //GameManager.data.enemy
-                    break;
-
-                case 3:
-                case 4:
-                    EffectManager.instance.BossTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].noteType);
-                    break;
-
-                case 99:
-                    EffectManager.instance.OneTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time);
-                    break;
-
-                case 5:
-                    EffectManager.instance.BossWaterGunEffect(BossPos.getRealPosition(), TargetPos.getRealPosition(), charging_time);
-                    break;
-
-                case 6:
-                    EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].direction);
-
-                    break;
-                case 7: // robot 보스 점프
-                    EffectManager.instance.JumpAttack(charging_time, TargetPos,true);
-                    break;
-                case 8: // robot 보스 총발사
-                    EffectManager.instance.GunAttack(charging_time, TargetPos);
-                    break;
-                case 10:
-                    if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
-                        EffectManager.instance.ElectricBallEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
-
-                    else
-                        EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
-                    break;
-
-                    
-                case 100: //장판 이펙트
-                    EffectManager.instance.TileWaveEffect(TargetPos.X,  TargetPos.Z,5);
-                    break;
-                case 101:
-                    EffectManager.instance.TileRailWaveEffect(TargetPos.X, TargetPos.Z, 5, pattern[0].direction);
-                    break;
-
-                case 200:   //아이템
-                    //print($"{TargetPos.X}, {TargetPos.Y}, {TargetPos.Z}");
-                    switch (pattern[0].direction)
-                    {
-                        case HexDirection.Up:
-                        {
-                        var m = Instantiate(itemModels[0]);
-                            m.name = "coloring";
-                            
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item1,ref m);
-                        m.transform.localPosition = new Vector3(0,2,0);
-                        }
+                        //GameManager.data.enemy
                         break;
-                        case HexDirection.Down:
-                        {
-                        var m = Instantiate(itemModels[1]);
-                            m.name = "coloring";
 
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item2,ref m);
-                        m.transform.localPosition = new Vector3(0,2,0);
-                        }
+                    case 3:
+                    case 4:
+                        EffectManager.instance.BossTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].noteType);
                         break;
-                        case HexDirection.LeftDown:
-                        {
-                        var m = Instantiate(itemModels[2]);
-                            m.name = "coloring";
 
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item3,ref m);
-                        m.transform.localPosition = new Vector3(0,2,0);
-                        }
+                    case 99:
+                        EffectManager.instance.OneTileEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time);
                         break;
-                        case HexDirection.RightDown:
-                        {
-                        var m = Instantiate(itemModels[3]);
-                            m.name = "coloring";
-                            
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item4,ref m);
-                        m.transform.localPosition = new Vector3(0,2,0);
-                        }
-                        break;
-                        case HexDirection.LeftUp:
-                        {
-                        var m = Instantiate(itemModels[4]);
-                            m.name = "coloring";
-                            
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item5,ref m);
-                        m.transform.localPosition = new Vector3(0,2,0);
-                        }
-                        break;
-                        case HexDirection.RightUp:
-                        {
-                        var m = Instantiate(itemModels[5]);
-                            m.name = "coloring";
-                            
-                        GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item6,ref m);
-                        m.transform.localPosition = new Vector3(0,2,0);
-                        }
-                        break;
-                    }
 
-                    
-                break;
+                    case 5:
+                        EffectManager.instance.BossWaterGunEffect(BossPos.getRealPosition(), TargetPos.getRealPosition(), charging_time);
+                        break;
 
-                case 600:   //게임 시작 패널
-                    StartCoroutine(LogoLoad(true));
-                    break;
-                case 601:   //게임 시작 패널
-                    StartCoroutine(LogoLoad(false));
-                    break;
+                    case 6:
+                        EffectManager.instance.BossQuakeEffect(TargetPos.X, TargetPos.Y, TargetPos.Z, charging_time, pattern[0].direction);
 
-                //보스 애니메이션
-                case 1000:
-                    GameManager.data.GetEnemyAnim().SetTrigger("Move");
-                    break;
-                case 1001:
-                    GameManager.data.GetEnemyAnim().SetTrigger("Attack");
-                    break;
-                case 1002:
-                    GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
-                    break;
-                case 1003:
-                    GameManager.data.GetEnemyAnim().SetTrigger("Attack3");
-                    break;
-                case 1004:
-                    GameManager.data.GetEnemyAnim().SetTrigger("Attack4");
-                    break;
+                        break;
+                    case 7: // robot 보스 점프
+                        EffectManager.instance.JumpAttack(charging_time, TargetPos, true);
+                        break;
+                    case 8: // robot 보스 총발사
+                        EffectManager.instance.GunAttack(charging_time, TargetPos);
+                        break;
+                    case 10:
+                        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
+                            EffectManager.instance.ElectricBallEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
+
+                        else
+                            EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
+                        break;
+
+
+                    case 100: //장판 이펙트
+                        EffectManager.instance.TileWaveEffect(TargetPos.X, TargetPos.Z, 5);
+                        break;
+                    case 101:
+                        EffectManager.instance.TileRailWaveEffect(TargetPos.X, TargetPos.Z, 5, pattern[0].direction);
+                        break;
+
+                    case 200:   //아이템
+                                //print($"{TargetPos.X}, {TargetPos.Y}, {TargetPos.Z}");
+                        switch (pattern[0].direction)
+                        {
+                            case HexDirection.Up:
+                                {
+                                    var m = Instantiate(itemModels[0]);
+                                    m.name = "coloring";
+
+                                    GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item1, ref m);
+                                    m.transform.localPosition = new Vector3(0, 2, 0);
+                                }
+                                break;
+                            case HexDirection.Down:
+                                {
+                                    var m = Instantiate(itemModels[1]);
+                                    m.name = "coloring";
+
+                                    GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item2, ref m);
+                                    m.transform.localPosition = new Vector3(0, 2, 0);
+                                }
+                                break;
+                            case HexDirection.LeftDown:
+                                {
+                                    var m = Instantiate(itemModels[2]);
+                                    m.name = "coloring";
+
+                                    GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item3, ref m);
+                                    m.transform.localPosition = new Vector3(0, 2, 0);
+                                }
+                                break;
+                            case HexDirection.RightDown:
+                                {
+                                    var m = Instantiate(itemModels[3]);
+                                    m.name = "coloring";
+
+                                    GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item4, ref m);
+                                    m.transform.localPosition = new Vector3(0, 2, 0);
+                                }
+                                break;
+                            case HexDirection.LeftUp:
+                                {
+                                    var m = Instantiate(itemModels[4]);
+                                    m.name = "coloring";
+
+                                    GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item5, ref m);
+                                    m.transform.localPosition = new Vector3(0, 2, 0);
+                                }
+                                break;
+                            case HexDirection.RightUp:
+                                {
+                                    var m = Instantiate(itemModels[5]);
+                                    m.name = "coloring";
+
+                                    GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item6, ref m);
+                                    m.transform.localPosition = new Vector3(0, 2, 0);
+                                }
+                                break;
+                        }
+
+
+                        break;
+
+                    case 600:   //게임 시작 패널
+                        StartCoroutine(LogoLoad(true));
+                        break;
+                    case 601:   //게임 시작 패널
+                        StartCoroutine(LogoLoad(false));
+                        break;
+
+                    //보스 애니메이션
+                    case 1000:
+                        GameManager.data.GetEnemyAnim().SetTrigger("Move");
+                        break;
+                    case 1001:
+                        GameManager.data.GetEnemyAnim().SetTrigger("Attack");
+                        break;
+                    case 1002:
+                        GameManager.data.GetEnemyAnim().SetTrigger("Attack2");
+                        break;
+                    case 1003:
+                        GameManager.data.GetEnemyAnim().SetTrigger("Attack3");
+                        break;
+                    case 1004:
+                        GameManager.data.GetEnemyAnim().SetTrigger("Attack4");
+                        break;
+                }
+                //Debug.Log("patternType : " + pattern[0].noteType);
+
+                settedPattern.Add(pattern[0]);
+                pattern.RemoveAt(0);
+                patNums++;
             }
-            //Debug.Log("patternType : " + pattern[0].noteType);
-
-            settedPattern.Add(pattern[0]);
-            pattern.RemoveAt(0);
-            patNums++;
+            
         }
         return patNums;
     }
