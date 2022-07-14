@@ -2812,20 +2812,21 @@ void Network::set_next_pattern(int room_id)
 	case 6: // 보스가 보는 방향으로 지진
 	case 7:
 	case 8:
-		tev.ev = EVENT_BOSS_TILE_ATTACK_START;
-		tev.obj_id = boss_id;
-		tev.type = t.type;
-		tev.x = t.x;
-		tev.y = t.y;
-		tev.z = t.z;
-		tev.game_room_id = room_id;
-		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed - 100);
-		tev.charging_time = t.speed;
-		tev.pivotType = t.pivotType;
-		tev.dir = t.dir;
-		timer_queue.push(tev);
 
+			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
+			tev.obj_id = boss_id;
+			tev.type = t.type;
+			tev.x = t.x;
+			tev.y = t.y;
+			tev.z = t.z;
+			tev.game_room_id = room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed - 100);
+			tev.charging_time = t.speed;
+			tev.pivotType = t.pivotType;
+			tev.dir = t.dir;
+			timer_queue.push(tev);
+		
 
 		break;
 

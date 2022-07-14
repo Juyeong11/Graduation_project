@@ -42,7 +42,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 	}
 	
 	// 맵 확인용
-	
+	/*
 	std::cout << LengthX << std::endl;
 	std::cout << LengthZ << std::endl;
 	std::cout << offsetX << std::endl;
@@ -57,7 +57,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 				std::cout << " " ;
 		}
 	}
-	
+	*/
 
 	std::ifstream in_m{ music_name, std::ios::binary };
 	if (!in_m) return;
@@ -66,7 +66,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 	in_m.read(&tmp, sizeof(tmp));
 	in_m.read(&tmp, sizeof(tmp));
 	in_m.read(&tmp, sizeof(tmp));
-
+	
 
 	std::string buf;
 
@@ -196,6 +196,8 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			pivotType = 7;
 		else if (pattern["pivotType"][i] == "PlayerN")
 			pivotType = 8;
+		else if (pattern["pivotType"][i] == "PlayerA")
+			pivotType = 9;
 		else if (pattern["pivotType"][i] == "END")
 			std::cout << std::endl << music_name + " - pattern csv load done.\n";
 		else {
@@ -207,17 +209,33 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 		int py = stoi(pattern["pivotY"][i]);
 		int pz = stoi(pattern["pivotZ"][i]);
 
-		
-		pattern_time.emplace_back(
-			noteType,
-			pivotType,
-			bar * timeByBar
-			+ addBeat * timeByBeat
-			+ add16Beat * timeBy16Beat
-			+ add24Beat * timeBy24Beat,
-			dir,
-			speed,
-			px,py,pz);
+		if (pivotType == 9) {
+			for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
+				pattern_time.emplace_back(
+					noteType,
+					4 + i,
+					bar * timeByBar
+					+ addBeat * timeByBeat
+					+ add16Beat * timeBy16Beat
+					+ add24Beat * timeBy24Beat,
+					dir,
+					speed,
+					px, py, pz);
+			}
+		}
+		else
+		{
+			pattern_time.emplace_back(
+				noteType,
+				pivotType,
+				bar * timeByBar
+				+ addBeat * timeByBeat
+				+ add16Beat * timeBy16Beat
+				+ add24Beat * timeBy24Beat,
+				dir,
+				speed,
+				px, py, pz);
+		}
 
 		
 			////패링공격이면 저장
