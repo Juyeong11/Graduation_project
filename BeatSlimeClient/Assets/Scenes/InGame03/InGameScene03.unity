@@ -2169,6 +2169,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Factory: {fileID: 727645559}
   LOGO: {fileID: 156540633}
+  itemModels: []
 --- !u!4 &727645558
 Transform:
   m_ObjectHideFlags: 0
@@ -4751,7 +4752,7 @@ MonoBehaviour:
   PM: {fileID: 727645557}
   player: {fileID: 438602109}
   enemy: {fileID: 1711564687}
-  enemyParriedTarget: {fileID: 0}
+  enemyParriedTarget: {fileID: 1711564687}
   tilemap: {fileID: 422432064}
   grid: {fileID: 422432065}
   loader: {fileID: 2121429946}

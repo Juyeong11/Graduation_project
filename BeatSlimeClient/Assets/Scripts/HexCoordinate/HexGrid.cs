@@ -221,7 +221,7 @@ public class CellMap
             }
         }
 
-        Debug.LogError(">Invalid coordinate<");
+        Debug.LogError(">Invalid coordinate< : " + H.X + " " + H.Y + " " + H.Z);
         return null;
     }
 
