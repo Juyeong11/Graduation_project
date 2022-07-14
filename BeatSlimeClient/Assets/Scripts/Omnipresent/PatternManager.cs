@@ -73,7 +73,7 @@ public class PatternManager : MonoBehaviour
             //DEBUG : 이펙트 패킷은 서버에서 보내줄 필요 없이 여기서 바로 읽어서 저장해놓고 사용하기 (동접자 올릴 때)
             
             //자신에게 날아오는 보스의 유도 공격만!
-            if (tmpP.noteType.ToString() == "10" && tmpP.pivotType == ("Player" + PID))
+            if (tmpP.noteType.ToString() == "10" && (tmpP.pivotType == ("Player" + PID) || tmpP.pivotType == ("PlayerA")))
             {
                 //Debug.Log(tmpP.id + " " + tmpP.noteType + " " + tmpP.pivotType);
                 Factory.attackNotesBeats.Add(tmpP.rhythmBeat.GetBeatTime());
