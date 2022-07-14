@@ -246,10 +246,10 @@ public class PatternManager : MonoBehaviour
                     }
                     //Debug.Log("patternType : " + pattern[0].noteType);
 
+                }
                     settedPattern.Add(pattern[0]);
                     pattern.RemoveAt(0);
                     patNums++;
-                }
             }
             else
             {
