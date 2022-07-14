@@ -288,7 +288,7 @@ public class EffectManager : MonoBehaviour
         Animator Ani = GameManager.data.GetEnemyAnim();
 
         Vector3 look = GameManager.data.enemy.transform.forward;
-        Vector3 targetLook = transform.position - GameManager.data.enemy.transform.position;
+        Vector3 targetLook = end_pos.getRealPosition() - GameManager.data.enemy.transform.position;
         float Theta = Vector3.Angle(look, targetLook);
 
 

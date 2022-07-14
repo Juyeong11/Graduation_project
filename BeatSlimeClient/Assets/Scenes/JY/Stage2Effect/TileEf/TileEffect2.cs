@@ -7,14 +7,17 @@ public class TileEffect2 : MonoBehaviour
     public float speed;
     VisualEffect vfWarning;
     VisualEffect vfAirStrike;
-    const float lifeTime = 2.0f;
+    const float warningLifeTime = 2.0f;
+    const float airStrikeLiftTime = 1.0f;
+
     // Start is called before the first frame update
     void Start()
     {
         
-        vfWarning = GetComponent<VisualEffect>();
+        VisualEffect[] temp = GetComponentsInChildren<VisualEffect>();
+        vfWarning = temp[0];
+        vfAirStrike = temp[1];
         vfWarning.Stop();
-        vfAirStrike = GetComponentInChildren<VisualEffect>();
         vfAirStrike.Stop();
         StartCoroutine(Animation());
     }
@@ -24,13 +27,13 @@ public class TileEffect2 : MonoBehaviour
     IEnumerator Animation()
     {
         vfWarning.Play();
-        vfWarning.playRate = 1/((1/lifeTime) * speed);
-  
+        vfWarning.playRate = 1/((1/ warningLifeTime) * speed);
+
 
         //playRate == 1 => playTime == 2
         //playTime == speed
         float t = 0.0f;
-        while (t <= speed)
+        while (t <= speed - 0.5)
         {
             t += Time.deltaTime;
             yield return null;
