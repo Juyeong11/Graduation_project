@@ -115,7 +115,11 @@ public class EnemyManager : MonoBehaviour
     {
         //Debug.LogError(">Player W Coordinate Error!< [ Self W : " + selfCoord.coordinates.W + ", Cell W : " + grid.cellMaps.Get(selfCoord.coordinates).w + 1 + " ]");
         //print("Self W : " + selfCoord.coordinates.W);
-        selfCoord.coordinates.W = grid.cellMaps.Get(selfCoord.coordinates).w + 1;
+        var cell = grid.cellMaps.Get(selfCoord.coordinates);
+        if (cell != null)
+            selfCoord.coordinates.W = grid.cellMaps.Get(selfCoord.coordinates).w + 1;
+        else
+            selfCoord.coordinates.W = 0;
         //PlayerTransform.position = calculatePlayerPosition();
 
         //Debug.Log("z : " + gameObject.transform.position.z);
