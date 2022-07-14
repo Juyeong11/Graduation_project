@@ -66,7 +66,7 @@ public class TargetingEffect2 : MonoBehaviour
             yield return null;
         }
         //패링 성공 애니메이션은 나중에
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 
 }
