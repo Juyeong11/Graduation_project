@@ -132,7 +132,7 @@ public class GameManager : MonoBehaviour
         timeBy16Beat = timeByBeat / 4;
 
         enemyAnim = enemy.GetComponentInChildren<Animator>();
-
+       
         //여기서 할 수밖에 없음
         player.GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.PlayerHPs[0].HPImage, HPGM.PlayerHPs[0].prevHPImage);
         HPGM.PlayerHPs[0].Set(FieldPlayerManager.self_skillnum, FieldPlayerManager.myName);
@@ -148,11 +148,11 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         if (!Network.isServerOnline()) Network.CreateAndConnect();
+
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene01")
             Network.SendChangeSceneDonePacket(1);
         else
             Network.SendChangeSceneDonePacket(2);
-
         offsetTime = 0;
         prePingTestTime = 5.0f;
         //DEBUG
@@ -547,7 +547,9 @@ public class GameManager : MonoBehaviour
                             offsetTime = System.DateTime.Now.Millisecond - Delay;
 
                             enemy.GetComponentInChildren<EnemyManager>().SetNearestSlime(Objects[0].gameObject);
-                            EffectManager.instance.SetTargetingEffectParent(ref enemyParriedTarget);
+                            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "InGameScene03")
+                                EffectManager.instance.SetTargetingEffectParent(ref enemyParriedTarget);
+
 
                         }
                         break;
@@ -568,16 +570,20 @@ public class GameManager : MonoBehaviour
                                 {
                                     Objects[pid].GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
-                                }
-
-                                if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
-                                    EffectManager.instance.JumpAttack(3, new HexCoordinates(p.x, p.z), false);
-                                else
-                                    Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
-                                if (pid < 3)   // 플레이어이면
-                                {
                                     Objects[pid].GetComponentInChildren<PlayerManager>().cellTag();
+                                    Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+
                                 }
+                                else
+                                {
+                                    if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
+                                        EffectManager.instance.JumpAttack(3, new HexCoordinates(p.x, p.z), false);
+                                    else
+                                    {
+                                        Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                    }
+                                }
+                               
                             }
                             else    //debug time
                             {

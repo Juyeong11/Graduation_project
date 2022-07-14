@@ -38,7 +38,7 @@ Network::Network() {
 	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
 	maps[WITCH_MAP]->SetMap("Map\\flower_load", "Music\\flower_load.csv");
 	maps[WITCH_MAP_HARD]->SetMap("Map\\flower_load", "Music\\flower_load2.csv");
-	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\flower_load.csv");
+	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\Aviform Skyliner.csv");
 	maps[TUTORI_MAP]->SetMap("Map\\Tutorial", "Music\\Tutorial.csv");
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
@@ -1101,7 +1101,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					}
 					//std::cout << "시작" << std::endl;
 					int room_id = get_game_room_id();
-					int boss_id = get_npc_id(p->map_type);
+					int boss_id = get_npc_id(1);
 					if (boss_id != -1)
 						game_room[room_id]->GameRoomInit(p->map_type, maps[p->map_type]->bpm, clients[boss_id], players, p);
 					p->ready_player_cnt = 0;
@@ -1283,7 +1283,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			if (cl.cur_room_num == -1) break;
 			GameRoom* gr = game_room[cl.cur_room_num];
 
-
+			
 			if (-1 == gr->FindPlayer(client_id)) break;
 
 			cl.vl.lock();
