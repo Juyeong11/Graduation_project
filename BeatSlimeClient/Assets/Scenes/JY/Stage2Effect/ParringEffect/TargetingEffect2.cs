@@ -49,6 +49,8 @@ public class TargetingEffect2 : MonoBehaviour
     // Update is called once per frame
     IEnumerator Animation()
     {
+        gameObject.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+
         vfElectircBall.Play();
         float scale = 0.0f;
        // gameObject.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
@@ -62,7 +64,7 @@ public class TargetingEffect2 : MonoBehaviour
                 CubicBezierCurve(startPos.y, pos1.y, pos2.y, targetPos.y, scale),
                 CubicBezierCurve(startPos.z, pos1.z, pos2.z, targetPos.z, scale)
                 );
-            Debug.Log(transform.position);
+            //Debug.Log(transform.position);
             yield return null;
         }
         //패링 성공 애니메이션은 나중에

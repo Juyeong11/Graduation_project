@@ -413,8 +413,9 @@ public class EffectManager : MonoBehaviour
 
     public void GunAttack(float speed, HexCoordinates target_pos)
     {
-        //타겟방향으로 돌아보는건 ik랑 애니메이션 활용해서 만드는걸로하고 일단 이펙트만 출력하자
 
+        //타겟방향으로 돌아보는건 ik랑 애니메이션 활용해서 만드는걸로하고 일단 이펙트만 출력하자
+        Debug.Log(target_pos.getRealPosition());
         GameObject go = Instantiate(BossWaterGunEffectPrefab, target_pos.getRealPosition(), Quaternion.identity);
         float s = speed * 1 / 1000f;
         //Debug.Log("effect w" + Time.time);

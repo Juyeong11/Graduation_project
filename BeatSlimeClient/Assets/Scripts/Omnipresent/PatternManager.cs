@@ -103,7 +103,8 @@ public class PatternManager : MonoBehaviour
             {
                 for(int i = 0; i < Protocol.CONSTANTS.MAX_IN_GAME_PLAYER; ++i)
                 {
-                    HexCoordinates TargetPos = GameManager.data.GetTargetPos("Player"+i+1);
+                    Debug.Log("Player" + (i + 1));
+                    HexCoordinates TargetPos = GameManager.data.GetTargetPos("Player"+(i+1));
 
                     HexCoordinates BossPos = GameManager.data.GetBossPos();
                     TargetPos.plus(pattern[0].pivot.X, pattern[0].pivot.Z);
@@ -139,11 +140,13 @@ public class PatternManager : MonoBehaviour
                             EffectManager.instance.JumpAttack(charging_time, TargetPos, true);
                             break;
                         case 8: // robot º¸½º ÃÑ¹ß»ç
+                        TargetPos.W -= 1;
+
                             EffectManager.instance.GunAttack(charging_time, TargetPos);
                             break;
                         case 10:
                             if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
-                                EffectManager.instance.ElectricBallEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
+                                EffectManager.instance.ElectricBallEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF("Player" + (i + 1)), charging_time);
 
                             else
                                 EffectManager.instance.BossTargetingEffect(BossPos.getRealPosition(), ref GameManager.data.GetPlayerREF(pattern[0].pivotType), charging_time);
@@ -289,6 +292,7 @@ public class PatternManager : MonoBehaviour
                         EffectManager.instance.JumpAttack(charging_time, TargetPos, true);
                         break;
                     case 8: // robot º¸½º ÃÑ¹ß»ç
+                        TargetPos.W -= 1;
                         EffectManager.instance.GunAttack(charging_time, TargetPos);
                         break;
                     case 10:

@@ -260,7 +260,7 @@ public class GameManager : MonoBehaviour
         // All die
         if (OnlinePlayerID == -1)
         {
-            return new HexCoordinates(0, 0, 0);
+            return new HexCoordinates(0, 1, 0);
         }
         if (pivotType == "PlayerM")
         {
@@ -284,7 +284,7 @@ public class GameManager : MonoBehaviour
         }
         else if (pivotType == "World")
         {
-            target_pos = new HexCoordinates(0, 0, 0);
+            target_pos = new HexCoordinates(0, 0, 1);
         }
         else if (pivotType == "Boss")
         {
@@ -635,7 +635,7 @@ public class GameManager : MonoBehaviour
                                 //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                                 //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
-                                Debug.Log("Target : " + target_id);
+                                //Debug.Log("Target : " + target_id);
                                 if (target_id == myPlayerID)
                                 {
                                     if (hm.CurrentHP - p.hp > 0)
