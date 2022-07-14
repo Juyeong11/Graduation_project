@@ -51,7 +51,9 @@ public class EnemyManager : MonoBehaviour
         reflectPosition();
         EnemyWCheck();
         CalcHPSlider();
-        EnemyRotateToLookAt();
+
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "InGameScene03")
+            EnemyRotateToLookAt();
     }
 
     public void EnemyRotateToLookAt()

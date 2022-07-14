@@ -258,6 +258,10 @@ public class EffectManager : MonoBehaviour
         StartCoroutine(CoTileRailWaveEffect(startX, startZ, power, (int)dir));
     }
 
+
+
+    //Robot
+
     IEnumerable CoRobotLookAt(float speed, HexCoordinates end_pos)
     {
         float t = 0;
@@ -270,8 +274,6 @@ public class EffectManager : MonoBehaviour
         // GameManager.data.enemy.GetComponent<HexCellPosition>().setDirection();
 
     }
-
-    //Robot
     public void ikTest(HexCoordinates end_pos)
     {
         //GameManager.data.GetEnemyAnim().SetIKPosition();
@@ -283,56 +285,130 @@ public class EffectManager : MonoBehaviour
     }
     IEnumerator CoJumpAttack(float speed, HexCoordinates end_pos, bool bAttack)
     {
-        const float totalAnimTime = 3.0f;
+        Animator Ani = GameManager.data.GetEnemyAnim();
+
+        Vector3 look = GameManager.data.enemy.transform.forward;
+        Vector3 targetLook = transform.position - GameManager.data.enemy.transform.position;
+        float Theta = Vector3.Angle(look, targetLook);
+
+
+        int turnTime = (int)(Theta / 45);// 도는 애니메이션 시간 == 1
+
+        float totalAnimTime = 3.0f + turnTime;
         const float JumpAnimTime = 1.2f;
-        GameManager.data.GetEnemyAnim().SetTrigger("StartJump");
+        const float attackAnimTime = 1.8f;
 
-        float s = 1 / ((1 / totalAnimTime) * speed);
+
+        float s = speed / totalAnimTime ;
         Debug.Log(s);
-        GameManager.data.GetEnemyAnim().SetFloat("AttackSpeed", s);
+        Debug.Log(totalAnimTime);
+
+        GameManager.data.GetEnemyAnim().SetFloat("AttackSpeed", attackAnimTime / s);
+        GameManager.data.GetEnemyAnim().SetFloat("JumpSpeed", JumpAnimTime / s);
+
+
+        if (turnTime > 0)
+        {
+            //60 이상이면 돌아보고
+            float direction = Vector3.Dot(Vector3.Cross(targetLook, look), Vector3.up);
+
+
+            if (direction > 0)
+            {
+                //Left
+                Ani.SetTrigger("TurnLeft");
+                Ani.SetBool("angleArrive", false);
+                Ani.SetFloat("TurnSpeed", 1 / (s / turnTime));
+                float t = 0;
+
+                Quaternion qu = GameManager.data.enemy.transform.rotation;
+                float startAngle = qu.eulerAngles.y;
+                float endAngle = (startAngle - Theta);
+                //
+                while (t < s * turnTime)
+                {
+                    t += Time.deltaTime;
+
+                    //Debug.Log(qu);
+                    qu = Quaternion.Euler(new Vector3(0, Mathf.Lerp(startAngle, endAngle, t / (s*turnTime)), 0));
+                    GameManager.data.enemy.transform.rotation = qu;
+                    yield return null;
+                }
+                Ani.SetBool("angleArrive", true);
+
+            }
+            else
+            {
+                //Right
+                Ani.SetTrigger("TurnRight");
+                Ani.SetBool("angleArrive", false);
+                Ani.SetFloat("TurnSpeed", 1 / (s / turnTime));
+                float t = 0;
+
+                Quaternion qu = GameManager.data.enemy.transform.rotation;
+                float startAngle = qu.eulerAngles.y;
+                float endAngle = (startAngle + Theta);
+                //
+                while (t < s*turnTime)
+                {
+                    t += Time.deltaTime;
+
+
+                    qu = Quaternion.Euler(new Vector3(0, Mathf.Lerp(startAngle, endAngle, t / (s*turnTime)), 0));
+                    GameManager.data.enemy.transform.rotation = qu;
+                    yield return null;
+                }
+                Ani.SetBool("angleArrive", true);
+
+            }
+
+
+        }
+        Ani.SetTrigger("StartJump");
+
         // moveSpeed
-        float arrivalTime = JumpAnimTime * (1 / s);
+        float arrivalTime =JumpAnimTime * (s);
         Debug.Log(arrivalTime);
-
-        Vector3 startPos = GameManager.data.enemy.transform.position;
-        Vector3 endPos = end_pos.getRealPosition();
-        float t = 0;
-        while (t < arrivalTime * 0.4)
         {
-            t += Time.deltaTime;
+            float t = 0;
+            while (t < arrivalTime * 0.4)
+            {
+                t += Time.deltaTime;
 
-            yield return null;
+                yield return null;
 
+            }
+            t = 0;
+            Vector3 startPos = GameManager.data.enemy.transform.position;
+            Vector3 endPos = end_pos.getRealPosition();
+            while (t < arrivalTime * 0.6)
+            {
+                //내가 원하는 방향으로 이동..
+                t += Time.deltaTime;
+
+                GameManager.data.enemy.transform.position = Vector3.Slerp(startPos, endPos, t / (arrivalTime * 0.6f));
+                yield return null;
+            }
+            GameManager.data.enemy.GetComponent<HexCellPosition>().SetPosition(end_pos.X, end_pos.Y, end_pos.Z);
+            GameManager.data.enemy.GetComponent<HexCellPosition>().reflectPosition();
+
+            if (bAttack == false)
+            {
+                GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 3);
+            }
+            else
+            {
+                int type = Random.Range(1, 3);
+                if (type == 1)
+                    GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 1);
+                else if (type == 2)
+                    GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 2);
+
+            }
+
+
+            // GameManager.data.GetEnemyAnim().SetBool("Jumping", false);
         }
-        t = 0;
-        while (t < arrivalTime * 0.6)
-        {
-            //내가 원하는 방향으로 이동..
-            t += Time.deltaTime;
-
-            GameManager.data.enemy.transform.position = Vector3.Slerp(startPos, endPos, t / (arrivalTime * 0.6f));
-            yield return null;
-        }
-        GameManager.data.enemy.GetComponent<HexCellPosition>().SetPosition(end_pos.X, end_pos.Y, end_pos.Z);
-        GameManager.data.enemy.GetComponent<HexCellPosition>().reflectPosition();
-
-        if (bAttack == false)
-        {
-            GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 3);
-        }
-        else
-        {
-            int type = Random.Range(1, 3);
-            if (type == 1)
-                GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 1);
-            else if (type == 2)
-                GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 2);
-
-        }
-
-
-        // GameManager.data.GetEnemyAnim().SetBool("Jumping", false);
-
     }
 
     public void GunAttack(float speed, HexCoordinates target_pos)
@@ -343,9 +419,6 @@ public class EffectManager : MonoBehaviour
         float s = speed * 1 / 1000f;
         //Debug.Log("effect w" + Time.time);
         go.GetComponent<GunEffect>().speed = s;
-      
-
-
     }
 
     public void ElectricBallEffect(Vector3 start_pos, ref GameObject target, int speed)

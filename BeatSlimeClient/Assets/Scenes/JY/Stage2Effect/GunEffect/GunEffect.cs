@@ -24,7 +24,7 @@ public class GunEffect : MonoBehaviour
 
 
         VisualEffect[] tmp = GetComponentsInChildren<VisualEffect>();
-        Debug.Log(tmp.Length);
+        
         vfWarning = tmp[0];
         vfShoot1 = tmp[1];
         vfShoot2 = tmp[2];
@@ -38,48 +38,119 @@ public class GunEffect : MonoBehaviour
         vfHit1.Stop();
         vfHit2.Stop();
 
-        GameManager.data.enemy.GetComponentInChildren<GunEffect2>().targetPos = transform.position;
+        GameManager.data.enemy.GetComponentInChildren<AnimEvent>().targetPos = transform.position;
         StartCoroutine(Animation());
     }
     public void Run()
     {
-       
+
     }
-   
+
     // Update is called once per frame
     IEnumerator Animation()
     {
-
-       
-
-        vfWarning.playRate = 1 / (1 / lifeTime * speed*0.8f);
+        vfWarning.playRate = 1 / (1 / lifeTime * speed);
         vfWarning.Play();
+        Animator Ani = GameManager.data.GetEnemyAnim();
 
-        //여기서 돌아보고
-        float t = 0;
-        while (t < speed*0.8f)
+
+        // 보스가 보는 방향과 내 위치 각도 구해서 30으로 나눠서 어느 방향으로 돌지 정하자
+        Vector3 look = GameManager.data.enemy.transform.forward;
+        Vector3 targetLook = transform.position - GameManager.data.enemy.transform.position;
+        float Theta = Vector3.Angle(look, targetLook);
+        if(Theta > 60)
         {
-            t += Time.deltaTime;
-            yield return null;
+            Ani.SetBool("Shooting", false);
+            //60 이상이면 돌아보고
+            float direction = Vector3.Dot(Vector3.Cross(targetLook, look), Vector3.up);
+            int cnt = (int)(Theta / 45);
+
+            Debug.Log(direction);
+            if (direction > 0)
+            {
+                //Left
+                Ani.SetTrigger("TurnLeft");
+                Ani.SetBool("angleArrive", false);
+                Ani.SetFloat("TurnSpeed", 1 / (speed/cnt));
+                float t = 0;
+
+                Quaternion qu = GameManager.data.enemy.transform.rotation;
+                float startAngle = qu.eulerAngles.y;
+                float endAngle = (startAngle - Theta);
+                //
+                while (t < speed)
+                {
+                    t += Time.deltaTime;
+
+                    
+                    //Debug.Log(qu);
+                    qu = Quaternion.Euler(new Vector3(0, Mathf.Lerp(startAngle, endAngle, t/speed),0));
+                    GameManager.data.enemy.transform.rotation = qu;
+                    yield return null;
+                }
+                Ani.SetBool("angleArrive", true);
+
+            }
+            else
+            {
+                //Right
+                Ani.SetTrigger("TurnRight");
+                Ani.SetBool("angleArrive", false);
+                Ani.SetFloat("TurnSpeed", 1 / (speed / cnt));
+                float t = 0;
+
+                Quaternion qu = GameManager.data.enemy.transform.rotation;
+                float startAngle = qu.eulerAngles.y;
+                float endAngle = (startAngle + Theta);
+                //
+                while (t < speed)
+                {
+                    t += Time.deltaTime;
+
+
+                    //Debug.Log(qu);
+                    qu = Quaternion.Euler(new Vector3(0, Mathf.Lerp(startAngle, endAngle, t / speed), 0));
+                    GameManager.data.enemy.transform.rotation = qu;
+                    yield return null;
+                }
+                Ani.SetBool("angleArrive", true);
+
+            }
 
         }
+        else
+        {
+            float t = 0;
+            while (t < speed)
+            {
+                t += Time.deltaTime;
+                yield return null;
+
+            }
+
+        }
+
+    
 
         //슛
-        Animator Ani = GameManager.data.GetEnemyAnim();
+
         Ani.SetTrigger("StartShoot");
-        Ani.SetBool("Shooting",true);
-
-
-        t = 0;
-        while (t < speed*0.2f)
+        Ani.SetBool("Shooting", true);
         {
-            t += Time.deltaTime;
+            float t =0;
+            
+            while (t < speed)
+            {
+                t += Time.deltaTime;
 
-          
 
-            yield return null;
+
+                yield return null;
+            }
+            Ani.SetBool("Shooting", false);
+            Destroy(gameObject);
         }
-        Ani.SetBool("Shooting",false);
-        Destroy(gameObject);
+
+
     }
 }

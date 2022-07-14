@@ -404,10 +404,10 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Q))
         {
             
-            HexCoordinates h = new HexCoordinates(5* zxcv, -5* zxcv,1);
+            HexCoordinates h = new HexCoordinates(5* zxcv, -3* zxcv,1);
             zxcv *= -1;
             
-            EffectManager.instance.GunAttack(2000,h);
+            EffectManager.instance.JumpAttack(10000,h,true);
         }
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
