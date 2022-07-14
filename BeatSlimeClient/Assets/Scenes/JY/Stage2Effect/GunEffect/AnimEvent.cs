@@ -10,6 +10,8 @@ public class AnimEvent : MonoBehaviour
     public VisualEffect vfShoot2;
     public VisualEffect vfHit1;
     public VisualEffect vfHit2;
+    public VisualEffect vfMissil1;
+    public VisualEffect vfMissil2;
 
     public Vector3 targetPos;
     // Start is called before the first frame update
@@ -23,6 +25,8 @@ public class AnimEvent : MonoBehaviour
         vfShoot2.Stop();
         vfHit1.Stop();
         vfHit2.Stop();
+        vfMissil1.Stop();
+        vfMissil2.Stop();
 
     }
 
@@ -41,13 +45,20 @@ public class AnimEvent : MonoBehaviour
         vfHit2.Play();
     }
 
-    public void TurnRight()
+    public void Launch1()
     {
-        Debug.Log("?");
+        vfMissil1.Play();
     }
-    public void TurnLeft()
+    public void Launch2()
     {
-        Debug.Log("?");
+        vfMissil2.Play();
+
+
+    }
+    public void Launch3()
+    {
+        vfMissil1.Play();
+        vfMissil2.Play();
 
     }
 }

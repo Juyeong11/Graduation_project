@@ -65,7 +65,7 @@ public class GunEffect : MonoBehaviour
             float direction = Vector3.Dot(Vector3.Cross(targetLook, look), Vector3.up);
             int cnt = (int)(Theta / 45);
 
-            Debug.Log(direction);
+            
             if (direction > 0)
             {
                 //Left
@@ -130,11 +130,11 @@ public class GunEffect : MonoBehaviour
 
         }
 
-    
+
 
         //½¸
-
-        Ani.SetTrigger("StartShoot");
+        if (!Ani.GetCurrentAnimatorStateInfo(0).IsName("GunShoot"))
+            Ani.SetTrigger("StartShoot");
         Ani.SetBool("Shooting", true);
         {
             float t =0;

@@ -43,7 +43,9 @@ public class EffectManager : MonoBehaviour
         float s = speed * 1 / 1000f;
         //Debug.Log("effect t" + Time.time);
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
-            go.GetComponent<TileEffect2>().speed = s;
+        { 
+            go.GetComponent<TileEffect2>().speed = s; 
+        }
         else
             go.GetComponent<TileEffect>().speed = s;
     }
@@ -54,7 +56,16 @@ public class EffectManager : MonoBehaviour
         {
             OneTileEffect(pat.x + startX, pat.y + startY, pat.z + startZ, speed);
         }
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
+        {
 
+            Animator Ani = GameManager.data.GetEnemyAnim();
+            if (Ani.GetCurrentAnimatorStateInfo(0).IsName("RocketLaunch")) return;
+            Ani.SetTrigger("StartLaunch");
+            float s = speed * 1 / 1000f;
+            Debug.Log("-----------------------------" + s);
+            Ani.SetFloat("LaunchSpeed", 3 / s);
+        }
     }
     /*
      * 5번 물줄기 6번 지진 이펙트를 만들어야함 별도의 prefeb으로 하고
@@ -415,7 +426,7 @@ public class EffectManager : MonoBehaviour
     {
 
         //타겟방향으로 돌아보는건 ik랑 애니메이션 활용해서 만드는걸로하고 일단 이펙트만 출력하자
-        Debug.Log(target_pos.getRealPosition());
+       // Debug.Log(target_pos.getRealPosition());
         GameObject go = Instantiate(BossWaterGunEffectPrefab, target_pos.getRealPosition(), Quaternion.identity);
         float s = speed * 1 / 1000f;
         //Debug.Log("effect w" + Time.time);
