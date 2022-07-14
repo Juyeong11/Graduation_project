@@ -112,7 +112,7 @@ public class Cell
         obejct.transform.Find("#VFX_item").gameObject.SetActive(false);
         // Item ²ô±â
     }
-    public void SetItemToThisCell(cellState item)
+    public void SetItemToThisCell(cellState item, ref GameObject g)
     {
         state = item;
         obejct.transform.Find("#VFX_item").gameObject.SetActive(true);

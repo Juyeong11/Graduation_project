@@ -19,6 +19,8 @@ public class PatternManager : MonoBehaviour
 
     public Image LOGO;
 
+    public List<GameObject> itemModels;
+
     private void Awake()
     {
         pattern = new List<Pattern>();
