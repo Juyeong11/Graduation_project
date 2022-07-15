@@ -533,38 +533,35 @@ public class PlayerManager : MonoBehaviour
         switch (nowOnCellTag.state)
         {
             case cellState.Item1:
-            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
             nowOnCellTag.GetItemFromThisCell();
-                changeColor(Color.red);
-                Debug.Log("Item1");
+            changeColor(Color.red);
+            Debug.Log("Item1");
+            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();    
             break;
             case cellState.Item2:
-            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
             nowOnCellTag.GetItemFromThisCell();
-                changeColor(Color.yellow);
+            changeColor(Color.yellow);
+            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();  
             break;
             case cellState.Item3:
-            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
-                changeColor(Color.red);
+            changeColor(Color.green);
             nowOnCellTag.GetItemFromThisCell();
-
+            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();  
             break;
             case cellState.Item4:
-            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
-                changeColor(Color.red);
+            changeColor(new Color(0.8f, 0f, 0.8f));
             nowOnCellTag.GetItemFromThisCell();
-            
+            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();    
             break;
             case cellState.Item5:
-            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
-                changeColor(Color.red);
+            changeColor(Color.blue);
             nowOnCellTag.GetItemFromThisCell();
-
+            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();   
             break;
             case cellState.Item6:
-            Destroy(nowOnCellTag.obejct.gameObject.transform.Find("coloring"));  
-                changeColor(Color.red);
+            changeColor(Color.cyan);
             nowOnCellTag.GetItemFromThisCell();
+            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();   
             break;
         }
     }

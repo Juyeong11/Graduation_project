@@ -118,8 +118,7 @@ public class Cell
     public void GetItemFromThisCell()
     {
         state = cellState.Normal;
-        var itemTrans = obejct.transform.Find("#VFX_item");
-        itemTrans.gameObject.SetActive(false);
+        
         // Item ²ô±â
     }
     public void SetItemToThisCell(cellState item,ref GameObject g)

@@ -573,8 +573,8 @@ public class GameManager : MonoBehaviour
                                 {
                                     Objects[pid].GetComponentInChildren<PlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[pid].GetComponentInChildren<PlayerManager>().JumpTrig();
-                                    Objects[pid].GetComponentInChildren<PlayerManager>().cellTag();
                                     Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                    Objects[pid].GetComponentInChildren<PlayerManager>().cellTag();
 
                                 }
                                 else

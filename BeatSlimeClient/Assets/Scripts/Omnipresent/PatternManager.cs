@@ -325,6 +325,7 @@ public class PatternManager : MonoBehaviour
 
                                     GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item1, ref m);
                                     m.transform.localPosition = new Vector3(0, 2, 0);
+                                    m.GetComponent<MDissolveIlluminator>().PrintUnDissolve();
                                 }
                                 break;
                             case HexDirection.Down:
@@ -334,6 +335,7 @@ public class PatternManager : MonoBehaviour
 
                                     GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item2, ref m);
                                     m.transform.localPosition = new Vector3(0, 2, 0);
+                                    m.GetComponent<MDissolveIlluminator>().PrintUnDissolve();
                                 }
                                 break;
                             case HexDirection.LeftDown:
@@ -343,6 +345,7 @@ public class PatternManager : MonoBehaviour
 
                                     GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item3, ref m);
                                     m.transform.localPosition = new Vector3(0, 2, 0);
+                                    m.GetComponent<MDissolveIlluminator>().PrintUnDissolve();
                                 }
                                 break;
                             case HexDirection.RightDown:
@@ -352,6 +355,7 @@ public class PatternManager : MonoBehaviour
 
                                     GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item4, ref m);
                                     m.transform.localPosition = new Vector3(0, 2, 0);
+                                    m.GetComponent<MDissolveIlluminator>().PrintUnDissolve();
                                 }
                                 break;
                             case HexDirection.LeftUp:
@@ -361,6 +365,7 @@ public class PatternManager : MonoBehaviour
 
                                     GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item5, ref m);
                                     m.transform.localPosition = new Vector3(0, 2, 0);
+                                    m.GetComponent<MDissolveIlluminator>().PrintUnDissolve();
                                 }
                                 break;
                             case HexDirection.RightUp:
@@ -370,6 +375,7 @@ public class PatternManager : MonoBehaviour
 
                                     GameManager.data.grid.cellMaps.Get(TargetPos.X, TargetPos.Y, TargetPos.Z).SetItemToThisCell(cellState.Item6, ref m);
                                     m.transform.localPosition = new Vector3(0, 2, 0);
+                                    m.GetComponent<MDissolveIlluminator>().PrintUnDissolve();
                                 }
                                 break;
                         }
