@@ -58,7 +58,7 @@ public class GunEffect : MonoBehaviour
         Vector3 look = GameManager.data.enemy.transform.forward;
         Vector3 targetLook = transform.position - GameManager.data.enemy.transform.position;
         float Theta = Vector3.Angle(look, targetLook);
-        if(Theta > 60)
+        if (Theta > 60 && !Ani.GetBool("Shooting"))
         {
             Ani.SetBool("Shooting", false);
             //60 이상이면 돌아보고
@@ -133,8 +133,7 @@ public class GunEffect : MonoBehaviour
 
 
         //슛
-        if (!Ani.GetCurrentAnimatorStateInfo(0).IsName("GunShoot"))
-            Ani.SetTrigger("StartShoot");
+        Ani.SetTrigger("StartShoot");
         Ani.SetBool("Shooting", true);
         {
             float t =0;

@@ -611,7 +611,7 @@ public class GameManager : MonoBehaviour
                                 else
                                 {
                                     if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
-                                        EffectManager.instance.JumpAttack(3, new HexCoordinates(p.x, p.z), false);
+                                        EffectManager.instance.JumpAttack(5000, new HexCoordinates(p.x, p.z), false);
                                     else
                                     {
                                         Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
