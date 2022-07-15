@@ -1986,7 +1986,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			for (const auto pl : gr->player_ids) {
 				if (pl == nullptr) continue;
 				send_score(cl.id, gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)], pl->id);
-				send_attack_player(cl.id, gr->boss_id, pl->id);
+				send_attack_player(cl.id, gr->boss_id->id, pl->id);
 
 			}
 			
