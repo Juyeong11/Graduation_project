@@ -44,7 +44,7 @@ public class EffectManager : MonoBehaviour
         //Debug.Log("effect t" + Time.time);
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene03")
         { 
-            go.GetComponent<TileEffect2>().speed = s; 
+            go.GetComponent<TileEffect2>().initialize(s);
         }
         else
             go.GetComponent<TileEffect>().speed = s;

@@ -85,6 +85,7 @@ public class PatternManager : MonoBehaviour
             //DEBUG : 장판 공격도 작은 노트 보여주고싶음 (비트 알려주기 위해)
         }
 
+        pattern.Sort((x, y) => x.GetAppearBeat().GetBeatTime().CompareTo(y.GetAppearBeat().GetBeatTime()));
         Factory.initiation();
         yield return null;
     }

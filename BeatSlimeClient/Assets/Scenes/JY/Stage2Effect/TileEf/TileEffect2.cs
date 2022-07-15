@@ -14,11 +14,16 @@ public class TileEffect2 : MonoBehaviour
     void Start()
     {
         
+    }
+
+    public void initialize(float spd)
+    {
         VisualEffect[] temp = GetComponentsInChildren<VisualEffect>();
         vfWarning = temp[0];
         vfAirStrike = temp[1];
         vfWarning.Stop();
         vfAirStrike.Stop();
+        speed = spd;
         StartCoroutine(Animation());
     }
 
