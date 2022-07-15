@@ -140,7 +140,7 @@ public class PatternManager : MonoBehaviour
                             EffectManager.instance.JumpAttack(charging_time, TargetPos, true);
                             break;
                         case 8: // robot º¸½º ÃÑ¹ß»ç
-                        TargetPos.W -= 1;
+                        
 
                             EffectManager.instance.GunAttack(charging_time, TargetPos);
                             break;

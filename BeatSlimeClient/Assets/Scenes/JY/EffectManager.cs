@@ -62,8 +62,8 @@ public class EffectManager : MonoBehaviour
             Animator Ani = GameManager.data.GetEnemyAnim();
             if (Ani.GetCurrentAnimatorStateInfo(0).IsName("RocketLaunch")) return;
             Ani.SetTrigger("StartLaunch");
-            float s = speed * 1 / 1000f;
-            Debug.Log("-----------------------------" + s);
+            float s = speed * 1 / 1000f * 2;
+           // Debug.Log("-----------------------------" + s);
             Ani.SetFloat("LaunchSpeed", 3 / s);
         }
     }
