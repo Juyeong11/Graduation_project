@@ -260,7 +260,7 @@ public class GameManager : MonoBehaviour
         // All die
         if (OnlinePlayerID == -1)
         {
-            return new HexCoordinates(0, 1, 0);
+            return new HexCoordinates(0, 0, 0);
         }
         if (pivotType == "PlayerM")
         {
