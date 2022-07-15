@@ -303,7 +303,7 @@ void Network::send_attack_player(int attacker, int target, int receiver)
 	packet.type = SC_PACKET_ATTACK;
 	packet.id = attacker;
 	packet.target_id = target;
-	packet.direction = clients[attacker]->direction;
+	//packet.direction = clients[attacker]->direction;
 	packet.hp = clients[target]->hp;
 	//packet.move_time = clients[mover]->last_move_time;
 
@@ -726,10 +726,10 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		GameObject* pl = game_room[game_room_id]->player_ids[i];
 		if (pl == nullptr) continue;
 		if (false == is_attack(pl->id, x, z)) continue;
-		pl->hp -= damage;
+		pl->hp -= std::clamp((damage - pl->armour), 0, 20);
 		//std::cout << "id : " << i << " damaged " << damage << std::endl;
 		if (game_room[game_room_id]->boss_id == nullptr) return;
-		game_room[game_room_id]->Score[i] -= 20 * damage;
+		game_room[game_room_id]->Score[i] -= 20 * std::clamp((damage - pl->armour), 0, 20);
 		for (const auto& p : game_room[game_room_id]->player_ids) {
 			if (p == nullptr) continue;
 
@@ -761,7 +761,7 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 
 
 	bool attack_flag = false;
-	int damage = cl->skill->Damage;
+	int damage = cl->skill->Damage * cl->power;
 	//damage = 10;
 	int cur_skill_type = cl->skill->SkillType - 1;
 	switch (cur_skill_type)
@@ -794,7 +794,6 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 			if (pl->hp > 100)
 				pl->hp = 100;
 			send_attack_player(cl->id, pl->id, pl->id);
-
 		}
 		gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] += 100 * damage;
 
@@ -1283,7 +1282,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			if (cl.cur_room_num == -1) break;
 			GameRoom* gr = game_room[cl.cur_room_num];
 
-			
+
 			if (-1 == gr->FindPlayer(client_id)) break;
 
 			cl.vl.lock();
@@ -1401,7 +1400,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					= std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
 
 				//수정
-				gr->boss_id->hp -= 14;
+				gr->boss_id->hp -= 14 *cl.power;
 				if (gr->boss_id->hp < 0) {
 					timer_event tev;
 					tev.ev = EVENT_GAME_END;
@@ -1921,6 +1920,61 @@ void Network::process_packet(int client_id, unsigned char* p)
 		std::cout << "Tutorial Start\n";
 	}
 	break;
+	case CS_PACKET_GET_ITEM:
+	{
+		cs_packet_get_item* packet = reinterpret_cast<cs_packet_get_item*>(p);
+
+		if (cl.cur_room_num == -1) break;
+		for (auto p : game_room[cl.cur_room_num]->player_ids) {
+			if (p == nullptr) continue;
+			send_use_item(p->id, cl.id, packet->itemType);
+		}
+		GameRoom* gr = game_room[cl.cur_room_num];
+		cl.power = 0;
+		cl.armour = 0;
+		switch (packet->itemType)
+		{
+		case DIR::UP: // 점수
+
+			gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)] += 500;
+			break;
+		case DIR::DOWN: // 트루뎀
+			if (gr->boss_id->Hit(100)) {
+				timer_event tev;
+				tev.ev = EVENT_GAME_END;
+				tev.game_room_id = gr->game_room_id;
+				//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+				tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(1);
+
+				timer_queue.push(tev);
+			}
+			gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)] += 100;
+
+			for (const auto pl : gr->player_ids) {
+				if (pl == nullptr) continue;
+				send_attack_player(-1, gr->boss_id->id, pl->id);
+			}
+			break;
+		case DIR::LEFTDOWN: // 공증 -> 게임 끝날 때 까지 지속
+			cl.power = 3;
+			break;
+		case DIR::RIGHTDOWN: // 방증
+			cl.armour = 10;
+			break;
+		case DIR::LEFTUP: // 체력회복
+			for (auto pl : game_room[cl.cur_room_num]->player_ids) {
+				if (pl == nullptr) continue;
+				pl->Hit(-50);
+				if (pl->hp > 100)
+					pl->hp = 100;
+				send_attack_player(cl.id, cl.id, pl->id);
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	break;
 	default:
 		std::cout << "wrong packet\n";
 		break;
@@ -2173,7 +2227,7 @@ void Network::worker()
 			else {
 				//std::cout << parrying_end_time << " " << player_parring_time << " player parrying failed\n";
 				//패링 못했으니 플레이어를 때리자
-				clients[target_id]->hp -= 10 * damamge_bug;
+				clients[target_id]->hp -= (10 * damamge_bug + clients[target_id]->armour);
 				for (const auto& p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 					if (game_room[game_room_id]->boss_id == nullptr) continue;
@@ -2414,6 +2468,7 @@ void Network::worker()
 			exp_over_pool.push(exp_over);
 		}
 		break;
+
 		case OP_GAME_END:
 		{
 			//이건 무조건 한 번만 하도록 보장되야함
@@ -2464,6 +2519,7 @@ void Network::worker()
 				for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 					GameObject* p = game_room[game_room_id]->player_ids[i];
 					if (p == nullptr) continue;
+					if (game_room[game_room_id]->Score[i] < 0)game_room[game_room_id]->Score[i] = 0;
 					std::cout << "clear score : " << game_room[game_room_id]->Score[i] << std::endl;
 					std::cout << "clear money : " << game_room[game_room_id]->Money[i] << std::endl;
 					if (game_room[game_room_id]->Score[i] < 0) game_room[game_room_id]->Score[i] = 0;
@@ -2813,20 +2869,20 @@ void Network::set_next_pattern(int room_id)
 	case 7:
 	case 8:
 
-			tev.ev = EVENT_BOSS_TILE_ATTACK_START;
-			tev.obj_id = boss_id;
-			tev.type = t.type;
-			tev.x = t.x;
-			tev.y = t.y;
-			tev.z = t.z;
-			tev.game_room_id = room_id;
-			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-			tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed - 100);
-			tev.charging_time = t.speed;
-			tev.pivotType = t.pivotType;
-			tev.dir = t.dir;
-			timer_queue.push(tev);
-		
+		tev.ev = EVENT_BOSS_TILE_ATTACK_START;
+		tev.obj_id = boss_id;
+		tev.type = t.type;
+		tev.x = t.x;
+		tev.y = t.y;
+		tev.z = t.z;
+		tev.game_room_id = room_id;
+		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed - 100);
+		tev.charging_time = t.speed;
+		tev.pivotType = t.pivotType;
+		tev.dir = t.dir;
+		timer_queue.push(tev);
+
 
 		break;
 
@@ -2888,7 +2944,7 @@ void Network::game_start(int room_id)
 	Witch* boss = reinterpret_cast<Witch*>(clients[boss_id]);
 	//수정
 
-	boss->hp = 1000;
+	boss->hp = maps[map_type]->bossHP;
 
 	int i = 0;
 	for (auto p : game_room[room_id]->player_ids) {
@@ -2902,7 +2958,8 @@ void Network::game_start(int room_id)
 		p->dest_y = -1;
 		p->dest_z = -1;
 
-
+		p->power = 0;
+		p->armour = 0;
 
 		p->x = maps[game_room[room_id]->map_type]->startX[i];
 		p->z = maps[game_room[room_id]->map_type]->startZ[i];

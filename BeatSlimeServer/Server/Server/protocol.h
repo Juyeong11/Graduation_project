@@ -25,6 +25,7 @@ const char CS_PACKET_TELEPORT = 17;
 const char CS_PACKET_BUY = 18;
 const char CS_PACKET_USE_ITEM = 19;
 const char CS_PACKET_PLAY_TUTORIAL = 20;
+const char CS_PACKET_GET_ITEM = 21;
 
 
 const char SC_PACKET_LOGIN_OK = 1;
@@ -163,6 +164,12 @@ struct cs_packet_use_item {
 struct cs_packet_play_tutorial {
 	unsigned char size;
 	char	type;
+};
+
+struct cs_packet_get_item {
+	unsigned char size;
+	char	type;
+	char itemType;
 };
 //server->client
 struct sc_packet_login_ok {

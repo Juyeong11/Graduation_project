@@ -21,6 +21,7 @@
 #include<concurrent_priority_queue.h> 
 #include<concurrent_queue.h>
 
+
 #include <WS2tcpip.h>
 #include <MSWSock.h>
 #include <windows.h> 
@@ -32,7 +33,8 @@
 
 enum MAP_TYPE { FIELD_MAP,TUTORI_MAP,WITCH_MAP, WITCH_MAP_HARD, ROBOT_MAP };
 
-enum COMP_OP { OP_RECV, OP_SEND, OP_ACCEPT, OP_BOSS_MOVE, OP_PLAYER_PARRYING,
+enum COMP_OP {
+	OP_RECV, OP_SEND, OP_ACCEPT, OP_BOSS_MOVE, OP_PLAYER_PARRYING,
 	OP_BOSS_TILE_ATTACK,
 	OP_BOSS_TILE_ATTACK_START,
 	OP_GAME_END,

@@ -39,6 +39,8 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 			startX[2] = _x;
 			startZ[2] = _z;
 		}
+		else if (map[i] == 5 || map[i] == 6)
+			map[i] = 0;
 	}
 	
 	// ¸Ê È®ÀÎ¿ë
@@ -110,6 +112,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 	for (int i = 0; i < num_totalPattern; ++i) {
 		if (999 == stoi(pattern["noteType"][i])) {
 			bpm = stoi(pattern["pivotType"][i]);
+			bossHP = stoi(pattern["direction"][i]);
 			break;
 		}
 
@@ -118,6 +121,8 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 		std::cout << "wrong bpm check pattern csv file \n";
 
 	}
+	if (bossHP == 0)
+		bossHP = 1000;
 	
 	totalSongTime = 0; //(* 1000);
 	nowSongTime = 0;
@@ -172,7 +177,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 		else if (pattern["direction"][i] == "RD")
 			dir = DIR::RIGHTDOWN;
 		else {
-			std::cout << "Load : wrong dir\n";
+			//std::cout << "Load : wrong dir : "<< pattern["direction"][i]<< '\n';
 			continue;
 		}
 
@@ -434,7 +439,8 @@ void GameRoom::game_end()
 	for (auto p : player_ids) {
 		if (p == nullptr) continue;
 
-
+		p->power = 0;
+		p->armour = 0;
 		//reinterpret_cast<Client*>(p)->cur_room_num = -1;
 		reinterpret_cast<Client*>(p)->is_active = true;
 		p = nullptr;

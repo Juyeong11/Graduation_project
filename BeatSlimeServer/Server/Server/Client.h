@@ -31,6 +31,8 @@ public:
 	short	pre_x, pre_y, pre_z;
 	short	dest_x, dest_y, dest_z;
 	int direction;
+	int power = 0;
+	int armour = 0;
 	std::atomic_int hp;
 	GO_TYPE		type;
 	//volatile«ÿ¡‡æﬂ «—¥Ÿ.

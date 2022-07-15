@@ -33,7 +33,7 @@ public class PlayerManager : MonoBehaviour
 
     bool playerAttacking;
     bool playerDieAnimTriggered;
-    List<(Beat,float)> SettledBallBeats;
+    List<(Beat, float)> SettledBallBeats;
 
     public bool isThisCurrentPlayingPlayerObject;
     public int playerClassofSkill;
@@ -48,7 +48,7 @@ public class PlayerManager : MonoBehaviour
         grid = GameManager.data.grid;
         state = playerState.Idle;
         selfCoord.direction = HexDirection.Up;
-        SettledBallBeats = new List<(Beat,float)>();
+        SettledBallBeats = new List<(Beat, float)>();
         playerDieAnimTriggered = false;
         nowOnCellTag = null;
 
@@ -91,15 +91,15 @@ public class PlayerManager : MonoBehaviour
 
     public void SkillTrig()
     {
-        switch(playerClassofSkill)
+        switch (playerClassofSkill)
         {
             case 0:
-            break;
+                break;
             case 1:
-            break;
+                break;
             case 2:
                 JumpTrigger.SetTrigger("Heal");
-            break;
+                break;
         }
 
     }
@@ -118,7 +118,7 @@ public class PlayerManager : MonoBehaviour
             PlayerRotateToLookAt();
             PlayerWCheck();
 
-            if (isThisCurrentPlayingPlayerObject&&nowOnCellTag.obejct)
+            if (isThisCurrentPlayingPlayerObject && nowOnCellTag.obejct)
             {
                 //print($"{nowOnCellTag.x}, {nowOnCellTag.y}, {nowOnCellTag.z}");
                 PlayerItemCheck();
@@ -148,7 +148,7 @@ public class PlayerManager : MonoBehaviour
 
     public void PlayerRotateToLookAt()
     {
-        switch(selfCoord.direction)
+        switch (selfCoord.direction)
         {
             case HexDirection.LeftUp:
                 //Vector3 c = Vector3.Cross(transform.rotation.eulerAngles, new Vector3(0, -120, 0));
@@ -279,7 +279,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (Network.isOnline)
             {
-                
+
                 GameManager.data.setMoved();
 
                 Network.SendMovePacket((byte)Protocol.DIR.LEFTUP);
@@ -302,7 +302,7 @@ public class PlayerManager : MonoBehaviour
             if (Network.isOnline)
             {
                 GameManager.data.setMoved();
-               
+
                 Network.SendMovePacket((byte)Protocol.DIR.UP);
             }
             else
@@ -312,7 +312,7 @@ public class PlayerManager : MonoBehaviour
                 {
                     if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).w <= selfCoord.coordinates.W)
                     {
-                        selfCoord.plus(0, -1, 1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y -1, selfCoord.coordinates.Z + 1).w - selfCoord.coordinates.W + 1);
+                        selfCoord.plus(0, -1, 1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z + 1).w - selfCoord.coordinates.W + 1);
                         JumpTrig();
                     }
                 }
@@ -323,7 +323,7 @@ public class PlayerManager : MonoBehaviour
             if (Network.isOnline)
             {
                 GameManager.data.setMoved();
-                
+
                 Network.SendMovePacket((byte)Protocol.DIR.RIGHTUP);
             }
             else
@@ -333,10 +333,10 @@ public class PlayerManager : MonoBehaviour
                 {
                     if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).w <= selfCoord.coordinates.W)
                     {
-                        selfCoord.plus(1, -1, 0, grid.cellMaps.Get(selfCoord.coordinates.X+1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
+                        selfCoord.plus(1, -1, 0, grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y - 1, selfCoord.coordinates.Z).w - selfCoord.coordinates.W + 1);
                         JumpTrig();
                     }
-                    
+
                 }
             }
         }
@@ -345,7 +345,7 @@ public class PlayerManager : MonoBehaviour
             if (Network.isOnline)
             {
                 GameManager.data.setMoved();
-                
+
                 Network.SendMovePacket((byte)Protocol.DIR.LEFTDOWN);
             }
             else
@@ -366,7 +366,7 @@ public class PlayerManager : MonoBehaviour
             if (Network.isOnline)
             {
                 GameManager.data.setMoved();
-                
+
                 Network.SendMovePacket((byte)Protocol.DIR.DOWN);
             }
             else
@@ -374,9 +374,9 @@ public class PlayerManager : MonoBehaviour
                 GameManager.data.setMoved();
                 if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z - 1).state != cellState.None)
                 {
-                    if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z -1).w <= selfCoord.coordinates.W)
+                    if (grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z - 1).w <= selfCoord.coordinates.W)
                     {
-                        selfCoord.plus(0, 1, -1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z-1).w - selfCoord.coordinates.W + 1);
+                        selfCoord.plus(0, 1, -1, grid.cellMaps.Get(selfCoord.coordinates.X, selfCoord.coordinates.Y + 1, selfCoord.coordinates.Z - 1).w - selfCoord.coordinates.W + 1);
                         JumpTrig();
                     }
                 }
@@ -387,7 +387,7 @@ public class PlayerManager : MonoBehaviour
             if (Network.isOnline)
             {
                 GameManager.data.setMoved();
-                
+
                 Network.SendMovePacket((byte)Protocol.DIR.RIGHTDOWN);
             }
             else
@@ -397,9 +397,9 @@ public class PlayerManager : MonoBehaviour
                 {
                     if (grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w <= selfCoord.coordinates.W)
                     {
-                        selfCoord.plus(1, 0, -1, grid.cellMaps.Get(selfCoord.coordinates.X+1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w - selfCoord.coordinates.W + 1);
+                        selfCoord.plus(1, 0, -1, grid.cellMaps.Get(selfCoord.coordinates.X + 1, selfCoord.coordinates.Y, selfCoord.coordinates.Z - 1).w - selfCoord.coordinates.W + 1);
                     }
-                        JumpTrig();
+                    JumpTrig();
                 }
             }
         }
@@ -407,7 +407,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (Network.isOnline)
             {
-                if (playerClassofSkill != 0 || Vector3.Distance(EnemyTransform.position, PlayerTransform.position) < 5f)   
+                if (playerClassofSkill != 0 || Vector3.Distance(EnemyTransform.position, PlayerTransform.position) < 5f)
                 {
                     GameManager.data.setMoved();
 
@@ -433,7 +433,7 @@ public class PlayerManager : MonoBehaviour
         gameObject.transform.position = new Vector3(gameObject.transform.position.x, (2f * GameManager.data.beatCounter / GameManager.data.timeByBeat) - 0.1f, gameObject.transform.position.z);
     }
 
-    public void SetBallBeat(Beat now,Beat b)
+    public void SetBallBeat(Beat now, Beat b)
     {
         Debug.Log(GameManager.data.timeByBeat / (float)b.GetBeatTime() * 0.75f);
         SettledBallBeats.Add((now + b, GameManager.data.timeByBeat / (float)b.GetBeatTime() * 0.75f));
@@ -533,36 +533,46 @@ public class PlayerManager : MonoBehaviour
         switch (nowOnCellTag.state)
         {
             case cellState.Item1:
-            nowOnCellTag.GetItemFromThisCell();
-            changeColor(Color.red);
-            Debug.Log("Item1");
-            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();    
-            break;
+                nowOnCellTag.GetItemFromThisCell();
+                changeColor(Color.red);
+                Debug.Log("Item1");
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                Network.SendGetItemPacket(1);
+                break;
             case cellState.Item2:
-            nowOnCellTag.GetItemFromThisCell();
-            changeColor(Color.yellow);
-            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();  
-            break;
+                nowOnCellTag.GetItemFromThisCell();
+                changeColor(Color.yellow);
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                Network.SendGetItemPacket(4);
+
+                break;
             case cellState.Item3:
-            changeColor(Color.green);
-            nowOnCellTag.GetItemFromThisCell();
-            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();  
-            break;
+                changeColor(Color.green);
+                nowOnCellTag.GetItemFromThisCell();
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                Network.SendGetItemPacket(3);
+
+                break;
             case cellState.Item4:
-            changeColor(new Color(0.8f, 0f, 0.8f));
-            nowOnCellTag.GetItemFromThisCell();
-            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();    
-            break;
+                changeColor(new Color(0.8f, 0f, 0.8f));
+                nowOnCellTag.GetItemFromThisCell();
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                Network.SendGetItemPacket(5);
+                break;
             case cellState.Item5:
-            changeColor(Color.blue);
-            nowOnCellTag.GetItemFromThisCell();
-            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();   
-            break;
+                changeColor(Color.blue);
+                nowOnCellTag.GetItemFromThisCell();
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                Network.SendGetItemPacket(0);
+
+                break;
             case cellState.Item6:
-            changeColor(Color.cyan);
-            nowOnCellTag.GetItemFromThisCell();
-            nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();   
-            break;
+                changeColor(Color.cyan);
+                nowOnCellTag.GetItemFromThisCell();
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                break;
+
+
         }
     }
 

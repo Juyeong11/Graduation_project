@@ -85,8 +85,8 @@ public class GameManager : MonoBehaviour
     //
     [System.NonSerialized]
     public GameObject[] Objects = new GameObject[4];
-    int[] ids;
-    int myPlayerID = -1;
+    public int[] ids;
+    public int myPlayerID = -1;
     public ArrayList Mapdata = new ArrayList();
 
     //server time
@@ -441,14 +441,45 @@ public class GameManager : MonoBehaviour
         {
             Network.SendTeleportPacket(4);
         }
+
         if (Input.GetKeyDown(KeyCode.F4))
         {
             player.GetComponentInChildren<PlayerManager>().changeColor(Color.red);
         }
-        if (Input.GetKeyDown(KeyCode.F5))
+
         {
-            enemyAnim.SetTrigger("Move");
+            if (Input.GetKeyDown(KeyCode.F8))
+            {
+                Network.SendGetItemPacket(0);
+                
+            }
+            if (Input.GetKeyDown(KeyCode.F9))
+            {
+               
+                Network.SendGetItemPacket(1);
+                
+            }
+            if (Input.GetKeyDown(KeyCode.F10))
+            {
+               
+                Network.SendGetItemPacket(2);
+               
+            }
+            if (Input.GetKeyDown(KeyCode.F11))
+            {
+               
+                Network.SendGetItemPacket(3);
+              
+            }
+            if (Input.GetKeyDown(KeyCode.F12))
+            {
+                
+                Network.SendGetItemPacket(4);
+            }
+            
         }
+
+
         if (isGameStart && Network.isServerOnline())
         {
             int prevBeats = nowBeat.addBeat;
@@ -624,7 +655,10 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_ATTACK:
                         {
                             Protocol.sc_packet_attack p = Protocol.sc_packet_attack.SetByteToVar(data);
-
+                            if(p.id == -1)
+                            {
+                                enemyAnim.SetTrigger("Hit");
+                            }
                             int target_id = ServerID_To_ClientID(p.target_id);
                             if (target_id == -1)
                                 break;

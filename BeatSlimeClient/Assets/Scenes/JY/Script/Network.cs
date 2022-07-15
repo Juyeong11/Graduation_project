@@ -355,6 +355,17 @@ public static class Network
         if (isOnline)
             ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
     }
+
+    public static void SendGetItemPacket(byte itemType)
+    {
+        Protocol.cs_packet_get_item pk = new Protocol.cs_packet_get_item();
+        pk.size = (byte)Marshal.SizeOf(typeof(Protocol.cs_packet_get_item));
+        pk.type = Protocol.CONSTANTS.CS_PACKET_GET_ITEM;
+
+        pk.itemType = itemType;
+        if (isOnline)
+            ClientSocket.BeginSend(pk.GetBytes(), 0, pk.size, SocketFlags.None, new System.AsyncCallback(sendComplet), ClientSocket);
+    }
     public static bool isServerOnline()
     {
         return debugOnline || isOnline;
