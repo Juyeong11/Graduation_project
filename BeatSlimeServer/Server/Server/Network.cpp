@@ -1389,7 +1389,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		//있다면 패링 성공 패킷을 보낸다.
 		cs_packet_parrying* packet = reinterpret_cast<cs_packet_parrying*>(p);
 #ifdef DEBUG
-		printf("%d : I want parrying!!\n", client_id);
+		//printf("%d : I want parrying!!\n", client_id);
 #endif
 		GameRoom* gr = game_room[reinterpret_cast<Client*>(clients[client_id])->cur_room_num];
 
@@ -1417,7 +1417,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				//패링 성공
 				// 패링 성공 패킷을 클라이언트로 보냄
 #ifdef DEBUG
-				printf("%d parry successed : %d in %d\n", id, running_time, pattern.time);
+				//printf("%d parry successed : %d in %d\n", id, running_time, pattern.time);
 #endif
 				reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
 					= std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
@@ -1986,6 +1986,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			for (const auto pl : gr->player_ids) {
 				if (pl == nullptr) continue;
 				send_score(cl.id, gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)], pl->id);
+				send_attack_player(cl.id, gr->boss_id, pl->id);
 
 			}
 			
