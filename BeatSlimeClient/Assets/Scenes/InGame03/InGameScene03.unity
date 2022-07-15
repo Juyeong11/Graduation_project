@@ -5301,6 +5301,8 @@ MonoBehaviour:
   ComboEffect: {fileID: 1719363825}
   ParticleEffect: {fileID: 1719363826}
   gameOverImage: {fileID: 2224594054131023562}
+  ids: 
+  myPlayerID: -1
   MN: {fileID: 783668092}
   PD: {fileID: 1264016706}
 --- !u!114 &2121429944
@@ -5375,7 +5377,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4511441025240208573, guid: 0ab9e890bcb41cc4cafc092f0e5ed178, type: 3}
       propertyPath: m_RootOrder
-      value: 12
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 4511441025240208573, guid: 0ab9e890bcb41cc4cafc092f0e5ed178, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5460,7 +5462,7 @@ Transform:
   m_Children:
   - {fileID: 1704106321}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1335912149208043067
 PrefabInstance:

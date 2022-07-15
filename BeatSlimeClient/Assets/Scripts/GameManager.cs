@@ -910,7 +910,14 @@ public class GameManager : MonoBehaviour
                             //Debug.Log(ping);
                         }
                         break;
+                    case Protocol.CONSTANTS.SC_PACKET_SEND_SCORE:
+                        {
+                            Protocol.sc_packet_score p = Protocol.sc_packet_score.SetByteToVar(data);
+                            //p.id => 점수가 바뀐 플레이어 아이디
+                            //p.id => 점수
 
+                        }
+                        break;
                     default:
                         Debug.Log("wrong + type");
 

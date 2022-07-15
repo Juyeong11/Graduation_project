@@ -48,6 +48,7 @@ const char SC_PACKET_CHAT = 17;
 const char SC_PACKET_LOGIN_FAIL = 18;
 const char SC_PACKET_BUY_RESULT = 19;
 const char SC_PACKET_USE_ITEM = 20;
+const char SC_PACKET_SEND_SCORE = 21;
 
 #pragma pack (push, 1)
 //client -> server
@@ -336,5 +337,12 @@ struct sc_packet_use_item {
 	char	type;
 	char	itemType;
 	int	user;
+};
+
+struct sc_packet_score {
+	unsigned char size;
+	char	type;
+	int id;
+	int	score;
 };
 #pragma pack(pop)

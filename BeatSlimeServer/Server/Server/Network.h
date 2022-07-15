@@ -88,6 +88,7 @@ public:
 	void send_chat_packet(int user_id, int my_id, char* mess);
 	void send_buy_result(int user_id, int itemType, char result);
 	void send_use_item(int user_id, int user, int itemType);
+	void send_score(int user_id,int score,int receiver);
 
 	void send_effect(int client_id, int actor_id, int target_id, int effect_type, int charging_time,int dir, int x, int y, int z);
 	void disconnect_client(int client_id);

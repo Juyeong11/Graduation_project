@@ -62,6 +62,7 @@ namespace Protocol
         public const byte SC_PACKET_LOGIN_FAIL = 18;
         public const byte SC_PACKET_BUY_RESULT = 19;
         public const byte SC_PACKET_USE_ITEM = 20;
+        public const byte SC_PACKET_SEND_SCORE = 21;
 
 
     }
@@ -535,5 +536,15 @@ namespace Protocol
         public byte type;
         public byte itemType;
         public int user;
+    }
+
+    [Serializable]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class sc_packet_score : ISerializeble<sc_packet_score>
+    {
+        public byte size;
+        public byte type;
+        public byte id;
+        public int score;
     }
 }

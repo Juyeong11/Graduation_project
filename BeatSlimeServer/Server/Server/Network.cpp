@@ -515,6 +515,24 @@ void Network::send_use_item(int user_id, int user, int itemType)
 
 }
 
+void Network::send_score(int user_id, int score, int receiver)
+{
+	int s = score;
+	if (score < 0) {
+		s = 0;
+	}
+	sc_packet_score packet;
+	packet.size = sizeof(packet);
+	packet.type = SC_PACKET_SEND_SCORE;
+	packet.id = user_id;
+	packet.score = s;
+
+	EXP_OVER* ex_over;
+	while (!exp_over_pool.try_pop(ex_over));
+	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);
+	reinterpret_cast<Client*>(clients[receiver])->do_send(ex_over);
+}
+
 void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
@@ -732,7 +750,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		game_room[game_room_id]->Score[i] -= 20 * std::clamp((damage - pl->armour), 0, 20);
 		for (const auto& p : game_room[game_room_id]->player_ids) {
 			if (p == nullptr) continue;
-
+			send_score(pl->id, game_room[game_room_id]->Score[i], p->id);
 			send_attack_player(game_room[game_room_id]->boss_id->id, pl->id, p->id);
 		}
 
@@ -784,6 +802,8 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 
 		for (const auto pl : gr->player_ids) {
 			if (pl == nullptr) continue;
+			send_score(cl->id, gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)], pl ->id);
+
 			send_attack_player(cl->id, gr->boss_id->id, pl->id);
 		}
 		break;
@@ -793,6 +813,9 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 			pl->Hit(-damage);
 			if (pl->hp > 100)
 				pl->hp = 100;
+			send_score(cl->id, gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)], pl->id);
+
+
 			send_attack_player(cl->id, pl->id, pl->id);
 		}
 		gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] += 100 * damage;
@@ -1398,7 +1421,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 #endif
 				reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
 					= std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
-
+				
+				gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)] += 14 * cl.power;
 				//수정
 				gr->boss_id->hp -= 14 *cl.power;
 				if (gr->boss_id->hp < 0) {
@@ -1413,6 +1437,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 				for (const auto pl : gr->player_ids) {
 					if (pl == nullptr) continue;
 					send_parrying(pl->id, client_id);
+					send_score(cl.id, gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)], pl->id);
+
 					send_attack_player(client_id, gr->boss_id->id, pl->id);
 				}
 			}
@@ -1937,6 +1963,14 @@ void Network::process_packet(int client_id, unsigned char* p)
 		case DIR::UP: // 점수
 
 			gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)] += 500;
+
+			for (const auto pl : gr->player_ids) {
+				if (pl == nullptr) continue;
+				send_score(cl.id, gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)], pl->id);
+				
+			}
+			
+
 			break;
 		case DIR::DOWN: // 트루뎀
 			if (gr->boss_id->Hit(100)) {
@@ -1949,11 +1983,12 @@ void Network::process_packet(int client_id, unsigned char* p)
 				timer_queue.push(tev);
 			}
 			gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)] += 100;
-
 			for (const auto pl : gr->player_ids) {
 				if (pl == nullptr) continue;
-				send_attack_player(-1, gr->boss_id->id, pl->id);
+				send_score(cl.id, gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)], pl->id);
+
 			}
+			
 			break;
 		case DIR::LEFTDOWN: // 공증 -> 게임 끝날 때 까지 지속
 			cl.power = 3;
@@ -1967,6 +2002,8 @@ void Network::process_packet(int client_id, unsigned char* p)
 				pl->Hit(-50);
 				if (pl->hp > 100)
 					pl->hp = 100;
+				send_score(cl.id, gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)], pl->id);
+
 				send_attack_player(cl.id, cl.id, pl->id);
 			}
 			break;
@@ -2227,7 +2264,7 @@ void Network::worker()
 			else {
 				//std::cout << parrying_end_time << " " << player_parring_time << " player parrying failed\n";
 				//패링 못했으니 플레이어를 때리자
-				clients[target_id]->hp -= (10 * damamge_bug + clients[target_id]->armour);
+				clients[target_id]->hp -= (10 * damamge_bug - clients[target_id]->armour);
 				for (const auto& p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 					if (game_room[game_room_id]->boss_id == nullptr) continue;
