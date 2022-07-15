@@ -54,6 +54,8 @@ public class PatternManager : MonoBehaviour
                 GameManager.data.JudgementTiming = int.Parse(datas[i]["pivotY"].ToString());
                 PatternManager.data.Factory.scrollSpeed = float.Parse(datas[i]["pivotX"].ToString());
 
+                GameManager.data.enemy.GetComponent<EnemyManager>().HP.RealInitHP(int.Parse(datas[i]["direction"].ToString()));
+
                 GameManager.data.bpm = SoundManager.instance.GetBGMBpm(GameManager.data.SongName);
                 GameManager.data.totalSongTime = (int)(SoundManager.instance.GetMusicLength(GameManager.data.SongName) * 1000f);
                 GameManager.data.nowSongTime = 0;

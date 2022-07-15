@@ -27,6 +27,14 @@ public class HPManager
         }
 
     }
+
+    public void RealInitHP(int h)
+    {
+        MaxHp = h;
+        CurrentHP = MaxHp;
+        prevHP = CurrentHP;
+    }
+
     public void Damage(int damage)
     {
         CurrentHP -= damage;
