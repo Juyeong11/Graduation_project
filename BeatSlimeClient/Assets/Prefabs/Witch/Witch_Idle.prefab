@@ -2601,7 +2601,7 @@ SkinnedMeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: ea4869d9de4e4fd4f9dd2eb887d7c7d5, type: 2}
   - {fileID: 2100000, guid: ea4869d9de4e4fd4f9dd2eb887d7c7d5, type: 2}
-  - {fileID: 133136606912108978, guid: 0278711991c03224cb6534ccd41640b2, type: 3}
+  - {fileID: 2100000, guid: ea4869d9de4e4fd4f9dd2eb887d7c7d5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4403,6 +4403,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8350823157733344250}
   - component: {fileID: 8389832374567302052}
+  - component: {fileID: 1085247488572728534}
   m_Layer: 0
   m_Name: Witch_Idle
   m_TagString: Untagged
@@ -4446,6 +4447,20 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &1085247488572728534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8696386860751853888}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e47da1b65dfa414ebd1629aa94ba7f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  body: {fileID: 1863390853980241974}
+  head: {fileID: 7467703469650049881}
 --- !u!1 &8702765848464055208
 GameObject:
   m_ObjectHideFlags: 0

@@ -445,7 +445,10 @@ public class GameManager : MonoBehaviour
         {
             player.GetComponentInChildren<PlayerManager>().changeColor(Color.red);
         }
-
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            enemyAnim.SetTrigger("Move");
+        }
         if (isGameStart && Network.isServerOnline())
         {
             int prevBeats = nowBeat.addBeat;
