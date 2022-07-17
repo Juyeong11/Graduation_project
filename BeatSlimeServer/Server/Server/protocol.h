@@ -254,6 +254,7 @@ struct sc_packet_game_init
 	int id2;
 	int id3;
 	int boss_id;
+	int coolTime[3];
 };
 
 struct sc_packet_effect

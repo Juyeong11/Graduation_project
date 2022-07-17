@@ -799,7 +799,7 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 			timer_queue.push(tev);
 		}
 		gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] += 100 * damage;
-
+		std::cout << gr->boss_id->hp<<std::endl;
 		for (const auto pl : gr->player_ids) {
 			if (pl == nullptr) continue;
 			send_score(cl->id, gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)], pl ->id);
@@ -1251,7 +1251,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 			std::cout << "set room\n";
 			int room_id = get_game_room_id();
-			int boss_id = get_npc_id(TUTORI_MAP);
+			int boss_id = get_npc_id(1);
 			if (boss_id != -1)
 				game_room[room_id]->GameRoomInit(TUTORI_MAP, maps[TUTORI_MAP]->bpm, clients[boss_id], players, nullptr);
 
@@ -1413,7 +1413,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			}
 
 			//100ms보다 작으면
-			if (abs(running_time - pattern.time) < 300) {
+			if (abs(running_time - pattern.time) < 600) {
 				//패링 성공
 				// 패링 성공 패킷을 클라이언트로 보냄
 #ifdef DEBUG
@@ -1929,23 +1929,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 	}
 	break;
-	case CS_PACKET_PLAY_TUTORIAL:
-	{
-		//cs_packet_play_tutorial* packet = reinterpret_cast<cs_packet_play_tutorial*>(p);
-		// 게임방 준비 시키고 game_room_init -> game_start 까지 하자
 
-		GameRoom* gr = game_room[cl.cur_room_num];
-
-		gr->start_time = std::chrono::system_clock::now();
-		int game_start_time = static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(gr->start_time).time_since_epoch().count());
-		game_start(gr->game_room_id);
-
-		send_game_start(client_id, game_start_time);
-
-
-		std::cout << "Tutorial Start\n";
-	}
-	break;
 	case CS_PACKET_GET_ITEM:
 	{
 		cs_packet_get_item* packet = reinterpret_cast<cs_packet_get_item*>(p);
@@ -1956,7 +1940,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			send_use_item(p->id, cl.id, packet->itemType);
 		}
 		GameRoom* gr = game_room[cl.cur_room_num];
-		cl.power = 0;
+		cl.power = 1;
 		cl.armour = 0;
 		switch (packet->itemType)
 		{
@@ -2256,7 +2240,7 @@ void Network::worker()
 			//패링을 했는지 안했는지 확인
 			auto player_parring_time = reinterpret_cast<Client*>(clients[target_id])->pre_parrying_pattern;
 
-			if (parrying_end_time - player_parring_time < 200) {
+			if (parrying_end_time - player_parring_time < 600) {
 				std::cout << parrying_end_time << " " << player_parring_time << " player already parrying\n";
 				//패링 했으니 넘어가자
 				//패링 한 뒤 동작은 이미 worker thread에서 수행된 상태이다
@@ -2935,7 +2919,7 @@ void Network::set_next_pattern(int room_id)
 		tev.z = t.z;
 		tev.game_room_id = room_id;
 		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
-		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time + 100);
+		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time + 300);
 		//tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
 		timer_queue.push(tev);
@@ -2996,7 +2980,7 @@ void Network::game_start(int room_id)
 		p->dest_y = -1;
 		p->dest_z = -1;
 
-		p->power = 0;
+		p->power = 1;
 		p->armour = 0;
 
 		p->x = maps[game_room[room_id]->map_type]->startX[i];
