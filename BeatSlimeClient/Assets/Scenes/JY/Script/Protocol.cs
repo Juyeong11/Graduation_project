@@ -424,6 +424,8 @@ namespace Protocol
         public int id2;
         public int id3;
         public int boss_id;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+        public int[] cool_times = new int[3];
     }
 
     [Serializable]

@@ -542,10 +542,7 @@ public class GameManager : MonoBehaviour
                     case Protocol.CONSTANTS.SC_PACKET_GAME_INIT:
                         {
                             Protocol.sc_packet_game_init p = Protocol.sc_packet_game_init.SetByteToVar(data);
-                            Debug.Log("game init");
-                            Debug.Log(p.id1);
-                            Debug.Log(p.id2);
-                            Debug.Log(p.id3);
+                            // p->cool_times[0],[1],[2] 쿨타임
                             ids[0] = p.id1;
                             ids[1] = p.id2;
                             ids[2] = p.id3;
@@ -560,8 +557,7 @@ public class GameManager : MonoBehaviour
 
 
                             PatternManager.data.Load(myPlayerID);
-                            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene01")
-                                Network.SendPlayTutorialPacket();
+
                             Network.SendGameStartReadyPacket();
                             Network.SendPingTestPacket();
                         }
@@ -917,12 +913,19 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_score p = Protocol.sc_packet_score.SetByteToVar(data);
                             //p.id => 점수가 바뀐 플레이어 아이디
-                            //p.id => 점수
+                            //p.score => 점수
 
                         }
                         break;
+                    case Protocol.CONSTANTS.SC_PACKET_USE_ITEM:
+                        {
+                            Protocol.sc_packet_use_item p = Protocol.sc_packet_use_item.SetByteToVar(data);
+                            //p.user -> 사용자
+                            //p.itemType -> 사용 아이템 
+                        }
+                        break;
                     default:
-                        Debug.Log("wrong + type");
+                        Debug.Log("wrong + type : " + type);
 
                         break;
                 }
