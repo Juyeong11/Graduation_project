@@ -703,6 +703,7 @@ public class GameManager : MonoBehaviour
                                     resultsData.attack += (hm.CurrentHP - p.hp);
 
                                     hm.Damage(hm.CurrentHP - p.hp);
+                                    ComboEffect.AttackApply(hm.CurrentHP - p.hp);
                                 }
 
                                 //Objects[target_id].GetComponentInChildren<EnemyManager>().StunTrig();

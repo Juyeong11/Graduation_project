@@ -13,12 +13,17 @@ public class UIJudgeEffect : MonoBehaviour
     public Image TT;
     public Image OO;
 
+    public Image HHH;
+    public Image TTT;
+    public Image OOO;
+    public Image VVV;
+
     public List<Sprite> comboSprites;
-    public List<Sprite> damageSprites;
 
     int countee = 0;
     float scale = 2.0f;
     float alp = 0.0f;
+    float alpp = 0.0f;
 
     public void Update()
     {
@@ -65,11 +70,51 @@ public class UIJudgeEffect : MonoBehaviour
     public void DamageApply(int damage)
     {
         alp = 1.5f;
-        TT.sprite = damageSprites[damage/10];
-        OO.sprite = damageSprites[damage%10];
+        TT.sprite = comboSprites[(damage/10) + 30];
+        OO.sprite = comboSprites[(damage%10) + 30];
+
 
         HH.color = new Color(1.0f, 1.0f, 1.0f, alp);
-        TT.color = new Color(1.0f, 1.0f, 1.0f, alp);
+        if (damage/10 == 0)
+        {
+            TT.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+        }
+        else
+        {
+            TT.color = new Color(1.0f, 1.0f, 1.0f, alp);
+        }
+
+
         OO.color = new Color(1.0f, 1.0f, 1.0f, alp);
+    }
+
+    public void AttackApply(int damage)
+    {
+        alpp = 1.5f;
+        TTT.sprite = comboSprites[(damage/100) + 10];
+        OOO.sprite = comboSprites[((damage/10)%10) + 10];
+        VVV.sprite = comboSprites[(damage%10) + 10];
+
+        HHH.color = new Color(1.0f, 1.0f, 1.0f, alpp);
+        if (damage/100 == 0)
+        {
+            TTT.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+        }
+        else
+        {
+            TTT.color = new Color(1.0f, 1.0f, 1.0f, alpp);
+        }
+
+        //이거 맞음
+        if (damage/10 == 0)
+        {
+            OOO.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+        }
+        else
+        {
+            OOO.color = new Color(1.0f, 1.0f, 1.0f, alpp);
+        }
+
+        VVV.color = new Color(1.0f, 1.0f, 1.0f, alpp);
     }
 }
