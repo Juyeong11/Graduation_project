@@ -18,7 +18,14 @@ public class UIJudgeEffect : MonoBehaviour
     public Image OOO;
     public Image VVV;
 
+    public Image sM;
+    public Image sC;
+    public Image sH;
+    public Image sT;
+    public Image sO;
+
     public List<Sprite> comboSprites;
+    public List<Sprite> scoreSprites;
 
     int countee = 0;
     float scale = 2.0f;
@@ -116,5 +123,41 @@ public class UIJudgeEffect : MonoBehaviour
         }
 
         VVV.color = new Color(1.0f, 1.0f, 1.0f, alpp);
+    }
+
+    public void ScoreApply(int score)
+    {
+        if (score<0)
+            score = 0;
+        sT.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+        sH.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+        sC.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+        sM.color = new Color(1.0f, 1.0f, 1.0f, 0.0f);
+
+        sO.sprite = scoreSprites[score % 10];
+        score /= 10;
+        if (score > 0)
+        {
+            sT.sprite = scoreSprites[score%10];
+            score /= 10;
+            sT.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+            if (score > 0)
+            {
+                sH.sprite = scoreSprites[score%10];
+                score /= 10;
+                sH.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+                if (score > 0)
+                {
+                    sC.sprite = scoreSprites[score%10];
+                    score /= 10;
+                    sC.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+                    if (score > 0)
+                    {
+                        sM.sprite = scoreSprites[score%20];
+                        sM.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+                    }
+                }
+            }
+        }
     }
 }
