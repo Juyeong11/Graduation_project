@@ -681,6 +681,8 @@ public class GameManager : MonoBehaviour
 
                                         ComboEffect.CountApply(ref nowCombo, true);
                                         CineCameraShake.instance.ShakeCamera(hm.CurrentHP - p.hp);
+                                        // 데미지 띄우기
+                                        ComboEffect.DamageApply(hm.CurrentHP - p.hp);
                                         //VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 30f);
                                     }
                                 }

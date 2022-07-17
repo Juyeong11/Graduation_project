@@ -9,10 +9,16 @@ public class UIJudgeEffect : MonoBehaviour
     public Image T;
     public Image O;
 
+    public Image HH;
+    public Image TT;
+    public Image OO;
+
     public List<Sprite> comboSprites;
+    public List<Sprite> damageSprites;
 
     int countee = 0;
     float scale = 2.0f;
+    float alp = 0.0f;
 
     public void Update()
     {
@@ -25,6 +31,18 @@ public class UIJudgeEffect : MonoBehaviour
 
             if (scale < 2.0f)
                 scale = 2.0f;
+        }
+
+        if (alp > 0.0f)
+        {
+            alp -= 1.0f * Time.deltaTime;
+            HH.color = new Color(1.0f, 1.0f, 1.0f, alp);
+            TT.color = new Color(1.0f, 1.0f, 1.0f, alp);
+            OO.color = new Color(1.0f, 1.0f, 1.0f, alp);
+            if (alp < 0.0f)
+            {
+                alp = 0.0f;
+            }
         }
     }
 
@@ -42,5 +60,16 @@ public class UIJudgeEffect : MonoBehaviour
         T.transform.localScale = new Vector3(scale, scale, scale);
         O.transform.localScale = new Vector3(scale, scale, scale);
         countee++;
+    }
+
+    public void DamageApply(int damage)
+    {
+        alp = 1.5f;
+        TT.sprite = damageSprites[damage/10];
+        OO.sprite = damageSprites[damage%10];
+
+        HH.color = new Color(1.0f, 1.0f, 1.0f, alp);
+        TT.color = new Color(1.0f, 1.0f, 1.0f, alp);
+        OO.color = new Color(1.0f, 1.0f, 1.0f, alp);
     }
 }
