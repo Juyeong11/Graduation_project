@@ -244,7 +244,11 @@ void Network::send_game_init(int c_id, GameObject* ids[3], int boss_id)
 		packet.id3 = -1;
 
 	packet.boss_id = boss_id;
+	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
+		if (ids[i] == nullptr) continue;
+		packet.coolTime[i] = skills[reinterpret_cast<Client*>(ids[i])->curSkill]->CoolTime;
 
+	}
 	EXP_OVER* ex_over;
 	while (!exp_over_pool.try_pop(ex_over));
 	ex_over->set_exp(OP_SEND, sizeof(packet), &packet);

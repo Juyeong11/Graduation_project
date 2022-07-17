@@ -102,6 +102,8 @@ public class GameManager : MonoBehaviour
     public MusicName MN;
     public PlayableDirector PD;
 
+    public bool isTutorial;
+
     void Awake()
     {
 
@@ -548,12 +550,35 @@ public class GameManager : MonoBehaviour
                             ids[2] = p.id3;
                             ids[3] = p.boss_id;
                             int pid = ServerID_To_ClientID(p.player_id);
+                            
 
                             print("init pid : " +pid);
                             Objects[pid] = player;
                             myPlayerID = pid;
                             Objects[3] = enemy;
                             Objects[3].SetActive(true);
+
+
+                            if (!isTutorial)
+                            {
+                                int currenty = 1;
+                                for (int i=0;i<3;i++)
+                                {
+                                    if (pid == i)
+                                    {
+                                        HPGM.PlayerHPs[0].cooltime = (float)p.cool_times[i];
+                                    }
+                                    else
+                                    {
+                                        HPGM.PlayerHPs[currenty].cooltime = (float)p.cool_times[i];
+                                        currenty++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                HPGM.PlayerHPs[0].cooltime = (float)p.cool_times[pid];
+                            }
 
 
                             PatternManager.data.Load(myPlayerID);
@@ -822,12 +847,13 @@ public class GameManager : MonoBehaviour
                                     {
                                         case 1:
                                             EffectManager.instance.PlayerWaterGunEffect(Objects[pid].transform.localPosition, ref Objects[tid], p.charging_time);
-
+                                            HPGM.PlayerHPs[pid].nowCooltime = HPGM.PlayerHPs[pid].cooltime;
                                             break;
                                         case 2:
                                             {
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerQuakeEffect(cell.X, cell.Y, cell.Z, p.charging_time);
+                                                HPGM.PlayerHPs[pid].nowCooltime = HPGM.PlayerHPs[pid].cooltime;
                                                 //Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " skill attack");
 
                                             }
@@ -836,6 +862,7 @@ public class GameManager : MonoBehaviour
                                             {
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerHealEffect(cell.X, cell.Y, cell.Z, p.charging_time);
+                                                HPGM.PlayerHPs[pid].nowCooltime = HPGM.PlayerHPs[pid].cooltime;
                                                 //Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " skill attack");
 
                                             }
@@ -914,7 +941,8 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_score p = Protocol.sc_packet_score.SetByteToVar(data);
                             //p.id => 점수가 바뀐 플레이어 아이디
                             //p.score => 점수
-
+                            if (p.id == myPlayerID)
+                                ComboEffect.ScoreApply(p.score);
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_USE_ITEM:
@@ -922,6 +950,7 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_use_item p = Protocol.sc_packet_use_item.SetByteToVar(data);
                             //p.user -> 사용자
                             //p.itemType -> 사용 아이템 
+                            
                         }
                         break;
                     default:
