@@ -222,7 +222,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 					bar * timeByBar
 					+ addBeat * timeByBeat
 					+ add16Beat * timeBy16Beat
-					+ add24Beat * timeBy24Beat,
+					+ add24Beat * timeBy24Beat + 70,
 					dir,
 					speed,
 					px, py, pz);
@@ -236,7 +236,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 				bar * timeByBar
 				+ addBeat * timeByBeat
 				+ add16Beat * timeBy16Beat
-				+ add24Beat * timeBy24Beat,
+				+ add24Beat * timeBy24Beat + 70,
 				dir,
 				speed,
 				px, py, pz);

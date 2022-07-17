@@ -1413,7 +1413,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			}
 
 			//100ms보다 작으면
-			if (abs(running_time - pattern.time) < 200) {
+			if (abs(running_time - pattern.time) < 300) {
 				//패링 성공
 				// 패링 성공 패킷을 클라이언트로 보냄
 #ifdef DEBUG
