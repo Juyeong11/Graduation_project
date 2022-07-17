@@ -15,9 +15,6 @@ Links.
 - github
 https://github.com/Juyeong11/Graduation_project
 
-- confluence
-https://terrorist.atlassian.net/wiki/spaces/GRADUATION/overview
-
 
 How Start.
 - build BeatSlimeServer/Server/Server.sln
