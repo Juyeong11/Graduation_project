@@ -14,6 +14,8 @@ public class IngamePartyUISetter : MonoBehaviour
     public Image prevHPImage;
     public Image CoolTime;
 
+    public Image itemImage;
+
     public float cooltime;
     public float nowCooltime = 0;
     
@@ -31,5 +33,11 @@ public class IngamePartyUISetter : MonoBehaviour
             nowCooltime -= Time.deltaTime;
         }
         CoolTime.fillAmount = nowCooltime / cooltime;
+    }
+
+    public void SetISImage(Sprite s)
+    {
+        itemImage.sprite = s;
+        itemImage.color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }

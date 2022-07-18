@@ -533,49 +533,49 @@ public class PlayerManager : MonoBehaviour
         switch (nowOnCellTag.state)
         {
             case cellState.Item1:
-                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                
                 nowOnCellTag.GetItemFromThisCell();
                 changeColor(Color.red);
                 Debug.Log("Item1");
-                
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(1);
                 break;
             case cellState.Item2:
-                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 nowOnCellTag.GetItemFromThisCell();
                 changeColor(Color.yellow);
-                
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(4);
 
                 break;
             case cellState.Item3:
-                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 changeColor(Color.green);
                 nowOnCellTag.GetItemFromThisCell();
-                
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(3);
 
                 break;
             case cellState.Item4:
-                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 changeColor(new Color(0.8f, 0f, 0.8f));
                 nowOnCellTag.GetItemFromThisCell();
-                
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(5);
                 break;
             case cellState.Item5:
-                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 changeColor(Color.blue);
                 nowOnCellTag.GetItemFromThisCell();
-                
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(0);
 
                 break;
             case cellState.Item6:
-                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
+                //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 changeColor(Color.cyan);
                 nowOnCellTag.GetItemFromThisCell();
-                
+                nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 break;
 
 

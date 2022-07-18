@@ -104,6 +104,8 @@ public class GameManager : MonoBehaviour
 
     public bool isTutorial;
 
+    public ItemSpecImages ISI;
+
     void Awake()
     {
 
@@ -727,7 +729,7 @@ public class GameManager : MonoBehaviour
                                 {
                                     resultsData.attack += (hm.CurrentHP - p.hp);
                                     ComboEffect.AttackApply(hm.CurrentHP - p.hp);
-                                    
+
                                     hm.Damage(hm.CurrentHP - p.hp);
                                     
                                 }
@@ -946,6 +948,7 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_score p = Protocol.sc_packet_score.SetByteToVar(data);
                             //p.id => 점수가 바뀐 플레이어 아이디
                             //p.score => 점수
+                            Debug.Log("score : " +p.score);
                             if (ServerID_To_ClientID(p.id) == myPlayerID)
                                 ComboEffect.ScoreApply(p.score);
                         }
@@ -955,6 +958,11 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_use_item p = Protocol.sc_packet_use_item.SetByteToVar(data);
                             //p.user -> 사용자
                             //p.itemType -> 사용 아이템 
+                            //효과 띄우면 됨
+                            // 0 - 점수
+                            // 1 - 트루뎀
+                            // 공증 방증 체력회복
+                            HPGM.PlayerHPs[ServerID_To_ClientID(p.user)].SetISImage(ISI.Img[p.itemType]);
                             
                         }
                         break;

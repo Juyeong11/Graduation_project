@@ -119,8 +119,8 @@ public class Cell
     {
         state = cellState.Normal;
 
-        var itemTrans = obejct.transform.Find("#VFX_item");
-        itemTrans.gameObject.SetActive(false);
+        //var itemTrans = obejct.transform.Find("#VFX_item");
+        //itemTrans.gameObject.SetActive(false);
 
         // Item ²ô±â
     }
