@@ -687,9 +687,12 @@ public class GameManager : MonoBehaviour
                             //enemy.GetComponent<EnemyManager>().BeatPatternServe(nowBeat, new Beat(0, randomTickForTest), Objects[target_id]);
                             //Objects[target_id].GetComponent<PlayerManager>().SetBallBeat(nowBeat, new Beat(0, randomTickForTest));
                             //Debug.Log("ServerID_To_ClientID : " + p.target_id+ " to " + target_id);
-                            if (target_id != 3) // is not boss
+
+                            
+                            if (target_id < 3) // is not boss
                             {
                                 HPManager hm = Objects[target_id].GetComponentInChildren<PlayerManager>().HP;
+                                //Debug.Log("print target_id : " + target_id + " and damage : " + (hm.CurrentHP - p.hp));
                                 //Debug.Log("ID : " + p.target_id + "damage : " + (hm.CurrentHP - p.hp));
 
                                 //Debug.Log("ATTACK : " + target_id + ", HP : " + hm.CurrentHP +" to " + p.hp);
@@ -718,13 +721,15 @@ public class GameManager : MonoBehaviour
                                 //Objects[ServerID_To_ClientID(p.id)].GetComponentInChildren<PlayerManager>().AttackTrig();
 
                                 HPManager hm = Objects[target_id].GetComponentInChildren<EnemyManager>().HP;
+                                //Debug.Log("print target_id : " + target_id + " and damage : " + (hm.CurrentHP - p.hp));
 
                                 if (hm.CurrentHP - p.hp > 0)
                                 {
                                     resultsData.attack += (hm.CurrentHP - p.hp);
-
-                                    hm.Damage(hm.CurrentHP - p.hp);
                                     ComboEffect.AttackApply(hm.CurrentHP - p.hp);
+                                    
+                                    hm.Damage(hm.CurrentHP - p.hp);
+                                    
                                 }
 
                                 //Objects[target_id].GetComponentInChildren<EnemyManager>().StunTrig();
@@ -941,7 +946,7 @@ public class GameManager : MonoBehaviour
                             Protocol.sc_packet_score p = Protocol.sc_packet_score.SetByteToVar(data);
                             //p.id => 점수가 바뀐 플레이어 아이디
                             //p.score => 점수
-                            if (p.id == myPlayerID)
+                            if (ServerID_To_ClientID(p.id) == myPlayerID)
                                 ComboEffect.ScoreApply(p.score);
                         }
                         break;

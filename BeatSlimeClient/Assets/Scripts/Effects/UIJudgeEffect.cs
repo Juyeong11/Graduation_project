@@ -56,6 +56,25 @@ public class UIJudgeEffect : MonoBehaviour
                 alp = 0.0f;
             }
         }
+        if (alpp > 0.0f)
+        {
+            alpp -= 1.0f * Time.deltaTime;
+            HHH.color = new Color(1.0f, 1.0f, 1.0f, alpp);
+            if (TTT.color.a > 0.0f)
+            {
+                TTT.color = new Color(1.0f, 1.0f, 1.0f, alpp);
+            }
+            if (OOO.color.a > 0.0f)
+            {
+                OOO.color = new Color(1.0f, 1.0f, 1.0f, alpp);
+            }
+            VVV.color = new Color(1.0f, 1.0f, 1.0f, alpp);
+            
+            if (alpp < 0.0f)
+            {
+                alpp = 0.0f;
+            }
+        }
     }
 
     public void CountApply(ref int combo, bool crush = false)
