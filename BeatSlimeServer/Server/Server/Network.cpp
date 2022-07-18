@@ -803,11 +803,11 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 			timer_queue.push(tev);
 		}
 		gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] += 100 * damage;
-		std::cout << gr->boss_id->hp<<std::endl;
-		std::cout << gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] <<std::endl;
+
+
 		for (const auto pl : gr->player_ids) {
 			if (pl == nullptr) continue;
-			send_score(cl->id, gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)], pl ->id);
+			send_score(cl->id, gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)], pl->id);
 
 			send_attack_player(cl->id, gr->boss_id->id, pl->id);
 		}
@@ -1426,10 +1426,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 #endif
 				reinterpret_cast<Client*>(clients[client_id])->pre_parrying_pattern
 					= std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now()).time_since_epoch().count();
-				
+
 				gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)] += 14 * cl.power;
 				//수정
-				gr->boss_id->hp -= 14 *cl.power;
+				gr->boss_id->hp -= 14 * cl.power;
 				if (gr->boss_id->hp < 0) {
 					timer_event tev;
 					tev.ev = EVENT_GAME_END;
@@ -1956,9 +1956,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 			for (const auto pl : gr->player_ids) {
 				if (pl == nullptr) continue;
 				send_score(cl.id, gr->Score[gr->FindPlayerID_by_GameRoom(cl.id)], pl->id);
-				
+
 			}
-			
+
 
 			break;
 		case DIR::DOWN: // 트루뎀
@@ -1978,7 +1978,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				send_attack_player(cl.id, gr->boss_id->id, pl->id);
 
 			}
-			
+
 			break;
 		case DIR::LEFTDOWN: // 공증 -> 게임 끝날 때 까지 지속
 			cl.power = 3;
@@ -2972,7 +2972,9 @@ void Network::game_start(int room_id)
 	//수정
 
 	boss->hp = maps[map_type]->bossHP;
-
+	game_room[room_id]->Score[0] = 0;
+	game_room[room_id]->Score[1] = 0;
+	game_room[room_id]->Score[2] = 0;
 	int i = 0;
 	for (auto p : game_room[room_id]->player_ids) {
 		if (p == nullptr)continue;
