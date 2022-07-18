@@ -1495,7 +1495,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		cs_packet_use_skill* packet = reinterpret_cast<cs_packet_use_skill*>(p);
 		Client* cl = reinterpret_cast<Client*>(clients[client_id]);
 		GameRoom* gr = game_room[cl->cur_room_num];
-
+		if (gr->boss_id == nullptr) break;
 
 		if ((cl->last_skill_time + std::chrono::milliseconds(maps[gr->map_type]->timeByBeat * cl->skill->CoolTime)) > std::chrono::system_clock::now()) break;
 		cl->last_skill_time = std::chrono::system_clock::now();
