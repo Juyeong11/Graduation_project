@@ -546,7 +546,7 @@ namespace Protocol
     {
         public byte size;
         public byte type;
-        public byte id;
+        public int id;
         public int score;
     }
 }

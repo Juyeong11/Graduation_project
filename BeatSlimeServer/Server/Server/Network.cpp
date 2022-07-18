@@ -804,6 +804,7 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 		}
 		gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] += 100 * damage;
 		std::cout << gr->boss_id->hp<<std::endl;
+		std::cout << gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)] <<std::endl;
 		for (const auto pl : gr->player_ids) {
 			if (pl == nullptr) continue;
 			send_score(cl->id, gr->Score[gr->FindPlayerID_by_GameRoom(cl->id)], pl ->id);
