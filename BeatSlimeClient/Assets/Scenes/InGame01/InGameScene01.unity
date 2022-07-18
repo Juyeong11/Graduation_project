@@ -4714,6 +4714,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 466191991251980961, guid: ea611a13a1d01114b938abe69053ec7f, type: 3}
+      propertyPath: dissolveSpeed
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 682205123564150058, guid: ea611a13a1d01114b938abe69053ec7f, type: 3}
       propertyPath: m_Name
       value: WitchAxis

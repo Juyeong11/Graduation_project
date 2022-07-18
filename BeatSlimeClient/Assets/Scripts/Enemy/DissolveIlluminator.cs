@@ -24,10 +24,11 @@ public class DissolveIlluminator : MonoBehaviour
 
     IEnumerator dissolv(float t)
     {
-        lerped = -2.5f;
+        lerped = -2.6f;
         while (lerped < 1.5f)
         {
-            lerped += Time.deltaTime * t;
+            lerped += 0.011f * t;
+            Debug.Log("lerped: " + lerped);
             foreach(var m in body.materials)
             {
                 m.SetFloat("_Dissolve", lerped);
@@ -36,16 +37,17 @@ public class DissolveIlluminator : MonoBehaviour
             {
                 m.SetFloat("_Dissolve", lerped);
             }
-            yield return null;
+            yield return new WaitForSeconds(0.01f);
         }
     }
 
     IEnumerator unDissolv(float t)
     {
-        lerped = 1.5f;
+        lerped = 1.6f;
         while (lerped > -2.5f)
         {
-            lerped -= Time.deltaTime * t;
+            lerped -= 0.01f * t;
+            Debug.Log("unlerped: " + lerped);
             foreach(var m in body.materials)
             {
                 m.SetFloat("_Dissolve", lerped);
@@ -54,7 +56,7 @@ public class DissolveIlluminator : MonoBehaviour
             {
                 m.SetFloat("_Dissolve", lerped);
             }
-            yield return null;
+            yield return new WaitForSeconds(0.01f);
         }
     }
 }

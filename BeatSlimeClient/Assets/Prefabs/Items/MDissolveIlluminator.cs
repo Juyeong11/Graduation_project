@@ -38,12 +38,12 @@ public class MDissolveIlluminator : MonoBehaviour
         lerped = -1.5f;
         while (lerped < 1.5f)
         {
-            lerped += Time.deltaTime * t;
+            lerped += 0.1f * t;
             foreach(var m in body.materials)
             {
                 m.SetFloat("_Dissolve", lerped);
             }
-            yield return null;
+            yield return new WaitForSeconds(0.1f);
         }
         Destroy(this.gameObject);
     }
@@ -53,12 +53,12 @@ public class MDissolveIlluminator : MonoBehaviour
         lerped = 1.5f;
         while (lerped > -1.5f)
         {
-            lerped -= Time.deltaTime * t;
+            lerped -= 0.1f * t;
             foreach(var m in body.materials)
             {
                 m.SetFloat("_Dissolve", lerped);
             }
-            yield return null;
+            yield return new WaitForSeconds(0.1f);
         }
     }
 }
