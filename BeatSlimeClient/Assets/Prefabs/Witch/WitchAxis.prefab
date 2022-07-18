@@ -57,6 +57,7 @@ MonoBehaviour:
   landOffsetX: 0
   landOffsetY: 0
   landOffsetZ: 0
+  landOffsetW: 0
   landOffsetRotate: 0
   landOffsetScale: 0
   landType: 0
@@ -79,6 +80,7 @@ MonoBehaviour:
   enemyMaxHp: 0
   selfCoord: {fileID: 8094704631446390613}
   nearestSlimeCoord: {fileID: 0}
+  doseNotConsiderSlime: 0
   grid: {fileID: 0}
   enemyNoteList:
   - {fileID: 0}
@@ -186,6 +188,10 @@ PrefabInstance:
     - target: {fileID: 1064399098768133275, guid: 92ed98eb52b752849aa0e04f523523f2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -3.4882026
+      objectReference: {fileID: 0}
+    - target: {fileID: 1085247488572728534, guid: 92ed98eb52b752849aa0e04f523523f2, type: 3}
+      propertyPath: dissolveSpeed
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 1116421658974861195, guid: 92ed98eb52b752849aa0e04f523523f2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
