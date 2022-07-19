@@ -2294,7 +2294,7 @@ void Network::worker()
 
 			//std::cout << charging_time << std::endl;
 			int target_id = game_room[game_room_id]->find_online_player();
-			std::cout << "ready : " << std::chrono::system_clock::now() << std::endl;
+			//std::cout << "ready : " << std::chrono::system_clock::now() << std::endl;
 
 			if (game_room[game_room_id]->isGaming == false) break;
 			if (target_id == -1) {
@@ -2411,7 +2411,7 @@ void Network::worker()
 			//game_room[game_room_id]->ready_lock.lock();
 			//std::cout << i++ <<" real " << std::chrono::system_clock::now() << std::endl;
 			//game_room[game_room_id]->ready_lock.unlock();
-			std::cout <<"hit : " << std::chrono::system_clock::now() << std::endl;
+			//std::cout <<"hit : " << std::chrono::system_clock::now() << std::endl;
 
 
 			switch (pattern_type)
@@ -2950,8 +2950,8 @@ void Network::set_next_pattern(int room_id)
 	if (tev.start_time < std::chrono::system_clock::now() + std::chrono::milliseconds(1000)) {
 		set_next_pattern(room_id);
 	}
-	std::cout << "time : " << tev.start_time << std::endl;
-	std::cout << "now : " << std::chrono::system_clock::now() << std::endl;
+	//std::cout << "time : " << tev.start_time << std::endl;
+	//std::cout << "now : " << std::chrono::system_clock::now() << std::endl;
 }
 
 void Network::input_db_event(int c_id, DB_EVENT_TYPE type, int data)
