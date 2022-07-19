@@ -35,11 +35,11 @@ Network::Network() {
 	DB = new DataBase;
 
 	DB->readSkills(skills);
-	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv");
-	maps[WITCH_MAP]->SetMap("Map\\flower_load", "Music\\flower_load.csv");
-	maps[WITCH_MAP_HARD]->SetMap("Map\\flower_load", "Music\\flower_load2.csv");
-	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\Aviform Skyliner.csv");
-	maps[TUTORI_MAP]->SetMap("Map\\Tutorial", "Music\\Tutorial.csv");
+	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv",0);
+	maps[WITCH_MAP]->SetMap("Map\\flower_load", "Music\\flower_load.csv",70);
+	maps[WITCH_MAP_HARD]->SetMap("Map\\flower_load", "Music\\flower_load2.csv", 70);
+	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\Aviform Skyliner.csv",70);
+	maps[TUTORI_MAP]->SetMap("Map\\Tutorial", "Music\\Tutorial.csv",70);
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
 	for (int i = 0; i < MAX_USER; ++i) {
@@ -1371,6 +1371,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				game_start(gr->game_room_id);
 
 				for (const auto pl : gr->player_ids) {
+					if (pl == nullptr) continue;
 					send_game_start(pl->id, game_start_time);
 					Client* p = reinterpret_cast<Client*>(pl);
 					p->cur_room_num = gr->game_room_id;
@@ -2291,8 +2292,9 @@ void Network::worker()
 			int dir = *(reinterpret_cast<int*>(exp_over->_net_buf + sizeof(int) * 6));
 			std::chrono::system_clock::time_point charging_time = *(reinterpret_cast<std::chrono::system_clock::time_point*>(exp_over->_net_buf + sizeof(int) * 7));
 
-
+			//std::cout << charging_time << std::endl;
 			int target_id = game_room[game_room_id]->find_online_player();
+			std::cout << "ready : " << std::chrono::system_clock::now() << std::endl;
 
 			if (game_room[game_room_id]->isGaming == false) break;
 			if (target_id == -1) {
@@ -2409,6 +2411,7 @@ void Network::worker()
 			//game_room[game_room_id]->ready_lock.lock();
 			//std::cout << i++ <<" real " << std::chrono::system_clock::now() << std::endl;
 			//game_room[game_room_id]->ready_lock.unlock();
+			std::cout <<"hit : " << std::chrono::system_clock::now() << std::endl;
 
 
 			switch (pattern_type)
@@ -2905,6 +2908,7 @@ void Network::set_next_pattern(int room_id)
 		tev.game_room_id = room_id;
 		//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
 		tev.start_time = game_room[room_id]->start_time + std::chrono::milliseconds(t.time - t.speed - 100);
+
 		tev.charging_time = t.speed;
 		tev.pivotType = t.pivotType;
 		tev.dir = t.dir;
@@ -2943,6 +2947,11 @@ void Network::set_next_pattern(int room_id)
 		set_next_pattern(room_id);
 		break;
 	}
+	if (tev.start_time < std::chrono::system_clock::now() + std::chrono::milliseconds(1000)) {
+		set_next_pattern(room_id);
+	}
+	std::cout << "time : " << tev.start_time << std::endl;
+	std::cout << "now : " << std::chrono::system_clock::now() << std::endl;
 }
 
 void Network::input_db_event(int c_id, DB_EVENT_TYPE type, int data)

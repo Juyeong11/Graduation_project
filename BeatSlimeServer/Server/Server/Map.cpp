@@ -3,7 +3,7 @@
 #include"Network.h"		
 #include"Map.h"
 
-void MapInfo::SetMap(std::string map_name, std::string music_name)
+void MapInfo::SetMap(std::string map_name, std::string music_name,int delay)
 {
 	std::ifstream in{ map_name, std::ios::binary };
 	if (!in) return;
@@ -222,7 +222,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 					bar * timeByBar
 					+ addBeat * timeByBeat
 					+ add16Beat * timeBy16Beat
-					+ add24Beat * timeBy24Beat + 70,
+					+ add24Beat * timeBy24Beat + delay,
 					dir,
 					speed,
 					px, py, pz);
@@ -236,7 +236,7 @@ void MapInfo::SetMap(std::string map_name, std::string music_name)
 				bar * timeByBar
 				+ addBeat * timeByBeat
 				+ add16Beat * timeBy16Beat
-				+ add24Beat * timeBy24Beat + 70,
+				+ add24Beat * timeBy24Beat + delay,
 				dir,
 				speed,
 				px, py, pz);
