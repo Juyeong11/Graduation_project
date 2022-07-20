@@ -1835,7 +1835,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			std::cout << "damage cheat\n";
 			if (damamge_bug >= 0.9f) {
 
-				damamge_bug = 0.1f;
+				damamge_bug = 0.05f;
 			}
 			else
 				damamge_bug = 1.0f;
