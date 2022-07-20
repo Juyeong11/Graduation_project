@@ -30,8 +30,8 @@ public class TargetingEffect : MonoBehaviour
         for (int i = 0; i < roketCnt; ++i)
         {
 
-            GameObject r = Instantiate(RoketPrefab);
-            GameObject rm = Instantiate(RoketMeshPrefab);
+            GameObject r = Instantiate(RoketPrefab, new Vector3(1000, 1000, 1000), Quaternion.identity);
+            GameObject rm = Instantiate(RoketMeshPrefab, new Vector3(1000, 1000, 1000), Quaternion.identity);
 
             Vector3 scale = r.transform.localScale;
             scale = scale * size;
