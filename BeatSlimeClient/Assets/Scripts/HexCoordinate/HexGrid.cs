@@ -133,6 +133,7 @@ public class Cell
         itemTrans.gameObject.SetActive(true);
         // Item дя╠Б
     }
+
 }
 
 public class CellMap

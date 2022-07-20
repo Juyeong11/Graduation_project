@@ -25,7 +25,7 @@ public class TileEffect : MonoBehaviour
         while (scale <= 1.0f)
         {
             scale += Time.deltaTime *1 / speed ;
-            gameObject.transform.GetChild(0).localScale = new Vector3(scale, 0.01f, scale);
+            gameObject.transform.localScale = new Vector3(scale, 0.01f, scale);
             yield return null;
         }
         //gameObject.transform.localScale

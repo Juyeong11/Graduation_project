@@ -48,6 +48,9 @@ public class EffectManager : MonoBehaviour
         }
         else
             go.GetComponent<TileEffect>().speed = s;
+
+        //go.transform.SetParent(GameManager.data.grid.cellMaps.map_Get(startX, startZ).obejct.transform);
+
     }
 
     public void BossTileEffect(int startX, int startY, int startZ, int speed, int EffectType)
@@ -147,6 +150,8 @@ public class EffectManager : MonoBehaviour
         //Debug.Log("effect q" + Time.time);
         go.GetComponent<HexCellPosition>().setDirection((byte)dir);
         go.GetComponent<PlayerQuake>().speed = s;
+
+
     }
 
     public void PlayerHealEffect(int startX, int startY, int startZ, int speed)
@@ -311,8 +316,7 @@ public class EffectManager : MonoBehaviour
 
 
         float s = speed / totalAnimTime ;
-        Debug.Log(s);
-        Debug.Log(totalAnimTime);
+
 
         GameManager.data.GetEnemyAnim().SetFloat("AttackSpeed", attackAnimTime / s);
         GameManager.data.GetEnemyAnim().SetFloat("JumpSpeed", JumpAnimTime / s);
@@ -379,7 +383,8 @@ public class EffectManager : MonoBehaviour
 
         // moveSpeed
         float arrivalTime =JumpAnimTime * (s);
-        Debug.Log(arrivalTime);
+
+        
         {
             float t = 0;
             while (t < arrivalTime * 0.4)
@@ -416,7 +421,16 @@ public class EffectManager : MonoBehaviour
                     GameManager.data.GetEnemyAnim().SetInteger("JumpAttackType", 2);
 
             }
+            t = 0;
+            while (t < arrivalTime * 0.4)
+            {
+                //내가 원하는 방향으로 이동..
+                t += Time.deltaTime;
 
+                //GameManager.data.enemy.transform.position = Vector3.Slerp(startPos, endPos, t / (arrivalTime * 0.6f));
+                yield return null;
+            }
+            TileWaveEffect(end_pos.X, end_pos.Z, 5);
 
             // GameManager.data.GetEnemyAnim().SetBool("Jumping", false);
         }

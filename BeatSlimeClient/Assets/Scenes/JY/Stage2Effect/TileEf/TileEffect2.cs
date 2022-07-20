@@ -33,6 +33,7 @@ public class TileEffect2 : MonoBehaviour
     {
         vfWarning.Play();
         vfWarning.playRate = 1/((1/ warningLifeTime) * speed);
+        //gameObject.transform.localScale = new Vector3(1, 1, 1);
 
 
         //playRate == 1 => playTime == 2
