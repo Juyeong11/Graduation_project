@@ -190,7 +190,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 		cs_packet_change_scene_done my_packet;
 		my_packet.size = sizeof(my_packet);
 		my_packet.type = CS_PACKET_CHANGE_SCENE_DONE;
-		my_packet.scene_num = 1; // ¹«Á¶°Ç ¸¶³à¸ÊÀ¸·Î
+		my_packet.scene_num = 2; // ¹«Á¶°Ç ¸¶³à¸ÊÀ¸·Î
 		SendPacket(ci, &my_packet);
 
 		cs_packet_game_start_ready my_packet1;
