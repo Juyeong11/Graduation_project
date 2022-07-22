@@ -38,7 +38,8 @@ public class MDissolveIlluminator : MonoBehaviour
         lerped = -1.5f;
         while (lerped < 1.5f)
         {
-            lerped += 0.1f * t;
+            lerped += 0.15f * t;
+            Debug.Log("L : " + lerped);
             foreach(var m in body.materials)
             {
                 m.SetFloat("_Dissolve", lerped);
@@ -54,6 +55,7 @@ public class MDissolveIlluminator : MonoBehaviour
         while (lerped > -1.5f)
         {
             lerped -= 0.1f * t;
+            Debug.Log("l : " + lerped);
             foreach(var m in body.materials)
             {
                 m.SetFloat("_Dissolve", lerped);

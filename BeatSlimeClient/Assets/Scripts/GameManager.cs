@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour
     public UIJudgeEffect ComboEffect;
     public SlimeJudgeEffect ParticleEffect;
     int nowCombo;
-    int HPGMStaticInt = 1;
+    //int HPGMStaticInt = 1;
 
     public GameOverImage gameOverImage;
     public ResultsData resultsData;

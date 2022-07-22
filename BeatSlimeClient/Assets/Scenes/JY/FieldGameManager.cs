@@ -109,7 +109,7 @@ public class FieldGameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F12))
         {
-            if (isDebugCharacter)
+            //if (isDebugCharacter)
             {
                 Network.SendTeleportPacket(1); // 100°ñµå È¹µæ
                 FieldPlayerManager.money += 100;
@@ -159,7 +159,7 @@ public class FieldGameManager : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            SceneManager.LoadScene("InGameScene01");
+            //SceneManager.LoadScene("InGameScene01");
 
             //TestTileEffect1();
         }
@@ -258,7 +258,7 @@ public class FieldGameManager : MonoBehaviour
                                 }
                                 else
                                 {
-                                    Debug.Log(p.id + ", " + myPlayerID);
+                                    //Debug.Log(p.id + ", " + myPlayerID);
                                     Objects[p.id].GetComponent<FieldOtherPlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[p.id].GetComponent<FieldOtherPlayerManager>().JumpTrig();
                                 }
