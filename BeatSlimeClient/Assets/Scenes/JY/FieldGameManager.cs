@@ -80,30 +80,18 @@ public class FieldGameManager : MonoBehaviour
         }
 
 
-        if (Input.GetKeyDown(KeyCode.Alpha9))
-        {
-            if (isDebugCharacter)
-            {
-                scene_num = 2;
-                StartCoroutine(ChangeScene());
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            //var r = new System.Random();
-            //Network.SendLogIn("Happy" + r.Next(0, 128));
-        }
+
         if (Input.GetKeyDown(KeyCode.F1))
         {
             //MN.ChangeMusicName(soundManager.getSongName());
             SceneManager.LoadScene("InGameScene01");
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha4))
+        if (Input.GetKeyDown(KeyCode.F2))
         {
             Network.SendTeleportPacket(0); // 1번 포탈로 이동
         }
-        if (Input.GetKeyDown(KeyCode.Alpha5))
+        if (Input.GetKeyDown(KeyCode.F3))
         {
             Network.SendTeleportPacket(5); // 2번 포탈로 이동
         }
@@ -115,32 +103,8 @@ public class FieldGameManager : MonoBehaviour
                 FieldPlayerManager.money += 100;
             }
         }
+
         if (Input.GetKeyDown(KeyCode.F11))
-        {
-            //아이템           가격      damage    cooltime
-            // 0 : AD0         0        5         10
-            // 1 : AD1         50       10        8
-            // 2 : AD2         150      20        7
-            // 3 : AD3         500      40        6
-            // 4 : Heal0       0        5         10
-            // 5 : Heal1       50       5         8
-            // 6 : Heal2       200      10        7
-            // 7 : Heal3       800      20        6
-            // 8 : Tank0       0        10        10
-            // 9 : Tank1       50       20        8
-            // 10: Tank2       150      40        7
-            // 11: Tank3       500      80        6
-            if (isDebugCharacter)
-                Network.SendBuyPacket(0); // 0번 아이템 구매
-        }
-        if (Input.GetKeyDown(KeyCode.F10))
-        {
-            //scrool item을 사용하겠다.
-            //itemType을 인자로 전달 0~9까지 마녀 맵 스크롤 0~9사이 숫자로 스크롤의 등급을 매김 
-            if (isDebugCharacter)
-                Network.SendUseItemPacket(1);
-        }
-        if (Input.GetKeyDown(KeyCode.F9))
         {
             // 스크롤을 얻겠다. 얻는 스크롤은 서버에서 랜덤하게 부여
             //if (isDebugCharacter)
@@ -157,12 +121,7 @@ public class FieldGameManager : MonoBehaviour
         {
             Application.Quit(0);
         }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            //SceneManager.LoadScene("InGameScene01");
 
-            //TestTileEffect1();
-        }
 
         if (Network.isOnline)
         {

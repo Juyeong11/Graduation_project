@@ -2534,6 +2534,7 @@ void Network::worker()
 					if (p == nullptr) continue;
 
 					send_game_end(p->id, 0, -1, game_room[game_room_id]->Money[i++], GAME_OVER);
+					p->SetMoney(10 * game_room[game_room_id]->Money[i]);
 					//돈만 추가
 				}
 				game_room[game_room_id]->game_end();
@@ -2546,6 +2547,7 @@ void Network::worker()
 					if (p == nullptr) continue;
 
 					send_game_end(p->id, 0, -1, game_room[game_room_id]->Money[i++], GAME_OVER);
+					p->SetMoney(10 * game_room[game_room_id]->Money[i]);
 					//돈만 추가
 				}
 				game_room[game_room_id]->game_end();
@@ -2563,7 +2565,7 @@ void Network::worker()
 					int get_item_type = game_room[game_room_id]->get_item_result();
 					send_game_end(p->id, game_room[game_room_id]->Score[i], get_item_type, game_room[game_room_id]->Money[i], GAME_CLEAR);
 					p->SetScore(game_room[game_room_id]->map_type - 1, game_room[game_room_id]->Score[i]);
-					p->SetMoney(game_room[game_room_id]->Money[i]);
+					p->SetMoney(10 * game_room[game_room_id]->Money[i]);
 					input_db_event(p->id, DB_GET_SCROLL, get_item_type);
 					input_db_event(p->id, DB_UPDATE_CLEAR_MAP);
 				}
@@ -2798,6 +2800,7 @@ void Network::do_DBevent()
 
 					cl.MMR = player_data.MMR;
 					cl.money = player_data.money;
+					std::cout << cl.name << " money : " << cl.money << ", " << player_data.money << std::endl;
 					memset(ex_over->_net_buf, 0, 20);
 					DB->readInventory(&cl, reinterpret_cast<char*>(ex_over->_net_buf));
 					DB->readClearMap(&cl);

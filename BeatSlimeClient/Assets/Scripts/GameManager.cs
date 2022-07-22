@@ -435,23 +435,16 @@ public class GameManager : MonoBehaviour
         //{
         //    Network.SendreadPacket();
         //}
-        if (Input.GetKeyDown(KeyCode.F1))
+        if (Input.GetKeyDown(KeyCode.F1)) // 보스 체력 500 감소
         {
             Network.SendTeleportPacket(2);
         }
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            VFXManager.data.HitSounder(1);
-        }
-        if (Input.GetKeyDown(KeyCode.F3))
+
+        if (Input.GetKeyDown(KeyCode.F2)) // 데미지 감소 치트
         {
             Network.SendTeleportPacket(4);
         }
 
-        if (Input.GetKeyDown(KeyCode.F4))
-        {
-            player.GetComponentInChildren<PlayerManager>().changeColor(1);
-        }
 
         {
             if (Input.GetKeyDown(KeyCode.F8))
