@@ -541,6 +541,8 @@ void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
 		std::cout << "disconnect_client : unexpected id range" << std::endl;
+	std::cout << "disconnect_client : " << clients[c_id]->name<< std::endl;
+
 	Client& client = *reinterpret_cast<Client*>(clients[c_id]);
 	client.dest_x = -1;
 	client.dest_y = -1;
@@ -781,7 +783,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 
 void Network::do_player_skill(GameRoom* gr, Client* cl) {
 
-
+	std::cout << cl->name << std::endl;
 	bool attack_flag = false;
 	int damage = cl->skill->Damage * cl->power;
 	//damage = 10;
@@ -814,6 +816,9 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 		break;
 	case HEAL:
 		for (auto pl : gr->player_ids) {
+			if (false == is_attack(pl->id, cl->id)) {
+				continue;
+			}
 			if (pl == nullptr) continue;
 			pl->Hit(-damage);
 			if (pl->hp > 100)
@@ -1494,12 +1499,12 @@ void Network::process_packet(int client_id, unsigned char* p)
 		* 자신의 게임방에 있는 친구들에게 자신의 스킬 사용 유무를 알려줘야 한다.
 		*/
 		cs_packet_use_skill* packet = reinterpret_cast<cs_packet_use_skill*>(p);
-		Client* cl = reinterpret_cast<Client*>(clients[client_id]);
-		GameRoom* gr = game_room[cl->cur_room_num];
+
+		GameRoom* gr = game_room[cl.cur_room_num];
 		if (gr->boss_id == nullptr) break;
 
-		if ((cl->last_skill_time + std::chrono::milliseconds(maps[gr->map_type]->timeByBeat * cl->skill->CoolTime)) > std::chrono::system_clock::now()) break;
-		cl->last_skill_time = std::chrono::system_clock::now();
+		if ((cl.last_skill_time + std::chrono::milliseconds(maps[gr->map_type]->timeByBeat * cl.skill->CoolTime)) > std::chrono::system_clock::now()) break;
+		cl.last_skill_time = std::chrono::system_clock::now();
 		//std::cout << maps[gr->map_type]->timeByBeat * cl->skill->CoolTime << std::endl;
 
 
@@ -1521,7 +1526,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		for (const auto& pl : gr->player_ids) {
 			if (pl == nullptr) continue;
 			const Skill* plskill = reinterpret_cast<Client*>(pl)->skill;
-			send_effect(pl->id, client_id, gr->boss_id->id, 55, 1000, cl->direction, cl->skill->SkillLevel, cl->skill->SkillType, -1);
+			send_effect(pl->id, client_id, gr->boss_id->id, 55, 1000, cl.direction, cl.skill->SkillLevel, cl.skill->SkillType, -1);
 		}
 
 		//플레이어 스킬 이벤트 등록
@@ -1537,7 +1542,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 		// 그냥 if문으로 구분하자... -> 클라이언트의 상호작용을 효율적으로 설계할 수 없을까?
 		//플레이어가 가지고 있는 스킬을 타입과 레벨을 확인해 그에 맞는 걸 하자
-		do_player_skill(gr, cl);
+		do_player_skill(gr, &cl);
 	}
 	break;
 	case CS_PACKET_CHANGE_SKILL:
@@ -1564,6 +1569,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					if (c->SkillAD < packet->skill_level) break;
 
 		c->skill = skills[skill_index];
+		c->curSkill = skill_index;
 		c->vl.lock();
 		std::unordered_set<int> my_vl{ c->viewlist };
 		c->vl.unlock();
@@ -2247,7 +2253,7 @@ void Network::worker()
 			auto player_parring_time = reinterpret_cast<Client*>(clients[target_id])->pre_parrying_pattern;
 
 			if (parrying_end_time - player_parring_time < 600) {
-				std::cout << parrying_end_time << " " << player_parring_time << " player already parrying\n";
+				//std::cout << parrying_end_time << " " << player_parring_time << " player already parrying\n";
 				//패링 했으니 넘어가자
 				//패링 한 뒤 동작은 이미 worker thread에서 수행된 상태이다
 				game_room[game_room_id]->Money[game_room[game_room_id]->FindPlayerID_by_GameRoom(target_id)] += 1;
@@ -2783,7 +2789,8 @@ void Network::do_DBevent()
 						cl.z = -21;
 						cl.y = -cl.x - cl.z;
 					}
-					cl.curSkill = player_data.curSkill;
+					cl.skill = skills[player_data.curSkill];
+					cl.curSkill = cl.skill->SkillType;
 
 					cl.SkillAD = player_data.SkillAD;
 					cl.SkillTa = player_data.SkillTa;

@@ -228,7 +228,7 @@ void DataBase::updatePlayer(const Client* const pl, bool isend)
 	unsigned char unlockSkillHe = pl->SkillHeal;
 
 	int mmr = pl->MMR;
-
+	
 	std::wstring command = std::format(L"EXEC updatePlayerData '{}',{},{},{},{},{}, {},{},{}, {}",
 		name, x, z, money, usingSkill, isUsing,
 		static_cast<int>(unlockSkillAD), static_cast<int>(unlockSkillTa), static_cast<int>(unlockSkillHe),
