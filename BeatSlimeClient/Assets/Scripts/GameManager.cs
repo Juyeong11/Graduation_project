@@ -576,8 +576,8 @@ public class GameManager : MonoBehaviour
                                     else
                                     {
                                         HPGM.PlayerHPs[currenty].cooltime = (float)p.cool_times[i];
-                                        currenty++;
                                         HPIndex.Add(i,currenty);
+                                        currenty++;
                                     }
                                 }
                             }
