@@ -87,9 +87,17 @@ public class UIJudgeEffect : MonoBehaviour
         T.sprite = comboSprites[((combo%100) / 10) + (10*(countee%4))];
         O.sprite = comboSprites[((combo%10)) + (10*(countee%4))];
 
-        H.transform.localScale = new Vector3(scale, scale, scale);
-        T.transform.localScale = new Vector3(scale, scale, scale);
-        O.transform.localScale = new Vector3(scale, scale, scale);
+        float appl = 0.0f;
+        if (combo/100 != 0)
+            appl = 1.0f;
+        H.transform.localScale = new Vector4(scale, scale, scale,appl);
+
+        if (combo < 10)
+            appl = 0.0f;
+        T.transform.localScale = new Vector4(scale, scale, scale);
+
+        appl = 1.0f;
+        O.transform.localScale = new Vector4(scale, scale, scale);
         countee++;
     }
 

@@ -106,6 +106,8 @@ public class GameManager : MonoBehaviour
 
     public ItemSpecImages ISI;
 
+    Dictionary<int,int> HPIndex = new Dictionary<int, int>();
+
     void Awake()
     {
 
@@ -569,17 +571,20 @@ public class GameManager : MonoBehaviour
                                     if (pid == i)
                                     {
                                         HPGM.PlayerHPs[0].cooltime = (float)p.cool_times[i];
+                                        HPIndex.Add(pid,0);
                                     }
                                     else
                                     {
                                         HPGM.PlayerHPs[currenty].cooltime = (float)p.cool_times[i];
                                         currenty++;
+                                        HPIndex.Add(i,currenty);
                                     }
                                 }
                             }
                             else
                             {
                                 HPGM.PlayerHPs[0].cooltime = (float)p.cool_times[pid];
+                                HPIndex.Add(pid,0);
                             }
 
 
@@ -760,17 +765,17 @@ public class GameManager : MonoBehaviour
                                 case (byte)Protocol.OBJECT_TYPE.PLAPER:
                                     {
                                         //print("PLAPER");
-                                        if (HPGMStaticInt <= 2)
+                                        //if (HPGMStaticInt <= 2)
                                         {
                                             // Debug.Log(p.id + ", " + p.x + ", " + p.y + ", " + p.z + ", " + "ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½");
                                             Objects[pid] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                             Objects[pid].SetActive(true);
-                                            Objects[pid].GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.PlayerHPs[HPGMStaticInt].HPImage, HPGM.PlayerHPs[HPGMStaticInt].prevHPImage);
+                                            Objects[pid].GetComponentInChildren<PlayerManager>().SetHPImages(HPGM.PlayerHPs[HPIndex[pid]].HPImage, HPGM.PlayerHPs[HPIndex[pid]].prevHPImage);
                                             Objects[pid].GetComponentInChildren<PlayerManager>().playerClassofSkill = p.skillType;
                                             Objects[pid].GetComponentInChildren<PlayerManager>().playerLevelofSkill = p.skillLevel;
                                             //Debug.Log(pid + ": " + p.skillType + ", " + p.skillLevel);
-                                            HPGM.PlayerHPs[HPGMStaticInt].Set(p.skillType, System.Text.Encoding.UTF8.GetString(p.name));
-                                            HPGMStaticInt++;
+                                            HPGM.PlayerHPs[HPIndex[pid]].Set(p.skillType, System.Text.Encoding.UTF8.GetString(p.name));
+                                            //HPGMStaticInt++;
 
 
                                             Objects[pid].GetComponentInChildren<Animator>().SetFloat("Speed", bpm / 45.0f);
@@ -854,13 +859,13 @@ public class GameManager : MonoBehaviour
                                     {
                                         case 1:
                                             EffectManager.instance.PlayerWaterGunEffect(Objects[pid].transform.localPosition, ref Objects[tid], p.charging_time);
-                                            HPGM.PlayerHPs[pid].nowCooltime = HPGM.PlayerHPs[pid].cooltime;
+                                            HPGM.PlayerHPs[HPIndex[pid]].nowCooltime = HPGM.PlayerHPs[HPIndex[pid]].cooltime;
                                             break;
                                         case 2:
                                             {
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerQuakeEffect(cell.X, cell.Y, cell.Z, p.charging_time);
-                                                HPGM.PlayerHPs[pid].nowCooltime = HPGM.PlayerHPs[pid].cooltime;
+                                                HPGM.PlayerHPs[HPIndex[pid]].nowCooltime = HPGM.PlayerHPs[HPIndex[pid]].cooltime;
                                                 //Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " skill attack");
 
                                             }
@@ -869,7 +874,7 @@ public class GameManager : MonoBehaviour
                                             {
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerHealEffect(cell.X, cell.Y, cell.Z, p.charging_time);
-                                                HPGM.PlayerHPs[pid].nowCooltime = HPGM.PlayerHPs[pid].cooltime;
+                                                HPGM.PlayerHPs[HPIndex[pid]].nowCooltime = HPGM.PlayerHPs[HPIndex[pid]].cooltime;
                                                 //Debug.Log(cell.X + ", " + cell.Y + ", " + cell.Z + " skill attack");
 
                                             }
@@ -962,7 +967,8 @@ public class GameManager : MonoBehaviour
                             // 0 - Á¡¼ö
                             // 1 - Æ®·çµ©
                             // °øÁõ ¹æÁõ Ã¼·ÂÈ¸º¹
-                            HPGM.PlayerHPs[ServerID_To_ClientID(p.user)].SetISImage(ISI.Img[p.itemType]);
+                            
+                            HPGM.PlayerHPs[HPIndex[ServerID_To_ClientID(p.user)]].SetISImage(ISI.Img[p.itemType]);
                             
                         }
                         break;
