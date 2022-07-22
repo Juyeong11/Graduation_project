@@ -535,22 +535,22 @@ public class PlayerManager : MonoBehaviour
             case cellState.Item1:
                 
                 nowOnCellTag.GetItemFromThisCell();
-                changeColor(Color.red);
-                Debug.Log("Item1");
+                changeColor(1);
+                //Debug.Log("Item1");
                 nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(1);
                 break;
             case cellState.Item2:
                 //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 nowOnCellTag.GetItemFromThisCell();
-                changeColor(Color.yellow);
+                changeColor(4);
                 nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(4);
 
                 break;
             case cellState.Item3:
                 //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
-                changeColor(Color.green);
+                changeColor(3);
                 nowOnCellTag.GetItemFromThisCell();
                 nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(3);
@@ -558,14 +558,14 @@ public class PlayerManager : MonoBehaviour
                 break;
             case cellState.Item4:
                 //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
-                changeColor(new Color(0.8f, 0f, 0.8f));
+                changeColor(5);
                 nowOnCellTag.GetItemFromThisCell();
                 nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(5);
                 break;
             case cellState.Item5:
                 //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
-                changeColor(Color.blue);
+                changeColor(0);
                 nowOnCellTag.GetItemFromThisCell();
                 nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 Network.SendGetItemPacket(0);
@@ -573,7 +573,7 @@ public class PlayerManager : MonoBehaviour
                 break;
             case cellState.Item6:
                 //nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
-                changeColor(Color.cyan);
+                changeColor(6);
                 nowOnCellTag.GetItemFromThisCell();
                 nowOnCellTag.obejct.GetComponentInChildren<MDissolveIlluminator>().PrintDissolve();
                 break;
@@ -584,8 +584,34 @@ public class PlayerManager : MonoBehaviour
 
     private SkinnedMeshRenderer mesh;
 
-    public void changeColor(Color c)
+    public void changeColor(int i)
     {
+        Color c = Color.red;
+        switch(i)
+        {
+            case 0:
+            c = Color.blue;
+            break;
+            case 1:
+            c = Color.red;
+            break;
+            case 2:
+            c = Color.red;
+            break;
+            case 3:
+            c = Color.green;
+            break;
+            case 4:
+            c = Color.yellow;
+            break;
+            case 5:
+            c = new Color(0.8f, 0f, 0.8f);
+            break;
+            case 6:
+            c = Color.cyan;
+            break;
+        }
+
         mesh = GetComponentInChildren<SkinnedMeshRenderer>();
         mesh.material = Instantiate(mesh.material);
         mesh.material.SetColor("Color_658ca3492a0d4c5294b395208005e893", c);

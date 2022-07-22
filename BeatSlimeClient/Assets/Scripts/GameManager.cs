@@ -450,7 +450,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F4))
         {
-            player.GetComponentInChildren<PlayerManager>().changeColor(Color.red);
+            player.GetComponentInChildren<PlayerManager>().changeColor(1);
         }
 
         {
@@ -968,7 +968,7 @@ public class GameManager : MonoBehaviour
                             // 0 - 점수
                             // 1 - 트루뎀
                             // 공증 방증 체력회복
-                            
+                            Objects[ServerID_To_ClientID(p.user)].GetComponentInChildren<PlayerManager>().changeColor(p.itemType);
                             HPGM.PlayerHPs[HPIndex[ServerID_To_ClientID(p.user)]].SetISImage(ISI.Img[p.itemType]);
                             
                         }
