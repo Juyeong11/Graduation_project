@@ -28,7 +28,7 @@ public class ShopManager : MonoBehaviour
         }
         if (FieldPlayerManager.skillLevelsContainer[1] == SKILL_MAX_LEVEL)
         {
-            skill_price[0].text = " ";
+            skill_price[1].text = " ";
             skill_level[1].text = "LV. MAX";
         }
         else
@@ -38,7 +38,7 @@ public class ShopManager : MonoBehaviour
         }
         if (FieldPlayerManager.skillLevelsContainer[2] == SKILL_MAX_LEVEL)
         {
-            skill_price[0].text = " ";
+            skill_price[2].text = " ";
             skill_level[2].text = "LV. MAX";
         }
         else
@@ -62,7 +62,7 @@ public class ShopManager : MonoBehaviour
         }
         if (FieldPlayerManager.skillLevelsContainer[1] == SKILL_MAX_LEVEL)
         {
-            skill_price[0].text = " ";
+            skill_price[1].text = " ";
             skill_level[1].text = "LV. MAX";
         }
         else
@@ -72,7 +72,7 @@ public class ShopManager : MonoBehaviour
         }
         if (FieldPlayerManager.skillLevelsContainer[2] == SKILL_MAX_LEVEL)
         {
-            skill_price[0].text = " ";
+            skill_price[2].text = " ";
             skill_level[2].text = "LV. MAX";
         }
         else
@@ -91,7 +91,7 @@ public class ShopManager : MonoBehaviour
     
     public void BuySkill(int skillNum)
     {
-        if (FieldPlayerManager.skillLevelsContainer[skillNum] == SKILL_MAX_LEVEL)
+        if (FieldPlayerManager.skillLevelsContainer[skillNum-1] == SKILL_MAX_LEVEL)
         {
             return;
         }
