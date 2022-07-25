@@ -19,7 +19,7 @@ using namespace chrono;
 
 extern HWND		hWnd;
 
-const static int MAX_TEST = 5000;
+const static int MAX_TEST = 1500;
 const static int MAX_CLIENTS = MAX_TEST * 2;
 const static int INVALID_ID = -1;
 const static int MAX_PACKET_SIZE = 255;
@@ -146,12 +146,13 @@ void ProcessPacket(int ci, unsigned char packet[])
 		g_clients[my_id].x = login_packet->x;
 		g_clients[my_id].y = login_packet->y;
 
-		/*
-		cs_packet_teleport t_packet;
-		t_packet.size = sizeof(t_packet);
-		t_packet.type = CS_PACKET_TELEPORT;
-		SendPacket(my_id, &t_packet);
-		*/
+
+		cs_packet_change_scene_done csd_packet;
+		csd_packet.size = sizeof(csd_packet);
+		csd_packet.type = CS_PACKET_CHANGE_SCENE_DONE;
+		csd_packet.scene_num = 0;
+		SendPacket(my_id, &csd_packet);
+
 	}
 	break;
 	case SC_PACKET_MOVE: {
@@ -173,7 +174,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 					my_packet.is_ready = true;
 					SendPacket(ci, &my_packet);
 
-					
+
 				}
 				if (0 != move_packet->move_time) {
 					auto d_ms = duration_cast<milliseconds>(high_resolution_clock::now().time_since_epoch()).count() - move_packet->move_time;
@@ -186,21 +187,22 @@ void ProcessPacket(int ci, unsigned char packet[])
 	}
 					   break;
 	case SC_PACKET_CHANGE_SCENE: {
+		sc_packet_change_scene* change_scene_packet = reinterpret_cast<sc_packet_change_scene*>(packet);
 
 		cs_packet_change_scene_done my_packet;
 		my_packet.size = sizeof(my_packet);
 		my_packet.type = CS_PACKET_CHANGE_SCENE_DONE;
-		my_packet.scene_num = 2; // ¹«Á¶°Ç ¸¶³à¸ÊÀ¸·Î
+		if (change_scene_packet->scene_num == 3) {
+			my_packet.scene_num = 1; // Æ©Åä¸®¾óÀ¸·Î
+		}
+		else {
+			my_packet.scene_num = 2; // ¸¶³à¸ÊÀ¸·Î
+		}
 		SendPacket(ci, &my_packet);
 
-		cs_packet_game_start_ready my_packet1;
-		my_packet1.size = sizeof(my_packet1);
-		my_packet1.type = CS_PACKET_GAME_START_READY;
-
-		SendPacket(ci, &my_packet1);
 	}
-	break;
-	case SC_PACKET_GAME_START: 
+							   break;
+	case SC_PACKET_GAME_START:
 	{
 		// draw point ÁÂÇ¥¸¦ ¿Å°Ü¼­ ¿·¿¡ ´Ù ±×¸®ÀÚ
 		g_clients[ci].game_state = 1;
@@ -214,7 +216,7 @@ void ProcessPacket(int ci, unsigned char packet[])
 		my_packet.scene_num = 0; // ÇÊµå¸ÊÀ¸·Î º¹±Í
 		SendPacket(ci, &my_packet);
 		g_clients[ci].game_state = 0;
-		
+
 	}break;
 
 	case SC_PACKET_PUT_OBJECT: break;
@@ -224,9 +226,17 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_PACKET_ATTACK: break;
 	case SC_PACKET_MAP_DATA: break;
 	case SC_PACKET_EFFECT: break;
-	
+
 	case SC_PACKET_PARRYING: break;
-	case SC_PACKET_GAME_INIT: break;
+	case SC_PACKET_GAME_INIT:
+	{
+		cs_packet_game_start_ready my_packet1;
+		my_packet1.size = sizeof(my_packet1);
+		my_packet1.type = CS_PACKET_GAME_START_READY;
+
+		SendPacket(ci, &my_packet1);
+	}
+	break;
 	case SC_PACKET_CHANGE_SKILL: break;
 
 
@@ -317,7 +327,7 @@ void Worker_Thread()
 
 constexpr int DELAY_LIMIT = 100;
 constexpr int DELAY_LIMIT2 = 150;
-constexpr int ACCEPT_DELY = 500;
+constexpr int ACCEPT_DELY = 50;
 
 void Adjust_Number_Of_Client()
 {

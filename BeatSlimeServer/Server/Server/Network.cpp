@@ -35,11 +35,11 @@ Network::Network() {
 	DB = new DataBase;
 
 	DB->readSkills(skills);
-	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv",0);
-	maps[WITCH_MAP]->SetMap("Map\\flower_load", "Music\\flower_load.csv",70);
+	maps[FIELD_MAP]->SetMap("Map\\Forest1", "Music\\flower_load.csv", 0);
+	maps[WITCH_MAP]->SetMap("Map\\flower_load", "Music\\flower_load.csv", 70);
 	maps[WITCH_MAP_HARD]->SetMap("Map\\flower_load", "Music\\flower_load2.csv", 70);
-	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\Aviform Skyliner.csv",70);
-	maps[TUTORI_MAP]->SetMap("Map\\Tutorial", "Music\\Tutorial.csv",70);
+	maps[ROBOT_MAP]->SetMap("Map\\Robot1", "Music\\Aviform Skyliner.csv", 70);
+	maps[TUTORI_MAP]->SetMap("Map\\Tutorial", "Music\\Tutorial.csv", 70);
 	//수정
 	//여기서 스킬을 초기화하지 말고 나중에 db연결되면 거기서 읽어오면서 스킬을 초기화하는 것으로 하자
 	for (int i = 0; i < MAX_USER; ++i) {
@@ -154,8 +154,8 @@ bool Network::is_attack(int a, int b)
 }
 bool Network::is_near(int a, int b)
 {
-	if (VIEW_RANGE < abs(clients[a]->x - clients[b]->x)) return false;
-	if (VIEW_RANGE < abs(clients[a]->z - clients[b]->z)) return false;
+	if (VIEW_RANGE - 1 < abs(clients[a]->x - clients[b]->x)) return false;
+	if (VIEW_RANGE - 1 < abs(clients[a]->z - clients[b]->z)) return false;
 
 	return true;
 }
@@ -541,7 +541,7 @@ void Network::disconnect_client(int c_id)
 {
 	if (c_id >= MAX_USER)
 		std::cout << "disconnect_client : unexpected id range" << std::endl;
-	std::cout << "disconnect_client : " << clients[c_id]->name<< std::endl;
+	std::cout << "disconnect_client : " << clients[c_id]->name << std::endl;
 
 	Client& client = *reinterpret_cast<Client*>(clients[c_id]);
 	client.dest_x = -1;
@@ -687,6 +687,7 @@ int Network::get_npc_id(int monsterType) {
 	}
 	return -1;
 }
+
 int Network::get_game_room_id()
 {
 	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
@@ -756,6 +757,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 		game_room[game_room_id]->Score[i] -= 20 * std::clamp((damage - pl->armour), 0, 20);
 		for (const auto& p : game_room[game_room_id]->player_ids) {
 			if (p == nullptr) continue;
+
 			send_score(pl->id, game_room[game_room_id]->Score[i], p->id);
 			send_attack_player(game_room[game_room_id]->boss_id->id, pl->id, p->id);
 		}
@@ -783,7 +785,7 @@ void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 
 void Network::do_player_skill(GameRoom* gr, Client* cl) {
 
-	std::cout << cl->name << std::endl;
+	//std::cout << cl->name << std::endl;
 	bool attack_flag = false;
 	int damage = cl->skill->Damage * cl->power;
 	//damage = 10;
@@ -896,7 +898,6 @@ void Network::process_packet(int client_id, unsigned char* p)
 	case CS_PACKET_MOVE:
 	{
 		if (false == cl.is_active) break;
-
 		cs_packet_move* packet = reinterpret_cast<cs_packet_move*>(p);
 		cl.last_packet_time = packet->move_time;
 		if (cl.last_move_time + std::chrono::milliseconds(200) > std::chrono::system_clock::now()) break;
@@ -917,7 +918,10 @@ void Network::process_packet(int client_id, unsigned char* p)
 			cur_map = game_room[cl.cur_room_num]->map_type;
 
 		}
+		if (client_id == 0) {
+			std::cout << "x : " << x << "y : " << y << "z : " << z << std::endl;
 
+		}
 
 		switch (packet->direction) {
 		case DIR::LEFTUP:
@@ -1071,6 +1075,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		for (int other : my_vl) {
 			// nearlist에 없으면
 			if (0 == nearlist.count(other)) {
+
 				// 나한테서 지우고
 				cl.vl.lock();
 				cl.viewlist.erase(other);
@@ -1108,10 +1113,11 @@ void Network::process_packet(int client_id, unsigned char* p)
 		// 올바른 위치에서 ready했는지 확인
 		cs_packet_change_scene_ready* packet = reinterpret_cast<cs_packet_change_scene_ready*>(p);
 
-
+		if (cl.cur_room_num != -1) { std::cout << cl.id << " error\n";  break; }
 		if (packet->is_ready) {
 			for (auto* p : portals) {
 				if (false == p->isPortal(cl.x, cl.z)) continue;
+
 				// 포탈에 들어오거나 나가서 plaer_ids를 수정해야하는 경우는 해당 패킷이 왔을 때 딱 한번 발생한다. -> lock을 한 번만 하면됨
 				//그래서 player_ids를 복사해 수정한 후 복사하는 방법을 lock횟수가 같기 때문에 그냥 lock을 건다.
 
@@ -1172,6 +1178,9 @@ void Network::process_packet(int client_id, unsigned char* p)
 		{
 		case FIELD_MAP:
 		{
+			cl.state_lock.lock();
+			cl.state = ST_INGAME;
+			cl.state_lock.unlock();
 			cl.vl.lock();
 			cl.viewlist.clear();
 			cl.vl.unlock();
@@ -1181,17 +1190,23 @@ void Network::process_packet(int client_id, unsigned char* p)
 					cl.z = game_room[cl.cur_room_num]->portal->z + 1;
 					cl.y = -cl.x - cl.z;
 					if (set_new_player_pos(client_id) == -1) {
-						cl.x = game_room[cl.cur_room_num]->portal->x;
-						cl.z = game_room[cl.cur_room_num]->portal->z;
-						cl.y = -cl.x - cl.z;
-						// 빈자리가 없어서 다시 인게임으로 들어감
+						send_change_scene(client_id, 3);
+						break;
+						// 빈자리가 없어서 튜토리얼 맵으로 들어감
+
 					}
 				}
-				else {
+				else { // 튜토리얼에서 돌아오는 친구는 원점으로
 					cl.x = 13;
 					cl.z = -25;
 					cl.y = -cl.x - cl.z;
-					set_new_player_pos(client_id);
+					if (set_new_player_pos(client_id) == -1) {
+						send_change_scene(client_id, 3);
+						break;
+
+
+						// 빈자리가 없어서 튜토리얼 맵으로 들어감
+					}
 				}
 			}
 
@@ -1266,7 +1281,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				game_room[room_id]->GameRoomInit(TUTORI_MAP, maps[TUTORI_MAP]->bpm, clients[boss_id], players, nullptr);
 
 			//game init
-			if (cl.cur_room_num == -1) break;
+			if (cl.cur_room_num == -1) { std::cout << "player not ready maybe player logout this game\n"; break; }
 			GameRoom* gr = game_room[cl.cur_room_num];
 
 			if (-1 == gr->FindPlayer(client_id)) break;
@@ -1301,13 +1316,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
 
 
-			//game start
-			gr->start_time = std::chrono::system_clock::now();
-			int game_start_time = static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(gr->start_time).time_since_epoch().count());
-			game_start(gr->game_room_id);
-
-			send_game_start(client_id, game_start_time);
-			Client* p = reinterpret_cast<Client*>(players[0]);
+			
 		}
 		break;
 		case 2:// 1 == in game map num
@@ -1347,6 +1356,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				}
 				else target.vl.unlock();
 			}
+			if (gr->boss_id == nullptr) break; // ????
 			send_game_init(client_id, gr->player_ids, gr->boss_id->id);
 
 
@@ -1360,6 +1370,21 @@ void Network::process_packet(int client_id, unsigned char* p)
 
 	}
 	break;
+	case CS_PACKET_PLAY_TUTORIAL:
+	{
+		cs_packet_play_tutorial* packet = reinterpret_cast<cs_packet_play_tutorial*>(p);
+
+		GameRoom* gr = game_room[cl.cur_room_num];
+		//game start
+		gr->start_time = std::chrono::system_clock::now();
+		int game_start_time = static_cast<int>(std::chrono::time_point_cast<std::chrono::milliseconds>(gr->start_time).time_since_epoch().count());
+		game_start(gr->game_room_id);
+		std::cout << "게임 시작하겠습니다!!!!!!\n";
+
+		send_game_start(client_id, game_start_time);
+		
+	}
+		break;
 	case CS_PACKET_GAME_START_READY:
 	{
 		cs_packet_game_start_ready* packet = reinterpret_cast<cs_packet_game_start_ready*>(p);
@@ -1952,6 +1977,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 			send_use_item(p->id, cl.id, packet->itemType);
 		}
 		GameRoom* gr = game_room[cl.cur_room_num];
+		if (gr->boss_id == nullptr) break;
 		cl.power = 1;
 		cl.armour = 0;
 		switch (packet->itemType)
@@ -2091,7 +2117,7 @@ void Network::worker()
 		break;
 		case OP_ACCEPT:
 		{
-			std::cout << "Accept Completed.\n";
+			//std::cout << "Accept Completed.\n";
 			SOCKET c_socket = *(reinterpret_cast<SOCKET*>(exp_over->_net_buf)); // 확장 overlapped구조체에 넣어 두었던 소캣을 꺼낸다
 			int new_id = get_new_id();
 			if (-1 == new_id) { std::cout << "need more ID\n"; continue; }
@@ -2558,8 +2584,8 @@ void Network::worker()
 					GameObject* p = game_room[game_room_id]->player_ids[i];
 					if (p == nullptr) continue;
 					if (game_room[game_room_id]->Score[i] < 0)game_room[game_room_id]->Score[i] = 0;
-					std::cout << "clear score : " << game_room[game_room_id]->Score[i] << std::endl;
-					std::cout << "clear money : " << game_room[game_room_id]->Money[i] << std::endl;
+					//std::cout << "clear score : " << game_room[game_room_id]->Score[i] << std::endl;
+					//std::cout << "clear money : " << game_room[game_room_id]->Money[i] << std::endl;
 					if (game_room[game_room_id]->Score[i] < 0) game_room[game_room_id]->Score[i] = 0;
 
 					int get_item_type = game_room[game_room_id]->get_item_result();
@@ -2626,9 +2652,7 @@ void Network::worker()
 			//set_new_player_pos(client_id);
 
 
-			cl.state_lock.lock();
-			cl.state = ST_INGAME;
-			cl.state_lock.unlock();
+
 			send_login_ok(client_id, item);
 
 
@@ -2787,9 +2811,8 @@ void Network::do_DBevent()
 					cl.z = player_data.z;
 					cl.y = -cl.x - cl.z;
 					if (set_new_player_pos(cl.id) == -1) {
-						cl.x = 17;
-						cl.z = -21;
-						cl.y = -cl.x - cl.z;
+						send_change_scene(cl.id, 3);
+
 					}
 					cl.skill = skills[player_data.curSkill];
 					cl.curSkill = cl.skill->SkillType;
@@ -2800,7 +2823,7 @@ void Network::do_DBevent()
 
 					cl.MMR = player_data.MMR;
 					cl.money = player_data.money;
-					std::cout << cl.name << " money : " << cl.money << ", " << player_data.money << std::endl;
+					//std::cout << cl.name << " money : " << cl.money << ", " << player_data.money << std::endl;
 					memset(ex_over->_net_buf, 0, 20);
 					DB->readInventory(&cl, reinterpret_cast<char*>(ex_over->_net_buf));
 					DB->readClearMap(&cl);

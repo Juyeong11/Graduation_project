@@ -580,17 +580,22 @@ public class GameManager : MonoBehaviour
                                 HPIndex.Add(pid,0);
                             }
 
+                            Debug.Log("게임 시작하겠습니다!!!!!!!!");
 
                             PatternManager.data.Load(myPlayerID);
 
-                            Network.SendGameStartReadyPacket();
+                            if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "InGameScene01")
+                                Network.SendPlayTutorialPacket();
+                            else
+                                Network.SendGameStartReadyPacket();
+
                             Network.SendPingTestPacket();
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_GAME_START:
                         {
                             Protocol.sc_packet_game_start p = Protocol.sc_packet_game_start.SetByteToVar(data);
-
+                            Debug.Log("진짜 시작하겠습니다!!!!!!");
                             GameStartTime = p.game_start_time;
                             int Delay = System.DateTime.Now.Millisecond;
 
@@ -741,6 +746,7 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_put_object p = Protocol.sc_packet_put_object.SetByteToVar(data);
                             int pid = ServerID_To_ClientID(p.id);
+                            if (pid == -1) break;
                             if (pid == myPlayerID)
                             {
                                 Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
@@ -796,7 +802,7 @@ public class GameManager : MonoBehaviour
                         {
                             Protocol.sc_packet_remove_object p = Protocol.sc_packet_remove_object.SetByteToVar(data);
                             int pid = ServerID_To_ClientID(p.id);
-
+                            if (pid == -1) break;
                             if (pid < 3)
                             {
                                 ObjectPool.instance.PlayerObjectQueue.Enqueue(Objects[pid]);

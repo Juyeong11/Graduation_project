@@ -13,7 +13,7 @@ public static class Network
     static public int[] ping_data = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
     static public int ping_index;
 
-    const int BUFSIZE = 512;
+    const int BUFSIZE = 2048;
 
     static Socket ClientSocket;
 
