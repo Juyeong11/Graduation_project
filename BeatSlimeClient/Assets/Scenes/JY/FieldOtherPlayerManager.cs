@@ -42,7 +42,7 @@ public class FieldOtherPlayerManager : MonoBehaviour
 
     public void JumpTrig()
     {
-        JumpTrigger.SetTrigger("Jump");
+        JumpTrigger.SetTrigger("IJump");
     }
 
     void Update()

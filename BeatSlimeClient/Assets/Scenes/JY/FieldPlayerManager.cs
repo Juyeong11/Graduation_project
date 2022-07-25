@@ -78,8 +78,8 @@ public class FieldPlayerManager : MonoBehaviour
 
     public void JumpTrig()
     {
-        JumpTrigger.SetTrigger("Jump");
-        OutLineTrigger.SetTrigger("Jump");
+        JumpTrigger.SetTrigger("IJump");
+        OutLineTrigger.SetTrigger("IJump");
         OutLineObject.layer = LayerMask.NameToLayer("RenderOut");
         //JumpTrigger.ResetTrigger("Jump");
     }
