@@ -692,8 +692,9 @@ int Network::get_game_room_id()
 {
 	for (int i = 0; i < MAX_GAME_ROOM_NUM; ++i) {
 		game_room[i]->state_lock.lock();
-		if (false == game_room[i]->isGaming) {
+		if (GAME_ROOM_STATE::READY == game_room[i]->state) {
 			game_room[i]->isGaming = true;
+			game_room[i]->state = GAME_ROOM_STATE::PLAYING;
 			game_room[i]->state_lock.unlock();
 			return i;
 		}
@@ -1191,6 +1192,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					cl.y = -cl.x - cl.z;
 					if (set_new_player_pos(client_id) == -1) {
 						send_change_scene(client_id, 3);
+						cl.cur_room_num = -1;
 						break;
 						// 빈자리가 없어서 튜토리얼 맵으로 들어감
 
@@ -1202,6 +1204,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 					cl.y = -cl.x - cl.z;
 					if (set_new_player_pos(client_id) == -1) {
 						send_change_scene(client_id, 3);
+						cl.cur_room_num = -1;
 						break;
 
 
@@ -2036,7 +2039,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 	}
 	break;
 	default:
-		std::cout << "wrong packet\n";
+		std::cout << packet_type <<" wrong packet\n";
 		break;
 	}
 }
@@ -2536,13 +2539,25 @@ void Network::worker()
 			//이건 무조건 한 번만 하도록 보장되야함
 			//
 			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
-			game_room[game_room_id]->state_lock.lock();
+			game_room[game_room_id]->game_end_lock.lock();
 			//보스 체력 확인하고
 			if (game_room[game_room_id]->isGaming == false) {
-				game_room[game_room_id]->state_lock.unlock();
+				game_room[game_room_id]->game_end_lock.unlock();
 				break;// GameEnd는 한 번만 들어와야됨
 			}
 			int boss_id = game_room[game_room_id]->boss_id->id;
+
+			//보스 공격 이벤트는 현재 시간에서 1초 간격으로 이벤트를 미리 등록해둔다
+			//즉 게임이 종료되고 1초가 지나면 해당 게임에 관한 패킷은 모두 사라지게 된다.
+			//게임에 대한 패킷이 모두 사라지고 나면 다시 해당 게임 방을 대기상태로 바꿔 플레이어가 입장 할 수 있도록 한다.
+			// 
+			timer_event tev;
+			tev.ev = EVENT_GAME_ROOM_READY;
+			tev.game_room_id = game_room_id;
+			//t.start_time = std::chrono::system_clock::now() + std::chrono::seconds(timeByBeat * i);
+			tev.start_time = std::chrono::system_clock::now() + std::chrono::seconds(3);
+
+			timer_queue.push(tev);
 
 			//if(clients[boss_id]->hp<10;
 			//체력에 따라 클리어 유무
@@ -2597,10 +2612,20 @@ void Network::worker()
 				}
 				game_room[game_room_id]->game_end();
 			}
-			game_room[game_room_id]->state_lock.unlock();
+			game_room[game_room_id]->game_end_lock.unlock();
 
 
 			exp_over_pool.push(exp_over);
+		}
+		break;
+		case OP_GAME_ROOM_READY:
+		{
+			int game_room_id = *(reinterpret_cast<int*>(exp_over->_net_buf));
+			game_room[game_room_id]->state_lock.lock();
+			game_room[game_room_id]->state = GAME_ROOM_STATE::READY;
+			game_room[game_room_id]->state_lock.unlock();
+
+
 		}
 		break;
 		case OP_PLAYER_MOVE:
@@ -2753,6 +2778,13 @@ void Network::do_timer() {
 					ex_over->_comp_op = OP_GAME_END;
 					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
 					break;
+				case EVENT_GAME_ROOM_READY:
+					ex_over->_comp_op = OP_GAME_ROOM_READY;
+					*reinterpret_cast<int*>(ex_over->_net_buf) = ev.game_room_id;
+					// 여기 오는 경우는 isGaming이 무조건 false일 때 오기때문에 따로 worker thread로 넘겨줘야한다.
+					PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);
+
+					break;
 				case EVENT_PALYER_MOVE:
 				{
 					ex_over->_comp_op = OP_PLAYER_MOVE;
@@ -2767,8 +2799,7 @@ void Network::do_timer() {
 				PostQueuedCompletionStatus(g_h_iocp, 1, ev.obj_id, &ex_over->_wsa_over);// 두번째 인자가 0이 되면 소캣 종료로 취급이 된다. 1로해주자
 			}
 			else {
-				//기껏 뺐는데 다시 넣는거 좀 비효율 적이다.
-				//다시 넣지 않는 방법으로 최적화 필요
+
 				timer_queue.push(ev);
 				break;
 			}

@@ -294,12 +294,14 @@ GameRoom::GameRoom() :bpm(0) {
 	ready_player_cnt = 0;
 	game_room_id = -1;
 	pattern_progress = -1;
+	state = GAME_ROOM_STATE::READY;
 }
 GameRoom::GameRoom(int id) : game_room_id(id) {
 	isGaming = false;
 	map_type = 0;
 	ready_player_cnt = 0;
 	pattern_progress = -1;
+	state = GAME_ROOM_STATE::READY;
 
 }
 

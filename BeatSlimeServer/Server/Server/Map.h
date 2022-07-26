@@ -135,6 +135,8 @@ public:
 		return false;
 	}
 };
+
+enum class GAME_ROOM_STATE{ READY,PLAYING };
 struct Pos {
 	int x, z;
 };
@@ -146,8 +148,11 @@ public:
 	float bpm;
 	std::chrono::system_clock::time_point start_time{};
 	// atomic으로는 동시에 MAX_IN_GAME_PLAYER명이서 같은 게임 룸에서 게임 시작하는걸 막을 수가 없을 듯
-	std::mutex state_lock;
+	std::mutex game_end_lock;
 	bool isGaming;
+
+	std::mutex state_lock;
+	GAME_ROOM_STATE state;//ready play
 	std::atomic_int pattern_progress;
 	std::atomic_int Score[MAX_IN_GAME_PLAYER];
 	std::atomic_int Money[MAX_IN_GAME_PLAYER];
