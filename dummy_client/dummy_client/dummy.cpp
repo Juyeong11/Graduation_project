@@ -230,11 +230,23 @@ void ProcessPacket(int ci, unsigned char packet[])
 	case SC_PACKET_PARRYING: break;
 	case SC_PACKET_GAME_INIT:
 	{
-		cs_packet_game_start_ready my_packet1;
-		my_packet1.size = sizeof(my_packet1);
-		my_packet1.type = CS_PACKET_GAME_START_READY;
+		sc_packet_game_init* game_init_packet = reinterpret_cast<sc_packet_game_init*>(packet);
+		if (game_init_packet->id2 == -1) // 플레이어가 1명이면 튜토리얼 시작
+		{
+			cs_packet_play_tutorial my_packet1;
+			my_packet1.size = sizeof(my_packet1);
+			my_packet1.type = CS_PACKET_PLAY_TUTORIAL;
 
-		SendPacket(ci, &my_packet1);
+			SendPacket(ci, &my_packet1);
+		}
+		else {
+			cs_packet_game_start_ready my_packet1;
+			my_packet1.size = sizeof(my_packet1);
+			my_packet1.type = CS_PACKET_GAME_START_READY;
+
+			SendPacket(ci, &my_packet1);
+		}
+		
 	}
 	break;
 	case SC_PACKET_CHANGE_SKILL: break;

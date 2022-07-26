@@ -1114,7 +1114,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		// 올바른 위치에서 ready했는지 확인
 		cs_packet_change_scene_ready* packet = reinterpret_cast<cs_packet_change_scene_ready*>(p);
 
-		if (cl.cur_room_num != -1) { std::cout << cl.id << " error\n";  break; }
+		if (cl.cur_room_num != -1) {  break; } //더미 클라이언트를 위한 예외처리
 		if (packet->is_ready) {
 			for (auto* p : portals) {
 				if (false == p->isPortal(cl.x, cl.z)) continue;
@@ -1284,7 +1284,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 				game_room[room_id]->GameRoomInit(TUTORI_MAP, maps[TUTORI_MAP]->bpm, clients[boss_id], players, nullptr);
 
 			//game init
-			if (cl.cur_room_num == -1) { std::cout << "player not ready maybe player logout this game\n"; break; }
+			if (cl.cur_room_num == -1) { std::cout << "player logout this game\n"; break; }
 			GameRoom* gr = game_room[cl.cur_room_num];
 
 			if (-1 == gr->FindPlayer(client_id)) break;
@@ -2842,8 +2842,9 @@ void Network::do_DBevent()
 					cl.z = player_data.z;
 					cl.y = -cl.x - cl.z;
 					if (set_new_player_pos(cl.id) == -1) {
-						send_change_scene(cl.id, 3);
-
+						cl.x = 19;
+						cl.z = -25;
+						cl.y = -cl.x - cl.z;
 					}
 					cl.skill = skills[player_data.curSkill];
 					cl.curSkill = cl.skill->SkillType;

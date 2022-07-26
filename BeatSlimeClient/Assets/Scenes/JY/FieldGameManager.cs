@@ -437,7 +437,7 @@ public class FieldGameManager : MonoBehaviour
                         }
                         break;
                     default:
-                        Debug.Log("이상한 타입이네" + type);
+                        Debug.Log("이상한 타입이네" + type); 
                         break;
                 }
             }
