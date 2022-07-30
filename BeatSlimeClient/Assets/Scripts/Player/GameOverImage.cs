@@ -6,7 +6,9 @@ using UnityEngine.UI;
 public enum GameEndTraits {
     None,
     Win,
-    Lose
+    Lose,
+    Perfect,
+    Timeout,
 }
 
 public class GameOverImage : MonoBehaviour
@@ -22,6 +24,8 @@ public class GameOverImage : MonoBehaviour
     public Text money;
     public Text scroll_grade;
 
+    public bool isTutorial;
+
 
     void Start()
     {
@@ -32,13 +36,25 @@ public class GameOverImage : MonoBehaviour
     void Update()
     {
         // 따로 클래스가 빠져있는 이유 : PlayerManager에서 하면 한 플레이어라도 죽으면 화면에 게임 오버가 뜨기 때문.
-        if (gameEnder == GameEndTraits.Lose)
+        if (isTutorial && gameEnder != GameEndTraits.None)
+        {
+            t.text = "Tutorial";
+            M.text = "-";
+            Center.SetActive(true);
+        }
+        else if (gameEnder == GameEndTraits.Lose)
         {
             t.text = "Game Over";
             M.text = "F";
             Center.SetActive(true);
         }
         else if (gameEnder == GameEndTraits.Win)
+        {
+            t.text = "Game Clear!";
+            M.text = "B";
+            Center.SetActive(true);
+        }
+        else if (gameEnder == GameEndTraits.Perfect)
         {
             t.text = "Game Clear!";
             M.text = "A";

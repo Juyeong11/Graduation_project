@@ -904,7 +904,16 @@ public class GameManager : MonoBehaviour
                             }
                             else if (p.end_type == 1)
                             {
-                                gameOverImage.SetGameEnd(GameEndTraits.Win);
+                                HPManager hm = enemy.GetComponentInChildren<EnemyManager>().HP;
+                                if (hm.CurrentHP <= 0)
+                                {
+                                    gameOverImage.SetGameEnd(GameEndTraits.Perfect);
+                                }
+                                else
+                                {
+                                    gameOverImage.SetGameEnd(GameEndTraits.Win);
+                                }
+                                
                                 gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack, resultsData.damaged,
                                                             p.score, p.money, p.item_type);
 

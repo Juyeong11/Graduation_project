@@ -158,7 +158,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5372549}
+  m_Color: {r: 0.9528302, g: 0.9528302, b: 0.9528302, a: 0.8784314}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -399,6 +399,7 @@ MonoBehaviour:
   ts: {fileID: 1515039419508735072}
   money: {fileID: 870033951742909047}
   scroll_grade: {fileID: 6887415862037429815}
+  isTutorial: 0
 --- !u!1 &2466235585737895169
 GameObject:
   m_ObjectHideFlags: 0
