@@ -19,6 +19,7 @@ public class PatternManager : MonoBehaviour
     public MovementNoteFactory Factory;
 
     public Image LOGO;
+    public Image Warning;
 
     private void Awake()
     {
@@ -31,7 +32,7 @@ public class PatternManager : MonoBehaviour
 
     public void Load(int myType)
     {
-        StartCoroutine(PatternLoad(myType+1));
+        StartCoroutine(PatternLoad(myType + 1));
     }
 
 
@@ -40,7 +41,7 @@ public class PatternManager : MonoBehaviour
         List<Dictionary<string, object>> datas = CSVReader.Read("Pattern/" + GameManager.data.SongName);
         int preBar = 0;
 
-        
+
         for (int i = 0; i < datas.Count; ++i)
         {
             ///PATTERN LOAD
@@ -73,7 +74,7 @@ public class PatternManager : MonoBehaviour
             pattern.Add(tmpP);
             //print("patternLoad : " + tmpP.id);
             //DEBUG : 이펙트 패킷은 서버에서 보내줄 필요 없이 여기서 바로 읽어서 저장해놓고 사용하기 (동접자 올릴 때)
-            
+
             //자신에게 날아오는 보스의 유도 공격만!
             if (tmpP.noteType.ToString() == "10" && (tmpP.pivotType == ("Player" + PID) || tmpP.pivotType == ("PlayerA")))
             {
@@ -92,11 +93,11 @@ public class PatternManager : MonoBehaviour
         yield return null;
     }
 
-    
+
     public int PeekPattern(Beat b)
     {
         int patNums = 0;
-        while(pattern.Count > 0 && pattern[0].GetAppearBeat() <= b)
+        while (pattern.Count > 0 && pattern[0].GetAppearBeat() <= b)
         {
             SettedPattern = pattern[0];
             //SetSkill.Invoke();
@@ -104,10 +105,10 @@ public class PatternManager : MonoBehaviour
             //
             if (pattern[0].pivotType == "PlayerA")
             {
-                for(int i = 0; i < Protocol.CONSTANTS.MAX_IN_GAME_PLAYER; ++i)
+                for (int i = 0; i < Protocol.CONSTANTS.MAX_IN_GAME_PLAYER; ++i)
                 {
                     Debug.Log("Player" + (i + 1));
-                    HexCoordinates TargetPos = GameManager.data.GetTargetPos("Player"+(i+1));
+                    HexCoordinates TargetPos = GameManager.data.GetTargetPos("Player" + (i + 1));
 
                     HexCoordinates BossPos = GameManager.data.GetBossPos();
                     TargetPos.plus(pattern[0].pivot.X, pattern[0].pivot.Z);
@@ -145,7 +146,7 @@ public class PatternManager : MonoBehaviour
                             EffectManager.instance.JumpAttack(charging_time, TargetPos, true);
                             break;
                         case 8: // robot 보스 총발사
-                        
+
 
                             EffectManager.instance.GunAttack(charging_time, TargetPos);
                             break;
@@ -234,6 +235,10 @@ public class PatternManager : MonoBehaviour
                         case 601:   //게임 시작 패널
                             StartCoroutine(LogoLoad(false));
                             break;
+                        case 606:   // 경고 패널
+                            print("경고 패널");
+                            StartCoroutine(WarningLoad(pattern[0].pivot.X, pattern[0].pivot.Y, pattern[0].pivot.Z));
+                            break;
 
                         //보스 애니메이션
                         case 1000:
@@ -255,9 +260,9 @@ public class PatternManager : MonoBehaviour
                     //Debug.Log("patternType : " + pattern[0].noteType);
 
                 }
-                    settedPattern.Add(pattern[0]);
-                    pattern.RemoveAt(0);
-                    patNums++;
+                settedPattern.Add(pattern[0]);
+                pattern.RemoveAt(0);
+                patNums++;
             }
             else
             {
@@ -391,6 +396,10 @@ public class PatternManager : MonoBehaviour
                     case 601:   //게임 시작 패널
                         StartCoroutine(LogoLoad(false));
                         break;
+                    case 606:   // 경고 패널
+                        print("경고 패널");
+                        StartCoroutine(WarningLoad(pattern[0].pivot.X, pattern[0].pivot.Y, pattern[0].pivot.Z));
+                        break;
 
                     //보스 애니메이션
                     case 1000:
@@ -415,7 +424,7 @@ public class PatternManager : MonoBehaviour
                 pattern.RemoveAt(0);
                 patNums++;
             }
-            
+
         }
         return patNums;
     }
@@ -453,6 +462,25 @@ public class PatternManager : MonoBehaviour
                 yield return new WaitForSeconds(0.01f);
             }
             LOGO.gameObject.SetActive(false);
+        }
+    }
+
+    IEnumerator WarningLoad(int speed, int count, int dum)
+    {
+        print($"speed : {speed}, count : {count}, dum : {dum}");
+        for (int i = 0; i < count; i++)
+        {
+            while (Warning.color.a < 0.6f)
+            {
+                Warning.color = new Color(Warning.color.r, Warning.color.g, Warning.color.b, Warning.color.a + (float)(speed/1000f));
+                yield return new WaitForSeconds(0.01f);
+            }
+
+            while (Warning.color.a > 0f)
+            {
+                Warning.color = new Color(Warning.color.r, Warning.color.g, Warning.color.b, Warning.color.a - (float)(speed/1000f));
+                yield return new WaitForSeconds(0.01f);
+            }
         }
     }
 }
