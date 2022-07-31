@@ -819,7 +819,7 @@ void Network::do_player_skill(GameRoom* gr, Client* cl) {
 		break;
 	case HEAL:
 		for (auto pl : gr->player_ids) {
-			if (false == is_attack(pl->id, cl->id)) {
+			if (false == is_near(pl->id, cl->id)) {
 				continue;
 			}
 			if (pl == nullptr) continue;
