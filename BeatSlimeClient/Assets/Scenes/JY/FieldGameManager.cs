@@ -38,6 +38,8 @@ public class FieldGameManager : MonoBehaviour
 
     private bool isDebugCharacter = false;
 
+    bool soundcage = false;
+
     void Awake()
     {
         print("Start");
@@ -84,7 +86,8 @@ public class FieldGameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F1))
         {
             //MN.ChangeMusicName(soundManager.getSongName());
-            SceneManager.LoadScene("InGameScene01");
+            FieldPlayerManager.instance.SC.SetSkill(1);
+            Invoke("Tutorial", 1.1f);
         }
 
         if (Input.GetKeyDown(KeyCode.F2))
@@ -161,6 +164,8 @@ public class FieldGameManager : MonoBehaviour
                             FieldPlayerManager.instance.ChangeSkill(p.cur_skill_type, p.cur_skill_level);
                             FieldPlayerManager.instance.SetSkillLevelContainer(p.skill_progress[0], p.skill_progress[1], p.skill_progress[2]);
 
+                            ExtraSoundManager.instance.SFX(ESound.OK);
+
                             for (int i = 0; i < 20; ++i)
                             {
                                 Debug.Log(p.inventory[i]);
@@ -178,11 +183,13 @@ public class FieldGameManager : MonoBehaviour
                             if (p.reason == 0)
                             {
                                 Debug.LogError("해당 아이디는 이미 사용 중 입니다.");
+                                
                             }
                             else
                             {
                                 Debug.LogError("하여튼 뭔가 잘못됨");
                             }
+                            ExtraSoundManager.instance.SFX(ESound.NO);
                         }
                         break;
                     case Protocol.CONSTANTS.SC_PACKET_CHANGE_SCENE:
@@ -214,12 +221,16 @@ public class FieldGameManager : MonoBehaviour
                                     FieldPlayerManager.instance.JumpTrig();
 
                                     grid.cellMaps.Get(p.x, p.y, p.z).obejct.GetComponentInChildren<SpriteRenderer>().enabled = false;
+
+                                    ExtraSoundManager.instance.JumpSound(0.8f);
                                 }
                                 else
                                 {
                                     //Debug.Log(p.id + ", " + myPlayerID);
                                     Objects[p.id].GetComponent<FieldOtherPlayerManager>().PlayerSpinDirection(p.x, p.y, p.z);
                                     Objects[p.id].GetComponent<FieldOtherPlayerManager>().JumpTrig();
+
+                                    ExtraSoundManager.instance.JumpSound(0.5f);
                                 }
                             }
                             Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
@@ -298,6 +309,8 @@ public class FieldGameManager : MonoBehaviour
                             if (p.id == myPlayerID)
                             {
                                 FieldPlayerManager.instance.ChangeSkill(p.skill_type, p.skill_level);
+
+                                ExtraSoundManager.instance.SFX(ESound.Question);
                             }
                             else
                             {
@@ -317,7 +330,7 @@ public class FieldGameManager : MonoBehaviour
 
                             ResponseMenu.transform.position = player.transform.position;
                             ResponseMenu.GetComponent<ResponseBillboardUI>().GetOn(player.transform, p.requester_id, Objects[p.requester_id].GetComponent<FieldOtherPlayerManager>().other_playerName);
-
+                            ExtraSoundManager.instance.SFX(ESound.Popup);
                             //수락
 
                             //Net.SendPartyRequestAnwserPacket(1, p.requester_id);
@@ -357,10 +370,12 @@ public class FieldGameManager : MonoBehaviour
                             {
                                 case 0:
                                     chattingManager.SetMess("<color=red>상대가 파티 신청을 거절했습니다!</color>");
+                                    ExtraSoundManager.instance.SFX(ESound.NO);
                                     break;
 
                                 case 1:
                                     chattingManager.SetMess("<color=red>" + reqName + "님이 새로운 파티원이 되었습니다!</color>");
+                                    ExtraSoundManager.instance.SFX(ESound.OK);
                                     foreach (var i in p.ids)
                                     {
                                         if (i == myPlayerID || i == -1)
@@ -372,10 +387,12 @@ public class FieldGameManager : MonoBehaviour
 
                                 case 2:
                                     chattingManager.SetMess("<color=red>상대의 파티에 남은 자리가 없습니다!</color>");
+                                    ExtraSoundManager.instance.SFX(ESound.NO);
                                     break;
 
                                 case 3:
                                     chattingManager.SetMess("<color=red>" + reqName + "님이 파티에서 탈퇴하셨습니다.</color>");
+                                    ExtraSoundManager.instance.SFX(ESound.NO);
                                     PartyManager.instance.DelParty(p.p_id);
                                     if (p.p_id == myPlayerID)
                                     {
@@ -385,10 +402,11 @@ public class FieldGameManager : MonoBehaviour
 
                                 case 4:
                                     chattingManager.SetMess("<color=red>상대는 이미 파티가 있습니다!</color>");
+                                    ExtraSoundManager.instance.SFX(ESound.Question);
                                     break;
                                 case 5:
                                     chattingManager.SetMess("<color=red>이미 가입된 파티가 있습니다!</color>");
-
+                                    ExtraSoundManager.instance.SFX(ESound.NO);
                                     break;
                             }
                         }
@@ -417,10 +435,12 @@ public class FieldGameManager : MonoBehaviour
                             if (p.result == 0)
                             {
                                 chattingManager.SetMess("소지금이 부족해 구매하지 못했습니다!");
+                                ExtraSoundManager.instance.SFX(ESound.NO);
                             }
                             else
                             {
                                 FieldPlayerManager.instance.SetSkillLevelContainer(p.itemType);
+                                ExtraSoundManager.instance.SFX(ESound.OK);
                             }
                             // p->itemType  구매 시도한 아이템
                             // p->result    0 구매 실패 1 구매 성공
@@ -442,6 +462,14 @@ public class FieldGameManager : MonoBehaviour
                 }
             }
         }
+        else
+        {
+            if (!soundcage)
+            {
+                ExtraSoundManager.instance.SFX(ESound.NO);
+                soundcage = true;
+            }
+        }
     }
 
     IEnumerator ChangeScene()
@@ -456,5 +484,10 @@ public class FieldGameManager : MonoBehaviour
         FieldPlayerManager.instance.EnterPortal();
         yield return new WaitForSeconds(0.5f);
         SceneManager.LoadScene(scene_num);
+    }
+
+    void Tutorial()
+    {
+        SceneManager.LoadScene("InGameScene01");
     }
 }

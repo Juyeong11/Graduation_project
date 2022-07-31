@@ -51,9 +51,7 @@ public class LoginManager : MonoBehaviour
             print(idChecker);
             return; 
         }
-
         
-       
         SceneManager.LoadScene("FieldScene");
         
         Network.SendLogIn(id);

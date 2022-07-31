@@ -23,6 +23,7 @@ public class BillboardUI : MonoBehaviour
     public void GetOff()
     {
         gameObject.SetActive(true);
+        ExtraSoundManager.instance.SFX(ESound.Popdown);
         StartCoroutine(BlinkOff());
     }
 
@@ -41,6 +42,7 @@ public class BillboardUI : MonoBehaviour
             NAME.text = t.parent.GetComponent<FieldOtherPlayerManager>().other_playerName;
             pops.sprite = join;
         }
+        ExtraSoundManager.instance.SFX(ESound.Popup);
         StartCoroutine(BlinkOn());
     }
 

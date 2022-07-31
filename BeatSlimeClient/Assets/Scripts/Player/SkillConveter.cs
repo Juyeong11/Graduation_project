@@ -16,4 +16,11 @@ public class SkillConveter : MonoBehaviour
         rings[FieldPlayerManager.self_skillnum - 1].SetTrigger("Skill");
         Network.SendChangeSkillPacket((byte)FieldPlayerManager.self_skillnum);
     }
+
+    public void SetSkill(int n)
+    {
+        FieldPlayerManager.self_skillnum = n;
+        rings[n - 1].SetTrigger("Skill");
+        Network.SendChangeSkillPacket((byte)FieldPlayerManager.self_skillnum);
+    }
 }

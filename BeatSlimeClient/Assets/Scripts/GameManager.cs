@@ -407,14 +407,14 @@ public class GameManager : MonoBehaviour
         //     enemyAnim.SetTrigger("Move");
         //     //player.GetComponent<PlayerManager>().JumpTrigger.SetTrigger("Dead");
         // }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
+        // if (Input.GetKeyDown(KeyCode.Q))
+        // {
             
-            HexCoordinates h = new HexCoordinates(5* zxcv, -3* zxcv,1);
-            zxcv *= -1;
+        //     HexCoordinates h = new HexCoordinates(5* zxcv, -3* zxcv,1);
+        //     zxcv *= -1;
             
-            EffectManager.instance.JumpAttack(10000,h,true);
-        }
+        //     EffectManager.instance.JumpAttack(10000,h,true);
+        // }
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             PM.Factory.scrollSpeed += 0.05f;
@@ -633,6 +633,7 @@ public class GameManager : MonoBehaviour
                                     Objects[pid].GetComponentInChildren<HexCellPosition>().SetPosition(p.x, p.y, p.z);
                                     Objects[pid].GetComponentInChildren<PlayerManager>().cellTag();
 
+                                    ExtraSoundManager.instance.JumpSound(0.6f);
                                 }
                                 else
                                 {
@@ -714,6 +715,7 @@ public class GameManager : MonoBehaviour
                                         ComboEffect.DamageApply(hm.CurrentHP - p.hp);
                                         //VFXManager.data.HitSounder((hm.CurrentHP - p.hp) / 30f);
                                     }
+                                    ExtraSoundManager.instance.SFX(ESound.Popdown);
                                 }
 
                                 Objects[target_id].GetComponentInChildren<PlayerManager>().StunTrig();
@@ -857,11 +859,13 @@ public class GameManager : MonoBehaviour
                                     switch (p.y)
                                     {
                                         case 1:
+                                            ExtraSoundManager.instance.SFX(ESound.Fire);
                                             EffectManager.instance.PlayerWaterGunEffect(Objects[pid].transform.localPosition, ref Objects[tid], p.charging_time);
                                             HPGM.PlayerHPs[HPIndex[pid]].nowCooltime = HPGM.PlayerHPs[HPIndex[pid]].cooltime;
                                             break;
                                         case 2:
                                             {
+                                                ExtraSoundManager.instance.SFX(ESound.Fire);
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerQuakeEffect(cell.X, cell.Y, cell.Z, p.charging_time);
                                                 HPGM.PlayerHPs[HPIndex[pid]].nowCooltime = HPGM.PlayerHPs[HPIndex[pid]].cooltime;
@@ -871,6 +875,7 @@ public class GameManager : MonoBehaviour
                                             break;
                                         case 3:
                                             {
+                                                ExtraSoundManager.instance.SFX(ESound.Popup);
                                                 HexCoordinates cell = Objects[pid].GetComponent<HexCellPosition>().coordinates;
                                                 EffectManager.instance.PlayerHealEffect(cell.X, cell.Y, cell.Z, p.charging_time);
                                                 HPGM.PlayerHPs[HPIndex[pid]].nowCooltime = HPGM.PlayerHPs[HPIndex[pid]].cooltime;
@@ -898,6 +903,7 @@ public class GameManager : MonoBehaviour
                             //스팀펑크 경우 10~20
                             if (p.end_type == 0)
                             {
+                                ExtraSoundManager.instance.SFX(ESound.NO);
                                 gameOverImage.SetGameEnd(GameEndTraits.Lose);
                                 gameOverImage.SetResultData(resultsData.perfect, resultsData.great, resultsData.miss, resultsData.attack, resultsData.damaged, 0, 0, 0);
                                 Debug.Log("Game_Over");
@@ -905,6 +911,7 @@ public class GameManager : MonoBehaviour
                             else if (p.end_type == 1)
                             {
                                 HPManager hm = enemy.GetComponentInChildren<EnemyManager>().HP;
+                                ExtraSoundManager.instance.SFX(ESound.OK);
                                 if (hm.CurrentHP <= 0)
                                 {
                                     gameOverImage.SetGameEnd(GameEndTraits.Perfect);
@@ -934,6 +941,7 @@ public class GameManager : MonoBehaviour
 
                             if (pid == myPlayerID)
                             {
+                                ExtraSoundManager.instance.SFX(ESound.Star);
                                 MidANote.notePerfect();
                                 JudgeEffect.GetComponent<IndicatorJudgeEffect>().JudgeApply(JudgeCases.PERFECT);
                                 ParticleEffect.ParticleApply(JudgeCases.PERFECT);
@@ -978,7 +986,7 @@ public class GameManager : MonoBehaviour
                             // 공증 방증 체력회복
                             Objects[ServerID_To_ClientID(p.user)].GetComponentInChildren<PlayerManager>().changeColor(p.itemType);
                             HPGM.PlayerHPs[HPIndex[ServerID_To_ClientID(p.user)]].SetISImage(ISI.Img[p.itemType]);
-                            
+                            ExtraSoundManager.instance.SFX(ESound.Popup);
                         }
                         break;
                     default:
