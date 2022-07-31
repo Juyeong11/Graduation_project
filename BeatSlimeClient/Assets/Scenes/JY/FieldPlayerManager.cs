@@ -495,11 +495,13 @@ public class FieldPlayerManager : MonoBehaviour
                         {
                             SM.ShopClose();
                             shopOpened = false;
+                            ExtraSoundManager.instance.SFX(ESound.Popdown);
                         }
                         else
                         {
                             SM.ShopOpen();
                             shopOpened = true;
+                            ExtraSoundManager.instance.SFX(ESound.Popup);
                         }
                     break;
 
