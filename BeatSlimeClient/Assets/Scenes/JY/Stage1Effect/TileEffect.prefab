@@ -154,6 +154,7 @@ MonoBehaviour:
   landOffsetX: 0
   landOffsetY: 0
   landOffsetZ: 0
+  landOffsetW: 0
   landOffsetRotate: 0
   landOffsetScale: 0
   landType: 0
@@ -171,6 +172,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
+  tile_mat: {fileID: 2100000, guid: de346ae44b9610649b0cd2c0573fbf3d, type: 2}
 --- !u!1001 &2121227943541947347
 PrefabInstance:
   m_ObjectHideFlags: 0

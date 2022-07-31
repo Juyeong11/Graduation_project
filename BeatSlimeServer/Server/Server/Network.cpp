@@ -746,7 +746,7 @@ void Network::do_npc_attack(int npc_id, int target_id, int reciver) {
 
 void Network::do_npc_tile_attack(int game_room_id, int x, int y, int z)
 {
-	int damage = 20 * damamge_bug;
+	int damage = 10 * damamge_bug;
 	for (int i = 0; i < MAX_IN_GAME_PLAYER; ++i) {
 
 		GameObject* pl = game_room[game_room_id]->player_ids[i];
