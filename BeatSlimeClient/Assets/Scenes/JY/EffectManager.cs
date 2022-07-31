@@ -121,7 +121,7 @@ public class EffectManager : MonoBehaviour
         go.GetComponent<QuakeEffect>().speed = s;
     }
     //// player attack
-    /// Quake watergun heal
+
 
     //
     public void PlayerWaterGunEffect(Vector3 start_pos, ref GameObject target, int speed)
