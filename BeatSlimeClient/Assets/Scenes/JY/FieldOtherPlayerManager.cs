@@ -13,6 +13,7 @@ public class FieldOtherPlayerManager : MonoBehaviour
     public PlayerKeyHandler handle;     //Invalid
 
     public FieldHexCellPosition selfCoord;
+    public SkillConveterV SC;
  
     public FieldHexGrid grid;
 
@@ -261,5 +262,6 @@ public class FieldOtherPlayerManager : MonoBehaviour
     {
         other_skillnum = skillNum;
         other_skillLevel = skillLevel;
+        SC.SetSkill(skillNum);
     }
 }
