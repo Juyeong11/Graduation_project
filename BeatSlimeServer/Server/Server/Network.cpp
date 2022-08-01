@@ -1527,7 +1527,7 @@ void Network::process_packet(int client_id, unsigned char* p)
 		* 자신의 게임방에 있는 친구들에게 자신의 스킬 사용 유무를 알려줘야 한다.
 		*/
 		cs_packet_use_skill* packet = reinterpret_cast<cs_packet_use_skill*>(p);
-
+		if (cl.cur_room_num == -1) break;
 		GameRoom* gr = game_room[cl.cur_room_num];
 		if (gr->boss_id == nullptr) break;
 
