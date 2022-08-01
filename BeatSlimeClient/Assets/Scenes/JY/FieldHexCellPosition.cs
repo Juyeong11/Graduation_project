@@ -123,9 +123,10 @@ public class FieldHexCellPosition : MonoBehaviour
         coordinates.plus(x, z, w);
         //reflectPosition();
     }
-    public void SetPosition(int x, int y, int z, int w=-9999)
+    public void SetPosition(int x, int y, int z, bool newer=false, int w=-9999)
     {
         preBeatedTime = Time.time;
+
 
         if (x + y + z != 0)
         {
@@ -136,6 +137,10 @@ public class FieldHexCellPosition : MonoBehaviour
         if (w == -9999)
             w = coordinates.W;
         coordinates.setCoordinates(x, z, w);
+        if (newer)
+        {
+            preCoordinates = coordinates;
+        }
         //reflectPosition();
     }
     public (int,int,int,int) Get()

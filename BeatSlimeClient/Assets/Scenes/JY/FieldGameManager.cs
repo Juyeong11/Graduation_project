@@ -253,7 +253,7 @@ public class FieldGameManager : MonoBehaviour
                                         Objects[p.id] = ObjectPool.instance.PlayerObjectQueue.Dequeue();
                                         Objects[p.id].SetActive(true);
 
-                                        Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z);
+                                        Objects[p.id].GetComponent<FieldHexCellPosition>().SetPosition(p.x, p.y, p.z,true);
 
                                         //print("myPlayerID : " + myPlayerID + " p.id :" + p.id + " p.skillType : " + p.skillType + " direction : " + p.direction);
 
