@@ -2574,7 +2574,7 @@ void Network::worker()
 				for (const auto p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 
-					send_game_end(p->id, 0, -1, game_room[game_room_id]->Money[i++], GAME_OVER);
+					send_game_end(p->id, 0, -1, 10 * game_room[game_room_id]->Money[i++], GAME_OVER);
 					p->SetMoney(10 * game_room[game_room_id]->Money[i]);
 					//돈만 추가
 				}
@@ -2587,7 +2587,7 @@ void Network::worker()
 				for (const auto p : game_room[game_room_id]->player_ids) {
 					if (p == nullptr) continue;
 
-					send_game_end(p->id, 0, -1, game_room[game_room_id]->Money[i++], GAME_OVER);
+					send_game_end(p->id, 0, -1, 10 * game_room[game_room_id]->Money[i++], GAME_OVER);
 					p->SetMoney(10 * game_room[game_room_id]->Money[i]);
 					//돈만 추가
 				}
@@ -2604,7 +2604,7 @@ void Network::worker()
 					if (game_room[game_room_id]->Score[i] < 0) game_room[game_room_id]->Score[i] = 0;
 
 					int get_item_type = game_room[game_room_id]->get_item_result();
-					send_game_end(p->id, game_room[game_room_id]->Score[i], get_item_type, game_room[game_room_id]->Money[i], GAME_CLEAR);
+					send_game_end(p->id, game_room[game_room_id]->Score[i], get_item_type, 10*game_room[game_room_id]->Money[i], GAME_CLEAR);
 					p->SetScore(game_room[game_room_id]->map_type - 1, game_room[game_room_id]->Score[i]);
 					p->SetMoney(10 * game_room[game_room_id]->Money[i]);
 					input_db_event(p->id, DB_GET_SCROLL, get_item_type);
